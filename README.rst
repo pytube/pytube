@@ -23,19 +23,23 @@ Usage example
 
     >>> from youtube import YouTube
     >>> yt = YouTube()
-    >>> yt.url = "http://www.youtube.com/watch?v=oHg5SJYRHA0"
-    >>> #View all encoding/quality options.
+    >>> yt.url = "http://www.youtube.com/watch?v=oHg5SJYRHA0
+
+    >>> # View all encoding/quality options.
     >>> yt.videos
     [<Video: flv - 360p>, <Video: mp4 - 360p>, <Video: flv - 224p>]
-    >>> #Similar to the Django ORM, you can filter.
+
+    >>> # Similar to the Django ORM, you can filter.
     >>> yt.filter('flv')
     [<Video: flv - 360p>, <Video: flv - 224p>]
+
     >>> yt.filter(res='360p')
     [<Video: flv - 360p>, <Video: mp4 - 360p>]
-    >>> #And get too.
+
+    >>> # You can even use get()
     >>> rick_astley = yt.get('mp4')
-    >>> #Okay, let's download!
+
+    >>> # Okay, let's download!
     >>> rick_astley.download()
     Downloading: RickRollD.mp4 Bytes: 10407900
     2449408  [23.53%]
-    >>> #Enjoy.
