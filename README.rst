@@ -23,7 +23,7 @@ Usage example
 
     >>> from youtube import YouTube
     >>> yt = YouTube()
-    >>> yt.url = "http://www.youtube.com/watch?v=oHg5SJYRHA0
+    >>> yt.url = "http://www.youtube.com/watch?v=oHg5SJYRHA0"
 
     >>> # View all encoding/quality options.
     >>> yt.videos
