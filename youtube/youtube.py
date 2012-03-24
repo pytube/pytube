@@ -71,7 +71,7 @@ class Video(object):
         """
         response = urlopen(self.url)
         #TODO: Allow a destination path to be specified.
-        dst_file = open('/Users/nickficano/Downloads/PyCon/' + self.filename, 'wb')
+        dst_file = open(self.filename, 'wb')
         meta_data = response.info()
         file_size = int(meta_data.getheaders("Content-Length")[0])
         print "Downloading: %s Bytes: %s" % (self.filename, file_size)
@@ -126,7 +126,7 @@ class YouTube(object):
         generated based on the name of the video.
         """
         if not self._filename:
-            self._filename = mark_save(self.title)
+            self._filename = safe_filename(self.title)
         return self._filename
 
     @filename.setter
