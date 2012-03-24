@@ -71,7 +71,7 @@ class Video(object):
         """
         response = urlopen(self.url)
         #TODO: Allow a destination path to be specified.
-        dst_file = open(self.filename, 'wb')
+        dst_file = open('/Users/nickficano/Downloads/PyCon/' + self.filename, 'wb')
         meta_data = response.info()
         file_size = int(meta_data.getheaders("Content-Length")[0])
         print "Downloading: %s Bytes: %s" % (self.filename, file_size)
@@ -282,15 +282,15 @@ class YouTube(object):
             return url[0]
 
 
-def sanitize_filename(text):
+def sanitize_filename(text, max_length=200):
     """
     Sanitizes filenames for many operating systems.
 
     Keyword arguments:
     text -- The unsanitized pending filename.
     """
-    # quick truncate for handling long filenames.
-    truncate = lambda text: text[:155].rsplit(' ', 1)[0]
+    #Quick way of truncating long filenames.
+    truncate = lambda text: text[:max_length].rsplit(' ', 0)[0]
 
     #NTFS forbids characters in range 0-31 (0x00-0x1F)
     ntfs = [chr(i) for i in range(0, 31)]
