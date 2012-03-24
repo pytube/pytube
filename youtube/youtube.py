@@ -126,7 +126,7 @@ class YouTube(object):
         generated based on the name of the video.
         """
         if not self._filename:
-            self._filename = slugify(self.title)
+            self._filename = mark_save(self.title)
         return self._filename
 
     @filename.setter
@@ -282,35 +282,28 @@ class YouTube(object):
             return url[0]
 
 
-def sanitize_filename(text, max_length=200):
+def safe_filename(text, max_length=200):
     """
     Sanitizes filenames for many operating systems.
 
     Keyword arguments:
     text -- The unsanitized pending filename.
     """
-    #Quick way of truncating long filenames.
+    #Quickly truncates long filenames.
     truncate = lambda text: text[:max_length].rsplit(' ', 0)[0]
 
-    #NTFS forbids characters in range 0-31 (0x00-0x1F)
+    #Tidy up ugly formatted filenames.
+    text = text.replace('_', ' ')
+    text = text.replace(':', ' -')
+        
+    #NTFS forbids filenames containing characters in range 0-31 (0x00-0x1F)
     ntfs = [chr(i) for i in range(0, 31)]
-
-    # This *should* cover a wide range of legacy operating systems.
+    
+    #Removing these SHOULD make most filename safe for a wide range
+    #of operating systems.
     paranoid = ['\"', '\#', '\$', '\%', '\'', '\*', '\,', '\.', '\/', '\:',
         '\;', '\<', '\>', '\?', '\\', '\^', '\|', '\~', '\\\\']
 
     blacklist = re.compile('|'.join(ntfs + paranoid), re.UNICODE)
     filename = blacklist.sub('', text)
     return truncate(filename)
-
-
-def slugify(text):
-    """
-    Santizes the video text, generating a valid filename.
-
-    Keyword arguments:
-    text -- The text corpus to make file name save.
-    """
-    text = sanitize_filename(text)
-    text = text.replace('_', ' ')
-    return text
