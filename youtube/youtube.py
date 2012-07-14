@@ -1,3 +1,4 @@
+from os.path import normpath
 from urllib import urlencode
 from urllib2 import urlopen
 from urlparse import urlparse, parse_qs
@@ -10,15 +11,26 @@ YT_BASE_URL = 'http://www.youtube.com/get_video_info'
 YT_ENCODING = {
     5: (5, "flv", "224p"),
     6: (6, "flv", "270p"),
-    34: (34, "flv", "360p"),
-    35: (35, "flv", "480p"),
+    13: (13, "3gp", "N/A"),
+    17: (17, "3gp", "144p"),
     18: (18, "mp4", "360p"),
     22: (22, "mp4", "720p"),
+    34: (34, "flv", "360p"),
+    35: (35, "flv", "480p"),
+    36: (36, "3gp", "240p"),
     37: (37, "mp4", "1080p"),
+    38: (38, "mp4", "3072p"),
     43: (43, "webm", "360p"),
     44: (44, "webm", "480p"),
     45: (45, "webm", "720p"),
     46: (46, "webm", "1080p"),
+    82: (82, "mp4", "360p"),
+    83: (83, "mp4", "240p"),
+    84: (84, "mp4", "720p"),
+    85: (85, "mp4", "520p"),
+    100: (100, "webm", "360p"),
+    101: (101, "webm", "360p"),
+    102: (102, "webm", "720p")
 }
 
 
@@ -41,37 +53,45 @@ class Video(object):
         self.url = url
         self.filename = filename
 
-    def download(self):
+    def download(self, path=None):
         """
         Downloads the file of the URL defined within the class
         instance.
+
+        Keyword arguments:
+        path -- Destination directory
         """
+
+        path = (normpath(path) + '/' if path else '')
         response = urlopen(self.url)
-        #TODO: Allow a destination path to be specified.
-        dst_file = open(self.filename, 'wb')
-        meta_data = response.info()
-        file_size = int(meta_data.getheaders("Content-Length")[0])
-        print "Downloading: %s Bytes: %s" % (self.filename, file_size)
+        with open(path + self.filename, 'wb') as dst_file:
+            meta_data = response.info()
+            file_size = int(meta_data.getheaders("Content-Length")[0])
+            print "Downloading: %s Bytes: %s" % (self.filename, file_size)
 
-        bytes_received = 0
-        chunk_size = 8192
-        while True:
-            buffer = response.read(chunk_size)
-            if not buffer:
-                break
+            bytes_received = 0
+            chunk_size = 8192
+            while True:
+                buffer = response.read(chunk_size)
+                if not buffer:
+                    break
 
-            bytes_received += len(buffer)
-            dst_file.write(buffer)
-            percent = bytes_received * 100. / file_size
-            status = r"%10d  [%3.2f%%]" % (bytes_received, percent)
-            status = status + chr(8) * (len(status) + 1)
-            print status,
-        dst_file.close()
+                bytes_received += len(buffer)
+                dst_file.write(buffer)
+                percent = bytes_received * 100. / file_size
+                status = r"%10d  [%3.2f%%]" % (bytes_received, percent)
+                status = status + chr(8) * (len(status) + 1)
+                print status,
 
     def __repr__(self):
         """A cleaner representation of the class instance."""
         return "<Video: %s - %s>" % (self.extension, self.resolution)
 
+    def __cmp__(self, other):
+        if type(other) == Video:
+            v1 = "%s %s" % (self.extension, self.resolution)
+            v2 = "%s %s" % (other.extension, other.resolution)
+            return cmp(v1, v2)
 
 class YouTube(object):
     _filename = None
@@ -168,7 +188,7 @@ class YouTube(object):
         https://gist.github.com/2009119)
 
         Keyword arguments:
-        path -- A tulip representing a path to a node within a tree.
+        path -- A tuple representing a path to a node within a tree.
         data -- The data containing the tree.
         """
         elem = path[0]
@@ -223,12 +243,15 @@ class YouTube(object):
                     #Sometimes the regex for matching the video returns
                     #a single empty element, so we'll skip those here.
                     continue
-
-                fmt, extension, resolution = self._extract_fmt(video)
-                filename = "%s.%s" % (self.filename, extension)
-
-                self.videos.append(Video(extension, resolution, url, filename))
-                self._fmt_values.append(fmt)
+                try:
+                    fmt, ext, res = self._extract_fmt(video)
+                    filename = "%s.%s" % (self.filename, ext)
+                except TypeError:
+                    pass
+                else:
+                    self.videos.append(Video(ext, res, url, filename))
+                    self._fmt_values.append(fmt)
+            self.videos.sort()
 
     def _extract_fmt(self, text):
         """
