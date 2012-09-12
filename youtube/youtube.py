@@ -225,10 +225,19 @@ class YouTube(object):
             'video_id': self.video_id
         })
 
+        self.title = None
+        self.videos = []
+
         response = urlopen(YT_BASE_URL + '?' + querystring)
-        #TODO: evaulate the status code.
+
         if response:
             content = response.read()
+            data = parse_qs(content)
+            if data.get('status', [''])[0] == 'failure':
+                print('Error downloading video: %s' %
+                      data.get('reason', ['Unknown reason'])[0])
+                return
+
             #Use my cool traversing method to extract the specific
             #attribute from the response body.
             path = ('url_encoded_fmt_stream_map', 'itag')
