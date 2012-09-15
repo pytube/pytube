@@ -17,20 +17,24 @@ I wrote it so you could specify an encoding format.
 In recently weeks interest has picked up in the project, so I decided to
 dedicate more time to further its development and actively maintain it.
 
-## Principals 
+### Philosophy
 
-My only real goals for this is to never require any third party dependancies,
+My only real goal for this is to never require any third party dependancies,
 to keep it simple and make it reliable.
 
-## Planned Features
+### Roadmap
 
 The only features I see implementing in the near future are:
 
 - Allow it to run as a command-line utility. 
 - Making it compatible with Python 3.
 
+### Known bugs
+- "Multiple videos returned" gets raised to frequently due to the lack 
+  of codec/quality information I've mapped to the fmt code in the TT_ENCODING
+  dict. For more info see: [Wikipedia - YouTube Quality and codecs](http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs) 
 
-## Usage
+## Usage Example
 
 ``` python
 from youtube import YouTube
