@@ -22,7 +22,7 @@ setup(
     packages=['pytube'],
     long_description=read('README.md'),
     classifiers=[
-        "Development Status :: - Beta",
+        "Development Status :: 4 - Beta",
         "Environment :: Console"
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
