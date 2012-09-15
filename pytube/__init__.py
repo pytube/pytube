@@ -9,36 +9,54 @@ YT_BASE_URL = 'http://www.youtube.com/get_video_info'
 
 # YouTube media encoding options.
 YT_ENCODING = {
-    5: (5, "flv", "224p"),
-    6: (6, "flv", "270p"),
-    13: (13, "3gp", "N/A"),
-    17: (17, "3gp", "144p"),
-    18: (18, "mp4", "360p"),
-    22: (22, "mp4", "720p"),
-    34: (34, "flv", "360p"),
-    35: (35, "flv", "480p"),
-    36: (36, "3gp", "240p"),
-    37: (37, "mp4", "1080p"),
-    38: (38, "mp4", "3072p"),
-    43: (43, "webm", "360p"),
-    44: (44, "webm", "480p"),
-    45: (45, "webm", "720p"),
-    46: (46, "webm", "1080p"),
-    82: (82, "mp4", "360p"),
-    83: (83, "mp4", "240p"),
-    84: (84, "mp4", "720p"),
-    85: (85, "mp4", "520p"),
-    100: (100, "webm", "360p"),
-    101: (101, "webm", "360p"),
-    102: (102, "webm", "720p")
+    #Flash Video
+    5: ["flv", "240p", "Sorenson H.263", "N/A", "0.25", "MP3", "64"],
+    6: ["flv", "270p", "Sorenson H.263", "N/A", "0.8", "MP3", "64"],
+    34: ["flv", "360p", "H.264", "Main", "0.5", "AAC", "128"],
+    35: ["flv", "480p", "H.264", "Main", "0.8-1", "AAC", "128"],
+
+    #3GP
+    36: ["3gp", "240p", "MPEG-4 Visual", "Simple", "0.17", "AAC", "38"],
+    13: ["3gp", "N/A", "MPEG-4 Visual", "N/A", "0.5", "AAC", "N/A"],
+    17: ["3gp", "144p", "MPEG-4 Visual", "Simple", "0.05", "AAC", "24"],
+
+    #MPEG-4
+    18: ["mp4", "360p", "H.264", "Baseline", "0.5", "AAC", "96"],
+    22: ["mp4", "720p", "H.264", "High", "2-2.9", "AAC", "192"],
+    37: ["mp4", "1080p", "H.264", "High", "3-4.3", "AAC", "192"],
+    38: ["mp4", "3072p", "H.264", "High", "3.5-5", "AAC", "192"],
+    82: ["mp4", "360p", "H.264", "3D", "0.5", "AAC", "96"],
+    83: ["mp4", "240p", "H.264", "3D", "0.5", "AAC", "96"],
+    84: ["mp4", "720p", "H.264", "3D", "2-2.9", "AAC", "152"],
+    85: ["mp4", "520p", "H.264", "3D", "2-2.9", "AAC", "152"],
+
+    #WebM
+    43: ["webm", "360p", "VP8", "N/A", "0.5", "Vorbis", "128"],
+    44: ["webm", "480p", "VP8", "N/A", "1", "Vorbis", "128"],
+    45: ["webm", "720p", "VP8", "N/A", "2", "Vorbis", "192"],
+    46: ["webm", "1080p", "VP8", "N/A", "N/A", "Vorbis", "192"],
+    100: ["webm", "360p", "VP8", "3D", "N/A", "Vorbis", "128"],
+    101: ["webm", "360p", "VP8", "3D", "N/A", "Vorbis", "192"],
+    102: ["webm", "720p", "VP8", "3D", "N/A", "Vorbis", "192"]
 }
 
+YT_ENCODING_KEYS = (
+    'extension', 'resolution', 'video_codec', 'profile', 'video_bitrate',
+    'audio_codec', 'audio_bitrate'
+)
+
+
+class MultipleObjectsReturned(Exception):
+    pass
+
+class YouTubeError(Exception):
+    pass
 
 class Video(object):
     """
     Class representation of a single instance of a YouTube video.
     """
-    def __init__(self, extension, resolution, url, filename):
+    def __init__(self, url, filename, **attributes):
         """
         Define the variables required to declare a new video.
 
@@ -48,10 +66,10 @@ class Video(object):
         url -- The url of the video. (e.g.: youtube.com/watch?v=..)
         filename -- The filename (minus the extention) to save the video.
         """
-        self.extension = extension
-        self.resolution = resolution
+
         self.url = url
         self.filename = filename
+        self.__dict__.update(**attributes)
 
     def download(self, path=None):
         """
@@ -85,13 +103,15 @@ class Video(object):
 
     def __repr__(self):
         """A cleaner representation of the class instance."""
-        return "<Video: %s - %s>" % (self.extension, self.resolution)
+        return "<Video: %s (.%s) - %s>" % (self.video_codec, self.extension,
+            self.resolution)
 
     def __cmp__(self, other):
         if type(other) == Video:
             v1 = "%s %s" % (self.extension, self.resolution)
             v2 = "%s %s" % (other.extension, other.resolution)
             return cmp(v1, v2)
+
 
 class YouTube(object):
     _filename = None
@@ -157,10 +177,13 @@ class YouTube(object):
                 continue
             else:
                 result.append(v)
-        if len(result) is 1:
+        if not len(result):
+            return
+        elif len(result) is 1:
             return result[0]
         else:
-            raise Exception("Multiple videos returned")
+            raise MultipleObjectsReturned("get() returned more than one " \
+                "object -- it returned %d!" % len(result))
 
     def filter(self, extension=None, res=None):
         """
@@ -219,10 +242,10 @@ class YouTube(object):
         resolutions and formats into a list.
         """
         querystring = urlencode({
-            'asv': 3,
-            'el': 'detailpage',
-            'hl': 'en_US',
-            'video_id': self.video_id
+                'asv': 3,
+                'el': 'detailpage',
+                'hl': 'en_US',
+                'video_id': self.video_id
         })
 
         self.title = None
@@ -233,10 +256,11 @@ class YouTube(object):
         if response:
             content = response.read()
             data = parse_qs(content)
-            if data.get('status', [''])[0] == 'failure':
-                print('Error downloading video: %s' %
-                      data.get('reason', ['Unknown reason'])[0])
-                return
+            if 'errorcode' in data:
+                error = data.get('reason', 'An unknown error has occurred')
+                if isinstance(error, list):
+                    error = error.pop()
+                raise YouTubeError(error)
 
             #Use my cool traversing method to extract the specific
             #attribute from the response body.
@@ -253,12 +277,13 @@ class YouTube(object):
                     #a single empty element, so we'll skip those here.
                     continue
                 try:
-                    fmt, ext, res = self._extract_fmt(video)
-                    filename = "%s.%s" % (self.filename, ext)
-                except TypeError:
+                    fmt, data = self._extract_fmt(video)
+                    filename = "%s.%s" % (self.filename, data['extension'])
+                except TypeError, KeyError:
                     pass
                 else:
-                    self.videos.append(Video(ext, res, url, filename))
+                    v = Video(url, filename, **data)
+                    self.videos.append(v)
                     self._fmt_values.append(fmt)
             self.videos.sort()
 
@@ -274,7 +299,12 @@ class YouTube(object):
         itag = re.findall('itag=(\d+)', text)
         if itag and len(itag) is 1:
             itag = int(itag[0])
-            return YT_ENCODING.get(itag, None)
+            attr = YT_ENCODING.get(itag, None)
+            if not attr:
+                return itag, None
+            data = {}
+            map(lambda k, v: data.update({k: v}), YT_ENCODING_KEYS, attr)
+            return itag, data
 
     def _extract_url(self, text):
         """

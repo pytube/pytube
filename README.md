@@ -29,18 +29,13 @@ The only features I see implementing in the near future are:
 - Allow it to run as a command-line utility. 
 - Making it compatible with Python 3.
 
-### Known bugs
-- "Multiple videos returned" gets raised to frequently due to the lack 
-  of codec/quality information I've mapped to the fmt code in the TT_ENCODING
-  dict. For more info see: [Wikipedia - YouTube Quality and codecs](http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs) 
-
 ## Usage Example
 
 ``` python
 from youtube import YouTube
 
 # not necessary, just for demo purposes
-from pprint import pprint as pp
+from pprint import pprint
 
 yt = YouTube()
 
@@ -50,26 +45,17 @@ yt.url = "http://www.youtube.com/watch?v=Ik-RsDGPI5Y"
 # Once set, you can see all the codec and quality options YouTube has made
 # available for the perticular video by printing videos.
 
-pp(yt.videos)
+pprint(yt.videos)
 
-#[<Video: 3gp - 144p>,
-# <Video: 3gp - 144p>,
-# <Video: 3gp - 240p>,
-# <Video: 3gp - 240p>,
-# <Video: flv - 224p>,
-# <Video: flv - 224p>,
-# <Video: flv - 360p>,
-# <Video: flv - 360p>,
-# <Video: flv - 480p>,
-# <Video: flv - 480p>,
-# <Video: mp4 - 360p>,
-# <Video: mp4 - 360p>,
-# <Video: mp4 - 720p>,
-# <Video: mp4 - 720p>,
-# <Video: webm - 360p>,
-# <Video: webm - 360p>,
-# <Video: webm - 480p>,
-# <Video: webm - 480p>]
+#[<Video: MPEG-4 Visual (.3gp) - 144p>,
+# <Video: MPEG-4 Visual (.3gp) - 240p>,
+# <Video: Sorenson H.263 (.flv) - 240p>,
+# <Video: H.264 (.flv) - 360p>,
+# <Video: H.264 (.flv) - 480p>,
+# <Video: H.264 (.mp4) - 360p>,
+# <Video: H.264 (.mp4) - 720p>,
+# <Video: VP8 (.webm) - 360p>,
+# <Video: VP8 (.webm) - 480p>]
 
 # The filename is automatically generated based on the video title.
 # You can override this by manually setting the filename.
@@ -84,27 +70,46 @@ yt.filename = 'Dancing Scene from Pulp Fiction'
 
 # You can also filter the criteria by filetype.
 
-pp(yt.filter('flv'))
+pprint(yt.filter('flv'))
 
-# [<Video: flv - 224p>,
-# <Video: flv - 224p>,
-# <Video: flv - 360p>,
-# <Video: flv - 360p>,
-# <Video: flv - 480p>,
-# <Video: flv - 480p>]
+#[<Video: Sorenson H.263 (.flv) - 240p>,
+# <Video: H.264 (.flv) - 360p>,
+# <Video: H.264 (.flv) - 480p>]
 
 # and by resolution
-pp(yt.filter(res='480p'))
+pprint(yt.filter(res='480p'))
 
-# [<Video: flv - 480p>,
-# <Video: flv - 480p>,
-# <Video: webm - 480p>,
-# <Video: webm - 480p>]
+#[<Video: H.264 (.flv) - 480p>, 
+#<Video: VP8 (.webm) - 480p>]
 
 # to select a video by a specific resolution and filetype you can use the get
 # method.
 
 video = yt.get('mp4', '720p')
+
+# NOTE: get() can only be used if and only if one object matches your criteria.
+# for example:
+
+pprint(yt.videos)
+
+#[<Video: MPEG-4 Visual (.3gp) - 144p>,
+# <Video: MPEG-4 Visual (.3gp) - 240p>,
+# <Video: Sorenson H.263 (.flv) - 240p>,
+# <Video: H.264 (.flv) - 360p>,
+# <Video: H.264 (.flv) - 480p>,
+# <Video: H.264 (.mp4) - 360p>,
+# <Video: H.264 (.mp4) - 720p>,
+# <Video: VP8 (.webm) - 360p>,
+# <Video: VP8 (.webm) - 480p>]
+
+# Notice we have two H.264 (.mp4) available to us.. now if we try to call get()
+# on mp4..
+
+video = yt.get('mp4')
+# MultipleObjectsReturned: get() returned more than one object -- it returned 2!
+
+# In this case, we'll need to specify both the codec (mp4) and resolution
+# (either 360p or 720p).
 
 # Okay, let's download it!
 video.download()
