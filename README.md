@@ -6,7 +6,21 @@ Downloading videos from YouTube shouldn't require some bloatware application,
 it's usually a niche condition you want to do so in the first place. So I 
 Prsent to you, PyTube!
 
-## Background
+## Installation from Git
+First you will need to clone the git repo:
+
+```
+$ git clone https://github.com/NFicano/python-youtube-download.git
+```
+
+Now we can install from the repo:
+
+```
+$ cd python-youtube-download
+$ python setup.py install # may need to be root
+```
+
+### Background
 
 After missing the deadline to register for PyCon 2012, I decided to write what
 became PyTube and crawler to collect all the YouTube links for the talks
@@ -33,7 +47,7 @@ The only features I see implementing in the near future are:
 ## Usage Example
 
 ``` python
-from youtube import YouTube
+from pytube import YouTube
 
 # not necessary, just for demo purposes
 from pprint import pprint
