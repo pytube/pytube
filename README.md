@@ -1,9 +1,10 @@
 ![pytube](https://s3.amazonaws.com/assets.nickficano.com/pytube_logo.png)
 
-# A lightwight, dependency-free YouTube Video download library, written in Python.
+# A lightwight, dependency-free Python library for downloading YouTube Videos.
 
 Downloading videos from YouTube shouldn't require some bloatware application,
-its usually a niche condition you need to do so in the first place.
+it's usually a niche condition you want to do so in the first place. So I 
+Prsent to you, PyTube!
 
 ## Background
 
