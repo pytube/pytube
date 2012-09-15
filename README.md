@@ -9,7 +9,7 @@ Prsent to you, PyTube!
 
 
 ## Installation
-To install requests, simply:
+To install pytube, simply:
 ```
 $ pip install pytube
 ```
