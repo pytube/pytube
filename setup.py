@@ -23,7 +23,7 @@ setup(
     long_description=read('README.md'),
     classifiers=[
         "Development Status :: 4 - Beta",
-        "Environment :: Console"
+        "Environment :: Console",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 2.6",
