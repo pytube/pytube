@@ -6,18 +6,12 @@ Downloading videos from YouTube shouldn't require some bloatware application,
 it's usually a niche condition you want to do so in the first place. So I 
 Prsent to you, PyTube!
 
-## Installation from Git
-First you will need to clone the git repo:
 
-```
-$ git clone https://github.com/NFicano/python-youtube-download.git
-```
 
-Now we can install from the repo:
-
+## Installation
+To install requests, simply:
 ```
-$ cd python-youtube-download
-$ python setup.py install # may need to be root
+$ pip install pytube
 ```
 
 ### Background
