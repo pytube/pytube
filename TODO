@@ -1,19 +1,12 @@
 TODO
 ====
 
-Short Term
-----------
-* Reimplement as Abstract Base Class.
-* Allow an output directory to be specified.
-* Unbind the filename from the Video class, to allow graceful file renaming.
-* Throw custom exceptions.
+* Refactor filename out of ``Video`` class, allowing for graceful file
+  renaming. At present, the filename must be set before defining the url.
+* Better handling and/or conditionally raising exceptions.
+* Add setup.py.
 * Detect duplicate video encoding options, preventing the creation of identical
     video class instances. (can cause get() method to raise unnecessary
     multiple returned excepion).
-
-Long Term
-----------
-* OS Compatibility testing of automatic filename generation.
-* Improve automatic filename generation.
 * Add functionality for batch URL processing.
 * Scrape and inject additional video information into metadata.
