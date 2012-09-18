@@ -9,10 +9,16 @@ Prsent to you, PyTube!
 
 
 ## Installation
-To install pytube, simply:
+Install PyTube with one of the following commands:
+```
+$ easy_install install pytube
+```
+or alternatively if you have pip installed:
 ```
 $ pip install pytube
 ```
+
+or you can get the [source code from github](https://github.com/NFicano/python-youtube-download)
 
 ### Background
 
