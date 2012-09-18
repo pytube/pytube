@@ -9,33 +9,19 @@ Prsent to you, PyTube!
 
 
 ## Installation
-Install PyTube with one of the following commands:
+If you are on Mac OS X or Linux, chances are that one of the following two commands will work for you:
+
 ```
-$ easy_install install pytube
+$ easy_install pytube
 ```
-or alternatively if you have pip installed:
+
+or even better:
+
 ```
 $ pip install pytube
 ```
 
-or you can get the [source code from github](https://github.com/NFicano/python-youtube-download)
-
-### Background
-
-After missing the deadline to register for PyCon 2012, I decided to write what
-became PyTube and crawler to collect all the YouTube links for the talks
-on [PyVideos.org](http://pyvideo.org/).
-
-To avoid having to encode them to mp4 (so I could watch them on my iPhone)
-I wrote it so you could specify an encoding format.
-
-In recently weeks interest has picked up in the project, so I decided to
-dedicate more time to further its development and actively maintain it.
-
-### Philosophy
-
-My only real goal for this is to never require any third party dependancies,
-to keep it simple and make it reliable.
+or you can get the [source code from github](https://github.com/NFicano/python-youtube-download).
 
 ### Roadmap
 
@@ -136,3 +122,20 @@ video.download()
 # argument to the download method.
 video.download('/tmp/')
 ```
+
+## Background
+
+After missing the deadline to register for PyCon 2012, I decided to write what
+became PyTube and crawler to collect all the YouTube links for the talks
+on [PyVideos.org](http://pyvideo.org/).
+
+To avoid having to encode them to mp4 (so I could watch them on my iPhone)
+I wrote it so you could specify an encoding format.
+
+In recently weeks interest has picked up in the project, so I decided to
+dedicate more time to further its development and actively maintain it.
+
+## Philosophy
+
+My only real goal for this is to never require any third party dependancies,
+to keep it simple and make it reliable.
