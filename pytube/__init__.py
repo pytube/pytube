@@ -7,7 +7,8 @@ import re
 
 YT_BASE_URL = 'http://www.youtube.com/get_video_info'
 
-# YouTube media encoding options.
+#YouTube quality and codecs id map.
+#source: http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
 YT_ENCODING = {
     #Flash Video
     5: ["flv", "240p", "Sorenson H.263", "N/A", "0.25", "MP3", "64"],
@@ -40,6 +41,7 @@ YT_ENCODING = {
     102: ["webm", "720p", "VP8", "3D", "N/A", "Vorbis", "192"]
 }
 
+# The keys corresponding to the quality/codec map above.
 YT_ENCODING_KEYS = (
     'extension', 'resolution', 'video_codec', 'profile', 'video_bitrate',
     'audio_codec', 'audio_bitrate'
@@ -47,10 +49,18 @@ YT_ENCODING_KEYS = (
 
 
 class MultipleObjectsReturned(Exception):
+    """
+    The query returned multiple objects when only one was expected.
+    """
     pass
 
+
 class YouTubeError(Exception):
+    """
+    The REST interface returned an error.
+    """
     pass
+
 
 class Video(object):
     """
@@ -104,7 +114,7 @@ class Video(object):
     def __repr__(self):
         """A cleaner representation of the class instance."""
         return "<Video: %s (.%s) - %s>" % (self.video_codec, self.extension,
-            self.resolution)
+                                           self.resolution)
 
     def __cmp__(self, other):
         if type(other) == Video:
@@ -182,8 +192,9 @@ class YouTube(object):
         elif len(result) is 1:
             return result[0]
         else:
-            raise MultipleObjectsReturned("get() returned more than one " \
-                "object -- it returned %d!" % len(result))
+            d = len(result)
+            raise MultipleObjectsReturned("get() returned more than one "
+                                          "object -- it returned %d!" % d)
 
     def filter(self, extension=None, res=None):
         """
@@ -215,7 +226,7 @@ class YouTube(object):
         data -- The data containing the tree.
         """
         elem = path[0]
-        #Get first element in tulip, and check if it contains a list.
+        #Get first element in tuple, and check if it contains a list.
         if type(data) is list:
             # Pop it, and let's continue..
             return self._fetch(path, data.pop())
@@ -223,7 +234,7 @@ class YouTube(object):
         data = parse_qs(data)
         #Get the element in our path
         data = data.get(elem, None)
-        #Offset the tulip by 1.
+        #Offset the tuple by 1.
         path = path[1::1]
         #Check if the path has reached the end OR the element return
         #nothing.
@@ -241,12 +252,8 @@ class YouTube(object):
         necessary details, and populating the different video
         resolutions and formats into a list.
         """
-        querystring = urlencode({
-                'asv': 3,
-                'el': 'detailpage',
-                'hl': 'en_US',
-                'video_id': self.video_id
-        })
+        querystring = urlencode({'asv': 3, 'el': 'detailpage', 'hl': 'en_US',
+                                 'video_id': self.video_id})
 
         self.title = None
         self.videos = []
@@ -279,7 +286,7 @@ class YouTube(object):
                 try:
                     fmt, data = self._extract_fmt(video)
                     filename = "%s.%s" % (self.filename, data['extension'])
-                except TypeError, KeyError:
+                except (TypeError, KeyError):
                     pass
                 else:
                     v = Video(url, filename, **data)
@@ -341,7 +348,7 @@ def safe_filename(text, max_length=200):
     #Removing these SHOULD make most filename safe for a wide range
     #of operating systems.
     paranoid = ['\"', '\#', '\$', '\%', '\'', '\*', '\,', '\.', '\/', '\:',
-        '\;', '\<', '\>', '\?', '\\', '\^', '\|', '\~', '\\\\']
+                '\;', '\<', '\>', '\?', '\\', '\^', '\|', '\~', '\\\\']
 
     blacklist = re.compile('|'.join(ntfs + paranoid), re.UNICODE)
     filename = blacklist.sub('', text)

@@ -11,10 +11,10 @@ def read(fname):
 
 setup(
     name = "pytube",
-    version = "0.0.4",
+    version = "0.0.5",
     author = "Nick Ficano",
     author_email = "nficano@gmail.com",
-    description = "A lightwight, dependency-free YouTube Video downloading library",
+    description = "A simple, yet versatile package for downloading YouTube videos.",
     license='The MIT License: http://www.opensource.org/licenses/mit-license.php',
     keywords = "youtube downloader",
     url = "https://github.com/NFicano/python-youtube-download",
@@ -25,6 +25,8 @@ setup(
         "Development Status :: 4 - Beta",
         "Environment :: Console",
         "Intended Audience :: Developers",
+        "Programming Language :: Python",
+        "Natural Language :: English",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
