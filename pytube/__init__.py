@@ -271,24 +271,24 @@ class YouTube(object):
 
             #Use my cool traversing method to extract the specific
             #attribute from the response body.
-            path = ('url_encoded_fmt_stream_map', 'itag')
-            #Using the ``itag`` (otherwised referred to as ``fmf``, set the
-            #available encoding options.
-            encoding_options = self._fetch(path, content)
+            path = ('url_encoded_fmt_stream_map', 'url')
+            video_urls = self._fetch(path, content)
+            #Get the video signatures, YouTube require them as an url component
+            path = ('url_encoded_fmt_stream_map', 'sig')
+            video_signatures = self._fetch(path, content)
             self.title = self._fetch(('title',), content)
 
-            for video in encoding_options:
-                url = self._extract_url(video)
-                if not url:
-                    #Sometimes the regex for matching the video returns
-                    #a single empty element, so we'll skip those here.
-                    continue
+            for idx in range(len(video_urls)):
+                url = video_urls[idx]
+                signature = video_signatures[idx]
                 try:
-                    fmt, data = self._extract_fmt(video)
+                    fmt, data = self._extract_fmt(url)
                     filename = "%s.%s" % (self.filename, data['extension'])
                 except (TypeError, KeyError):
                     pass
                 else:
+                    #Add video signature to url
+                    url = "%s&signature=%s" % (url, signature)
                     v = Video(url, filename, **data)
                     self.videos.append(v)
                     self._fmt_values.append(fmt)
@@ -312,20 +312,6 @@ class YouTube(object):
             data = {}
             map(lambda k, v: data.update({k: v}), YT_ENCODING_KEYS, attr)
             return itag, data
-
-    def _extract_url(self, text):
-        """
-        (I hate to be redundant here, but whatever) YouTube does not
-        pass you a completely valid URLencoded form, I suspect this is
-        suppose to act as a deterrent.. Nothing some regulular
-        expressions couldn't handle.
-
-        Keyword arguments:
-        text -- The malformed data contained in the itag node.
-        """
-        url = re.findall('url=(.*)', text)
-        if url and len(url) is 1:
-            return url[0]
 
 
 def safe_filename(text, max_length=200):
