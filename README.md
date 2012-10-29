@@ -112,6 +112,13 @@ video = yt.get('mp4')
 # In this case, we'll need to specify both the codec (mp4) and resolution
 # (either 360p or 720p).
 
+# We can also get the highest resolution available using the 
+# get_highest_quality() method. An optional preferred filetype extension can be 
+# specified as a string, otherwise we default to 'mp4', if available. The function
+# will favour the highest quality over the preferred filetype, though.
+
+video = yt.get_highest_res(preferred='mp4')
+
 # Okay, let's download it!
 video.download()
 
