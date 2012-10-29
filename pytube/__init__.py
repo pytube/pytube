@@ -196,6 +196,26 @@ class YouTube(object):
             raise MultipleObjectsReturned("get() returned more than one "
                                           "object -- it returned %d!" % d)
 
+    def get_highest_res(self, preferred='mp4'):
+        """
+        Return the highest quality resolution available that matches the 
+        preferred filetype, if available. Will favour the highest quality 
+        over the preferred filetype. If not available, the highest 
+        quality that matches any filetype is returned.
+
+        Keyword arguments:
+        preferred -- the preferred extension (e.g.: mp4) 
+        """
+        highest, result = 0, None
+        for v in self.videos:
+            current = int(v.resolution[:-1])
+            if ((current > highest) or 
+                (current == highest and v.extension == preferred)):
+                highest = current
+                result = v
+
+        return result
+
     def filter(self, extension=None, res=None):
         """
         Return a filtered list of videos given an extention and
