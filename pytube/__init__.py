@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from os.path import normpath
 from urllib import urlencode
 from urllib2 import urlopen
@@ -93,8 +95,9 @@ class Video(object):
         path = (normpath(path) + '/' if path else '')
         response = urlopen(self.url)
         with open(path + self.filename, 'wb') as dst_file:
-            meta_data = response.info()
-            file_size = int(meta_data.getheaders("Content-Length")[0])
+            meta_data = dict(response.info().items())
+            file_size = int(meta_data.get("Content-Length") or
+                            meta_data.get("content-length"))
             print "Downloading: %s Bytes: %s" % (self.filename, file_size)
 
             bytes_received = 0
@@ -116,11 +119,11 @@ class Video(object):
         return "<Video: %s (.%s) - %s>" % (self.video_codec, self.extension,
                                            self.resolution)
 
-    def __cmp__(self, other):
+    def __lt__(self, other):
         if type(other) == Video:
             v1 = "%s %s" % (self.extension, self.resolution)
             v2 = "%s %s" % (other.extension, other.resolution)
-            return cmp(v1, v2)
+            return (v1 > v2) - (v1 < v2) < 0
 
 
 class YouTube(object):
@@ -261,7 +264,7 @@ class YouTube(object):
         response = urlopen(YT_BASE_URL + '?' + querystring)
 
         if response:
-            content = response.read()
+            content = response.read().decode()
             data = parse_qs(content)
             if 'errorcode' in data:
                 error = data.get('reason', 'An unknown error has occurred')
