@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from os.path import normpath
 from urllib2 import urlopen
 
@@ -46,6 +47,10 @@ class Video(object):
                 
                 self._bytes_received += len(self._buffer)
                 dst_file.write(self._buffer)
+                percent = self._bytes_received * 100. / file_size
+                status = r"%10d  [%3.2f%%]" % (self._bytes_received, percent)
+                status = status + chr(8) * (len(status) + 1)
+                print status,
 
     def __repr__(self):
         """A cleaner representation of the class instance."""

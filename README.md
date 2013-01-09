@@ -27,8 +27,9 @@ or you can get the [source code from github](https://github.com/NFicano/python-y
 
 The only features I see implementing in the near future are:
 
-- Allow it to run as a command-line utility. 
-- Making it compatible with Python 3.
+- refactor console printing into separate command-line utility. 
+- Add nosetests
+- Add Sphinx documentation
 
 ## Usage Example
 
