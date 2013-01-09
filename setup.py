@@ -20,6 +20,7 @@ setup(
     url = "https://github.com/NFicano/python-youtube-download",
     download_url="https://github.com/NFicano/python-youtube-download/tarball/master",
     packages=['pytube'],
+    use_2to3= True,
     long_description=read('README.md'),
     classifiers=[
         "Development Status :: 4 - Beta",
