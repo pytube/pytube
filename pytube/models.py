@@ -39,7 +39,6 @@ class Video(object):
             file_size = int(meta_data.get("Content-Length") or
                             meta_data.get("content-length"))
             self._bytes_received = 0
-            self._buffer = buffer
             while True:
                 self._buffer = response.read(chunk_size)
                 if not self._buffer:
