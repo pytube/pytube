@@ -33,8 +33,9 @@ class Video(object):
         """
 
         path = (normpath(path) + '/' if path else '')
+        fullpath = '%s%s.%s' % (path, self.filename, self.extension)
         response = urlopen(self.url)
-        with open(path + self.filename, 'wb') as dst_file:
+        with open(path + self.filename + '.' + self.extension, 'wb') as dst_file:
             meta_data = dict(response.info().items())
             file_size = int(meta_data.get("Content-Length") or
                             meta_data.get("content-length"))

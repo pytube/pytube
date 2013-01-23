@@ -88,6 +88,9 @@ class YouTube(object):
     def filename(self, filename):
         """ Defines the filename."""
         self._filename = filename
+        if self.videos:
+            for video in self.videos:
+                video.filename = filename
 
     @property
     def video_id(self):
@@ -237,13 +240,12 @@ class YouTube(object):
                 signature = video_signatures[idx]
                 try:
                     fmt, data = self._extract_fmt(url)
-                    filename = "%s.%s" % (self.filename, data['extension'])
                 except (TypeError, KeyError):
                     pass
                 else:
                     #Add video signature to url
                     url = "%s&signature=%s" % (url, signature)
-                    v = Video(url, filename, **data)
+                    v = Video(url, self.filename, **data)
                     self.videos.append(v)
                     self._fmt_values.append(fmt)
             self.videos.sort()
