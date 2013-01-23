@@ -5,7 +5,7 @@ from .models import Video
 from .utils import safe_filename
 from urllib import urlencode
 from urllib2 import urlopen
-from urlparse import urlparse, parse_qs
+from urlparse import urlparse, parse_qs, unquote
 
 import re
 
@@ -88,6 +88,9 @@ class YouTube(object):
     def filename(self, filename):
         """ Defines the filename."""
         self._filename = filename
+        if self.videos:
+            for video in self.videos:
+                video.filename = filename
 
     @property
     def video_id(self):
@@ -174,6 +177,35 @@ class YouTube(object):
             # Nope, let's keep diggin'
             return self._fetch(path, data)
 
+    def _parse_stream_map(self, data):
+        """
+        Python's `parse_qs` can't properly decode the stream map 
+        containing video data so we use this instead.
+
+        Keyword arguments:
+        data -- The parsed response from YouTube.
+        """
+        videoinfo = {
+            "itag": [], 
+            "url": [], 
+            "quality": [], 
+            "fallback_host": [], 
+            "sig": [], 
+            "type": []
+        }
+        text = data["url_encoded_fmt_stream_map"][0]
+        # Split individual videos
+        videos = text.split(",") 
+        # Unquote the characters and split to parameters
+        videos = [video.split("&") for video in videos]
+
+        for video in videos:
+            for kv in video:
+                key, value = kv.split("=")
+                videoinfo.get(key, []).append(unquote(value))
+
+        return videoinfo
+
     def _get_video_info(self):
         """
         This is responsable for executing the request, extracting the
@@ -197,13 +229,10 @@ class YouTube(object):
                     error = error.pop()
                 raise YouTubeError(error)
 
-            #Use my cool traversing method to extract the specific
-            #attribute from the response body.
-            path = ('url_encoded_fmt_stream_map', 'url')
-            video_urls = self._fetch(path, content)
+            stream_map = self._parse_stream_map(data)
+            video_urls = stream_map["url"]
             #Get the video signatures, YouTube require them as an url component
-            path = ('url_encoded_fmt_stream_map', 'sig')
-            video_signatures = self._fetch(path, content)
+            video_signatures = stream_map["sig"]
             self.title = self._fetch(('title',), content)
 
             for idx in range(len(video_urls)):
@@ -211,13 +240,12 @@ class YouTube(object):
                 signature = video_signatures[idx]
                 try:
                     fmt, data = self._extract_fmt(url)
-                    filename = "%s.%s" % (self.filename, data['extension'])
                 except (TypeError, KeyError):
                     pass
                 else:
                     #Add video signature to url
                     url = "%s&signature=%s" % (url, signature)
-                    v = Video(url, filename, **data)
+                    v = Video(url, self.filename, **data)
                     self.videos.append(v)
                     self._fmt_values.append(fmt)
             self.videos.sort()
