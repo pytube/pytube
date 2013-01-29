@@ -78,7 +78,13 @@ pprint(yt.filter('flv'))
 # <Video: H.264 (.flv) - 360p>,
 # <Video: H.264 (.flv) - 480p>]
 
-# and by resolution
+# notice that the list is ordered by lowest resolution to highest. If you 
+# wanted the highest resolution available for a specific file type, you
+# can simply do: 
+print yt.filter('mp4')[-1]
+#<Video: H.264 (.mp4) - 720p>
+
+# you can also get all videos for a given resolution
 pprint(yt.filter(res='480p'))
 
 #[<Video: H.264 (.flv) - 480p>, 
