@@ -1,7 +1,9 @@
+import sys
 import argparse
 
 from .api import YouTube
 from .utils import print_status
+from .exceptions import YouTubeError
 
 
 def _main():
@@ -21,7 +23,11 @@ def _main():
     args = parser.parse_args()
 
     yt =  YouTube()
-    yt.url = args.url
+    try:
+        yt.url = args.url
+    except YouTubeError:
+        print "Incorrect video URL."
+        sys.exit(1)
 
     if args.filename:
         yt.filename = args.filename
@@ -29,18 +35,35 @@ def _main():
     if args.ext and args.res:
         # There's only ope video that matches both so get it
         vid = yt.get(args.ext, args.res)
+        # Check if there's a video returned
+        if not vid:
+            print "There's no video with the specified format/resolution combination."
+            sys.exit(1)
+
     elif args.ext:
         # There are several videos with the same extension
         videos = yt.filter(extension=args.ext)
+        # Check if we have a video
+        if not videos:
+            print "There are no videos in the specified format."
+            sys.exit(1)
         # Select the highest resolution one
         vid = max(videos)
     elif args.res:
-        # There are several videos with the same extension
-        videos = yt.filter(resolution=args.res)
+        # There might be several videos in the same resolution
+        videos = yt.filter(res=args.res)
+        # Check if we have a video
+        if not videos:
+            print "There are no videos in the specified in the specified resolution."
+            sys.exit(1)
         # Select the highest resolution one
         vid = max(videos)
     else:
         # If nothing is specified get the highest resolution one
         vid = max(yt.videos)
 
-    vid.download(path=args.path, on_progress=print_status)
+    try:
+        vid.download(path=args.path, on_progress=print_status)
+    except KeyboardInterrupt:
+        print "Download interrupted."
+        sys.exit(1)
