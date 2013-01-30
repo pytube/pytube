@@ -30,7 +30,13 @@ class Video(object):
         Keyword arguments:
         path -- Destination directory
         chunk_size -- File size (in bytes) to write to buffer at a time
-        (default: 8 bytes).
+                      (default: 8 bytes).
+        on_progress -- A function to be called every time the buffer was
+                       written out. Arguments passed are the current and
+                       the full size.
+        on_finish -- To be called when the download is finished. The full
+                     path to the file is passed as an argument.
+
         """
 
         path = (normpath(path) + '/' if path else '')

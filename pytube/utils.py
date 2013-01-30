@@ -28,7 +28,7 @@ def safe_filename(text, max_length=200):
 
 
 def print_status(progress, file_size):
-        percent = progress * 100. / file_size
-        status = r"%10d  [%3.2f%%]" % (progress, percent)
-        status = status + chr(8) * (len(status) + 1)
-        print status,
+    percent = progress * 100. / file_size
+    status = r"%10d  [%3.2f%%]" % (progress, percent)
+    status = status + chr(8) * (len(status) + 1)
+    print status,
