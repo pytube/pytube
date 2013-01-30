@@ -1,5 +1,6 @@
 import re
 
+
 def safe_filename(text, max_length=200):
     """
     Sanitizes filenames for many operating systems.

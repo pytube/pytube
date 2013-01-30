@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from os.path import normpath
 from urllib2 import urlopen
 
+
 class Video(object):
     """
     Class representation of a single instance of a YouTube video.
@@ -20,7 +21,7 @@ class Video(object):
         self.url = url
         self.filename = filename
         self.__dict__.update(**attributes)
-        
+
     def download(self, path=None, chunk_size=8*1024,
                  on_progress=None, on_finish=None):
         """
@@ -53,12 +54,11 @@ class Video(object):
                     if on_finish:
                         on_finish(fullpath)
                     break
-                
+
                 self._bytes_received += len(self._buffer)
                 dst_file.write(self._buffer)
                 if on_progress:
                     on_progress(self._bytes_received, file_size)
-
 
     def __repr__(self):
         """A cleaner representation of the class instance."""

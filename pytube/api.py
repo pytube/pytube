@@ -51,6 +51,7 @@ YT_ENCODING_KEYS = (
     'audio_codec', 'audio_bitrate'
 )
 
+
 class YouTube(object):
     _filename = None
     _fmt_values = []
@@ -179,23 +180,23 @@ class YouTube(object):
 
     def _parse_stream_map(self, data):
         """
-        Python's `parse_qs` can't properly decode the stream map 
+        Python's `parse_qs` can't properly decode the stream map
         containing video data so we use this instead.
 
         Keyword arguments:
         data -- The parsed response from YouTube.
         """
         videoinfo = {
-            "itag": [], 
-            "url": [], 
-            "quality": [], 
-            "fallback_host": [], 
-            "sig": [], 
+            "itag": [],
+            "url": [],
+            "quality": [],
+            "fallback_host": [],
+            "sig": [],
             "type": []
         }
         text = data["url_encoded_fmt_stream_map"][0]
         # Split individual videos
-        videos = text.split(",") 
+        videos = text.split(",")
         # Unquote the characters and split to parameters
         videos = [video.split("&") for video in videos]
 

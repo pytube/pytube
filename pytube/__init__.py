@@ -5,4 +5,3 @@ __license__ = 'MIT License'
 __copyright__ = 'Copyright 2013 Nick Ficano'
 
 from .api import YouTube
-
