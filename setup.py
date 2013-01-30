@@ -22,6 +22,10 @@ setup(
     download_url="https://github.com/NFicano/python-youtube-download/tarball/master",
     packages=['pytube'],
     use_2to3=True,
+    entry_points={
+        "console_scripts": [
+            "pytube = pytube:_main",
+        ]},
     long_description=read('README.md'),
     classifiers=[
         "Development Status :: 4 - Beta",
