@@ -12,7 +12,7 @@ def read(fname):
 
 setup(
     name="pytube",
-    version="0.0.5",
+    version="0.1.0",
     author="Nick Ficano",
     author_email="nficano@gmail.com",
     description="A simple, yet versatile package for downloading YouTube videos.",
