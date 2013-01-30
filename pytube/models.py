@@ -21,7 +21,8 @@ class Video(object):
         self.filename = filename
         self.__dict__.update(**attributes)
         
-    def download(self, path=None, chunk_size=8*1024):
+    def download(self, path=None, chunk_size=8*1024,
+                 on_progress=None, on_finish=None):
         """
         Downloads the file of the URL defined within the class
         instance.
@@ -43,14 +44,15 @@ class Video(object):
             while True:
                 self._buffer = response.read(chunk_size)
                 if not self._buffer:
+                    if on_finish:
+                        on_finish(fullpath)
                     break
                 
                 self._bytes_received += len(self._buffer)
                 dst_file.write(self._buffer)
-                percent = self._bytes_received * 100. / file_size
-                status = r"%10d  [%3.2f%%]" % (self._bytes_received, percent)
-                status = status + chr(8) * (len(status) + 1)
-                print status,
+                if on_data:
+                    on_progress(self._bytes_received, file_size)
+
 
     def __repr__(self):
         """A cleaner representation of the class instance."""
