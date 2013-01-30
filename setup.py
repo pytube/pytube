@@ -6,21 +6,26 @@ PyTube
 -------
 """
 
+
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name = "pytube",
-    version = "0.0.5",
-    author = "Nick Ficano",
-    author_email = "nficano@gmail.com",
-    description = "A simple, yet versatile package for downloading YouTube videos.",
+    name="pytube",
+    version="0.1.0",
+    author="Nick Ficano",
+    author_email="nficano@gmail.com",
+    description="A simple, yet versatile package for downloading YouTube videos.",
     license='The MIT License: http://www.opensource.org/licenses/mit-license.php',
-    keywords = "youtube downloader",
-    url = "https://github.com/NFicano/python-youtube-download",
+    keywords="youtube downloader",
+    url="https://github.com/NFicano/python-youtube-download",
     download_url="https://github.com/NFicano/python-youtube-download/tarball/master",
     packages=['pytube'],
-    use_2to3= True,
+    use_2to3=True,
+    entry_points={
+        "console_scripts": [
+            "pytube = pytube:_main",
+        ]},
     long_description=read('README.md'),
     classifiers=[
         "Development Status :: 4 - Beta",

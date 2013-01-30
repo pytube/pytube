@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from os.path import normpath
 from urllib2 import urlopen
 
+
 class Video(object):
     """
     Class representation of a single instance of a YouTube video.
@@ -20,8 +21,9 @@ class Video(object):
         self.url = url
         self.filename = filename
         self.__dict__.update(**attributes)
-        
-    def download(self, path=None, chunk_size=8*1024):
+
+    def download(self, path=None, chunk_size=8*1024,
+                 on_progress=None, on_finish=None):
         """
         Downloads the file of the URL defined within the class
         instance.
@@ -29,7 +31,13 @@ class Video(object):
         Keyword arguments:
         path -- Destination directory
         chunk_size -- File size (in bytes) to write to buffer at a time
-        (default: 8 bytes).
+                      (default: 8 bytes).
+        on_progress -- A function to be called every time the buffer was
+                       written out. Arguments passed are the current and
+                       the full size.
+        on_finish -- To be called when the download is finished. The full
+                     path to the file is passed as an argument.
+
         """
 
         path = (normpath(path) + '/' if path else '')
@@ -43,14 +51,14 @@ class Video(object):
             while True:
                 self._buffer = response.read(chunk_size)
                 if not self._buffer:
+                    if on_finish:
+                        on_finish(fullpath)
                     break
-                
+
                 self._bytes_received += len(self._buffer)
                 dst_file.write(self._buffer)
-                percent = self._bytes_received * 100. / file_size
-                status = r"%10d  [%3.2f%%]" % (self._bytes_received, percent)
-                status = status + chr(8) * (len(status) + 1)
-                print status,
+                if on_progress:
+                    on_progress(self._bytes_received, file_size)
 
     def __repr__(self):
         """A cleaner representation of the class instance."""
