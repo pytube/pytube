@@ -56,7 +56,7 @@ class Video(object):
                 
                 self._bytes_received += len(self._buffer)
                 dst_file.write(self._buffer)
-                if on_data:
+                if on_progress:
                     on_progress(self._bytes_received, file_size)
 
 
