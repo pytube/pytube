@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from distutils.core import setup
 
 """
 PyTube
