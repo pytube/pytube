@@ -16,7 +16,7 @@ setup(
     author_email="nficano@gmail.com",
     url="http://pytube.nickficano.com",
     packages=packages,
-    download_url="https://github.com/NFicano/pytube/tarball/0.1.14",
+    download_url="https://github.com/NFicano/pytube/tarball/0.1.15",
     license="MIT License",
     scripts = ['pytube/bin/pytube.py'],
     classifiers=[
