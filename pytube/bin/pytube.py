@@ -3,7 +3,7 @@
 import sys
 import argparse
 
-from pytube.api import YouTube
+from pytube import YouTube
 from pytube.utils import print_status
 from pytube.exceptions import YouTubeError
 
