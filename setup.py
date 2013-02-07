@@ -1,39 +1,24 @@
 #!/usr/bin/env python
 
-import os
-from setuptools import setup
+from distutils.core import setup
+import pytube
 
 packages = [
     'pytube'
 ]
 
-requires = []
-
-
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
 setup(
     name="pytube",
-    version="0.1.12",
-    description="",
+    version=pytube.__version__,
+    description="A simple, yet versatile package for downloading " \
+                "YouTube videos.",
     author="Nick Ficano",
     author_email="nficano@gmail.com",
-    url="http://pytube.nickficao.com",
+    url="http://pytube.nickficano.com",
     packages=packages,
-    package_data={'': ['LICENSE']},
-    package_dir={'pytube': 'pytube'},
-    download_url="https://github.com/NFicano/pytube/tarball/0.1.12",
-    include_package_data=True,
-    install_requires=requires,
-    license=open("LICENSE").read(),
-
-    use_2to3=True,
-    entry_points={
-        "console_scripts": [
-            "pytube=pytube:_main",
-        ]},
-    long_description=open('README.md').read(),
+    download_url="https://github.com/NFicano/pytube/tarball/0.1.14",
+    license="MIT License",
+    scripts = ['pytube/bin/pytube.py'],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",
@@ -46,5 +31,7 @@ setup(
         "Programming Language :: Python :: 3.0",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Utilities",
+        "Topic :: Internet",
+        "Topic :: Multimedia :: Video"
     ],
 )

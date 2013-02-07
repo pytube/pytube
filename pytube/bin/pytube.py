@@ -1,9 +1,11 @@
+#!/usr/bin/env python
+
 import sys
 import argparse
 
-from .api import YouTube
-from .utils import print_status
-from .exceptions import YouTubeError
+from pytube.api import YouTube
+from pytube.utils import print_status
+from pytube.exceptions import YouTubeError
 
 
 def _main():
