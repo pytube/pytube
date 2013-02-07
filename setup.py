@@ -1,10 +1,13 @@
-import os
-from distutils.core import setup
+#!/usr/bin/env python
 
-"""
-PyTube
--------
-"""
+import os
+from setuptools import setup
+
+packages = [
+    'pytube'
+]
+
+requires = []
 
 
 def read(fname):
@@ -12,21 +15,25 @@ def read(fname):
 
 setup(
     name="pytube",
-    version="0.1.11",
+    version="0.1.12",
+    description="",
     author="Nick Ficano",
     author_email="nficano@gmail.com",
-    description="A simple, yet versatile package for downloading YouTube videos.",
-    license='The MIT License: http://www.opensource.org/licenses/mit-license.php',
-    keywords="youtube downloader",
-    url="https://github.com/NFicano/pytube",
-    download_url="https://github.com/NFicano/pytube/tarball/0.1.11",
-    packages=['pytube'],
+    url="http://pytube.nickficao.com",
+    packages=packages,
+    package_data={'': ['LICENSE']},
+    package_dir={'pytube': 'pytube'},
+    download_url="https://github.com/NFicano/pytube/tarball/0.1.12",
+    include_package_data=True,
+    install_requires=requires,
+    license=open("LICENSE").read(),
+
     use_2to3=True,
     entry_points={
         "console_scripts": [
-            "pytube = pytube:_main",
+            "pytube=pytube:_main",
         ]},
-    long_description=read('README.md'),
+    long_description=open('README.md').read(),
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",
