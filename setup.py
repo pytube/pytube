@@ -12,14 +12,14 @@ def read(fname):
 
 setup(
     name="pytube",
-    version="0.1.1",
+    version="0.1.11",
     author="Nick Ficano",
     author_email="nficano@gmail.com",
     description="A simple, yet versatile package for downloading YouTube videos.",
     license='The MIT License: http://www.opensource.org/licenses/mit-license.php',
     keywords="youtube downloader",
     url="https://github.com/NFicano/pytube",
-    download_url="https://github.com/NFicano/pytube/tarball/0.1.1",
+    download_url="https://github.com/NFicano/pytube/tarball/0.1.11",
     packages=['pytube'],
     use_2to3=True,
     entry_points={
