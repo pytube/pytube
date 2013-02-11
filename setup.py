@@ -18,7 +18,7 @@ setup(
     packages=packages,
     download_url="https://github.com/NFicano/pytube/tarball/0.1.16",
     license="MIT License",
-    scripts = ['pytube/bin/pytube.py'],
+    scripts = ['scripts/pytubectl'],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",

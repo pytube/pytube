@@ -103,19 +103,19 @@ class YouTube(object):
             if video_id:
                 return video_id.pop()
 
-    def get(self, extension=None, res=None):
+    def get(self, extension=None, resolution=None):
         """
         Return a single video given an extention and resolution.
 
         Keyword arguments:
         extention -- The desired file extention (e.g.: mp4).
-        res -- The desired broadcasting standard of the video (e.g.: 1080p).
+        resolution -- The desired video broadcasting standard.
         """
         result = []
         for v in self.videos:
             if extension and v.extension != extension:
                 continue
-            elif res and v.resolution != res:
+            elif resolution and v.resolution != resolution:
                 continue
             else:
                 result.append(v)
@@ -128,20 +128,20 @@ class YouTube(object):
             raise MultipleObjectsReturned("get() returned more than one "
                                           "object -- it returned %d!" % d)
 
-    def filter(self, extension=None, res=None):
+    def filter(self, extension=None, resolution=None):
         """
         Return a filtered list of videos given an extention and
         resolution criteria.
 
         Keyword arguments:
         extention -- The desired file extention (e.g.: mp4).
-        res -- The desired broadcasting standard of the video (e.g.: 1080p).
+        resolution -- The desired video broadcasting standard.
         """
         results = []
         for v in self.videos:
             if extension and v.extension != extension:
                 continue
-            elif res and v.resolution != res:
+            elif resolution and v.resolution != resolution:
                 continue
             else:
                 results.append(v)
