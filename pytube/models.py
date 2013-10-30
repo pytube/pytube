@@ -8,6 +8,7 @@ from sys import exit
 class Video(object):
     """
     Class representation of a single instance of a YouTube video.
+
     """
     def __init__(self, url, filename, **attributes):
         """
