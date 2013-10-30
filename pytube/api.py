@@ -103,19 +103,19 @@ class YouTube(object):
             if video_id:
                 return video_id.pop()
 
-    def get(self, extension=None, resolution=None):
+    def get(self, extension=None, res=None):
         """
         Return a single video given an extention and resolution.
 
         Keyword arguments:
         extention -- The desired file extention (e.g.: mp4).
-        resolution -- The desired video broadcasting standard.
+        res -- The desired broadcasting standard of the video (e.g.: 1080p).
         """
         result = []
         for v in self.videos:
             if extension and v.extension != extension:
                 continue
-            elif resolution and v.resolution != resolution:
+            elif res and v.resolution != res:
                 continue
             else:
                 result.append(v)
@@ -126,22 +126,22 @@ class YouTube(object):
         else:
             d = len(result)
             raise MultipleObjectsReturned("get() returned more than one "
-                                          "object -- it returned %d!" % d)
+                                          "object -- it returned {}!".format(d))
 
-    def filter(self, extension=None, resolution=None):
+    def filter(self, extension=None, res=None):
         """
         Return a filtered list of videos given an extention and
         resolution criteria.
 
         Keyword arguments:
         extention -- The desired file extention (e.g.: mp4).
-        resolution -- The desired video broadcasting standard.
+        res -- The desired broadcasting standard of the video (e.g.: 1080p).
         """
         results = []
         for v in self.videos:
             if extension and v.extension != extension:
                 continue
-            elif resolution and v.resolution != resolution:
+            elif res and v.resolution != res:
                 continue
             else:
                 results.append(v)
@@ -245,7 +245,7 @@ class YouTube(object):
                     pass
                 else:
                     #Add video signature to url
-                    url = "%s&signature=%s" % (url, signature)
+                    url = "{0}&signature={1}".format(url, signature)
                     v = Video(url, self.filename, **data)
                     self.videos.append(v)
                     self._fmt_values.append(fmt)
