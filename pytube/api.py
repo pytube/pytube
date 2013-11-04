@@ -126,7 +126,7 @@ class YouTube(object):
         else:
             d = len(result)
             raise MultipleObjectsReturned("get() returned more than one "
-                                          "object -- it returned %d!" % d)
+                                          "object -- it returned {}!".format(d))
 
     def filter(self, extension=None, resolution=None):
         """
@@ -245,7 +245,7 @@ class YouTube(object):
                     pass
                 else:
                     #Add video signature to url
-                    url = "%s&signature=%s" % (url, signature)
+                    url = "{0}&signature={1}".format(url, signature)
                     v = Video(url, self.filename, **data)
                     self.videos.append(v)
                     self._fmt_values.append(fmt)
