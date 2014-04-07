@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
 
-from .exceptions import MultipleObjectsReturned, YouTubeError
+from .exceptions import *
 from .models import Video
 from .utils import safe_filename
 from urllib import urlencode
 from urllib2 import urlopen
 from urlparse import urlparse, parse_qs, unquote
 
-import re
+import re, json
 
 YT_BASE_URL = 'http://www.youtube.com/get_video_info'
 
@@ -56,6 +56,8 @@ class YouTube(object):
     _filename = None
     _fmt_values = []
     _video_url = None
+    _debug_mode = False
+    _js_code = False
     title = None
     videos = []
     # fmt was an undocumented URL parameter that allowed selecting
@@ -178,7 +180,7 @@ class YouTube(object):
             # Nope, let's keep diggin'
             return self._fetch(path, data)
 
-    def _parse_stream_map(self, data):
+    def _parse_stream_map(self, text):
         """
         Python's `parse_qs` can't properly decode the stream map
         containing video data so we use this instead.
@@ -191,10 +193,10 @@ class YouTube(object):
             "url": [],
             "quality": [],
             "fallback_host": [],
-            "sig": [],
+            "s": [],
             "type": []
         }
-        text = data["url_encoded_fmt_stream_map"][0]
+
         # Split individual videos
         videos = text.split(",")
         # Unquote the characters and split to parameters
@@ -207,45 +209,120 @@ class YouTube(object):
 
         return videoinfo
 
+    def _findBetween(self, s, first, last):
+        try:
+            start = s.index(first) + len(first)
+            end = s.index( last, start )
+            return s[start:end]
+        except ValueError:
+            return ""
+
+    def _log(self, *args):
+        if self._debug_mode:
+            print " ".join([str(a) for a in args])
+
     def _get_video_info(self):
         """
         This is responsable for executing the request, extracting the
         necessary details, and populating the different video
         resolutions and formats into a list.
         """
-        querystring = urlencode({'asv': 3, 'el': 'detailpage', 'hl': 'en_US',
-                                 'video_id': self.video_id})
-
         self.title = None
         self.videos = []
 
-        response = urlopen(YT_BASE_URL + '?' + querystring)
+        response = urlopen(self.url)
 
         if response:
-            content = response.read().decode()
-            data = parse_qs(content)
-            if 'errorcode' in data:
-                error = data.get('reason', 'An unknown error has occurred')
-                if isinstance(error, list):
-                    error = error.pop()
-                raise YouTubeError(error)
+            content = response.read().decode("utf-8")
+            try:
+                data = json.loads(self._findBetween(content, "ytplayer.config = ", ";</script>"))
+            except Exception as e:
+                raise YouTubeError("Cannot decode JSON: {0}".format(e))
 
-            stream_map = self._parse_stream_map(data)
+            stream_map = self._parse_stream_map(data["args"]["url_encoded_fmt_stream_map"])
+
+            self.title = data["args"]["title"]
+            js_url = "http:" + data["assets"]["js"]
             video_urls = stream_map["url"]
-            #Apparently signatures are not needed as of 2014-02-28
-            self.title = self._fetch(('title',), content)
 
-            for idx in range(len(video_urls)):
-                url = video_urls[idx]
+            for i, url in enumerate(video_urls):
                 try:
-                    fmt, data = self._extract_fmt(url)
+                    fmt, fmt_data = self._extract_fmt(url)
                 except (TypeError, KeyError):
-                    pass
-                else:
-                    v = Video(url, self.filename, **data)
-                    self.videos.append(v)
-                    self._fmt_values.append(fmt)
+                    continue
+                
+                # If the signature must be ciphered...
+                if "signature=" not in url:
+                    signature = self._cipher(stream_map["s"][i], js_url)
+                    url = "%s&signature=%s" % (url, signature)
+                
+                self.videos.append(Video(url, self.filename, **fmt_data))
+                self._fmt_values.append(fmt)
             self.videos.sort()
+
+    def _cipher(self, s, url):
+        """
+        Get the signature using the cipher implemented in the JavaScript code
+
+        Keyword arguments:
+        s -- Signature
+        url -- url of JavaScript file
+        """
+
+        # Getting JS code (if hasn't downloaded yet)
+        self._js_code = urlopen(url).read().decode() if not self._js_code else self._js_code
+
+        try:
+            code = re.findall(r"function \w{2}\(\w{1}\)\{a=a\.split\(\"\"\)\;(.*)\}", self._js_code)[0]
+            code = "a='" + s + "';" + code[:code.index("}")]
+            # Running the super JavaScript VM
+            return self._interpreter(code)
+        except Exception as e:
+            self._log("error:",e)
+            raise CipherError("Couldn't cipher the signature. Maybe YouTube has changed the cipher algorithm. Notify this issue on GitHub ;)")
+
+    def _interpreter(self, code):
+        # TODO: parse automatically the 'swap' method
+        # function Bn(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c;return a};
+        def _swap(args): a = list(args[0]); b = int(args[1]); c = a[0]; a[0] = a[b % len(a)]; a[b] = c; return "".join(a)
+
+        virtual_memory = {"a": "", "return": ""}
+        methods = {
+            "split": lambda args: "",
+            "slice": lambda args: args[0][int(args[1]):],
+            "reverse": lambda args: args[0][::-1],
+            "join": lambda args: args[0],
+            "swap": _swap
+        }
+
+        regex = re.compile(r"(\w+\.)?(\w+)\(([^)]*)\)")
+        code = code.replace("return ", "return=")
+
+        for instruction in code.split(";"):
+            var, method = instruction.split("=")
+            m = regex.match(method)
+            if m == None:
+                virtual_memory[var] = method[1:-1]
+                self._log("%s=%s" % (var, virtual_memory[var]))
+                continue
+            else:
+                m = m.groups()
+                if m[0] != None:
+                    #m[0] = "_swap" if m[0] == None else m[0]
+                    obj = m[0][:-1]
+                    virtual_memory[var] = methods[m[1]]([virtual_memory[obj]] + m[2].split(","))
+                    self._log("%s.%s(%s) -> %s" % (obj, m[1], m[2], virtual_memory[var]))
+                else:
+                    arguments = []
+                    for arg in m[2].split(","):
+                        if arg == None:
+                            continue
+                        arg = virtual_memory[arg] if arg[0] == '"' or not arg.isdigit() else arg
+                        arguments += [arg]
+                    virtual_memory[var] = _swap(arguments)
+                    self._log("swap(%s) -> %s" % (",".join(arguments), virtual_memory[var]))
+
+        return virtual_memory["return"]
 
     def _extract_fmt(self, text):
         """
