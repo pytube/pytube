@@ -4,9 +4,13 @@ from .exceptions import *
 from .tinyjs import *
 from .models import Video
 from .utils import safe_filename
-from urllib import urlencode
-from urllib2 import urlopen
-from urlparse import urlparse, parse_qs, unquote
+try:
+    from urllib import urlencode
+    from urllib2 import urlopen
+    from urlparse import urlparse, parse_qs, unquote
+except ImportError:
+    from urllib.parse import urlencode, urlparse, parse_qs, unquote
+    from urllib.request import urlopen
 
 import re, json
 
@@ -317,6 +321,4 @@ class YouTube(object):
             attr = YT_ENCODING.get(itag, None)
             if not attr:
                 return itag, None
-            data = {}
-            map(lambda k, v: data.update({k: v}), YT_ENCODING_KEYS, attr)
-            return itag, data
+            return itag, dict(zip(YT_ENCODING_KEYS, attr))
