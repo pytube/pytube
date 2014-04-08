@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from .exceptions import *
+from .tinyjs import *
 from .models import Video
 from .utils import safe_filename
 from urllib import urlencode
@@ -56,8 +57,8 @@ class YouTube(object):
     _filename = None
     _fmt_values = []
     _video_url = None
-    _debug_mode = False
     _js_code = False
+    _precompiled = False
     title = None
     videos = []
     # fmt was an undocumented URL parameter that allowed selecting
@@ -231,7 +232,19 @@ class YouTube(object):
         if response:
             content = response.read().decode("utf-8")
             try:
-                data = json.loads(self._findBetween(content, "ytplayer.config = ", ";</script>"))
+                player_conf = content[18 + content.find("ytplayer.config = "):]
+                bracket_count = 0
+                for i, char in enumerate(player_conf):
+                    if char == "{":
+                        bracket_count += 1
+                    elif char == "}":
+                        bracket_count -= 1
+                        if bracket_count == 0:
+                            break
+                else:
+                    raise YouTubeError("Cannot get JSON from HTML")
+                
+                data = json.loads(player_conf[:i+1])
             except Exception as e:
                 raise YouTubeError("Cannot decode JSON: {0}".format(e))
 
@@ -266,53 +279,28 @@ class YouTube(object):
         """
 
         # Getting JS code (if hasn't downloaded yet)
-        self._js_code = urlopen(url).read().decode() if not self._js_code else self._js_code
+        if not self._js_code:
+            self._js_code = urlopen(url).read().decode() if not self._js_code else self._js_code
 
         try:
             code = re.findall(r"function \w{2}\(\w{1}\)\{\w{1}=\w{1}\.split\(\"\"\)\;(.*)\}", self._js_code)[0]
-            code = "a='" + s + "';" + code[:code.index("}")]
-            # Running the super JavaScript VM
-            return self._interpreter(code)
+            code = code[:code.index("}")]
+            
+            signature = "a='" + s + "'"
+
+            # Tiny JavaScript VM
+            jsvm = JSVM()
+
+            # Precompiling with the super JavaScript VM (if hasn't compiled yet)
+            if not self._precompiled:
+                self._precompiled = jsvm.compile(code)
+            jsvm.setPreinterpreted(jsvm.compile(signature) + self._precompiled)
+
+            # Executing the JS code
+            return jsvm.run()["return"]
+
         except Exception as e:
-            raise CipherError("Couldn't cipher the signature. Maybe YouTube has changed the cipher algorithm. Notify this issue on GitHub ;)")
-
-    def _interpreter(self, code):
-        # TODO: parse automatically the 'swap' method
-        # function Bn(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c;return a};
-        def _swap(args): a = list(args[0]); b = int(args[1]); c = a[0]; a[0] = a[b % len(a)]; a[b] = c; return "".join(a)
-
-        virtual_memory = {"a": "", "return": ""}
-        methods = {
-            "split": lambda args: "",
-            "slice": lambda args: args[0][int(args[1]):],
-            "reverse": lambda args: args[0][::-1],
-            "join": lambda args: args[0],
-            "swap": _swap
-        }
-
-        regex = re.compile(r"(\w+\.)?(\w+)\(([^)]*)\)")
-        code = code.replace("return ", "return=")
-
-        for instruction in code.split(";"):
-            var, method = instruction.split("=")
-            m = regex.match(method)
-            if m == None:
-                virtual_memory[var] = method[1:-1]
-                continue
-            else:
-                m = m.groups()
-                arguments = [virtual_memory[m[0][:-1]]] if m[0] != None else []
-                for a in m[2].split(","):
-                    if a == None or a == "":
-                        continue
-                    # Replace variables with his value
-                    arguments += [virtual_memory[a] if not a[0] == '"' and not a.isdigit() else a]
-                
-                # Suppose that an undefined method is 'swap' method
-                method = "swap" if m[1] not in methods.keys() else m[1]
-                virtual_memory[var] = methods[method](arguments)
-
-        return virtual_memory["return"]
+            raise CipherError("Couldn't cipher the signature. Maybe YouTube has changed the cipher algorithm. Notify this issue on GitHub: %s" % e)
 
     def _extract_fmt(self, text):
         """
