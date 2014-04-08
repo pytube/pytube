@@ -1,13 +1,14 @@
 from __future__ import unicode_literals
 
-from .exceptions import MultipleObjectsReturned, YouTubeError
+from .exceptions import *
+from .tinyjs import *
 from .models import Video
 from .utils import safe_filename
 from urllib import urlencode
 from urllib2 import urlopen
 from urlparse import urlparse, parse_qs, unquote
 
-import re
+import re, json
 
 YT_BASE_URL = 'http://www.youtube.com/get_video_info'
 
@@ -56,6 +57,8 @@ class YouTube(object):
     _filename = None
     _fmt_values = []
     _video_url = None
+    _js_code = False
+    _precompiled = False
     title = None
     videos = []
     # fmt was an undocumented URL parameter that allowed selecting
@@ -178,7 +181,7 @@ class YouTube(object):
             # Nope, let's keep diggin'
             return self._fetch(path, data)
 
-    def _parse_stream_map(self, data):
+    def _parse_stream_map(self, text):
         """
         Python's `parse_qs` can't properly decode the stream map
         containing video data so we use this instead.
@@ -191,10 +194,10 @@ class YouTube(object):
             "url": [],
             "quality": [],
             "fallback_host": [],
-            "sig": [],
+            "s": [],
             "type": []
         }
-        text = data["url_encoded_fmt_stream_map"][0]
+
         # Split individual videos
         videos = text.split(",")
         # Unquote the characters and split to parameters
@@ -207,45 +210,97 @@ class YouTube(object):
 
         return videoinfo
 
+    def _findBetween(self, s, first, last):
+        try:
+            start = s.index(first) + len(first)
+            end = s.index( last, start )
+            return s[start:end]
+        except ValueError:
+            return ""
+
     def _get_video_info(self):
         """
         This is responsable for executing the request, extracting the
         necessary details, and populating the different video
         resolutions and formats into a list.
         """
-        querystring = urlencode({'asv': 3, 'el': 'detailpage', 'hl': 'en_US',
-                                 'video_id': self.video_id})
-
         self.title = None
         self.videos = []
 
-        response = urlopen(YT_BASE_URL + '?' + querystring)
+        response = urlopen(self.url)
 
         if response:
-            content = response.read().decode()
-            data = parse_qs(content)
-            if 'errorcode' in data:
-                error = data.get('reason', 'An unknown error has occurred')
-                if isinstance(error, list):
-                    error = error.pop()
-                raise YouTubeError(error)
-
-            stream_map = self._parse_stream_map(data)
-            video_urls = stream_map["url"]
-            #Apparently signatures are not needed as of 2014-02-28
-            self.title = self._fetch(('title',), content)
-
-            for idx in range(len(video_urls)):
-                url = video_urls[idx]
-                try:
-                    fmt, data = self._extract_fmt(url)
-                except (TypeError, KeyError):
-                    pass
+            content = response.read().decode("utf-8")
+            try:
+                player_conf = content[18 + content.find("ytplayer.config = "):]
+                bracket_count = 0
+                for i, char in enumerate(player_conf):
+                    if char == "{":
+                        bracket_count += 1
+                    elif char == "}":
+                        bracket_count -= 1
+                        if bracket_count == 0:
+                            break
                 else:
-                    v = Video(url, self.filename, **data)
-                    self.videos.append(v)
-                    self._fmt_values.append(fmt)
+                    raise YouTubeError("Cannot get JSON from HTML")
+                
+                data = json.loads(player_conf[:i+1])
+            except Exception as e:
+                raise YouTubeError("Cannot decode JSON: {0}".format(e))
+
+            stream_map = self._parse_stream_map(data["args"]["url_encoded_fmt_stream_map"])
+
+            self.title = data["args"]["title"]
+            js_url = "http:" + data["assets"]["js"]
+            video_urls = stream_map["url"]
+
+            for i, url in enumerate(video_urls):
+                try:
+                    fmt, fmt_data = self._extract_fmt(url)
+                except (TypeError, KeyError):
+                    continue
+                
+                # If the signature must be ciphered...
+                if "signature=" not in url:
+                    signature = self._cipher(stream_map["s"][i], js_url)
+                    url = "%s&signature=%s" % (url, signature)
+                
+                self.videos.append(Video(url, self.filename, **fmt_data))
+                self._fmt_values.append(fmt)
             self.videos.sort()
+
+    def _cipher(self, s, url):
+        """
+        Get the signature using the cipher implemented in the JavaScript code
+
+        Keyword arguments:
+        s -- Signature
+        url -- url of JavaScript file
+        """
+
+        # Getting JS code (if hasn't downloaded yet)
+        if not self._js_code:
+            self._js_code = urlopen(url).read().decode() if not self._js_code else self._js_code
+
+        try:
+            code = re.findall(r"function \w{2}\(\w{1}\)\{\w{1}=\w{1}\.split\(\"\"\)\;(.*)\}", self._js_code)[0]
+            code = code[:code.index("}")]
+            
+            signature = "a='" + s + "'"
+
+            # Tiny JavaScript VM
+            jsvm = JSVM()
+
+            # Precompiling with the super JavaScript VM (if hasn't compiled yet)
+            if not self._precompiled:
+                self._precompiled = jsvm.compile(code)
+            jsvm.setPreinterpreted(jsvm.compile(signature) + self._precompiled)
+
+            # Executing the JS code
+            return jsvm.run()["return"]
+
+        except Exception as e:
+            raise CipherError("Couldn't cipher the signature. Maybe YouTube has changed the cipher algorithm. Notify this issue on GitHub: %s" % e)
 
     def _extract_fmt(self, text):
         """
