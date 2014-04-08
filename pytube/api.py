@@ -217,10 +217,6 @@ class YouTube(object):
         except ValueError:
             return ""
 
-    def _log(self, *args):
-        if self._debug_mode:
-            print " ".join([str(a) for a in args])
-
     def _get_video_info(self):
         """
         This is responsable for executing the request, extracting the
@@ -273,12 +269,11 @@ class YouTube(object):
         self._js_code = urlopen(url).read().decode() if not self._js_code else self._js_code
 
         try:
-            code = re.findall(r"function \w{2}\(\w{1}\)\{a=a\.split\(\"\"\)\;(.*)\}", self._js_code)[0]
+            code = re.findall(r"function \w{2}\(\w{1}\)\{\w{1}=\w{1}\.split\(\"\"\)\;(.*)\}", self._js_code)[0]
             code = "a='" + s + "';" + code[:code.index("}")]
             # Running the super JavaScript VM
             return self._interpreter(code)
         except Exception as e:
-            self._log("error:",e)
             raise CipherError("Couldn't cipher the signature. Maybe YouTube has changed the cipher algorithm. Notify this issue on GitHub ;)")
 
     def _interpreter(self, code):
@@ -303,24 +298,19 @@ class YouTube(object):
             m = regex.match(method)
             if m == None:
                 virtual_memory[var] = method[1:-1]
-                self._log("%s=%s" % (var, virtual_memory[var]))
                 continue
             else:
                 m = m.groups()
-                if m[0] != None:
-                    #m[0] = "_swap" if m[0] == None else m[0]
-                    obj = m[0][:-1]
-                    virtual_memory[var] = methods[m[1]]([virtual_memory[obj]] + m[2].split(","))
-                    self._log("%s.%s(%s) -> %s" % (obj, m[1], m[2], virtual_memory[var]))
-                else:
-                    arguments = []
-                    for arg in m[2].split(","):
-                        if arg == None:
-                            continue
-                        arg = virtual_memory[arg] if arg[0] == '"' or not arg.isdigit() else arg
-                        arguments += [arg]
-                    virtual_memory[var] = _swap(arguments)
-                    self._log("swap(%s) -> %s" % (",".join(arguments), virtual_memory[var]))
+                arguments = [virtual_memory[m[0][:-1]]] if m[0] != None else []
+                for a in m[2].split(","):
+                    if a == None or a == "":
+                        continue
+                    # Replace variables with his value
+                    arguments += [virtual_memory[a] if not a[0] == '"' and not a.isdigit() else a]
+                
+                # Suppose that an undefined method is 'swap' method
+                method = "swap" if m[1] not in methods.keys() else m[1]
+                virtual_memory[var] = methods[method](arguments)
 
         return virtual_memory["return"]
 
