@@ -4,7 +4,7 @@
 
 Downloading videos from YouTube shouldn't require some bloatware application,
 it's usually a niche condition you want to do so in the first place. So I 
-Prsent to you, PyTube!
+present to you, PyTube!
 
 
 
@@ -21,7 +21,7 @@ or even better:
 $ pip install pytube
 ```
 
-or you can get the [source code from github](https://github.com/NFicano/python-youtube-download).
+or you can get the [source code from github](https://github.com/NFicano/pytube.
 
 ### Roadmap
 
