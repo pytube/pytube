@@ -5,7 +5,6 @@ try:
     from urllib2 import urlopen
 except ImportError:
     from urllib.request import urlopen
-from sys import exit
 
 
 class Video(object):
@@ -53,7 +52,7 @@ class Video(object):
         if isfile(fullpath):
             print("\n\nError: Conflicting filename:'{}'.\n\n".format(
                   self.filename))
-            exit(1)
+            return 1
 
         response = urlopen(self.url)
         meta_data = dict(response.info().items())
@@ -84,18 +83,20 @@ class Video(object):
                   "Check that: ('{0}'), is a valid pathname.\n\n" \
                   "Or that ('{1}.{2}') is a valid filename.\n\n".format(
                         path, self.filename, self.extension))
-            exit(2)
+            return 2
 
         except BufferError:
             print("\n\nError: Failed on writing buffer.\n" \
                   "Failed to write video to file.\n\n")
-            exit(1)
+            return 1
 
         except KeyboardInterrupt:
             print("\n\nInterrupt signal given.\nDeleting incomplete video" \
                   "('{0}.{1}').\n\n".format(self.filename, self.extension))
             remove(fullpath)
-            exit(1)
+            return 1
+
+        return 0
 
 
     def __repr__(self):
