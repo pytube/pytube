@@ -1,4 +1,6 @@
 import re
+import sys
+import time
 
 
 def safe_filename(text, max_length=200):
@@ -27,7 +29,7 @@ def safe_filename(text, max_length=200):
     filename = blacklist.sub('', text)
     return truncate(filename)
 
-
+_next_print = 0
 def print_status(progress, file_size):
     """
     This function - when passed as `on_progress` to `Video.download` - prints
@@ -37,8 +39,13 @@ def print_status(progress, file_size):
     progress -- The lenght of the currently downloaded bytes.
     file_size -- The total size of the video.
     """
-
+    global _next_print
+    now = time.time()
+    if _next_print > now:
+        return
+    _next_print = now + 1
     percent = progress * 100. / file_size
     status = r"{0:10d}  [{1:3.2f}%]".format(progress, percent)
     status = status + chr(8) * (len(status) + 1)
-    print(status,)
+    sys.stdout.write(status)
+    sys.stdout.flush()
