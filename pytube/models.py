@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from os.path import normpath, isfile
 from os import remove
+from time import clock
 try:
     from urllib2 import urlopen
 except ImportError:
@@ -60,6 +61,7 @@ class Video(object):
         file_size = int(meta_data.get("Content-Length") or
                 meta_data.get("content-length"))
         self._bytes_received = 0
+        start = clock()
         try:
             with open(fullpath, 'wb') as dst_file:
                 # Print downloading message
@@ -76,7 +78,7 @@ class Video(object):
                     self._bytes_received += len(self._buffer)
                     dst_file.write(self._buffer)
                     if on_progress:
-                        on_progress(self._bytes_received, file_size)
+                        on_progress(self._bytes_received, file_size, start)
 
         # Catch possible exceptions occurring during download
         except IOError:

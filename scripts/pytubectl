@@ -69,3 +69,6 @@ def _main():
     except KeyboardInterrupt:
         print "Download interrupted."
         sys.exit(1)
+
+if __name__ == '__main__':
+    _main()
