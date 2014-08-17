@@ -1,6 +1,15 @@
+import argparse
 import re
+
+from os import path
 from sys import stdout, platform
 from time import clock
+
+
+class FullPaths(argparse.Action):
+    """Expand user- and relative-paths"""
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, path.abspath(path.expanduser(values)))
 
 def safe_filename(text, max_length=200):
     """
@@ -72,7 +81,6 @@ def print_status(progress, file_size, start):
 
     percentDone = int(progress) * 100. / file_size
     done = int(50 * progress / int(file_size))
-    rawtxt = '\b' if platform.startswith('win') else '\r'
-    stdout.write("%s[%s%s][%3.2f%%] %s at %s/s  " % (rawtxt, '=' * done, ' ' * (50-done), percentDone,
+    stdout.write("\r  [%s%s][%3.2f%%] %s at %s/s\r " % ('=' * done, ' ' * (50-done), percentDone,
         sizeof(file_size), sizeof(progress//(clock() - start))))
     stdout.flush()
