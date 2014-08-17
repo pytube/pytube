@@ -42,7 +42,7 @@ def _main():
         if not all([args.ext, args.res]):
             print "\nMake sure you give either of the below specified format/resolution combination.\n"
             pprint(res_formts)
-            return
+            sys.exit(1)
 
     if args.ext and args.res:
         # There's only ope video that matches both so get it
