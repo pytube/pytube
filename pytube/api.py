@@ -38,7 +38,7 @@ YT_ENCODING = {
     82: ["mp4", "360p", "H.264", "3D", "0.5", "AAC", "96"],
     83: ["mp4", "240p", "H.264", "3D", "0.5", "AAC", "96"],
     84: ["mp4", "720p", "H.264", "3D", "2-2.9", "AAC", "152"],
-    85: ["mp4", "520p", "H.264", "3D", "2-2.9", "AAC", "152"],
+    85: ["mp4", "1080p", "H.264", "3D", "2-2.9", "AAC", "152"],
 
     #WebM
     43: ["webm", "360p", "VP8", "N/A", "0.5", "Vorbis", "128"],
@@ -110,7 +110,7 @@ class YouTube(object):
             if video_id:
                 return video_id.pop()
 
-    def get(self, extension=None, resolution=None):
+    def get(self, extension=None, resolution=None, profile="High"):
         """
         Return a single video given an extention and resolution.
 
@@ -123,6 +123,8 @@ class YouTube(object):
             if extension and v.extension != extension:
                 continue
             elif resolution and v.resolution != resolution:
+                continue
+            elif profile and v.profile != profile:
                 continue
             else:
                 result.append(v)
