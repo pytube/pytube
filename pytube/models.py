@@ -100,8 +100,8 @@ class Video(object):
 
     def __repr__(self):
         """A cleaner representation of the class instance."""
-        return "<Video: {0} (.{1}) - {2}>".format(self.video_codec, self.extension,
-                                           self.resolution)
+        return "<Video: {0} (.{1}) - {2} - {3}>".format(self.video_codec, self.extension,
+                                           self.resolution, self.profile)
 
     def __lt__(self, other):
         if type(other) == Video:
