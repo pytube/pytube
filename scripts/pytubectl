@@ -2,7 +2,9 @@
 
 from pytube import YouTube
 from pytube.utils import print_status
+from pytube.utils import FullPaths
 from pytube.exceptions import YouTubeError
+from pprint import pprint
 
 import sys
 import argparse
@@ -15,7 +17,7 @@ def _main():
                         help="The requested format of the video", dest="ext")
     parser.add_argument("--resolution", "-r",
                         help="The requested resolution", dest="res")
-    parser.add_argument("--path", "-p",
+    parser.add_argument("--path", "-p", action=FullPaths,
                         help="The path to save the video to.", dest="path")
     parser.add_argument("--filename", "-f",
                         dest="filename",
@@ -27,6 +29,8 @@ def _main():
     yt =  YouTube()
     try:
         yt.url = args.url
+        res_formts = yt.videos
+        res_formts = ["%s %s"% (str(res_formts[index].extension), str(res_formts[index].resolution)) for index, video in enumerate(res_formts)]
     except YouTubeError:
         print "Incorrect video URL."
         sys.exit(1)
@@ -34,12 +38,19 @@ def _main():
     if args.filename:
         yt.filename = args.filename
 
+    if args.ext or args.res:
+        if not all([args.ext, args.res]):
+            print "\nMake sure you give either of the below specified format/resolution combination.\n"
+            pprint(res_formts)
+            sys.exit(1)
+
     if args.ext and args.res:
         # There's only ope video that matches both so get it
         vid = yt.get(args.ext, args.res)
         # Check if there's a video returned
         if not vid:
-            print "There's no video with the specified format/resolution combination."
+            print "\nThere's no video with the specified format/resolution combination.\n"
+            pprint(res_formts)
             sys.exit(1)
 
     elif args.ext:
@@ -69,3 +80,6 @@ def _main():
     except KeyboardInterrupt:
         print "Download interrupted."
         sys.exit(1)
+
+if __name__ == '__main__':
+    _main()
