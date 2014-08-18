@@ -1,5 +1,15 @@
+import argparse
 import re
-from sys import stdout
+
+from os import path
+from sys import stdout, platform
+from time import clock
+
+
+class FullPaths(argparse.Action):
+    """Expand user- and relative-paths"""
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, path.abspath(path.expanduser(values)))
 
 def safe_filename(text, max_length=200):
     """
@@ -27,8 +37,38 @@ def safe_filename(text, max_length=200):
     filename = blacklist.sub('', text)
     return truncate(filename)
 
+def sizeof(bytes):
+    """ Takes the size of file or folder in bytes and
+        returns size formatted in kb, MB, GB, TB or PB.
 
-def print_status(progress, file_size):
+        Args:
+            bytes(int): size of the file in bytes
+        Return:
+            (str): containing size with formatting.
+    """
+    alternative = [
+        (1024 ** 5, ' PB'),
+        (1024 ** 4, ' TB'),
+        (1024 ** 3, ' GB'),
+        (1024 ** 2, ' MB'),
+        (1024 ** 1, ' KB'),
+        (1024 ** 0, (' byte', ' bytes')),
+    ]
+
+    for factor, suffix in alternative:
+        if bytes >= factor:
+            break
+    amount = int(bytes/factor)
+    if isinstance(suffix, tuple):
+        singular, multiple = suffix
+        if amount == 1:
+            suffix = singular
+        else:
+            suffix = multiple
+    return "%s%s" % (str(amount), suffix)
+
+
+def print_status(progress, file_size, start):
     """
     This function - when passed as `on_progress` to `Video.download` - prints
     out the current download progress.
@@ -36,10 +76,11 @@ def print_status(progress, file_size):
     Arguments:
     progress -- The lenght of the currently downloaded bytes.
     file_size -- The total size of the video.
+    start -- time when started
     """
 
-    percent = progress * 100. / file_size
-    status = r"{0:10d}  [{1:3.2f}%]".format(progress, percent)
-    status = status + chr(8) * (len(status) + 1)
-    stdout.write('%s\r' % status)
+    percentDone = int(progress) * 100. / file_size
+    done = int(50 * progress / int(file_size))
+    stdout.write("\r  [%s%s][%3.2f%%] %s at %s/s\r " % ('=' * done, ' ' * (50-done), percentDone,
+        sizeof(file_size), sizeof(progress//(clock() - start))))
     stdout.flush()
