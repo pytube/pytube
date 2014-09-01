@@ -291,9 +291,13 @@ class YouTube(object):
             try:
                 #print("Trying: %s" % code)
                 # Get the helper object that's used by the cipher code
-                obj = code[2:4]
+                obj = re.findall(r"[a-zA-Z]{2}\.", code)[0][0:2]
                 obj = re.findall(r"var " + obj + "=.*?};", self._js_code)[0]
-                #print("Object is %s" % obj)
+                print("JS Object is %s" % obj)
+                gfile = open("/tmp/debug.html", "w")
+                gfile.write("Object is %s\n" % code[2:4])
+                gfile.write(self._js_code)
+                gfile.close()
 
                 signature = "a='" + s + "'.split('');"
                 # ^ Maybe figure out the name of the var instead of assuming 'a' (Which seems to always be true as of now)
