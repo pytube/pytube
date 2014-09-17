@@ -249,8 +249,9 @@ class YouTube(object):
                             break
                 else:
                     raise YouTubeError("Cannot get JSON from HTML")
-                
-                data = json.loads(player_conf[:i+1])
+
+                index = i + 1
+                data = json.loads(player_conf[:index])
             except Exception as e:
                 raise YouTubeError("Cannot decode JSON: {0}".format(e))
 
