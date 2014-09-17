@@ -2,7 +2,7 @@ import argparse
 import re
 
 from os import path
-from sys import stdout, platform
+from sys import stdout
 from time import clock
 
 

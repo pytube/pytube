@@ -5,14 +5,14 @@ from .tinyjs import *
 from .models import Video
 from .utils import safe_filename
 try:
-    from urllib import urlencode
     from urllib2 import urlopen
     from urlparse import urlparse, parse_qs, unquote
 except ImportError:
-    from urllib.parse import urlencode, urlparse, parse_qs, unquote
+    from urllib.parse import urlparse, parse_qs, unquote
     from urllib.request import urlopen
 
-import re, json
+import re
+import json
 
 YT_BASE_URL = 'http://www.youtube.com/get_video_info'
 
