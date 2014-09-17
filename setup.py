@@ -10,7 +10,7 @@ packages = [
 setup(
     name="pytube",
     version=pytube.__version__,
-    description="A simple, yet versatile package for downloading " \
+    description="A simple, yet versatile package for downloading "
                 "YouTube videos.",
     author="Nick Ficano",
     author_email="nficano@gmail.com",
@@ -18,7 +18,7 @@ setup(
     packages=packages,
     download_url="https://github.com/NFicano/pytube/tarball/0.1.16",
     license="MIT License",
-    scripts = ['scripts/pytubectl'],
+    scripts=['scripts/pytubectl'],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",

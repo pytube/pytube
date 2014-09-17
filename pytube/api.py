@@ -5,14 +5,14 @@ from .tinyjs import *
 from .models import Video
 from .utils import safe_filename
 try:
-    from urllib import urlencode
     from urllib2 import urlopen
     from urlparse import urlparse, parse_qs, unquote
 except ImportError:
-    from urllib.parse import urlencode, urlparse, parse_qs, unquote
+    from urllib.parse import urlparse, parse_qs, unquote
     from urllib.request import urlopen
 
-import re, json
+import re
+import json
 
 YT_BASE_URL = 'http://www.youtube.com/get_video_info'
 
@@ -219,7 +219,7 @@ class YouTube(object):
     def _findBetween(self, s, first, last):
         try:
             start = s.index(first) + len(first)
-            end = s.index( last, start )
+            end = s.index(last, start)
             return s[start:end]
         except ValueError:
             return ""
@@ -249,8 +249,9 @@ class YouTube(object):
                             break
                 else:
                     raise YouTubeError("Cannot get JSON from HTML")
-                
-                data = json.loads(player_conf[:i+1])
+
+                index = i + 1
+                data = json.loads(player_conf[:index])
             except Exception as e:
                 raise YouTubeError("Cannot decode JSON: {0}".format(e))
 
@@ -265,12 +266,12 @@ class YouTube(object):
                     fmt, fmt_data = self._extract_fmt(url)
                 except (TypeError, KeyError):
                     continue
-                
+
                 # If the signature must be ciphered...
                 if "signature=" not in url:
                     signature = self._cipher(stream_map["s"][i], js_url)
                     url = "%s&signature=%s" % (url, signature)
-                
+
                 self.videos.append(Video(url, self.filename, **fmt_data))
                 self._fmt_values.append(fmt)
             self.videos.sort()
@@ -291,7 +292,7 @@ class YouTube(object):
         try:
             code = re.findall(r"function \w{2}\(\w{1}\)\{\w{1}=\w{1}\.split\(\"\"\)\;(.*)\}", self._js_code)[0]
             code = code[:code.index("}")]
-            
+
             signature = "a='" + s + "'"
 
             # Tiny JavaScript VM

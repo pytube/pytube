@@ -2,7 +2,7 @@ import argparse
 import re
 
 from os import path
-from sys import stdout, platform
+from sys import stdout
 from time import clock
 
 
@@ -10,6 +10,7 @@ class FullPaths(argparse.Action):
     """Expand user- and relative-paths"""
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, path.abspath(path.expanduser(values)))
+
 
 def safe_filename(text, max_length=200):
     """
@@ -37,6 +38,7 @@ def safe_filename(text, max_length=200):
     filename = blacklist.sub('', text)
     return truncate(filename)
 
+
 def sizeof(bytes):
     """ Takes the size of file or folder in bytes and
         returns size formatted in kb, MB, GB, TB or PB.
@@ -58,7 +60,7 @@ def sizeof(bytes):
     for factor, suffix in alternative:
         if bytes >= factor:
             break
-    amount = int(bytes/factor)
+    amount = int(bytes / factor)
     if isinstance(suffix, tuple):
         singular, multiple = suffix
         if amount == 1:
@@ -81,6 +83,6 @@ def print_status(progress, file_size, start):
 
     percentDone = int(progress) * 100. / file_size
     done = int(50 * progress / int(file_size))
-    stdout.write("\r  [%s%s][%3.2f%%] %s at %s/s\r " % ('=' * done, ' ' * (50-done), percentDone,
-        sizeof(file_size), sizeof(progress//(clock() - start))))
+    stdout.write("\r  [%s%s][%3.2f%%] %s at %s/s\r " % ('=' * done, ' ' * (50 - done), percentDone,
+        sizeof(file_size), sizeof(progress // (clock() - start))))
     stdout.flush()
