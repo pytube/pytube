@@ -30,7 +30,7 @@ class Video(object):
         self.filename = filename
         self.__dict__.update(**attributes)
 
-    def download(self, path=None, chunk_size=8*1024,
+    def download(self, path=None, chunk_size=8 * 1024,
                  on_progress=None, on_finish=None):
         """
         Downloads the file of the URL defined within the class

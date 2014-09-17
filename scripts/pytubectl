@@ -30,7 +30,7 @@ def _main():
     try:
         yt.url = args.url
         res_formts = yt.videos
-        res_formts = ["%s %s"% (str(res_formts[index].extension), str(res_formts[index].resolution)) for index, video in enumerate(res_formts)]
+        res_formts = ["%s %s" % (str(res_formts[index].extension), str(res_formts[index].resolution)) for index, video in enumerate(res_formts)]
     except YouTubeError:
         print "Incorrect video URL."
         sys.exit(1)
