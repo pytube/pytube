@@ -60,7 +60,7 @@ class Video(object):
         response = urlopen(self.url)
         meta_data = dict(response.info().items())
         file_size = int(meta_data.get("Content-Length") or
-                meta_data.get("content-length"))
+                        meta_data.get("content-length"))
         self._bytes_received = 0
         start = clock()
         try:
@@ -86,7 +86,7 @@ class Video(object):
             print("\n\nError: Failed to open file.\n"
                   "Check that: ('{0}'), is a valid pathname.\n\n"
                   "Or that ('{1}.{2}') is a valid filename.\n\n".format(
-                        path, self.filename, self.extension))
+                      path, self.filename, self.extension))
             exit(2)
 
         except BufferError:
@@ -103,7 +103,7 @@ class Video(object):
     def __repr__(self):
         """A cleaner representation of the class instance."""
         return "<Video: {0} (.{1}) - {2} - {3}>".format(self.video_codec, self.extension,
-                                           self.resolution, self.profile)
+                                                        self.resolution, self.profile)
 
     def __lt__(self, other):
         if type(other) == Video:
