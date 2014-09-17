@@ -100,7 +100,6 @@ class Video(object):
             remove(fullpath)
             exit(1)
 
-
     def __repr__(self):
         """A cleaner representation of the class instance."""
         return "<Video: {0} (.{1}) - {2} - {3}>".format(self.video_codec, self.extension,

@@ -26,7 +26,7 @@ def _main():
 
     args = parser.parse_args()
 
-    yt =  YouTube()
+    yt = YouTube()
     try:
         yt.url = args.url
         res_formts = yt.videos

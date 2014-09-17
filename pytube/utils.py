@@ -11,6 +11,7 @@ class FullPaths(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, path.abspath(path.expanduser(values)))
 
+
 def safe_filename(text, max_length=200):
     """
     Sanitizes filenames for many operating systems.
@@ -36,6 +37,7 @@ def safe_filename(text, max_length=200):
     blacklist = re.compile('|'.join(ntfs + paranoid), re.UNICODE)
     filename = blacklist.sub('', text)
     return truncate(filename)
+
 
 def sizeof(bytes):
     """ Takes the size of file or folder in bytes and

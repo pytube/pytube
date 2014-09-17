@@ -265,12 +265,12 @@ class YouTube(object):
                     fmt, fmt_data = self._extract_fmt(url)
                 except (TypeError, KeyError):
                     continue
-                
+
                 # If the signature must be ciphered...
                 if "signature=" not in url:
                     signature = self._cipher(stream_map["s"][i], js_url)
                     url = "%s&signature=%s" % (url, signature)
-                
+
                 self.videos.append(Video(url, self.filename, **fmt_data))
                 self._fmt_values.append(fmt)
             self.videos.sort()
@@ -291,7 +291,7 @@ class YouTube(object):
         try:
             code = re.findall(r"function \w{2}\(\w{1}\)\{\w{1}=\w{1}\.split\(\"\"\)\;(.*)\}", self._js_code)[0]
             code = code[:code.index("}")]
-            
+
             signature = "a='" + s + "'"
 
             # Tiny JavaScript VM
