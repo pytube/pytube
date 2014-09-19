@@ -255,6 +255,11 @@ class YouTube(object):
             except Exception as e:
                 raise YouTubeError("Cannot decode JSON: {0}".format(e))
 
+            is_vevo = False
+            if data['args'].get('ptk', '') in ['vevo', 'dashmpd']:
+                # Vevo videos with encrypted signatures
+                is_vevo = True
+
             stream_map = self._parse_stream_map(data["args"]["url_encoded_fmt_stream_map"])
 
             self.title = data["args"]["title"]
@@ -269,12 +274,43 @@ class YouTube(object):
 
                 # If the signature must be ciphered...
                 if "signature=" not in url:
-                    signature = self._cipher(stream_map["s"][i], js_url)
-                    url = "%s&signature=%s" % (url, signature)
+                    if is_vevo:
+                        has_decrypted_signature = False
+                        try:
+                            signature = self._decrypt_signature(stream_map['s'][0])
+                            url += '&signature=' + signature
+                            has_decrypted_signature = True
+                        except TypeError, e:
+                            pass
+
+                        if not has_decrypted_signature:
+                            raise CipherError("Couldn't cipher the signature. Maybe YouTube has changed the cipher algorithm. Notify this issue on GitHub")
+
+                    else:
+                        signature = self._cipher(stream_map["s"][i], js_url)
+                        url = "%s&signature=%s" % (url, signature)
 
                 self.videos.append(Video(url, self.filename, **fmt_data))
                 self._fmt_values.append(fmt)
             self.videos.sort()
+
+    @staticmethod
+    def _decrypt_signature(s):
+        def tu(a, b):
+            c = a[0]
+            a[0] = a[b % len(a)]
+            a[b] = c
+            return a
+
+        def splice(a, b):
+            return a[b:]
+
+        a = list(s)
+        a = tu(a[::-1], 26)
+        a = tu(a[::-1], 28)
+        a = tu(a, 38)
+        a = splice(a[::-1], 3)
+        return "".join(a)
 
     def _cipher(self, s, url):
         """
