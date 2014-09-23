@@ -1,9 +1,7 @@
-![pytube](https://s3.amazonaws.com/assets.nickficano.com/pytube_logo.png)
-
 # A lightweight, dependency-free Python library for downloading YouTube Videos.
 
 Downloading videos from YouTube shouldn't require some bloatware application,
-it's usually a niche condition you want to do so in the first place. So I 
+it's usually a niche condition you want to do so in the first place. So I
 present to you, PyTube!
 
 
@@ -21,13 +19,13 @@ or even better:
 $ pip install pytube
 ```
 
-or you can get the [source code from github](https://github.com/NFicano/pytube.
+or you can get the [source code from github](https://github.com/NFicano/pytube).
 
 ### Roadmap
 
 The only features I see implementing in the near future are:
 
-- refactor console printing into separate command-line utility. 
+- refactor console printing into separate command-line utility.
 - Add nosetests
 - Add Sphinx documentation
 
@@ -78,16 +76,16 @@ pprint(yt.filter('flv'))
 # <Video: H.264 (.flv) - 360p>,
 # <Video: H.264 (.flv) - 480p>]
 
-# notice that the list is ordered by lowest resolution to highest. If you 
+# notice that the list is ordered by lowest resolution to highest. If you
 # wanted the highest resolution available for a specific file type, you
-# can simply do: 
+# can simply do:
 print yt.filter('mp4')[-1]
 #<Video: H.264 (.mp4) - 720p>
 
 # you can also get all videos for a given resolution
 pprint(yt.filter(res='480p'))
 
-#[<Video: H.264 (.flv) - 480p>, 
+#[<Video: H.264 (.flv) - 480p>,
 #<Video: VP8 (.webm) - 480p>]
 
 # to select a video by a specific resolution and filetype you can use the get
@@ -125,7 +123,7 @@ video.download()
 # Downloading: Pulp Fiction - Dancing Scene.mp4 Bytes: 37561829
 # 37561829  [100.00%]
 
-# Note: If you wanted to choose the output directory, simply pass it as an 
+# Note: If you wanted to choose the output directory, simply pass it as an
 # argument to the download method.
 video.download('/tmp/')
 ```
