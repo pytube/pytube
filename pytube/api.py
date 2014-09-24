@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
-# TODO: don't import *
-from .exceptions import *
+from .exceptions import MultipleObjectsReturned, YouTubeError, CipherError
 from .tinyjs import *
 from .models import Video
 from .utils import safe_filename
@@ -148,8 +147,8 @@ class YouTube(object):
         """Return a filtered list of videos given an extention and resolution
         criteria.
 
-        :params extention: The desired file extention (e.g.: mp4).
-        :params resolution: The desired video broadcasting standard.
+        :param extention: The desired file extention (e.g.: mp4).
+        :param resolution: The desired video broadcasting standard.
         """
         results = []
         for v in self.videos:
@@ -167,8 +166,8 @@ class YouTube(object):
 
         https://gist.github.com/2009119)
 
-        :params path: A tuple representing a path to a node within a tree.
-        :params data: The data containing the tree.
+        :param path: A tuple representing a path to a node within a tree.
+        :param data: The data containing the tree.
         """
         elem = path[0]
         # Get first element in tuple, and check if it contains a list.
@@ -215,14 +214,6 @@ class YouTube(object):
                 videoinfo.get(key, []).append(unquote(value))
 
         return videoinfo
-
-    def _findBetween(self, s, first, last):
-        try:
-            start = s.index(first) + len(first)
-            end = s.index(last, start)
-            return s[start:end]
-        except ValueError:
-            return ""
 
     def _get_video_info(self):
         """This is responsable for executing the request, extracting the
@@ -321,8 +312,8 @@ class YouTube(object):
     def _cipher(self, s, url):
         """Get the signature using the cipher implemented in the JavaScript code
 
-        :params s: Signature
-        :params url: url of JavaScript file
+        :param s: Signature
+        :param url: url of JavaScript file
         """
         # TODO: refactor removing tinyJS
 
@@ -362,7 +353,7 @@ class YouTube(object):
         suspect this is suppose to act as a deterrent.. Nothing some regulular
         expressions couldn't handle.
 
-        :params text: The malformed data contained within each url node.
+        :param text: The malformed data contained within each url node.
         """
         itag = re.findall('itag=(\d+)', text)
         if itag and len(itag) is 1:
