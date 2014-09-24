@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import argparse
 import re
 
@@ -13,24 +15,22 @@ class FullPaths(argparse.Action):
 
 
 def safe_filename(text, max_length=200):
-    """
-    Sanitizes filenames for many operating systems.
+    """Sanitizes filenames for many operating systems.
 
-    Keyword arguments:
-    text -- The unsanitized pending filename.
+    :params text: The unsanitized pending filename.
     """
-    #Quickly truncates long filenames.
+    # Quickly truncates long filenames.
     truncate = lambda text: text[:max_length].rsplit(' ', 0)[0]
 
-    #Tidy up ugly formatted filenames.
+    # Tidy up ugly formatted filenames.
     text = text.replace('_', ' ')
     text = text.replace(':', ' -')
 
-    #NTFS forbids filenames containing characters in range 0-31 (0x00-0x1F)
+    # NTFS forbids filenames containing characters in range 0-31 (0x00-0x1F)
     ntfs = [chr(i) for i in range(0, 31)]
 
-    #Removing these SHOULD make most filename safe for a wide range
-    #of operating systems.
+    # Removing these SHOULD make most filename safe for a wide range of
+    # operating systems.
     paranoid = ['\"', '\#', '\$', '\%', '\'', '\*', '\,', '\.', '\/', '\:',
                 '\;', '\<', '\>', '\?', '\\', '\^', '\|', '\~', '\\\\']
 
@@ -40,13 +40,10 @@ def safe_filename(text, max_length=200):
 
 
 def sizeof(bytes):
-    """ Takes the size of file or folder in bytes and
-        returns size formatted in kb, MB, GB, TB or PB.
+    """Takes the size of file or folder in bytes and returns size formatted in
+    KB, MB, GB, TB or PB.
 
-        Args:
-            bytes(int): size of the file in bytes
-        Return:
-            (str): containing size with formatting.
+    :params bytes: size of the file in bytes
     """
     alternative = [
         (1024 ** 5, ' PB'),
@@ -75,14 +72,14 @@ def print_status(progress, file_size, start):
     This function - when passed as `on_progress` to `Video.download` - prints
     out the current download progress.
 
-    Arguments:
-    progress -- The lenght of the currently downloaded bytes.
-    file_size -- The total size of the video.
-    start -- time when started
+    :params progress: The lenght of the currently downloaded bytes.
+    :params file_size: The total size of the video.
+    :params start: time when started
     """
 
     percentDone = int(progress) * 100. / file_size
     done = int(50 * progress / int(file_size))
-    stdout.write("\r  [%s%s][%3.2f%%] %s at %s/s\r " % ('=' * done, ' ' * (50 - done), percentDone,
-        sizeof(file_size), sizeof(progress // (clock() - start))))
+    stdout.write("\r  [%s%s][%3.2f%%] %s at %s/s\r " % ('=' * done, ' ' *
+        (50 - done), percentDone, sizeof(file_size), sizeof(
+          progress // (clock() - start))))
     stdout.flush()
