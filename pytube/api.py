@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 from .exceptions import MultipleObjectsReturned, YouTubeError, CipherError
@@ -63,6 +65,8 @@ YT_ENCODING_KEYS = (
 
 
 class YouTube(object):
+    # TODO: just cause you CAN do this, doesn't mean you should. `hasattr` is
+    # much cleaner.
     _filename = None
     _fmt_values = []
     _video_url = None
@@ -83,6 +87,7 @@ class YouTube(object):
     def url(self, url):
         """ Defines the URL of the YouTube video.
         """
+        # TODO: erm, this is ugly. url should just be a method, not a property.
         self._video_url = url
         # Reset the filename.
         self._filename = None
@@ -147,8 +152,8 @@ class YouTube(object):
         """Return a filtered list of videos given an extention and resolution
         criteria.
 
-        :param extention: The desired file extention (e.g.: mp4).
-        :param resolution: The desired video broadcasting standard.
+        :params extention: The desired file extention (e.g.: mp4).
+        :params resolution: The desired video broadcasting standard.
         """
         results = []
         for v in self.videos:
@@ -166,8 +171,8 @@ class YouTube(object):
 
         https://gist.github.com/2009119)
 
-        :param path: A tuple representing a path to a node within a tree.
-        :param data: The data containing the tree.
+        :params path: A tuple representing a path to a node within a tree.
+        :params data: The data containing the tree.
         """
         elem = path[0]
         # Get first element in tuple, and check if it contains a list.
@@ -312,8 +317,8 @@ class YouTube(object):
     def _cipher(self, s, url):
         """Get the signature using the cipher implemented in the JavaScript code
 
-        :param s: Signature
-        :param url: url of JavaScript file
+        :params s: Signature
+        :params url: url of JavaScript file
         """
         # TODO: refactor removing tinyJS
 
@@ -353,7 +358,7 @@ class YouTube(object):
         suspect this is suppose to act as a deterrent.. Nothing some regulular
         expressions couldn't handle.
 
-        :param text: The malformed data contained within each url node.
+        :params text: The malformed data contained within each url node.
         """
         itag = re.findall('itag=(\d+)', text)
         if itag and len(itag) is 1:
