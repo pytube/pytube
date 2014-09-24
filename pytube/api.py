@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from .exceptions import MultipleObjectsReturned, YouTubeError, CipherError
-from .tinyjs import *
+from .tinyjs import * # TODO: get rid of tinyjs ugghhh
 from .models import Video
 from .utils import safe_filename
 try:
