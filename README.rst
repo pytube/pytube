@@ -160,7 +160,7 @@ Background
 
 After missing the deadline to register for PyCon 2012, I decided to write what
 became PyTube and crawler to collect all the YouTube links for the talks
-on PyVideos.
+on PyVideos_.
 
 To avoid having to encode them to mp4 (so I could watch them on my iPhone)
 I wrote it so you could specify an encoding format.
