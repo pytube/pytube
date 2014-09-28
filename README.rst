@@ -57,7 +57,7 @@ The only features I see implementing in the near future are:
 Usage Example
 =============
 
-... code:: python
+.. code:: python
 
     from pytube import YouTube
 
