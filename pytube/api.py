@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from .exceptions import MultipleObjectsReturned, YouTubeError, CipherError
-from .tinyjs import * # TODO: get rid of tinyjs ugghhh
+from .tinyjs import JSVM
 from .models import Video
 from .utils import safe_filename
 try:
@@ -146,7 +146,7 @@ class YouTube(object):
             return result[0]
         else:
             raise MultipleObjectsReturned(
-              "get() returned more than one object")
+                "get() returned more than one object")
 
     def filter(self, extension=None, resolution=None):
         """Return a filtered list of videos given an extention and resolution
@@ -257,7 +257,7 @@ class YouTube(object):
                 is_vevo = True
 
             stream_map = self._parse_stream_map(
-              data["args"]["url_encoded_fmt_stream_map"])
+                data["args"]["url_encoded_fmt_stream_map"])
 
             self.title = data["args"]["title"]
             js_url = "http:" + data["assets"]["js"]
@@ -275,16 +275,17 @@ class YouTube(object):
                         has_decrypted_signature = False
                         try:
                             signature = self._decrypt_signature(
-                              stream_map['s'][0])
+                                stream_map['s'][0])
                             url += '&signature=' + signature
                             has_decrypted_signature = True
                         except TypeError, e:
                             pass
 
                         if not has_decrypted_signature:
-                            raise CipherError("Couldn't cipher the signature. "
-                              "Maybe YouTube has changed the cipher "
-                              "algorithm. Notify this issue on GitHub")
+                            raise CipherError(
+                                "Couldn't cipher the signature. "
+                                "Maybe YouTube has changed the cipher "
+                                "algorithm. Notify this issue on GitHub")
 
                     else:
                         signature = self._cipher(stream_map["s"][i], js_url)
@@ -315,7 +316,8 @@ class YouTube(object):
         return "".join(a)
 
     def _cipher(self, s, url):
-        """Get the signature using the cipher implemented in the JavaScript code
+        """Get the signature using the cipher
+        implemented in the JavaScript code
 
         :params s: Signature
         :params url: url of JavaScript file

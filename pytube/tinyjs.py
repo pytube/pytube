@@ -1,5 +1,6 @@
 import re
 
+
 class JSVM(object):
 
     _memory = {}
@@ -9,13 +10,31 @@ class JSVM(object):
     def __init__(self, code=""):
         # TODO: parse automatically the 'swap' method
         # function Bn(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c;return a};
-        def _swap(args): a = list(args[0]); b = int(args[1]); c = a[0]; a[0] = a[b % len(a)]; a[b] = c; return "".join(a)
-        def _split(args): return ""
-        def _slice(args): return args[0][int(args[1]):]
-        def _reverse(args): return args[0][::-1]
-        def _join(args): return "".join(args[0])
-        def _assign(args): return args[0]
-        def _get(args): return self._memory[args[0]]
+        def _swap(args):
+            a = list(args[0])
+            b = int(args[1])
+            c = a[0]
+            a[0] = a[b % len(a)]
+            a[b] = c
+            return "".join(a)
+
+        def _split(args):
+            return ""
+
+        def _slice(args):
+            return args[0][int(args[1]):]
+
+        def _reverse(args):
+            return args[0][::-1]
+
+        def _join(args):
+            return "".join(args[0])
+
+        def _assign(args):
+            return args[0]
+
+        def _get(args):
+            return self._memory[args[0]]
 
         self._js_methods = {
             "split": _split,
@@ -38,17 +57,17 @@ class JSVM(object):
             #print instruction
             var, method = instruction.split("=")
             m = regex.match(method)
-            if m == None:
+            if m is None:
                 arguments = [method[1:-1]]
                 method = "$assign"
             else:
                 m = m.groups()
                 #print m
                 arguments = []
-                pre_args = [m[0][:-1]] if m[0] != None else []
+                pre_args = [m[0][:-1]] if m[0] is not None else []
                 pre_args += m[2].split(",")
                 for a in pre_args:
-                    if a == None or a == "":
+                    if a is None or a == "":
                         continue
                     # Replace variables with his value
                     arguments += [JSMethod(self._js_methods["$get"], a) if not a[0] == '"' and not a[0] == '' and not a.isdigit() else a]
@@ -68,6 +87,7 @@ class JSVM(object):
             self._memory[ins[0]] = ins[1].run()
         return self._memory
 
+
 class JSMethod(object):
 
     def __init__(self, method, args):
@@ -75,7 +95,7 @@ class JSMethod(object):
         self._a = args
 
     def run(self):
-        args = [arg.run() if isinstance(arg, JSMethod) else arg for arg in self._a]
+        args = [a.run() if isinstance(a, JSMethod) else a for a in self._a]
         return self._m(args)
 
     def __repr__(self):
