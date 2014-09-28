@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+
+# Colors
+COLOR_OFF="\033[0m"   # unsets color to term fg color
+RED="\033[0;31m"      # red
+GREEN="\033[0;32m"    # green
+YELLOW="\033[0;33m"   # yellow
+MAGENTA="\033[0;35m"  # magenta
+CYAN="\033[0;36m"     # cyan
+
+if [[ "$@" != "major" ]] && [[ "$@" != "minor" ]] && [[ "$@" != "patch" ]]; then
+    echo -e "${RED}WARNING: Invalid release type, must specify 'major', 'minor', or 'patch'${COLOR_OFF}\n"
+    exit
+fi
+
+echo -e "\n${GREEN}STARTING RELEASE PROCESS${COLOR_OFF}\n"
+
+git status | grep "working directory clean" &> /dev/null
+if [ ! $? -eq 0 ]; then # working directory is NOT clean
+    echo -e "${RED}WARNING: You have uncomitted changes, you may have forgotten something${COLOR_OFF}\n"
+    exit
+fi
+
+echo -e "${YELLOW}--->${COLOR_OFF} Updating local copy"
+git pull -q origin master
+
+echo -e "${YELLOW}--->${COLOR_OFF} Retrieving release versions"
+
+current_version=`cat pytube/__init__.py |grep '__version__ ='|sed 's/[^0-9.]//g'`
+major=`echo $current_version | awk '{split($0,a,"."); print a[1]}'`
+minor=`echo $current_version | awk '{split($0,a,"."); print a[2]}'`
+patch=`echo $current_version | awk '{split($0,a,"."); print a[3]}'`
+
+if [[ "$@" == "major" ]]; then
+    major=$(($major + 1));
+    minor="0"
+    patch="0"
+elif [[ "$@" == "minor" ]]; then
+    minor=$(($minor + 1));
+    patch="0"
+elif [[ "$@" == "patch" ]]; then
+    patch=$(($patch + 1));
+fi
+
+next_version="${major}.${minor}.${patch}"
+
+echo -e  "${YELLOW}   >${COLOR_OFF} ${MAGENTA}${current_version}${COLOR_OFF} -> ${MAGENTA}${next_version}${COLOR_OFF}"
+
+echo -e "${YELLOW}--->${COLOR_OFF} Creating necessary temp file"
+tempfoo=`basename $0`
+TMPFILE=`mktemp /tmp/${tempfoo}.XXXXXX` || {
+    echo -e "${RED}WARNING: Cannot create temp file using mktemp in /tmp dir ${COLOR_OFF}\n"
+    exit 1
+}
+
+find_this="__version__ = '$current_version'"
+replace_with="__version__ = '$next_version'"
+
+echo -e "${YELLOW}--->${COLOR_OFF} Updating pytube/__init__.py"
+sed "s/$find_this/$replace_with/" pytube/__init__.py > $TMPFILE && mv $TMPFILE pytube/__init__.py
+
+find_this="pytube.git@$current_version"
+replace_with="pytube.git@$next_version"
+
+echo -e "${YELLOW}--->${COLOR_OFF} Updating README.rst"
+sed "s/$find_this/$replace_with/" README.rst > $TMPFILE && mv $TMPFILE README.rst
+
+echo -e "${YELLOW}--->${COLOR_OFF} Updating CHANGES.rst for new release"
+version_header="$next_version ($(date +%F))"
+dashes=`yes '-'|head -n ${#version_header}|tr -d '\n'`
+gitchangelog |sed "4s/.*/$version_header/"|sed "5s/.*/$dashes/" > $TMPFILE && mv $TMPFILE CHANGES.rst
+
+echo -e "${YELLOW}--->${COLOR_OFF} Adding changed files to git"
+git add CHANGES.rst README.rst pytube/__init__.py
+
+echo -e "${YELLOW}--->${COLOR_OFF} Creating release"
+git commit -q -m "Release version $next_version"
+
+echo -e "${YELLOW}--->${COLOR_OFF} Tagging release"
+git tag -a $next_version -m "Release version $next_version"
+
+echo -e "${YELLOW}--->${COLOR_OFF} Pushing release and tags to github"
+git push -q origin master && git push -q --tags
+
+echo -e "${YELLOW}--->${COLOR_OFF} Creating python release"
+cp README.rst README
+python setup.py sdist upload > /dev/null
+rm README
+
+echo -e "\n${CYAN}RELEASED VERSION ${next_version}!${COLOR_OFF}\n"
