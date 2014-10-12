@@ -12,6 +12,7 @@ except ImportError:
     from urllib.request import urlopen
 
 import re, json, subprocess
+import execjs
 
 YT_BASE_URL = 'http://www.youtube.com/get_video_info'
 
@@ -293,11 +294,6 @@ class YouTube(object):
                 # Get the helper object that's used by the cipher code
                 obj = re.findall(r"[a-zA-Z]{2}\.", code)[0][0:2]
                 obj = re.findall(r"var " + obj + "=.*?};", self._js_code)[0]
-                print("JS Object is %s" % obj)
-                gfile = open("/tmp/debug.html", "w")
-                gfile.write("Object is %s\n" % code[2:4])
-                gfile.write(self._js_code)
-                gfile.close()
 
                 signature = "a='" + s + "'.split('');"
                 # ^ Maybe figure out the name of the var instead of assuming 'a' (Which seems to always be true as of now)
@@ -306,13 +302,9 @@ class YouTube(object):
                 # algorithm in python...
 
                 # Wrap in function and evaluate using system's js interpreter (ie spidermonkey)
-                code = obj[4:] + ' function getsig(){' + signature + code + '}; print(getsig());'
-                #print("Compiling: '%s'" % code)
-                gfile = open("/tmp/yt.js", "w") # Dump to file for easier debugging
-                # Could pipe directly into process, would make it work on windows etc...
-                gfile.write(code)
-                gfile.close()
-                ret = subprocess.check_output([ "js", "/tmp/yt.js" ], stderr=subprocess.STDOUT).strip().decode(encoding='UTF-8')
+                code = obj[4:] + ' function getsig(){' + signature + code + '};'
+                compiledcode=execjs.compile(code)
+                ret=compiledcode.call("getsig")
                 if len(ret) < 10: # Better: check exit code
                     continue
                 #print("Signature seems to be '%s'" % ret)
