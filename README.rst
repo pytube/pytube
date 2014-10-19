@@ -110,7 +110,7 @@ Usage Example
     #<Video: H.264 (.mp4) - 720p>
 
     # you can also get all videos for a given resolution
-    pprint(yt.filter(res='480p'))
+    pprint(yt.filter(resolution='480p'))
 
     #[<Video: H.264 (.flv) - 480p>,
     #<Video: VP8 (.webm) - 480p>]
