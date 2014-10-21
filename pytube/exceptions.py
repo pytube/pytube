@@ -11,8 +11,9 @@ class YouTubeError(Exception):
     """
     pass
 
+
 class CipherError(Exception):
-	"""
-	The _cipher method returned an error.
-	"""
-	pass
+    """
+    The _cipher method returned an error.
+    """
+    pass

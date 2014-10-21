@@ -1,36 +1,38 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from .exceptions import *
+from .exceptions import MultipleObjectsReturned, YouTubeError, CipherError
 from .models import Video
 from .utils import safe_filename
 try:
-    from urllib import urlencode
     from urllib2 import urlopen
     from urlparse import urlparse, parse_qs, unquote
 except ImportError:
-    from urllib.parse import urlencode, urlparse, parse_qs, unquote
+    from urllib.parse import urlparse, parse_qs, unquote
     from urllib.request import urlopen
 
-import re, json, subprocess
+import re
+import json
 import execjs
 
 YT_BASE_URL = 'http://www.youtube.com/get_video_info'
 
-#YouTube quality and codecs id map.
-#source: http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
+# YouTube quality and codecs id map.
+# source: http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
 YT_ENCODING = {
-    #Flash Video
+    # Flash Video
     5: ["flv", "240p", "Sorenson H.263", "N/A", "0.25", "MP3", "64"],
     6: ["flv", "270p", "Sorenson H.263", "N/A", "0.8", "MP3", "64"],
     34: ["flv", "360p", "H.264", "Main", "0.5", "AAC", "128"],
     35: ["flv", "480p", "H.264", "Main", "0.8-1", "AAC", "128"],
 
-    #3GP
+    # 3GP
     36: ["3gp", "240p", "MPEG-4 Visual", "Simple", "0.17", "AAC", "38"],
     13: ["3gp", "N/A", "MPEG-4 Visual", "N/A", "0.5", "AAC", "N/A"],
     17: ["3gp", "144p", "MPEG-4 Visual", "Simple", "0.05", "AAC", "24"],
 
-    #MPEG-4
+    # MPEG-4
     18: ["mp4", "360p", "H.264", "Baseline", "0.5", "AAC", "96"],
     22: ["mp4", "720p", "H.264", "High", "2-2.9", "AAC", "192"],
     37: ["mp4", "1080p", "H.264", "High", "3-4.3", "AAC", "192"],
@@ -38,9 +40,9 @@ YT_ENCODING = {
     82: ["mp4", "360p", "H.264", "3D", "0.5", "AAC", "96"],
     83: ["mp4", "240p", "H.264", "3D", "0.5", "AAC", "96"],
     84: ["mp4", "720p", "H.264", "3D", "2-2.9", "AAC", "152"],
-    85: ["mp4", "520p", "H.264", "3D", "2-2.9", "AAC", "152"],
+    85: ["mp4", "1080p", "H.264", "3D", "2-2.9", "AAC", "152"],
 
-    #WebM
+    # WebM
     43: ["webm", "360p", "VP8", "N/A", "0.5", "Vorbis", "128"],
     44: ["webm", "480p", "VP8", "N/A", "1", "Vorbis", "128"],
     45: ["webm", "720p", "VP8", "N/A", "2", "Vorbis", "192"],
@@ -52,12 +54,19 @@ YT_ENCODING = {
 
 # The keys corresponding to the quality/codec map above.
 YT_ENCODING_KEYS = (
-    'extension', 'resolution', 'video_codec', 'profile', 'video_bitrate',
-    'audio_codec', 'audio_bitrate'
+    'extension',
+    'resolution',
+    'video_codec',
+    'profile',
+    'video_bitrate',
+    'audio_codec',
+    'audio_bitrate'
 )
 
 
 class YouTube(object):
+    # TODO: just cause you CAN do this, doesn't mean you should. `hasattr` is
+    # much cleaner.
     _filename = None
     _fmt_values = []
     _video_url = None
@@ -70,23 +79,25 @@ class YouTube(object):
 
     @property
     def url(self):
-        """Exposes the video url."""
+        """Exposes the video url.
+        """
         return self._video_url
 
     @url.setter
     def url(self, url):
-        """ Defines the URL of the YouTube video."""
+        """ Defines the URL of the YouTube video.
+        """
+        # TODO: erm, this is ugly. url should just be a method, not a property.
         self._video_url = url
-        #Reset the filename.
+        # Reset the filename.
         self._filename = None
-        #Get the video details.
+        # Get the video details.
         self._get_video_info()
 
     @property
     def filename(self):
-        """
-        Exposes the title of the video. If this is not set, one is
-        generated based on the name of the video.
+        """Exposes the title of the video. If this is not set, one is generated
+        based on the name of the video.
         """
         if not self._filename:
             self._filename = safe_filename(self.title)
@@ -94,7 +105,8 @@ class YouTube(object):
 
     @filename.setter
     def filename(self, filename):
-        """ Defines the filename."""
+        """Defines the filename.
+        """
         self._filename = filename
         if self.videos:
             for video in self.videos:
@@ -102,7 +114,8 @@ class YouTube(object):
 
     @property
     def video_id(self):
-        """Gets the video ID extracted from the URL."""
+        """Gets the video ID extracted from the URL.
+        """
         parts = urlparse(self._video_url)
         qs = getattr(parts, 'query', None)
         if qs:
@@ -110,19 +123,20 @@ class YouTube(object):
             if video_id:
                 return video_id.pop()
 
-    def get(self, extension=None, resolution=None):
-        """
-        Return a single video given an extention and resolution.
+    def get(self, extension=None, resolution=None, profile="High"):
+        """Return a single video given an extention and resolution.
 
-        Keyword arguments:
-        extention -- The desired file extention (e.g.: mp4).
-        resolution -- The desired video broadcasting standard.
+        :params extention: The desired file extention (e.g.: mp4).
+        :params resolution: The desired video broadcasting standard.
+        :params profile: The desired quality profile.
         """
         result = []
         for v in self.videos:
             if extension and v.extension != extension:
                 continue
             elif resolution and v.resolution != resolution:
+                continue
+            elif profile and v.profile != profile:
                 continue
             else:
                 result.append(v)
@@ -131,18 +145,15 @@ class YouTube(object):
         elif len(result) is 1:
             return result[0]
         else:
-            d = len(result)
-            raise MultipleObjectsReturned("get() returned more than one "
-                                          "object -- it returned {}!".format(d))
+            raise MultipleObjectsReturned(
+                "get() returned more than one object")
 
     def filter(self, extension=None, resolution=None):
-        """
-        Return a filtered list of videos given an extention and
-        resolution criteria.
+        """Return a filtered list of videos given an extention and resolution
+        criteria.
 
-        Keyword arguments:
-        extention -- The desired file extention (e.g.: mp4).
-        resolution -- The desired video broadcasting standard.
+        :params extention: The desired file extention (e.g.: mp4).
+        :params resolution: The desired video broadcasting standard.
         """
         results = []
         for v in self.videos:
@@ -155,28 +166,27 @@ class YouTube(object):
         return results
 
     def _fetch(self, path, data):
-        """
-        Given a path, traverse the response for the desired data. (A
+        """Given a path, traverse the response for the desired data. (A
         modified ver. of my dictionary traverse method:
+
         https://gist.github.com/2009119)
 
-        Keyword arguments:
-        path -- A tuple representing a path to a node within a tree.
-        data -- The data containing the tree.
+        :params path: A tuple representing a path to a node within a tree.
+        :params data: The data containing the tree.
         """
         elem = path[0]
-        #Get first element in tuple, and check if it contains a list.
+        # Get first element in tuple, and check if it contains a list.
         if type(data) is list:
             # Pop it, and let's continue..
             return self._fetch(path, data.pop())
-        #Parse the url encoded data
+        # Parse the url encoded data
         data = parse_qs(data)
-        #Get the element in our path
+        # Get the element in our path
         data = data.get(elem, None)
-        #Offset the tuple by 1.
+        # Offset the tuple by 1.
         path = path[1::1]
-        #Check if the path has reached the end OR the element return
-        #nothing.
+        # Check if the path has reached the end OR the element return
+        # nothing.
         if len(path) is 0 or data is None:
             if type(data) is list and len(data) is 1:
                 data = data.pop()
@@ -186,12 +196,8 @@ class YouTube(object):
             return self._fetch(path, data)
 
     def _parse_stream_map(self, text):
-        """
-        Python's `parse_qs` can't properly decode the stream map
+        """Python's `parse_qs` can't properly decode the stream map
         containing video data so we use this instead.
-
-        Keyword arguments:
-        data -- The parsed response from YouTube.
         """
         videoinfo = {
             "itag": [],
@@ -214,20 +220,12 @@ class YouTube(object):
 
         return videoinfo
 
-    def _findBetween(self, s, first, last):
-        try:
-            start = s.index(first) + len(first)
-            end = s.index( last, start )
-            return s[start:end]
-        except ValueError:
-            return ""
-
     def _get_video_info(self):
+        """This is responsable for executing the request, extracting the
+        necessary details, and populating the different video resolutions and
+        formats into a list.
         """
-        This is responsable for executing the request, extracting the
-        necessary details, and populating the different video
-        resolutions and formats into a list.
-        """
+        # TODO: split up into smaller functions. Cyclomatic complexity => 15
         self.title = None
         self.videos = []
 
@@ -247,12 +245,19 @@ class YouTube(object):
                             break
                 else:
                     raise YouTubeError("Cannot get JSON from HTML")
-                
-                data = json.loads(player_conf[:i+1])
+
+                index = i + 1
+                data = json.loads(player_conf[:index])
             except Exception as e:
                 raise YouTubeError("Cannot decode JSON: {0}".format(e))
 
-            stream_map = self._parse_stream_map(data["args"]["url_encoded_fmt_stream_map"])
+            is_vevo = False
+            if data['args'].get('ptk', '') in ['vevo', 'dashmpd']:
+                # Vevo videos with encrypted signatures
+                is_vevo = True
+
+            stream_map = self._parse_stream_map(
+                data["args"]["url_encoded_fmt_stream_map"])
 
             self.title = data["args"]["title"]
             js_url = "http:" + data["assets"]["js"]
@@ -263,34 +268,71 @@ class YouTube(object):
                     fmt, fmt_data = self._extract_fmt(url)
                 except (TypeError, KeyError):
                     continue
-                
+
                 # If the signature must be ciphered...
                 if "signature=" not in url:
-                    signature = self._cipher(stream_map["s"][i], js_url)
-                    url = "%s&signature=%s" % (url, signature)
-                
+                    if is_vevo:
+                        has_decrypted_signature = False
+                        try:
+                            signature = self._decrypt_signature(
+                                stream_map['s'][0])
+                            url += '&signature=' + signature
+                            has_decrypted_signature = True
+                        except TypeError, e:
+                            pass
+
+                        if not has_decrypted_signature:
+                            raise CipherError(
+                                "Couldn't cipher the signature. "
+                                "Maybe YouTube has changed the cipher "
+                                "algorithm. Notify this issue on GitHub")
+
+                    else:
+                        signature = self._cipher(stream_map["s"][i], js_url)
+                        url = "%s&signature=%s" % (url, signature)
+
                 self.videos.append(Video(url, self.filename, **fmt_data))
                 self._fmt_values.append(fmt)
             self.videos.sort()
 
-    def _cipher(self, s, url):
+    @staticmethod
+    def _decrypt_signature(s):
+        """Comment me :)
         """
-        Get the signature using the cipher implemented in the JavaScript code
+        def tu(a, b):
+            c = a[0]
+            a[0] = a[b % len(a)]
+            a[b] = c
+            return a
 
-        Keyword arguments:
-        s -- Signature
-        url -- url of JavaScript file
+        def splice(a, b):
+            return a[b:]
+
+        a = list(s)
+        a = tu(a[::-1], 26)
+        a = tu(a[::-1], 28)
+        a = tu(a, 38)
+        a = splice(a[::-1], 3)
+        return "".join(a)
+
+    def _cipher(self, s, url):
+        """Get the signature using the cipher
+        implemented in the JavaScript code
+
+        :params s: Signature
+        :params url: url of JavaScript file
         """
+        # TODO: refactor removing tinyJS
 
         # Getting JS code (if hasn't downloaded yet)
         if not self._js_code:
-            self._js_code = urlopen(url).read().decode() if not self._js_code else self._js_code
+            # TODO: don't use conditional expression if line > 79 characters.
+            self._js_code = (urlopen(url).read().decode()
+                             if not self._js_code else self._js_code)
 
         codes = re.findall(r"function \S{2}\(\S{1}\)\{\S{1}=\S{1}\.split\(\"\"\)\;(.*?)\}", self._js_code)
-        #print("Got %s codes..." % len(codes))
         for code in codes:
             try:
-                #print("Trying: %s" % code)
                 # Get the helper object that's used by the cipher code
                 obj = re.findall(r"[a-zA-Z]{2}\.", code)[0][0:2]
                 obj = re.findall(r"var " + obj + "=.*?};", self._js_code)[0]
@@ -307,22 +349,19 @@ class YouTube(object):
                 ret=compiledcode.call("getsig")
                 if len(ret) < 10: # Better: check exit code
                     continue
-                #print("Signature seems to be '%s'" % ret)
                 return ret
 
             except Exception as e:
                 print("Oopsie... ", format(e))
 
-        raise CipherError("Couldn't cipher the signature. Maybe YouTube has changed the cipher algorithm. Notify this issue on GitHub: %s" % format(e))
+                raise CipherError("Couldn't cipher the signature. Maybe YouTube has changed the cipher algorithm. Notify this issue on GitHub: %s" % format(e))
 
     def _extract_fmt(self, text):
-        """
-        YouTube does not pass you a completely valid URLencoded form,
-        I suspect this is suppose to act as a deterrent.. Nothing some
-        regulular expressions couldn't handle.
+        """YouTube does not pass you a completely valid URLencoded form, I
+        suspect this is suppose to act as a deterrent.. Nothing some regulular
+        expressions couldn't handle.
 
-        Keyword arguments:
-        text -- The malformed data contained within each url node.
+        :params text: The malformed data contained within each url node.
         """
         itag = re.findall('itag=(\d+)', text)
         if itag and len(itag) is 1:
