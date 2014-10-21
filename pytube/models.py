@@ -1,10 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from os.path import normpath, isfile
 from os import remove
+from time import clock
 try:
     from urllib2 import urlopen
 except ImportError:
     from urllib.request import urlopen
+from pytube.utils import sizeof
 
 
 class Video(object):
@@ -27,7 +31,7 @@ class Video(object):
         self.filename = filename
         self.__dict__.update(**attributes)
 
-    def download(self, path=None, chunk_size=8*1024,
+    def download(self, path=None, chunk_size=8 * 1024,
                  on_progress=None, on_finish=None):
         """
         Downloads the file of the URL defined within the class
@@ -57,13 +61,14 @@ class Video(object):
         response = urlopen(self.url)
         meta_data = dict(response.info().items())
         file_size = int(meta_data.get("Content-Length") or
-                meta_data.get("content-length"))
+                        meta_data.get("content-length"))
         self._bytes_received = 0
+        start = clock()
         try:
             with open(fullpath, 'wb') as dst_file:
                 # Print downloading message
-                print("\nDownloading: '{0}.{1}' (Bytes: {2})\n\n".format(
-                      self.filename, self.extension, file_size))
+                print("\nDownloading: '{0}.{1}' (Bytes: {2}) \nto path: {3}\n\n".format(
+                      self.filename, self.extension, sizeof(file_size), path))
 
                 while True:
                     self._buffer = response.read(chunk_size)
@@ -75,34 +80,36 @@ class Video(object):
                     self._bytes_received += len(self._buffer)
                     dst_file.write(self._buffer)
                     if on_progress:
-                        on_progress(self._bytes_received, file_size)
+                        on_progress(self._bytes_received, file_size, start)
 
         # Catch possible exceptions occurring during download
         except IOError:
-            print("\n\nError: Failed to open file.\n" \
-                  "Check that: ('{0}'), is a valid pathname.\n\n" \
+            print("\n\nError: Failed to open file.\n"
+                  "Check that: ('{0}'), is a valid pathname.\n\n"
                   "Or that ('{1}.{2}') is a valid filename.\n\n".format(
                         path, self.filename, self.extension))
             return 2
 
         except BufferError:
-            print("\n\nError: Failed on writing buffer.\n" \
+            print("\n\nError: Failed on writing buffer.\n"
                   "Failed to write video to file.\n\n")
             return 1
 
         except KeyboardInterrupt:
-            print("\n\nInterrupt signal given.\nDeleting incomplete video" \
+            print("\n\nInterrupt signal given.\nDeleting incomplete video"
                   "('{0}.{1}').\n\n".format(self.filename, self.extension))
             remove(fullpath)
             return 1
 
         return 0
 
-
     def __repr__(self):
         """A cleaner representation of the class instance."""
-        return "<Video: {0} (.{1}) - {2}>".format(self.video_codec, self.extension,
-                                           self.resolution)
+        return "<Video: {0} (.{1}) - {2} - {3}>".format(
+            self.video_codec,
+            self.extension,
+            self.resolution,
+            self.profile)
 
     def __lt__(self, other):
         if type(other) == Video:
