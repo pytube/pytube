@@ -38,12 +38,6 @@ def _main():
     if args.filename:
         yt.filename = args.filename
 
-    if args.ext or args.res:
-        if not all([args.ext, args.res]):
-            print "\nMake sure you give either of the below specified format/resolution combination.\n"
-            pprint(res_formts)
-            sys.exit(1)
-
     if args.ext and args.res:
         # There's only ope video that matches both so get it
         vid = yt.get(args.ext, args.res)
@@ -80,9 +74,9 @@ def _main():
     try:
         ret = vid.download(path=args.path, on_progress=print_status)
         if ret == 0:
-            print("....done!                    ")
+            print("....done!                    \n\n")
         else:
-            print("\nError!")
+            print("\nError!\n\n")
         return ret
     except KeyboardInterrupt:
         print("Download interrupted.")
