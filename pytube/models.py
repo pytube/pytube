@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 from os.path import normpath, isfile
 from os import remove
-from time import clock
+from time import time
 try:
     from urllib2 import urlopen
 except ImportError:
@@ -63,7 +63,7 @@ class Video(object):
         file_size = int(meta_data.get("Content-Length") or
                         meta_data.get("content-length"))
         self._bytes_received = 0
-        start = clock()
+        start = time()
         try:
             with open(fullpath, 'wb') as dst_file:
                 # Print downloading message

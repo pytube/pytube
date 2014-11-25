@@ -7,7 +7,7 @@ import time
 
 from os import path
 from sys import stdout
-from time import clock
+from time import time
 
 
 class FullPaths(argparse.Action):
@@ -68,7 +68,6 @@ def sizeof(bytes):
             suffix = multiple
     return "%s%s" % (str(amount), suffix)
 
-
 def print_status(progress, file_size, start):
     """
     This function - when passed as `on_progress` to `Video.download` - prints
@@ -79,9 +78,18 @@ def print_status(progress, file_size, start):
     :params start: time when started
     """
 
+    global lastcall
+    now = time()
+    if now < lastcall: # account for clock adjustments
+        lastcall = 0
+    if now < lastcall + 1.: # only print once a second
+        return
+    lastcall = now
     percentDone = int(progress) * 100. / file_size
     done = int(50 * progress / int(file_size))
-    stdout.write("\r  [%s%s][%3.2f%%] %s at %s/s\r " %
+    stdout.write(" \r  [%s%s][%3.2f%%] %s at %s/s      \r " %
                 ('=' * done, ' ' * (50 - done), percentDone, sizeof(file_size),
-                    sizeof(progress // (clock() - start))))
+                    sizeof(progress // (now - start + .001))))
     stdout.flush()
+
+lastcall = 0
