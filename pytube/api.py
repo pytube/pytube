@@ -252,9 +252,9 @@ class YouTube(object):
                 raise YouTubeError("Cannot decode JSON: {0}".format(e))
 
             is_vevo = False
-            if data['args'].get('ptk', '') in ['vevo', 'dashmpd']:
-                # Vevo videos with encrypted signatures
-                is_vevo = True
+            #if data['args'].get('ptk', '') in ['vevo', 'dashmpd']:
+            #    # Vevo videos with encrypted signatures
+            #    is_vevo = True
 
             stream_map = self._parse_stream_map(
                 data["args"]["url_encoded_fmt_stream_map"])
@@ -278,7 +278,7 @@ class YouTube(object):
                                 stream_map['s'][0])
                             url += '&signature=' + signature
                             has_decrypted_signature = True
-                        except TypeError, e:
+                        except TypeError:
                             pass
 
                         if not has_decrypted_signature:
