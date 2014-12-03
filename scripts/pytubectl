@@ -32,7 +32,7 @@ def _main():
         res_formts = yt.videos
         res_formts = ["%s %s" % (str(res_formts[index].extension), str(res_formts[index].resolution)) for index, video in enumerate(res_formts)]
     except YouTubeError:
-        print "Incorrect video URL."
+        print("Incorrect video URL.")
         sys.exit(1)
 
     if args.filename:
@@ -40,7 +40,7 @@ def _main():
 
     if args.ext or args.res:
         if not all([args.ext, args.res]):
-            print "\nMake sure you give either of the below specified format/resolution combination.\n"
+            print("\nMake sure you give either of the below specified format/resolution combination.\n")
             pprint(res_formts)
             sys.exit(1)
 
@@ -49,7 +49,7 @@ def _main():
         vid = yt.get(args.ext, args.res)
         # Check if there's a video returned
         if not vid:
-            print "\nThere's no video with the specified format/resolution combination.\n"
+            print("\nThere's no video with the specified format/resolution combination.\n")
             pprint(res_formts)
             sys.exit(1)
 
@@ -58,7 +58,7 @@ def _main():
         videos = yt.filter(extension=args.ext)
         # Check if we have a video
         if not videos:
-            print "There are no videos in the specified format."
+            print("There are no videos in the specified format.")
             sys.exit(1)
         # Select the highest resolution one
         vid = max(videos)
@@ -67,7 +67,7 @@ def _main():
         videos = yt.filter(res=args.res)
         # Check if we have a video
         if not videos:
-            print "There are no videos in the specified in the specified resolution."
+            print("There are no videos in the specified in the specified resolution.")
             sys.exit(1)
         # Select the highest resolution one
         vid = max(videos)
@@ -78,7 +78,7 @@ def _main():
     try:
         vid.download(path=args.path, on_progress=print_status)
     except KeyboardInterrupt:
-        print "Download interrupted."
+        print("Download interrupted.")
         sys.exit(1)
 
 if __name__ == '__main__':
