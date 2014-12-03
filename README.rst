@@ -11,6 +11,13 @@ Downloading videos from YouTube shouldn't require some bloatware application,
 it's usually a niche condition you want to do so in the first place. So I
 present to you, PyTube!
 
+Requirements
+============
+
+- Python 2.6+ (2.7 recommended)
+- PIP (for some installation methods)
+- GIT (for some installation methods)
+
 Installation
 ============
 
