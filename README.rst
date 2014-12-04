@@ -14,7 +14,7 @@ present to you, PyTube!
 Requirements
 ============
 
-- Python 2.6+ (2.7 recommended)
+- Python 2.6+ (2.7 or 3.4 recommended)
 - PIP (for some installation methods)
 - GIT (for some installation methods)
 
