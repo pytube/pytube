@@ -95,6 +95,7 @@ Usage Example
     # You can override this by manually setting the filename.
 
     # view the auto generated filename:
+    from __future__ import print_function
     print(yt.filename)
 
     #Pulp Fiction - Dancing Scene [HD]
