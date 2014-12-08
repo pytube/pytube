@@ -14,7 +14,7 @@ present to you, PyTube!
 Requirements
 ============
 
-- Python 2.6+ (2.7 recommended)
+- Python 2.6+ (2.7 or 3.4 recommended)
 - PIP (for some installation methods)
 - GIT (for some installation methods)
 
@@ -95,7 +95,8 @@ Usage Example
     # You can override this by manually setting the filename.
 
     # view the auto generated filename:
-    print yt.filename
+    from __future__ import print_function
+    print(yt.filename)
 
     #Pulp Fiction - Dancing Scene [HD]
 
@@ -113,7 +114,7 @@ Usage Example
     # notice that the list is ordered by lowest resolution to highest. If you
     # wanted the highest resolution available for a specific file type, you
     # can simply do:
-    print yt.filter('mp4')[-1]
+    print(yt.filter('mp4')[-1])
     #<Video: H.264 (.mp4) - 720p>
 
     # you can also get all videos for a given resolution

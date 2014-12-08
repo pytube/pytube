@@ -278,7 +278,7 @@ class YouTube(object):
                                 stream_map['s'][0])
                             url += '&signature=' + signature
                             has_decrypted_signature = True
-                        except TypeError, e:
+                        except TypeError:
                             pass
 
                         if not has_decrypted_signature:
