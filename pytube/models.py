@@ -10,6 +10,7 @@ except ImportError:
     from urllib.request import urlopen
 from sys import exit
 from pytube.utils import sizeof
+from os.path import isdir
 
 
 class Video(object):
@@ -50,8 +51,11 @@ class Video(object):
 
         """
 
-        path = (normpath(path) + '/' if path else '')
-        fullpath = '{0}{1}.{2}'.format(path, self.filename, self.extension)
+        if isdir(normpath(path)) :
+            path = (normpath(path) + '/' if path else '')
+            fullpath = '{0}{1}.{2}'.format(path, self.filename, self.extension)
+        else:
+            fullpath = normpath(path)
 
         # Check for conflicting filenames
         if isfile(fullpath) and not force_overwrite:
