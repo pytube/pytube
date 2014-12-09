@@ -33,7 +33,7 @@ class Video(object):
         self.__dict__.update(**attributes)
 
     def download(self, path=None, chunk_size=8 * 1024,
-                 on_progress=None, on_finish=None):
+                 on_progress=None, on_finish=None, force_overwrite=False):
         """
         Downloads the file of the URL defined within the class
         instance.
@@ -54,10 +54,9 @@ class Video(object):
         fullpath = '{0}{1}.{2}'.format(path, self.filename, self.extension)
 
         # Check for conflicting filenames
-        if isfile(fullpath):
-            print("\n\nError: Conflicting filename:'{}'.\n\n".format(
+        if isfile(fullpath) and not force_overwrite:
+            raise FileExistsError("\n\nError: Conflicting filename:'{}'.\n\n".format(
                   self.filename))
-            exit(1)
 
         response = urlopen(self.url)
         meta_data = dict(response.info().items())
