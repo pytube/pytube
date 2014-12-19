@@ -44,4 +44,5 @@ setup(
                 "YouTube videos.",
     long_description=open_file('README.rst').read(),
     zip_safe=True,
+    install_requires=['pyexecjs']
 )
