@@ -15,6 +15,7 @@ Requirements
 ============
 
 - Python 2.6+ (2.7 or 3.4 recommended)
+- PyExecJs
 - PIP (for some installation methods)
 - GIT (for some installation methods)
 
