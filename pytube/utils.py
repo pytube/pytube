@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 import argparse
 import re
+import sys
+import time
 
 from os import path
 from sys import stdout
@@ -77,9 +79,18 @@ def print_status(progress, file_size, start):
     :params start: time when started
     """
 
+    global lastcall
+    now = time()
+    if now < lastcall: # account for clock adjustments
+        lastcall = 0
+    if now < lastcall + 1.: # only print once a second
+        return
+    lastcall = now
     percentDone = int(progress) * 100. / file_size
     done = int(50 * progress / int(file_size))
-    stdout.write("\r  [%s%s][%3.2f%%] %s at %s/s\r " %
+    stdout.write(" \r  [%s%s][%3.2f%%] %s at %s/s      \r " %
                 ('=' * done, ' ' * (50 - done), percentDone, sizeof(file_size),
-                    sizeof(progress // (clock() - start))))
+                    sizeof(progress // (now - start + .001))))
     stdout.flush()
+
+lastcall = 0
