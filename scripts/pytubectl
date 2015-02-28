@@ -8,6 +8,7 @@ from pytube.exceptions import YouTubeError
 from pprint import pprint
 
 import sys
+import os
 import argparse
 
 
@@ -19,6 +20,7 @@ def _main():
     parser.add_argument("--resolution", "-r",
                         help="The requested resolution", dest="res")
     parser.add_argument("--path", "-p", action=FullPaths,
+                        default=os.getcwd(),
                         help="The path to save the video to.", dest="path")
     parser.add_argument("--filename", "-f",
                         dest="filename",
