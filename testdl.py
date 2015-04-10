@@ -13,6 +13,4 @@ pprint(yt.videos)
 print(yt.filename)
 yt.filename = 'Dancing'
 video = yt.get('mp4', '720p')
-
-
 video.download('/home/user/') #video.download('/tmp/')
