@@ -58,15 +58,6 @@ class ExampleApp(tk.Frame):
             menu.add_command(label=string,command=lambda value=string:self.om_variable.set(value))
         self.om_variable.set(options[0])
 
-          
-    def fill_options(self):
-        menu = self.om['menu']
-        menu.delete(0,'end')
-        options = ["red","orange","green","blue"]
-        for string in options:
-            menu.add_command(label=string,command=lambda value=string:self.om_variable.set(value))
-        self.om_variable.set(options[0])
-
     def print_out(self):
         ''' Print a greeting constructed
             from the selections made by
