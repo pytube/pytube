@@ -152,6 +152,9 @@ Usage Example
     # In this case, we'll need to specify both the codec (mp4) and resolution
     # (either 360p or 720p).
 
+    # Retrieve the size in MB of the video (is one small HEAD fetch to the server)
+    print(str(int(video.size() / 1024.0 / 1024.0)) + ' MB')
+    
     # Okay, let's download it!
     video.download()
 
