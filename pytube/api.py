@@ -309,10 +309,10 @@ class YouTube(object):
             return a[b:]
 
         a = list(s)
-        a = tu(a[::-1], 26)
-        a = tu(a[::-1], 28)
-        a = tu(a, 38)
-        a = splice(a[::-1], 3)
+        a = splice(a, 3)
+        a = a[::-1]
+        a = splice(a, 3)
+        a = tu(a, 17)
         return "".join(a)
 
     def _cipher(self, s, url):
