@@ -5,9 +5,9 @@ from os.path import normpath, isfile
 from os import remove
 from time import clock
 try:
-    from urllib2 import urlopen
+    from urllib2 import urlopen, Request
 except ImportError:
-    from urllib.request import urlopen
+    from urllib.request import urlopen, Request # not sure if this Request works as in urllib2
 from pytube.utils import sizeof
 from os.path import isdir
 
@@ -32,6 +32,22 @@ class Video(object):
         self.filename = filename
         self.__dict__.update(**attributes)
 
+    def size(self):
+        """
+        Fetches the size in bytes of the video pointed to by the URL
+        defined within the class instance.
+        """
+        
+        request = Request(self.url)
+        request.get_method = lambda : 'HEAD'
+        response = urlopen(request)
+        
+        meta_data = dict(response.info().items())
+        file_size = int(meta_data.get("Content-Length") or
+                        meta_data.get("content-length"))
+        
+        return file_size
+      
     def download(self, path=None, chunk_size=8 * 1024,
                  on_progress=None, on_finish=None, force_overwrite=False):
         """
