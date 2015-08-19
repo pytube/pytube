@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 from .exceptions import MultipleObjectsReturned, YouTubeError, CipherError
 from .jsinterp import JSInterpreter
 from .models import Video
@@ -15,8 +14,7 @@ except ImportError:
 
 import re
 import json
-
-YT_BASE_URL = 'http://www.youtube.com/get_video_info'
+import warnings
 
 # YouTube quality and codecs id map.
 # source: http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
@@ -65,8 +63,6 @@ YT_ENCODING_KEYS = (
 
 
 class YouTube(object):
-    # TODO: just cause you CAN do this, doesn't mean you should. `hasattr` is
-    # much cleaner.
     _filename = None
     _fmt_values = []
     _video_url = None
@@ -74,20 +70,20 @@ class YouTube(object):
     _precompiled = False
     title = None
     videos = []
-    # fmt was an undocumented URL parameter that allowed selecting
-    # YouTube quality mode without using player user interface.
 
     @property
     def url(self):
-        """Exposes the video url.
-        """
+        """Exposes the video url."""
         return self._video_url
 
     @url.setter
     def url(self, url):
-        """ Defines the URL of the YouTube video.
-        """
-        # TODO: erm, this is ugly. url should just be a method, not a property.
+        """Defines the URL of the YouTube video."""
+        warnings.warn("url setter deprecated, use `from_url()` "
+                      "instead.", DeprecationWarning)
+        self.from_url(url)
+
+    def from_url(self, url):
         self._video_url = url
         # Reset the filename.
         self._filename = None
@@ -105,8 +101,13 @@ class YouTube(object):
 
     @filename.setter
     def filename(self, filename):
-        """Defines the filename.
-        """
+        """Defines the filename."""
+        warnings.warn("filename setter deprecated, use `set_filename()` "
+                      "instead.", DeprecationWarning)
+        self.set_filename(filename)
+
+    def set_filename(self, filename):
+        """Defines the filename."""
         self._filename = filename
         if self.videos:
             for video in self.videos:
@@ -114,8 +115,7 @@ class YouTube(object):
 
     @property
     def video_id(self):
-        """Gets the video ID extracted from the URL.
-        """
+        """Gets the video ID extracted from the URL."""
         parts = urlparse(self._video_url)
         qs = getattr(parts, 'query', None)
         if qs:
@@ -126,9 +126,12 @@ class YouTube(object):
     def get(self, extension=None, resolution=None, profile="High"):
         """Return a single video given an extention and resolution.
 
-        :params extention: The desired file extention (e.g.: mp4).
-        :params resolution: The desired video broadcasting standard.
-        :params profile: The desired quality profile.
+        :param str extention:
+            The desired file extention (e.g.: mp4).
+        :param str resolution:
+            The desired video broadcasting standard.
+        :param str profile:
+            The desired quality profile.
         """
         result = []
         for v in self.videos:
@@ -152,8 +155,10 @@ class YouTube(object):
         """Return a filtered list of videos given an extention and resolution
         criteria.
 
-        :params extention: The desired file extention (e.g.: mp4).
-        :params resolution: The desired video broadcasting standard.
+        :param str extention:
+            The desired file extention (e.g.: mp4).
+        :param str resolution:
+            The desired video broadcasting standard.
         """
         results = []
         for v in self.videos:
@@ -164,36 +169,6 @@ class YouTube(object):
             else:
                 results.append(v)
         return results
-
-    def _fetch(self, path, data):
-        """Given a path, traverse the response for the desired data. (A
-        modified ver. of my dictionary traverse method:
-
-        https://gist.github.com/2009119)
-
-        :params path: A tuple representing a path to a node within a tree.
-        :params data: The data containing the tree.
-        """
-        elem = path[0]
-        # Get first element in tuple, and check if it contains a list.
-        if type(data) is list:
-            # Pop it, and let's continue..
-            return self._fetch(path, data.pop())
-        # Parse the url encoded data
-        data = parse_qs(data)
-        # Get the element in our path
-        data = data.get(elem, None)
-        # Offset the tuple by 1.
-        path = path[1::1]
-        # Check if the path has reached the end OR the element return
-        # nothing.
-        if len(path) is 0 or data is None:
-            if type(data) is list and len(data) is 1:
-                data = data.pop()
-            return data
-        else:
-            # Nope, let's keep diggin'
-            return self._fetch(path, data)
 
     def _parse_stream_map(self, text):
         """Python's `parse_qs` can't properly decode the stream map
@@ -225,7 +200,6 @@ class YouTube(object):
         necessary details, and populating the different video resolutions and
         formats into a list.
         """
-        # TODO: split up into smaller functions. Cyclomatic complexity => 15
         self.title = None
         self.videos = []
 
@@ -245,7 +219,6 @@ class YouTube(object):
                             break
                 else:
                     raise YouTubeError("Cannot get JSON from HTML")
-
                 index = i + 1
                 data = json.loads(player_conf[:index])
             except Exception as e:
@@ -266,22 +239,22 @@ class YouTube(object):
 
                 # If the signature must be ciphered...
                 if "signature=" not in url:
-                    signature = self._cipher(stream_map["s"][i], js_url)
+                    signature = self._get_cipher(stream_map["s"][i], js_url)
                     url = "%s&signature=%s" % (url, signature)
 
                 self.videos.append(Video(url, self.filename, **fmt_data))
                 self._fmt_values.append(fmt)
             self.videos.sort()
 
-    def _cipher(self, s, url):
+    def _get_cipher(self, signature, url):
         """Get the signature using the cipher
         implemented in the JavaScript code
 
-        :params s: Signature
-        :params url: url of JavaScript file
+        :param str signature:
+            Signature.
+        :param str url:
+            url of JavaScript file.
         """
-        # TODO: refactor removing tinyJS
-
         # Getting JS code (if hasn't downloaded yet)
         if not self._js_code:
             # TODO: don't use conditional expression if line > 79 characters.
@@ -289,26 +262,26 @@ class YouTube(object):
                              if not self._js_code else self._js_code)
 
         try:
-            mobj = re.search(
-            r'\.sig\|\|([a-zA-Z0-9$]+)\(', self._js_code)
+            mobj = re.search(r'\.sig\|\|([a-zA-Z0-9$]+)\(', self._js_code)
             if mobj:
                 # return the first matching group
-                funcname= next(g for g in mobj.groups() if g is not None)
+                funcname = next(g for g in mobj.groups() if g is not None)
 
             jsi = JSInterpreter(self._js_code)
             initial_function = jsi.extract_function(funcname)
-            return initial_function([s])
+            return initial_function([signature])
         except Exception as e:
             raise CipherError("Couldn't cipher the signature. Maybe YouTube "
-                              "has changed the cipher algorithm. Notify "
-                              "this issue on GitHub: %s" % e)
+                "has changed the cipher algorithm. Notify this issue on "
+                "GitHub: %s" % e)
 
     def _extract_fmt(self, text):
         """YouTube does not pass you a completely valid URLencoded form, I
-        suspect this is suppose to act as a deterrent.. Nothing some regulular
-        expressions couldn't handle.
+        suspect this is suppose to act as a deterrent.. Nothing some regex
+        couldn't handle.
 
-        :params text: The malformed data contained within each url node.
+        :param str text:
+            The malformed data contained within each url node.
         """
         itag = re.findall('itag=(\d+)', text)
         if itag and len(itag) is 1:
