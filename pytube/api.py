@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from .exceptions import MultipleObjectsReturned, YouTubeError, CipherError
-from .tinyjs import * # TODO: get rid of tinyjs ugghhh
+from .jsinterp import JSInterpreter
 from .models import Video
 from .utils import safe_filename
 try:
@@ -146,7 +146,7 @@ class YouTube(object):
             return result[0]
         else:
             raise MultipleObjectsReturned(
-              "get() returned more than one object")
+                "get() returned more than one object")
 
     def filter(self, extension=None, resolution=None):
         """Return a filtered list of videos given an extention and resolution
@@ -251,13 +251,8 @@ class YouTube(object):
             except Exception as e:
                 raise YouTubeError("Cannot decode JSON: {0}".format(e))
 
-            is_vevo = False
-            if data['args'].get('ptk', '') in ['vevo', 'dashmpd']:
-                # Vevo videos with encrypted signatures
-                is_vevo = True
-
             stream_map = self._parse_stream_map(
-              data["args"]["url_encoded_fmt_stream_map"])
+                data["args"]["url_encoded_fmt_stream_map"])
 
             self.title = data["args"]["title"]
             js_url = "http:" + data["assets"]["js"]
@@ -271,51 +266,16 @@ class YouTube(object):
 
                 # If the signature must be ciphered...
                 if "signature=" not in url:
-                    if is_vevo:
-                        has_decrypted_signature = False
-                        try:
-                            signature = self._decrypt_signature(
-                              stream_map['s'][0])
-                            url += '&signature=' + signature
-                            has_decrypted_signature = True
-                        except TypeError, e:
-                            pass
-
-                        if not has_decrypted_signature:
-                            raise CipherError("Couldn't cipher the signature. "
-                              "Maybe YouTube has changed the cipher "
-                              "algorithm. Notify this issue on GitHub")
-
-                    else:
-                        signature = self._cipher(stream_map["s"][i], js_url)
-                        url = "%s&signature=%s" % (url, signature)
+                    signature = self._cipher(stream_map["s"][i], js_url)
+                    url = "%s&signature=%s" % (url, signature)
 
                 self.videos.append(Video(url, self.filename, **fmt_data))
                 self._fmt_values.append(fmt)
             self.videos.sort()
 
-    @staticmethod
-    def _decrypt_signature(s):
-        """Comment me :)
-        """
-        def tu(a, b):
-            c = a[0]
-            a[0] = a[b % len(a)]
-            a[b] = c
-            return a
-
-        def splice(a, b):
-            return a[b:]
-
-        a = list(s)
-        a = tu(a[::-1], 26)
-        a = tu(a[::-1], 28)
-        a = tu(a, 38)
-        a = splice(a[::-1], 3)
-        return "".join(a)
-
     def _cipher(self, s, url):
-        """Get the signature using the cipher implemented in the JavaScript code
+        """Get the signature using the cipher
+        implemented in the JavaScript code
 
         :params s: Signature
         :params url: url of JavaScript file
@@ -329,25 +289,15 @@ class YouTube(object):
                              if not self._js_code else self._js_code)
 
         try:
-            regexp = r'function \w{2}\(\w{1}\)\{\w{1}=\w{1}\.split\(\"\"\)' \
-                '\;(.*)\}'
-            code = re.findall(regexp, self._js_code)[0]
-            code = code[:code.index("}")]
+            mobj = re.search(
+            r'\.sig\|\|([a-zA-Z0-9$]+)\(', self._js_code)
+            if mobj:
+                # return the first matching group
+                funcname= next(g for g in mobj.groups() if g is not None)
 
-            signature = "a='" + s + "'"
-
-            # Tiny JavaScript VM
-            jsvm = JSVM()
-
-            # Precompiling with the super JavaScript VM (if hasn't compiled
-            # yet)
-            if not self._precompiled:
-                self._precompiled = jsvm.compile(code)
-            jsvm.setPreinterpreted(jsvm.compile(signature) + self._precompiled)
-
-            # Executing the JS code
-            return jsvm.run()["return"]
-
+            jsi = JSInterpreter(self._js_code)
+            initial_function = jsi.extract_function(funcname)
+            return initial_function([s])
         except Exception as e:
             raise CipherError("Couldn't cipher the signature. Maybe YouTube "
                               "has changed the cipher algorithm. Notify "
