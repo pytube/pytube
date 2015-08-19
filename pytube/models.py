@@ -1,56 +1,58 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
-from os.path import normpath, isfile
 from os import remove
+from os.path import normpath, isfile, isdir
 from time import clock
 try:
     from urllib2 import urlopen
 except ImportError:
     from urllib.request import urlopen
+
 from pytube.utils import sizeof
-from os.path import isdir
 
 
 class Video(object):
-    """
-    Class representation of a single instance of a YouTube video.
-
+    """Class representation of a single instance of a YouTube video.
     """
     def __init__(self, url, filename, **attributes):
         """
         Define the variables required to declare a new video.
 
-        Keyword arguments:
-        extention -- The file extention the video should be saved as.
-        resolution -- The broadcasting standard of the video.
-        url -- The url of the video. (e.g.: youtube.com/watch?v=..)
-        filename -- The filename (minus the extention) to save the video.
+        :param extention:
+            The file extention the video should be saved as.
+        :param resolution:
+            The broadcasting standard of the video.
+        :param url:
+            The url of the video. (e.g.: youtube.com/watch?v=..)
+        :param filename:
+            The filename (minus the extention) to save the video.
         """
 
         self.url = url
         self.filename = filename
         self.__dict__.update(**attributes)
 
-    def download(self, path=None, chunk_size=8 * 1024,
-                 on_progress=None, on_finish=None, force_overwrite=False):
+    def download(self, path='', chunk_size=8 * 1024, on_progress=None,
+                 on_finish=None, force_overwrite=False):
         """
         Downloads the file of the URL defined within the class
         instance.
 
-        Keyword arguments:
-        path -- Destination directory
-        chunk_size -- File size (in bytes) to write to buffer at a time
-                      (default: 8 bytes).
-        on_progress -- A function to be called every time the buffer was
-                       written out. Arguments passed are the current and
-                       the full size.
-        on_finish -- To be called when the download is finished. The full
-                     path to the file is passed as an argument.
-
+        :param path:
+            Destination directory
+        :param chunk_size:
+            File size (in bytes) to write to buffer at a time (default: 8
+            bytes).
+        :param on_progress:
+            A function to be called every time the buffer was written
+            out. Arguments passed are the current and the full size.
+        :param on_finish:
+            To be called when the download is finished. The full path to the
+            file is passed as an argument.
         """
 
-        if isdir(normpath(path)) :
+        if isdir(normpath(path)):
             path = (normpath(path) + '/' if path else '')
             fullpath = '{0}{1}.{2}'.format(path, self.filename, self.extension)
         else:
@@ -58,8 +60,8 @@ class Video(object):
 
         # Check for conflicting filenames
         if isfile(fullpath) and not force_overwrite:
-            raise FileExistsError("\n\nError: Conflicting filename:'{}'.\n\n".format(
-                  self.filename))
+            raise OSError("\Error: Conflicting filename:'{}'".format(
+                self.filename))
 
         response = urlopen(self.url)
         meta_data = dict(response.info().items())
@@ -70,8 +72,9 @@ class Video(object):
         try:
             with open(fullpath, 'wb') as dst_file:
                 # Print downloading message
-                print("\nDownloading: '{0}.{1}' (Bytes: {2}) \nto path: {3}\n\n".format(
-                      self.filename, self.extension, sizeof(file_size), path))
+                print("Downloading: '{0}.{1}' (Bytes: {2}) to path: "
+                      "{3}".format(self.filename, self.extension,
+                        sizeof(file_size), path))
 
                 while True:
                     self._buffer = response.read(chunk_size)
@@ -87,27 +90,24 @@ class Video(object):
 
         # Catch possible exceptions occurring during download
         except IOError:
-            raise IOError("\n\nError: Failed to open file.\n"
-                  "Check that: ('{0}'), is a valid pathname.\n\n"
-                  "Or that ('{1}.{2}') is a valid filename.\n\n".format(
-                      path, self.filename, self.extension))
+            raise IOError("Error: Failed to open file. Check that: ('{0}'), "
+                  "is a valid pathname. " "Or that ('{1}.{2}') is a valid "
+                  "filename.".format(path, self.filename, self.extension))
 
         except BufferError:
-            raise BufferError("\n\nError: Failed on writing buffer.\n"
-                  "Failed to write video to file.\n\n")
+            raise BufferError("Error: Failed on writing buffer. Failed to "
+                  "write video to file.")
 
         except KeyboardInterrupt:
             remove(fullpath)
-            raise KeyboardInterrupt("\n\nInterrupt signal given.\nDeleting incomplete video"
-                  "('{0}.{1}').\n\n".format(self.filename, self.extension))
+            raise KeyboardInterrupt("Interrupt signal given. Deleting "
+                "incomplete video('{0}.{1}').".format(self.filename,
+                self.extension))
 
     def __repr__(self):
         """A cleaner representation of the class instance."""
-        return "<Video: {0} (.{1}) - {2} - {3}>".format(
-            self.video_codec,
-            self.extension,
-            self.resolution,
-            self.profile)
+        return "<Video: {0} (.{1}) - {2} - {3}>".format(self.video_codec,
+            self.extension, self.resolution, self.profile)
 
     def __lt__(self, other):
         if type(other) == Video:
