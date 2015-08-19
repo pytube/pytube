@@ -30,7 +30,7 @@ Using PIP via PyPI
 
 .. code:: bash
 
-    pip install pytube==0.1.16
+    pip install pytube
 
 Using PIP via Github
 
@@ -74,7 +74,7 @@ Usage Example
     yt = YouTube()
 
     # Set the video URL.
-    yt.url = "http://www.youtube.com/watch?v=Ik-RsDGPI5Y"
+    yt.from_url("http://www.youtube.com/watch?v=Ik-RsDGPI5Y")
 
     # Once set, you can see all the codec and quality options YouTube has made
     # available for the perticular video by printing videos.
@@ -101,7 +101,7 @@ Usage Example
     #Pulp Fiction - Dancing Scene [HD]
 
     # set the filename:
-    yt.filename = 'Dancing Scene from Pulp Fiction'
+    yt.set_filename('Dancing Scene from Pulp Fiction')
 
     # You can also filter the criteria by filetype.
 
