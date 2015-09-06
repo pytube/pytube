@@ -23,9 +23,6 @@ Installation
 
 If you are on Mac OS X or Linux, chances are that one of the following two commands will work for you:
 
-Installation
-============
-
 Using PIP via PyPI
 
 .. code:: bash
