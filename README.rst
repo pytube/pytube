@@ -36,13 +36,13 @@ Using PIP via Github
 
 .. code:: bash
 
-    pip install git+git://github.com/NFicano/pytube.git@0.2.1#egg=pytube
+    pip install git+git://github.com/NFicano/pytube.git@0.3.0#egg=pytube
 
 Adding to your ``requirements.txt`` file (run ``pip install -r requirements.txt`` afterwards)
 
 .. code:: bash
 
-    git+ssh://git@github.com/NFicano/pytube.git@0.2.1#egg=pytube
+    git+ssh://git@github.com/NFicano/pytube.git@0.3.0#egg=pytube
 
 Manually via GIT
 
