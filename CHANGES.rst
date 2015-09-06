@@ -1,7 +1,12 @@
 Changelog
 =========
 
-0.3.0 (2015-09-05)
+0.3.1 (2015-09-05)
+------------------
+
+- Fix rst violations in readme. [Jose Diaz-Gonzalez]
+
+0.3.0 (2015-09-06)
 ------------------
 
 - Changed print statement to logging. [João Ricardo]
