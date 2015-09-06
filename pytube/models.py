@@ -4,6 +4,8 @@ from __future__ import unicode_literals, print_function
 from os import remove
 from os.path import normpath, isfile, isdir
 from time import clock
+import logging
+
 try:
     from urllib2 import urlopen
 except ImportError:
@@ -72,9 +74,9 @@ class Video(object):
         try:
             with open(fullpath, 'wb') as dst_file:
                 # Print downloading message
-                print("Downloading: '{0}.{1}' (Bytes: {2}) to path: "
-                      "{3}".format(self.filename, self.extension,
-                        sizeof(file_size), path))
+                logging.info("Downloading: '{0}.{1}' (Bytes: {2}) to path: "
+                             "{3}".format(self.filename, self.extension,
+                                          sizeof(file_size), path))
 
                 while True:
                     self._buffer = response.read(chunk_size)

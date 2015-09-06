@@ -23,9 +23,6 @@ Installation
 
 If you are on Mac OS X or Linux, chances are that one of the following two commands will work for you:
 
-Installation
-============
-
 Using PIP via PyPI
 
 .. code:: bash
@@ -36,13 +33,13 @@ Using PIP via Github
 
 .. code:: bash
 
-    pip install git+git://github.com/NFicano/pytube.git@0.2.1#egg=pytube
+    pip install git+git://github.com/NFicano/pytube.git@0.3.1#egg=pytube
 
 Adding to your ``requirements.txt`` file (run ``pip install -r requirements.txt`` afterwards)
 
 .. code:: bash
 
-    git+ssh://git@github.com/NFicano/pytube.git@0.2.1#egg=pytube
+    git+ssh://git@github.com/NFicano/pytube.git@0.3.1#egg=pytube
 
 Manually via GIT
 
