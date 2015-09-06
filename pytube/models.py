@@ -73,11 +73,10 @@ class Video(object):
         start = clock()
         try:
             with open(fullpath, 'wb') as dst_file:
-                # Print downloading message
-                logging.info("Downloading: '{0}.{1}' (Bytes: {2}) to path: "
-                             "{3}".format(self.filename, self.extension,
-                                          sizeof(file_size), path))
-
+                # Print downloading message.
+                logging.info("Downloading: '%s.%s' (Bytes: %s) to path: %s",
+                             self.filename, self.extension, sizeof(file_size),
+                             path)
                 while True:
                     self._buffer = response.read(chunk_size)
                     if not self._buffer:
