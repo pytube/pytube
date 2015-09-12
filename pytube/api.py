@@ -15,6 +15,9 @@ except ImportError:
 import re
 import json
 import warnings
+import logging
+
+log = logging.getLogger(__name__)
 
 # YouTube quality and codecs id map.
 # source: http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
@@ -151,7 +154,7 @@ class YouTube(object):
             raise MultipleObjectsReturned(
                 "get() returned more than one object")
 
-    def filter(self, extension=None, resolution=None):
+    def filter(self, extension=None, resolution=None, profile=None):
         """Return a filtered list of videos given an extention and resolution
         criteria.
 
@@ -165,6 +168,8 @@ class YouTube(object):
             if extension and v.extension != extension:
                 continue
             elif resolution and v.resolution != resolution:
+                continue
+            elif profile and v.profile != profile:
                 continue
             else:
                 results.append(v)
