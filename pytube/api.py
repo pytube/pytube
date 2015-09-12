@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from .exceptions import MultipleObjectsReturned, YouTubeError, CipherError
-from .jsinterp import JSInterpreter
-from .models import Video
-from .utils import safe_filename
 try:
     from urllib2 import urlopen
     from urlparse import urlparse, parse_qs, unquote
 except ImportError:
     from urllib.parse import urlparse, parse_qs, unquote
     from urllib.request import urlopen
-
-import re
 import json
-import warnings
 import logging
+import re
+import warnings
+
+from .exceptions import MultipleObjectsReturned, YouTubeError, CipherError
+from .jsinterp import JSInterpreter
+from .models import Video
+from .utils import safe_filename
 
 log = logging.getLogger(__name__)
 
@@ -74,10 +74,37 @@ class YouTube(object):
 
     def from_url(self, url):
         self._video_url = url
+
         # Reset the filename.
         self._filename = None
+
         # Get the video details.
-        self._get_video_info()
+        video_data = self.get_video_data()
+
+        # Set the title.
+        self.title = video_data.get("args", {}).get("title")
+
+        js_url = "http:" + video_data.get("assets", {}).get("js")
+        stream_map = video_data.get("args", {}).get("stream_map")
+        video_urls = stream_map.get("url")
+
+        for i, url in enumerate(video_urls):
+            try:
+                fmt, fmt_data = self._extract_fmt(url)
+                if not fmt_data:
+                    log.warn("unable to identify itag=%s", fmt)
+                    continue
+            except (TypeError, KeyError) as e:
+                log.exception("passing on exception %s", e)
+                continue
+
+            # If the signature must be ciphered...
+            if "signature=" not in url:
+                signature = self._get_cipher(stream_map["s"][i], js_url)
+                url = "{}&signature={}".format(url, signature)
+            self.videos.append(Video(url, self.filename, **fmt_data))
+            self._fmt_values.append(fmt)
+        self.videos.sort()
 
     @property
     def filename(self):
@@ -134,7 +161,7 @@ class YouTube(object):
                 result.append(v)
         if not len(result):
             return
-        elif len(result) is 1:
+        elif len(result) == 1:
             return result[0]
         else:
             raise MultipleObjectsReturned(
@@ -167,7 +194,7 @@ class YouTube(object):
         """Python's `parse_qs` can't properly decode the stream map
         containing video data so we use this instead.
         """
-        info_dict = {
+        dct = {
             "itag": [],
             "url": [],
             "quality": [],
@@ -184,10 +211,10 @@ class YouTube(object):
         for video in videos:
             for kv in video:
                 key, value = kv.split("=")
-                info_dict.get(key, []).append(unquote(value))
-        return info_dict
+                dct.get(key, []).append(unquote(value))
+        return dct
 
-    def _get_video_info(self):
+    def get_video_data(self):
         """This is responsable for executing the request, extracting the
         necessary details, and populating the different video resolutions and
         formats into a list.
@@ -212,28 +239,8 @@ class YouTube(object):
         encoded_stream_map = json_data.get("args", {}).get(
             "url_encoded_fmt_stream_map")
         stream_map = self._parse_stream_map(encoded_stream_map)
-
-        self.title = json_data.get("args", {}).get("title")
-        js_url = "http:" + json_data.get("assets", {}).get("js")
-        video_urls = stream_map["url"]
-
-        for i, url in enumerate(video_urls):
-            try:
-                fmt, fmt_data = self._extract_fmt(url)
-                if not fmt_data:
-                    log.warn("unable to identify itag=%s", fmt)
-                    continue
-            except (TypeError, KeyError) as e:
-                log.exception("passing on exception %s", e)
-                continue
-
-            # If the signature must be ciphered...
-            if "signature=" not in url:
-                signature = self._get_cipher(stream_map["s"][i], js_url)
-                url = "{}&signature={}".format(url, signature)
-            self.videos.append(Video(url, self.filename, **fmt_data))
-            self._fmt_values.append(fmt)
-        self.videos.sort()
+        json_data['args']['stream_map'] = stream_map
+        return json_data
 
     def _get_json_data(self, body):
         """Isolates and parses the json stream from the html content.
