@@ -123,7 +123,7 @@ class YouTube(object):
             if video_id:
                 return video_id.pop()
 
-    def get(self, extension=None, resolution=None, profile="High"):
+    def get(self, extension=None, resolution=None, profile=None):
         """Return a single video given an extention and resolution.
 
         :param str extention:
