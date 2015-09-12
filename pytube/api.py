@@ -66,13 +66,11 @@ YT_ENCODING_KEYS = (
 
 
 class YouTube(object):
-    _filename = None
-    _fmt_values = []
-    _video_url = None
-    _js_code = False
-    _precompiled = False
-    title = None
-    videos = []
+    def __init__(self):
+        self._filename = None
+        self._fmt_values = []
+        self._video_url = None
+        self._js_code = False
 
     @property
     def url(self):
@@ -120,9 +118,9 @@ class YouTube(object):
     def video_id(self):
         """Gets the video ID extracted from the URL."""
         parts = urlparse(self._video_url)
-        qs = getattr(parts, 'query', None)
+        qs = getattr(parts, 'query')
         if qs:
-            video_id = parse_qs(qs).get('v', None)
+            video_id = parse_qs(qs).get('v')
             if video_id:
                 return video_id.pop()
 
@@ -212,46 +210,73 @@ class YouTube(object):
 
         response = urlopen(self.url)
 
-        if response:
-            content = response.read().decode("utf-8")
+        if not response:
+            return False
+        body = response.read().decode("utf-8")
+
+        if "og:restrictions:age" in body:
+            raise YouTubeError("Unable to fetch age restricted content.")
+
+        json_data = self._get_json_data(body)
+
+        if not json_data:
+            raise YouTubeError("Unable to extract json.")
+
+        encoded_stream_map = json_data.get("args", {}).get(
+            "url_encoded_fmt_stream_map")
+        stream_map = self._parse_stream_map(encoded_stream_map)
+
+        self.title = json_data.get("args", {}).get("title")
+        js_url = "http:{}".format(json_data["assets"]["js"])
+        video_urls = stream_map["url"]
+
+        for i, url in enumerate(video_urls):
             try:
-                player_conf = content[18 + content.find("ytplayer.config = "):]
-                bracket_count = 0
-                for i, char in enumerate(player_conf):
-                    if char == "{":
-                        bracket_count += 1
-                    elif char == "}":
-                        bracket_count -= 1
-                        if bracket_count == 0:
-                            break
-                else:
-                    raise YouTubeError("Cannot get JSON from HTML")
-                index = i + 1
-                data = json.loads(player_conf[:index])
-            except Exception as e:
-                raise YouTubeError("Cannot decode JSON: {0}".format(e))
+                fmt, fmt_data = self._extract_fmt(url)
+            except (TypeError, KeyError):
+                continue
 
-            stream_map = self._parse_stream_map(
-                data["args"]["url_encoded_fmt_stream_map"])
+            # If the signature must be ciphered...
+            if "signature=" not in url:
+                signature = self._get_cipher(stream_map["s"][i], js_url)
+                url = "{}&signature={}".format(url, signature)
 
-            self.title = data["args"]["title"]
-            js_url = "http:" + data["assets"]["js"]
-            video_urls = stream_map["url"]
+            self.videos.append(Video(url, self.filename, **fmt_data))
+            self._fmt_values.append(fmt)
+        self.videos.sort()
 
-            for i, url in enumerate(video_urls):
-                try:
-                    fmt, fmt_data = self._extract_fmt(url)
-                except (TypeError, KeyError):
-                    continue
+    def _get_json_data(self, body):
+        """Isolates and parses the json stream from the html content.
 
-                # If the signature must be ciphered...
-                if "signature=" not in url:
-                    signature = self._get_cipher(stream_map["s"][i], js_url)
-                    url = "%s&signature=%s" % (url, signature)
+        :param str body: The content body of the YouTube page.
+        """
+        # Note: the number 18 represents the length of "ytplayer.config = ".
+        start = body.find("ytplayer.config = ") + 18
+        body = body[start:]
+        offset = self._find_json_offset(body)
 
-                self.videos.append(Video(url, self.filename, **fmt_data))
-                self._fmt_values.append(fmt)
-            self.videos.sort()
+        if not offset:
+            return None
+        return json.loads(body[:offset])
+
+    def _find_json_offset(self, body):
+        """Finds the variable offset of where the json starts using bracket
+        matching/counting.
+
+        :param str body: The content body of the YouTube page.
+        """
+        bracket_count = 0
+        index = 1
+        for i, char in enumerate(body):
+            if char == "{":
+                bracket_count += 1
+            elif char == "}":
+                bracket_count -= 1
+                if bracket_count == 0:
+                    break
+        else:
+            return None
+        return index + i
 
     def _get_cipher(self, signature, url):
         """Get the signature using the cipher
