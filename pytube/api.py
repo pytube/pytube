@@ -179,7 +179,7 @@ class YouTube(object):
         """Python's `parse_qs` can't properly decode the stream map
         containing video data so we use this instead.
         """
-        videoinfo = {
+        info_dict = {
             "itag": [],
             "url": [],
             "quality": [],
@@ -196,9 +196,8 @@ class YouTube(object):
         for video in videos:
             for kv in video:
                 key, value = kv.split("=")
-                videoinfo.get(key, []).append(unquote(value))
-
-        return videoinfo
+                info_dict.get(key, []).append(unquote(value))
+        return info_dict
 
     def _get_video_info(self):
         """This is responsable for executing the request, extracting the
@@ -227,7 +226,7 @@ class YouTube(object):
         stream_map = self._parse_stream_map(encoded_stream_map)
 
         self.title = json_data.get("args", {}).get("title")
-        js_url = "http:{}".format(json_data["assets"]["js"])
+        js_url = "http:" + json_data.get("assets", {}).get("js")
         video_urls = stream_map["url"]
 
         for i, url in enumerate(video_urls):
