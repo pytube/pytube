@@ -20,7 +20,6 @@ import logging
 log = logging.getLogger(__name__)
 
 # YouTube quality and codecs id map.
-# source: http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
 YT_ENCODING = {
     # flash
     5: ["flv", "240p", "Sorenson H.263", "N/A", "0.25", "MP3", "64"],
