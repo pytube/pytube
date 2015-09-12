@@ -22,35 +22,24 @@ log = logging.getLogger(__name__)
 # YouTube quality and codecs id map.
 # source: http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
 YT_ENCODING = {
-    # Flash Video
+    # flash
     5: ["flv", "240p", "Sorenson H.263", "N/A", "0.25", "MP3", "64"],
-    6: ["flv", "270p", "Sorenson H.263", "N/A", "0.8", "MP3", "64"],
-    34: ["flv", "360p", "H.264", "Main", "0.5", "AAC", "128"],
-    35: ["flv", "480p", "H.264", "Main", "0.8-1", "AAC", "128"],
 
-    # 3GP
-    36: ["3gp", "240p", "MPEG-4 Visual", "Simple", "0.17", "AAC", "38"],
-    13: ["3gp", "N/A", "MPEG-4 Visual", "N/A", "0.5", "AAC", "N/A"],
+    # 3gp
     17: ["3gp", "144p", "MPEG-4 Visual", "Simple", "0.05", "AAC", "24"],
+    36: ["3gp", "240p", "MPEG-4 Visual", "Simple", "0.17", "AAC", "38"],
 
-    # MPEG-4
+    # webm
+    43: ["webm", "360p", "VP8", "N/A", "0.5", "Vorbis", "128"],
+    100: ["webm", "360p", "VP8", "3D", "N/A", "Vorbis", "128"],
+
+    # mpeg4
     18: ["mp4", "360p", "H.264", "Baseline", "0.5", "AAC", "96"],
     22: ["mp4", "720p", "H.264", "High", "2-2.9", "AAC", "192"],
-    37: ["mp4", "1080p", "H.264", "High", "3-4.3", "AAC", "192"],
-    38: ["mp4", "3072p", "H.264", "High", "3.5-5", "AAC", "192"],
     82: ["mp4", "360p", "H.264", "3D", "0.5", "AAC", "96"],
     83: ["mp4", "240p", "H.264", "3D", "0.5", "AAC", "96"],
     84: ["mp4", "720p", "H.264", "3D", "2-2.9", "AAC", "152"],
     85: ["mp4", "1080p", "H.264", "3D", "2-2.9", "AAC", "152"],
-
-    # WebM
-    43: ["webm", "360p", "VP8", "N/A", "0.5", "Vorbis", "128"],
-    44: ["webm", "480p", "VP8", "N/A", "1", "Vorbis", "128"],
-    45: ["webm", "720p", "VP8", "N/A", "2", "Vorbis", "192"],
-    46: ["webm", "1080p", "VP8", "N/A", "N/A", "Vorbis", "192"],
-    100: ["webm", "360p", "VP8", "3D", "N/A", "Vorbis", "128"],
-    101: ["webm", "360p", "VP8", "3D", "N/A", "Vorbis", "192"],
-    102: ["webm", "720p", "VP8", "3D", "N/A", "Vorbis", "192"]
 }
 
 # The keys corresponding to the quality/codec map above.
@@ -232,14 +221,17 @@ class YouTube(object):
         for i, url in enumerate(video_urls):
             try:
                 fmt, fmt_data = self._extract_fmt(url)
-            except (TypeError, KeyError):
+                if not fmt_data:
+                    log.warn("unable to identify itag=%s", fmt)
+                    continue
+            except (TypeError, KeyError) as e:
+                log.exception("passing on exception %s", e)
                 continue
 
             # If the signature must be ciphered...
             if "signature=" not in url:
                 signature = self._get_cipher(stream_map["s"][i], js_url)
                 url = "{}&signature={}".format(url, signature)
-
             self.videos.append(Video(url, self.filename, **fmt_data))
             self._fmt_values.append(fmt)
         self.videos.sort()
