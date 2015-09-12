@@ -162,6 +162,8 @@ class YouTube(object):
             The desired file extention (e.g.: mp4).
         :param str resolution:
             The desired video broadcasting standard.
+        :param str profile:
+            The desired quality profile.
         """
         results = []
         for v in self.videos:
