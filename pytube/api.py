@@ -132,7 +132,7 @@ class YouTube(object):
 
     @property
     def video_id(self):
-        """Gets the video ID extracted from the URL."""
+        """Extracts the video id from the url."""
         parts = urlparse(self._video_url)
         qs = getattr(parts, 'query')
         if qs:
@@ -160,13 +160,12 @@ class YouTube(object):
                 continue
             else:
                 result.append(v)
-        if not len(result):
+        if len(result) <= 0:
             return DoesNotExist("The requested video does not exist.")
         elif len(result) == 1:
             return result[0]
         else:
-            raise MultipleObjectsReturned(
-                "get() returned more than one object")
+            raise MultipleObjectsReturned("More than 1 video match criteria.")
 
     def filter(self, extension=None, resolution=None, profile=None):
         """Return a filtered list of videos given an extention and resolution
