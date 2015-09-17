@@ -12,7 +12,8 @@ import logging
 import re
 import warnings
 
-from .exceptions import MultipleObjectsReturned, YouTubeError, CipherError
+from .exceptions import MultipleObjectsReturned, YouTubeError, CipherError, \
+    DoesNotExist
 from .jsinterp import JSInterpreter
 from .models import Video
 from .utils import safe_filename
@@ -160,7 +161,7 @@ class YouTube(object):
             else:
                 result.append(v)
         if not len(result):
-            return
+            return DoesNotExist("The requested video does not exist.")
         elif len(result) == 1:
             return result[0]
         else:
@@ -231,18 +232,19 @@ class YouTube(object):
         if "og:restrictions:age" in body:
             raise YouTubeError("Unable to fetch age restricted content.")
 
-        json_data = self._get_json_data(body)
+        json_data = self._extract_json_data(body)
 
         if not json_data:
             raise YouTubeError("Unable to extract json.")
 
         encoded_stream_map = json_data.get("args", {}).get(
             "url_encoded_fmt_stream_map")
-        stream_map = self._parse_stream_map(encoded_stream_map)
-        json_data['args']['stream_map'] = stream_map
+
+        json_data['args']['stream_map'] = self._parse_stream_map(
+            encoded_stream_map)
         return json_data
 
-    def _get_json_data(self, body):
+    def _extract_json_data(self, body):
         """Isolates and parses the json stream from the html content.
 
         :param str body: The content body of the YouTube page.

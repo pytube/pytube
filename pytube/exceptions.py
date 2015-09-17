@@ -14,3 +14,9 @@ class CipherError(Exception):
     """The _cipher method returned an error.
     """
     pass
+
+
+class DoesNotExist(Exception):
+    """The requested video does not exist.
+    """
+    pass
