@@ -20,3 +20,9 @@ class DoesNotExist(Exception):
     """The requested video does not exist.
     """
     pass
+
+
+class AgeRestricted(Exception):
+    """The requested video has an age restriction.
+    """
+    pass
