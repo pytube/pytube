@@ -55,11 +55,14 @@ YT_ENCODING_KEYS = (
 
 
 class YouTube(object):
-    def __init__(self):
+    def __init__(self, url=None):
         self._filename = None
         self._fmt_values = []
         self._video_url = None
         self._js_code = False
+        self._videos = []
+        if url:
+            self.from_url(url)
 
     @property
     def url(self):
@@ -113,9 +116,8 @@ class YouTube(object):
             if "signature=" not in url:
                 signature = self._get_cipher(stream_map["s"][i], js_url)
                 url = "{}&signature={}".format(url, signature)
-            self.videos.append(Video(url, self.filename, **fmt_data))
+            self.add_video(url, self.filename, **fmt_data)
             self._fmt_values.append(fmt)
-        self.videos.sort()
 
     @property
     def filename(self):
@@ -144,8 +146,8 @@ class YouTube(object):
             The filename of the video.
         """
         self._filename = filename
-        if self.videos:
-            for video in self.videos:
+        if self.get_videos():
+            for video in self.get_videos():
                 video.filename = filename
 
     @property
@@ -157,6 +159,28 @@ class YouTube(object):
             video_id = parse_qs(qs).get('v')
             if video_id:
                 return video_id.pop()
+        return False
+
+    def get_videos(self):
+        """Returns all videos.
+        """
+        return self._videos
+
+    def add_video(self, url, filename, **kwargs):
+        """Adds new video object to videos.
+        """
+        video = Video(url, filename, **kwargs)
+        self._videos.append(video)
+        self._videos.sort()
+        return True
+
+    @property
+    def videos(self):
+        """Returns all videos
+        """
+        warnings.warn("videos property deprecated, use `get_videos()` "
+                      "instead.", DeprecationWarning)
+        return self._videos
 
     def get(self, extension=None, resolution=None, profile=None):
         """Return a single video given a file extention and/or resolution
@@ -170,7 +194,7 @@ class YouTube(object):
             The desired quality profile.
         """
         result = []
-        for v in self.videos:
+        for v in self.get_videos():
             if extension and v.extension != extension:
                 continue
             elif resolution and v.resolution != resolution:
@@ -200,7 +224,7 @@ class YouTube(object):
             The desired quality profile.
         """
         results = []
-        for v in self.videos:
+        for v in self.get_videos():
             if extension and v.extension != extension:
                 continue
             elif resolution and v.resolution != resolution:
@@ -243,7 +267,6 @@ class YouTube(object):
     def get_video_data(self):
         """Fetch the page and extract out the video data."""
         self.title = None
-        self.videos = []
 
         response = urlopen(self.url)
 
