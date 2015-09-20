@@ -116,7 +116,7 @@ class YouTube(object):
             if "signature=" not in url:
                 signature = self._get_cipher(stream_map["s"][i], js_url)
                 url = "{}&signature={}".format(url, signature)
-            self.add_video(url, self.filename, **fmt_data)
+            self._add_video(url, self.filename, **fmt_data)
             self._fmt_values.append(fmt)
 
     @property
@@ -165,14 +165,6 @@ class YouTube(object):
         """Returns all videos.
         """
         return self._videos
-
-    def add_video(self, url, filename, **kwargs):
-        """Adds new video object to videos.
-        """
-        video = Video(url, filename, **kwargs)
-        self._videos.append(video)
-        self._videos.sort()
-        return True
 
     @property
     def videos(self):
@@ -365,3 +357,11 @@ class YouTube(object):
             if not attr:
                 return itag, None
             return itag, dict(zip(YT_ENCODING_KEYS, attr))
+
+    def _add_video(self, url, filename, **kwargs):
+        """Adds new video object to videos.
+        """
+        video = Video(url, filename, **kwargs)
+        self._videos.append(video)
+        self._videos.sort()
+        return True
