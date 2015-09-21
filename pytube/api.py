@@ -343,7 +343,7 @@ class YouTube(object):
 
     def _extract_fmt(self, text):
         """YouTube does not pass you a completely valid URLencoded form, I
-        suspect this is suppose to act as a deterrent.. Nothing some regex
+        suspect this is suppose to act as a deterrent... Nothing some regex
         couldn't handle.
 
         :param str text:
