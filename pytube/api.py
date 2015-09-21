@@ -129,8 +129,8 @@ class YouTube(object):
 
     @filename.setter
     def filename(self, filename):
-        """Set the filename (This method is deprecated. Use
-        `set_filename()` instead).
+        """Set the filename (This method is deprecated. Use `set_filename()`
+        instead).
 
         :param str filename:
             The filename of the video.
@@ -227,6 +227,31 @@ class YouTube(object):
                 results.append(v)
         return results
 
+    def get_video_data(self):
+        """Fetch the page and extract out the video data."""
+        self.title = None
+
+        response = urlopen(self.url)
+
+        if not response:
+            return False
+        html = response.read().decode("utf-8")
+
+        if "og:restrictions:age" in html:
+            raise AgeRestricted
+
+        json_object = self._extract_json_data(html)
+
+        if not json_object:
+            raise YouTubeError("Unable to extract json.")
+
+        encoded_stream_map = json_object.get("args", {}).get(
+            "url_encoded_fmt_stream_map")
+
+        json_object['args']['stream_map'] = self._parse_stream_map(
+            encoded_stream_map)
+        return json_object
+
     def _parse_stream_map(self, blob):
         """A modified version of `urlparse.parse_qs` that is able to decode
         YouTube's stream map.
@@ -256,31 +281,6 @@ class YouTube(object):
         log.debug('decoded stream map: %s', dct)
         return dct
 
-    def get_video_data(self):
-        """Fetch the page and extract out the video data."""
-        self.title = None
-
-        response = urlopen(self.url)
-
-        if not response:
-            return False
-        html = response.read().decode("utf-8")
-
-        if "og:restrictions:age" in html:
-            raise AgeRestricted
-
-        json_object = self._extract_json_data(html)
-
-        if not json_object:
-            raise YouTubeError("Unable to extract json.")
-
-        encoded_stream_map = json_object.get("args", {}).get(
-            "url_encoded_fmt_stream_map")
-
-        json_object['args']['stream_map'] = self._parse_stream_map(
-            encoded_stream_map)
-        return json_object
-
     def _extract_json_data(self, html):
         """Extract the json from the html.
 
@@ -302,14 +302,14 @@ class YouTube(object):
         :param str html:
             The raw html of the YouTube page.
         """
-        bracket_count = 0
+        brackets = []
         index = 1
         for i, char in enumerate(html):
             if char == "{":
-                bracket_count += 1
+                brackets.append("}")
             elif char == "}":
-                bracket_count -= 1
-                if bracket_count == 0:
+                brackets.pop()
+                if len(brackets) == 0:
                     break
         else:
             return None
@@ -323,34 +323,34 @@ class YouTube(object):
         :param str url:
             url of JavaScript file.
         """
-        # Getting JS code (if hasn't downloaded yet)
+        reg_exp = re.compile(r'\.sig\|\|([a-zA-Z0-9$]+)\(')
         if not self._js_code:
-            # TODO: don't use conditional expression if line > 79 characters.
-            self._js_code = (urlopen(url).read().decode()
-                             if not self._js_code else self._js_code)
+            js = urlopen(url).read().decode()
+            self._js_code = (js if not self._js_code else self._js_code)
         try:
-            mobj = re.search(r'\.sig\|\|([a-zA-Z0-9$]+)\(', self._js_code)
-            if mobj:
+            results = reg_exp.search(self._js_code)
+            if results:
                 # return the first matching group
-                funcname = next(g for g in mobj.groups() if g is not None)
+                func = next(g for g in results.groups() if g is not None)
 
             jsi = JSInterpreter(self._js_code)
-            initial_function = jsi.extract_function(funcname)
+            initial_function = jsi.extract_function(func)
             return initial_function([signature])
         except Exception as e:
             raise CipherError("Couldn't cipher the signature. Maybe YouTube "
-                "has changed the cipher algorithm. Notify this issue on "
-                "GitHub: %s" % e)
+                              "has changed the cipher algorithm. Notify this "
+                              "issue on GitHub: %s" % e)
 
     def _extract_fmt(self, text):
         """YouTube does not pass you a completely valid URLencoded form, I
-        suspect this is suppose to act as a deterrent.. Nothing some regex
+        suspect this is suppose to act as a deterrent... Nothing some regex
         couldn't handle.
 
         :param str text:
             The malformed data contained within each url node.
         """
-        itag = re.findall('itag=(\d+)', text)
+        reg_exp = re.compile('itag=(\d+)')
+        itag = reg_exp.findall(text)
         if itag and len(itag) == 1:
             itag = int(itag[0])
             attr = YT_ENCODING.get(itag, None)

@@ -92,26 +92,27 @@ class Video(object):
         # Catch possible exceptions occurring during download
         except IOError:
             raise IOError("Error: Failed to open file. Check that: ('{0}'), "
-                  "is a valid pathname. " "Or that ('{1}.{2}') is a valid "
-                  "filename.".format(path, self.filename, self.extension))
+                          "is a valid pathname. " "Or that ('{1}.{2}') is a "
+                          "valid filename.".format(path, self.filename,
+                                                   self.extension))
 
         except BufferError:
-            raise BufferError("Error: Failed on writing buffer. Failed to "
-                  "write video to file.")
+            raise BufferError("Error: Failed on writing buffer. Failed "
+                              "to write video to file.")
 
         except KeyboardInterrupt:
             remove(fullpath)
             raise KeyboardInterrupt("Interrupt signal given. Deleting "
-                "incomplete video('{0}.{1}').".format(self.filename,
-                self.extension))
+                                    "incomplete video('{0}.{1}')."
+                                    .format(self.filename, self.extension))
 
     def __repr__(self):
         """A cleaner representation of the class instance."""
-        return "<Video: {0} (.{1}) - {2} - {3}>".format(self.video_codec,
-            self.extension, self.resolution, self.profile)
+        return "<Video: {0} (.{1}) - {2} - {3}>".format(
+            self.video_codec, self.extension, self.resolution, self.profile)
 
     def __lt__(self, other):
-        if type(other) == Video:
+        if isinstance(other, Video):
             v1 = "{0} {1}".format(self.extension, self.resolution)
             v2 = "{0} {1}".format(other.extension, other.resolution)
             return (v1 > v2) - (v1 < v2) < 0
