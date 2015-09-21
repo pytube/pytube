@@ -14,13 +14,15 @@ class FullPaths(argparse.Action):
         setattr(namespace, self.dest, path.abspath(path.expanduser(values)))
 
 
-def safe_filename(text, max_length=200):
+def truncate(text, max_length=200):
+    return text[:max_length].rsplit(' ', 0)[0]
+
+
+def safe_filename(text, max_length):
     """Sanitizes filenames for many operating systems.
 
     :params text: The unsanitized pending filename.
     """
-    # Quickly truncates long filenames.
-    truncate = lambda text: text[:max_length].rsplit(' ', 0)[0]
 
     # Tidy up ugly formatted filenames.
     text = text.replace('_', ' ')
@@ -82,6 +84,6 @@ def print_status(progress, file_size, start):
     dt = (clock() - start)
     if dt > 0:
         stdout.write("\r  [%s%s][%3.2f%%] %s at %s/s\r " %
-                    ('=' * done, ' ' * (50 - done), percentDone, sizeof(file_size),
-                        sizeof(progress // dt)))
+                     ('=' * done, ' ' * (50 - done), percentDone,
+                      sizeof(file_size), sizeof(progress // dt)))
     stdout.flush()
