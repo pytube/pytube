@@ -129,8 +129,8 @@ class YouTube(object):
 
     @filename.setter
     def filename(self, filename):
-        """Set the filename (This method is deprecated. Use
-        `set_filename()` instead).
+        """Set the filename (This method is deprecated. Use `set_filename()`
+        instead).
 
         :param str filename:
             The filename of the video.
@@ -227,6 +227,31 @@ class YouTube(object):
                 results.append(v)
         return results
 
+    def get_video_data(self):
+        """Fetch the page and extract out the video data."""
+        self.title = None
+
+        response = urlopen(self.url)
+
+        if not response:
+            return False
+        html = response.read().decode("utf-8")
+
+        if "og:restrictions:age" in html:
+            raise AgeRestricted
+
+        json_object = self._extract_json_data(html)
+
+        if not json_object:
+            raise YouTubeError("Unable to extract json.")
+
+        encoded_stream_map = json_object.get("args", {}).get(
+            "url_encoded_fmt_stream_map")
+
+        json_object['args']['stream_map'] = self._parse_stream_map(
+            encoded_stream_map)
+        return json_object
+
     def _parse_stream_map(self, blob):
         """A modified version of `urlparse.parse_qs` that is able to decode
         YouTube's stream map.
@@ -255,31 +280,6 @@ class YouTube(object):
                 dct.get(key, []).append(unquote(value))
         log.debug('decoded stream map: %s', dct)
         return dct
-
-    def get_video_data(self):
-        """Fetch the page and extract out the video data."""
-        self.title = None
-
-        response = urlopen(self.url)
-
-        if not response:
-            return False
-        html = response.read().decode("utf-8")
-
-        if "og:restrictions:age" in html:
-            raise AgeRestricted
-
-        json_object = self._extract_json_data(html)
-
-        if not json_object:
-            raise YouTubeError("Unable to extract json.")
-
-        encoded_stream_map = json_object.get("args", {}).get(
-            "url_encoded_fmt_stream_map")
-
-        json_object['args']['stream_map'] = self._parse_stream_map(
-            encoded_stream_map)
-        return json_object
 
     def _extract_json_data(self, html):
         """Extract the json from the html.
@@ -339,8 +339,8 @@ class YouTube(object):
             return initial_function([signature])
         except Exception as e:
             raise CipherError("Couldn't cipher the signature. Maybe YouTube "
-                "has changed the cipher algorithm. Notify this issue on "
-                "GitHub: %s" % e)
+                              "has changed the cipher algorithm. Notify this "
+                              "issue on GitHub: %s" % e)
 
     def _extract_fmt(self, text):
         """YouTube does not pass you a completely valid URLencoded form, I
