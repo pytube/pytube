@@ -23,7 +23,7 @@ setup(
     packages=['pytube'],
     url="http://pytube.nickficano.com",
     license=open_file('LICENSE.txt').read(),
-    scripts=['scripts/pytubectl'],
+    scripts=['scripts/pytube'],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",

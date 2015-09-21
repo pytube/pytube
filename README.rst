@@ -58,27 +58,27 @@ setting it to the desired filetype:
 
 .. code:: bash
 
-   pytubecli -e mp4 http://www.youtube.com/watch?v=Ik-RsDGPI5Y
+   $ pytube -e mp4 http://www.youtube.com/watch?v=Ik-RsDGPI5Y
 
 
 Same thing for specifying a resolution:
 
 .. code:: bash
 
-   pytubecli -r 720p http://www.youtube.com/watch?v=Ik-RsDGPI5Y
+   $ pytube -r 720p http://www.youtube.com/watch?v=Ik-RsDGPI5Y
 
 
 You can also specify a download file path (``-p`` or ``--path=``):
 
 .. code:: bash
 
-   pytubecli -e mp4 -p ~/Downloads/ http://www.youtube.com/watch?v=Ik-RsDGPI5Y
+   $ pytube -e mp4 -p ~/Downloads/ http://www.youtube.com/watch?v=Ik-RsDGPI5Y
 
 and/or optionally choose the filename (``-f`` or ``--filename=``):
 
 .. code:: bash
 
-   pytubecli -e mp4 -f Dancing Scene from Pulp Fiction http://www.youtube.com/watch?v=Ik-RsDGPI5Y
+   $ pytube -e mp4 -f Dancing Scene from Pulp Fiction http://www.youtube.com/watch?v=Ik-RsDGPI5Y
 
 
 
