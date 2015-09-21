@@ -18,7 +18,7 @@ from .jsinterp import JSInterpreter
 from .models import Video
 from .utils import safe_filename
 
-log = logging.getLogger(__name__)
+log = logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 # YouTube quality and codecs id map.
 YT_ENCODING = {
