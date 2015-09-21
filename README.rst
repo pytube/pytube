@@ -53,7 +53,7 @@ Manually via GIT
 Command-Line Usage
 ==================
 
-You can download a video by simply passing the -e (or --extension=) switch and
+You can download a video by simply passing the ``-e`` (or ``--extension=``) switch and
 setting it to the desired filetype:
 
 .. code:: bash
@@ -68,13 +68,13 @@ Same thing for specifying a resolution:
    pytubecli -r 720p http://www.youtube.com/watch?v=Ik-RsDGPI5Y
 
 
-You can also specify a download file path (-p or --path=):
+You can also specify a download file path (``-p`` or ``--path=``):
 
 .. code:: bash
 
    pytubecli -e mp4 -p ~/Downloads/ http://www.youtube.com/watch?v=Ik-RsDGPI5Y
 
-and/or optionally choose the filename (-f or --filename=):
+and/or optionally choose the filename (``-f`` or ``--filename=``):
 
 .. code:: bash
 
