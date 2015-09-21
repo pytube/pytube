@@ -18,7 +18,7 @@ def truncate(text, max_length=200):
     return text[:max_length].rsplit(' ', 0)[0]
 
 
-def safe_filename(text, max_length):
+def safe_filename(text, max_length=200):
     """Sanitizes filenames for many operating systems.
 
     :params text: The unsanitized pending filename.

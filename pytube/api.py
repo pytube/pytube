@@ -302,14 +302,14 @@ class YouTube(object):
         :param str html:
             The raw html of the YouTube page.
         """
-        bracket_count = 0
+        brackets = []
         index = 1
         for i, char in enumerate(html):
             if char == "{":
-                bracket_count += 1
+                brackets.append("}")
             elif char == "}":
-                bracket_count -= 1
-                if bracket_count == 0:
+                brackets.pop()
+                if len(brackets) == 0:
                     break
         else:
             return None
