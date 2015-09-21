@@ -323,19 +323,18 @@ class YouTube(object):
         :param str url:
             url of JavaScript file.
         """
-        # Getting JS code (if hasn't downloaded yet)
+        reg_exp = re.compile(r'\.sig\|\|([a-zA-Z0-9$]+)\(')
         if not self._js_code:
-            # TODO: don't use conditional expression if line > 79 characters.
-            self._js_code = (urlopen(url).read().decode()
-                             if not self._js_code else self._js_code)
+            js = urlopen(url).read().decode()
+            self._js_code = (js if not self._js_code else self._js_code)
         try:
-            mobj = re.search(r'\.sig\|\|([a-zA-Z0-9$]+)\(', self._js_code)
-            if mobj:
+            results = reg_exp.search(self._js_code)
+            if results:
                 # return the first matching group
-                funcname = next(g for g in mobj.groups() if g is not None)
+                func = next(g for g in results.groups() if g is not None)
 
             jsi = JSInterpreter(self._js_code)
-            initial_function = jsi.extract_function(funcname)
+            initial_function = jsi.extract_function(func)
             return initial_function([signature])
         except Exception as e:
             raise CipherError("Couldn't cipher the signature. Maybe YouTube "
@@ -350,7 +349,8 @@ class YouTube(object):
         :param str text:
             The malformed data contained within each url node.
         """
-        itag = re.findall('itag=(\d+)', text)
+        reg_exp = re.compile('itag=(\d+)')
+        itag = reg_exp.findall(text)
         if itag and len(itag) == 1:
             itag = int(itag[0])
             attr = YT_ENCODING.get(itag, None)
