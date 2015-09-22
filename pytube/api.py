@@ -366,7 +366,7 @@ class YouTube(object):
                               "issue on GitHub: {}".format(e))
         return False
 
-    def _get_quality_profile_from_url(self, url):
+    def _get_quality_profile_from_url(self, video_url):
         """Gets the quality profile given a video url. Normally we would just
         use ``urlparse`` since itags are represented as a get parameter, but
         YouTube doesn't pass a properly encoded url.
@@ -375,7 +375,7 @@ class YouTube(object):
             The malformed encoded url.
         """
         reg_exp = re.compile('itag=(\d+)')
-        itag = reg_exp.findall(url)
+        itag = reg_exp.findall(video_url)
         if itag and len(itag) == 1:
             itag = int(itag[0])
             # Given an itag, refer to the YouTube quality profiles to get the
