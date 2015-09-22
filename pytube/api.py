@@ -261,7 +261,6 @@ class YouTube(object):
             "url_encoded_fmt_stream_map")
         json_object['args']['stream_map'] = self._parse_stream_map(
             encoded_stream_map)
-
         return json_object
 
     def _parse_stream_map(self, blob):
