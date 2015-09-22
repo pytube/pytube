@@ -21,7 +21,7 @@ from .utils import safe_filename
 log = logging.getLogger(__name__)
 
 # YouTube quality and codecs id map.
-YT_ENCODING = {
+YT_QUALITY_PROFILES = {
     # flash
     5: ["flv", "240p", "Sorenson H.263", "N/A", "0.25", "MP3", "64"],
 
@@ -43,7 +43,7 @@ YT_ENCODING = {
 }
 
 # The keys corresponding to the quality/codec map above.
-YT_ENCODING_KEYS = (
+YT_QUALITY_PROFILE_KEYS = (
     'extension',
     'resolution',
     'video_codec',
@@ -159,11 +159,11 @@ class YouTube(object):
         # Get the video details.
         video_data = self.get_video_data()
 
-        # Set the title.
+        # Set the title from the title.
         self.title = video_data.get("args", {}).get("title")
 
-        # Rewrite and add the url to the javascript, we'll need to fetch this
-        # if the YouTube doesn't give us the signature.
+        # Rewrite and add the url to the javascript file, we'll need to fetch
+        # this if YouTube doesn't provide us with the signature.
         js_url = "http:" + video_data.get("assets", {}).get("js")
 
         # Just make these easily accessible as variables.
@@ -193,14 +193,15 @@ class YouTube(object):
 
     def get(self, extension=None, resolution=None, profile=None):
         """Gets a single video given a file extention (and/or resolution
-        and/or profile).
+        and/or quality profile).
 
         :param str extention:
-            The desired file extention (e.g.: mp4).
+            The desired file extention (e.g.: mp4, flv).
         :param str resolution:
-            The desired video broadcasting standard.
+            The desired video broadcasting standard (e.g.: 720p, 1080p)
         :param str profile:
-            The desired quality profile.
+            The desired quality profile (this is subjective, I don't recommend
+            using it).
         """
         result = []
         for v in self.get_videos():
@@ -222,14 +223,15 @@ class YouTube(object):
 
     def filter(self, extension=None, resolution=None, profile=None):
         """Gets a filtered list of videos given a file extention and/or
-        resolution and/or profile.
+        resolution and/or quality profile.
 
         :param str extention:
-            The desired file extention (e.g.: mp4).
+            The desired file extention (e.g.: mp4, flv).
         :param str resolution:
-            The desired video broadcasting standard.
+            The desired video broadcasting standard (e.g.: 720p, 1080p)
         :param str profile:
-            The desired quality profile.
+            The desired quality profile (this is subjective, I don't recommend
+            using it).
         """
         results = []
         for v in self.get_videos():
@@ -249,7 +251,7 @@ class YouTube(object):
         self.title = None
         response = urlopen(self.url)
         if not response:
-            raise PytubeError("Unable to open url: %s", self.url)
+            raise PytubeError("Unable to open url: {}".format(self.url))
 
         html = response.read().decode("utf-8")
         if "og:restrictions:age" in html:
@@ -346,22 +348,21 @@ class YouTube(object):
         if not self._js_code:
             response = urlopen(url)
             if not response:
-                raise PytubeError("Unable to open url: %s", self.url)
-            js = response.read().decode("utf-8")
-            self._js_code = (js if not self._js_code else self._js_code)
+                raise PytubeError("Unable to open url: {}".format(self.url))
+            self._js_code = response.read().decode("utf-8")
         try:
-            results = reg_exp.search(self._js_code)
-            if results:
+            matches = reg_exp.search(self._js_code)
+            if matches:
                 # Return the first matching group.
-                func = next(g for g in results.groups() if g is not None)
-
+                func = next(g for g in matches.groups() if g is not None)
+            # Load js into JS Python interpreter.
             jsi = JSInterpreter(self._js_code)
             initial_function = jsi.extract_function(func)
             return initial_function([signature])
         except Exception as e:
             raise CipherError("Couldn't cipher the signature. Maybe YouTube "
                               "has changed the cipher algorithm. Notify this "
-                              "issue on GitHub: %s" % e)
+                              "issue on GitHub: {}".format(e))
         return False
 
     def _get_encoding_profile(self, text):
@@ -376,12 +377,14 @@ class YouTube(object):
         itag = reg_exp.findall(text)
         if itag and len(itag) == 1:
             itag = int(itag[0])
-            # Given an itag, refer to the YouTube encoding dict to get the
-            # properties (media type, resolution, etc) of the video.
-            attr = YT_ENCODING.get(itag, None)
-            if not attr:
+            # Given an itag, refer to the YouTube quality profiles to get the
+            # properties (media type, resolution, etc.) of the video.
+            quality_profile = YT_QUALITY_PROFILES.get(itag)
+            if not quality_profile:
                 return itag, None
-            return itag, dict(zip(YT_ENCODING_KEYS, attr))
+            # Here we just combine the quality profile keys to the
+            # corresponding quality profile, referenced by the itag.
+            return itag, dict(zip(YT_QUALITY_PROFILE_KEYS, quality_profile))
         if not itag:
             raise PytubeError("Unable to get encoding profile, no itag found.")
         elif len(itag) > 1:
