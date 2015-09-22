@@ -174,7 +174,7 @@ class YouTube(object):
         # of available videos.
         for idx, url in enumerate(video_urls):
             try:
-                itag, encoding_profile = self._get_encoding_profile(url)
+                itag, encoding_profile = self._get_quality_profile(url)
                 if not encoding_profile:
                     log.warn("unable to identify profile for itag=%s", itag)
                     continue
@@ -365,7 +365,7 @@ class YouTube(object):
                               "issue on GitHub: {}".format(e))
         return False
 
-    def _get_encoding_profile(self, text):
+    def _get_quality_profile(self, text):
         """YouTube does not pass you a completely valid URLencoded form, I
         suspect this is supposed to be some sort of a deterrent but nothing
         regex can't handle.
