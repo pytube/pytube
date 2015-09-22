@@ -57,7 +57,6 @@ YT_ENCODING_KEYS = (
 class YouTube(object):
     def __init__(self, url=None):
         self._filename = None
-        self._fmt_values = []
         self._video_url = None
         self._js_code = False
         self._videos = []
@@ -66,30 +65,30 @@ class YouTube(object):
 
     @property
     def url(self):
-        """Get the video url."""
+        """Gets the video url."""
         return self._video_url
 
     @url.setter
     def url(self, url):
-        """Set the YouTube video url (This method is deprecated. Use
-        `from_url()` instead).
+        """Sets the url for the video (This method is deprecated. Use
+        ``from_url()`` instead).
 
         :param str url:
-            The YouTube video url.
+            The url to the YouTube video.
         """
         warnings.warn("url setter deprecated, use `from_url()` "
                       "instead.", DeprecationWarning)
         self.from_url(url)
 
     def from_url(self, url):
-        """Set the YouTube video url.
+        """Sets the url for the video.
 
         :param str url:
-            The YouTube video url.
+            The url to the YouTube video.
         """
         self._video_url = url
 
-        # Reset the filename.
+        # Reset the filename incase it was previously set.
         self._filename = None
 
         # Get the video details.
@@ -98,30 +97,38 @@ class YouTube(object):
         # Set the title.
         self.title = video_data.get("args", {}).get("title")
 
+        # Rewrite and add the url to the javascript, we'll need to fetch this
+        # if the YouTube doesn't give us the signature.
         js_url = "http:" + video_data.get("assets", {}).get("js")
+
+        # Just make these easily accessible as variables.
         stream_map = video_data.get("args", {}).get("stream_map")
         video_urls = stream_map.get("url")
 
+        # For each video url, identify the encoding profile and add it to list
+        # of available videos.
         for i, url in enumerate(video_urls):
             try:
-                fmt, fmt_data = self._extract_fmt(url)
-                if not fmt_data:
-                    log.warn("unable to identify itag=%s", fmt)
+                itag, encoding_profile = self._get_encoding_profile(url)
+                if not encoding_profile:
+                    log.warn("unable to identify profile for itag=%s", itag)
                     continue
             except (TypeError, KeyError) as e:
                 log.exception("passing on exception %s", e)
                 continue
 
-            # If the signature must be ciphered...
+            # Check if we have the signature, otherwise we'll need to get the
+            # cipher from the js.
             if "signature=" not in url:
                 signature = self._get_cipher(stream_map["s"][i], js_url)
                 url = "{}&signature={}".format(url, signature)
-            self._add_video(url, self.filename, **fmt_data)
-            self._fmt_values.append(fmt)
+            self._add_video(url, self.filename, **encoding_profile)
 
     @property
     def filename(self):
-        """Get the title of the video."""
+        """Gets the filename of the video.  If it hasn't been defined by the
+        user, the title will instead be used.
+        """
         if not self._filename:
             self._filename = safe_filename(self.title)
             log.debug("generated 'safe' filename: %s", self._filename)
@@ -129,18 +136,18 @@ class YouTube(object):
 
     @filename.setter
     def filename(self, filename):
-        """Set the filename (This method is deprecated. Use `set_filename()`
+        """Sets the filename (This method is deprecated. Use ``set_filename()``
         instead).
 
         :param str filename:
             The filename of the video.
         """
-        warnings.warn("filename setter deprecated, use `set_filename()` "
+        warnings.warn("filename setter deprecated. Use ``set_filename()`` "
                       "instead.", DeprecationWarning)
         self.set_filename(filename)
 
     def set_filename(self, filename):
-        """Set the filename.
+        """Sets the filename of the video.
 
         :param str filename:
             The filename of the video.
@@ -149,10 +156,11 @@ class YouTube(object):
         if self.get_videos():
             for video in self.get_videos():
                 video.filename = filename
+        return True
 
     @property
     def video_id(self):
-        """Extracts the video id from the url."""
+        """Gets the video id by parsing and extracting it from the url."""
         parts = urlparse(self._video_url)
         qs = getattr(parts, 'query')
         if qs:
@@ -162,21 +170,21 @@ class YouTube(object):
         return False
 
     def get_videos(self):
-        """Returns all videos.
-        """
+        """Gets all videos."""
         return self._videos
 
     @property
     def videos(self):
-        """Returns all videos
+        """Gets all videos. (This method is deprecated. Use ``get_videos()``
+        instead.
         """
-        warnings.warn("videos property deprecated, use `get_videos()` "
+        warnings.warn("videos property deprecated. Use ``get_videos()`` "
                       "instead.", DeprecationWarning)
         return self._videos
 
     def get(self, extension=None, resolution=None, profile=None):
-        """Return a single video given a file extention and/or resolution
-        and/or profile.
+        """Gets a single video given a file extention (and/or resolution
+        and/or profile).
 
         :param str extention:
             The desired file extention (e.g.: mp4).
@@ -197,15 +205,14 @@ class YouTube(object):
                 result.append(v)
         matches = len(result)
         if matches <= 0:
-            return DoesNotExist("No videos met criteria.")
+            return DoesNotExist("No videos met this criteria.")
         elif matches == 1:
             return result[0]
         else:
-            raise MultipleObjectsReturned(
-                "{} videos met criteria".format(matches))
+            raise MultipleObjectsReturned("Multiple videos met this criteria.")
 
     def filter(self, extension=None, resolution=None, profile=None):
-        """Return a filtered list of videos given a file extention and/or
+        """Gets a filtered list of videos given a file extention and/or
         resolution and/or profile.
 
         :param str extention:
@@ -228,32 +235,37 @@ class YouTube(object):
         return results
 
     def get_video_data(self):
-        """Fetch the page and extract out the video data."""
+        """Gets the page and extracts out the video data."""
         self.title = None
 
         response = urlopen(self.url)
 
         if not response:
+            # That's a problem, give me internets.
             return False
         html = response.read().decode("utf-8")
 
         if "og:restrictions:age" in html:
-            raise AgeRestricted
+            raise AgeRestricted("Age restricted video. Unable to download "
+                                "without being signed in.")
 
+        # Extract out the json data from the html response body.
         json_object = self._extract_json_data(html)
 
         if not json_object:
             raise YouTubeError("Unable to extract json.")
 
+        # Here we decode the stream map and bundle it into the json object. We
+        # do this just so we just can return one object for the video data.
         encoded_stream_map = json_object.get("args", {}).get(
             "url_encoded_fmt_stream_map")
-
         json_object['args']['stream_map'] = self._parse_stream_map(
             encoded_stream_map)
+
         return json_object
 
     def _parse_stream_map(self, blob):
-        """A modified version of `urlparse.parse_qs` that is able to decode
+        """A modified version of `urlparse.parse_qs` that's able to decode
         YouTube's stream map.
 
         :param str blob:
@@ -268,24 +280,25 @@ class YouTube(object):
             "type": []
         }
 
-        # Split individual videos
+        # Split the comma separated videos.
         videos = blob.split(",")
-        # Unquote the characters and split to parameters
+        # Unquote the characters and split to parameters.
         videos = [video.split("&") for video in videos]
 
+        # Split at the equals sign so we can break this key value pairs and
+        # toss it into a dictionary.
         for video in videos:
             for kv in video:
                 key, value = kv.split("=")
-                log.debug('stream map key value: %s => %s', key, value)
                 dct.get(key, []).append(unquote(value))
         log.debug('decoded stream map: %s', dct)
         return dct
 
     def _extract_json_data(self, html):
-        """Extract the json from the html.
+        """Extract the json out from the html.
 
         :param str html:
-            The raw html of the YouTube page.
+            The raw html of the page.
         """
         # 18 represents the length of "ytplayer.config = ".
         start = html.find("ytplayer.config = ") + 18
@@ -293,6 +306,7 @@ class YouTube(object):
         offset = self._find_json_offset(html)
 
         if not offset:
+            log.warn("unable to find offset for the json data")
             return None
         return json.loads(html[:offset])
 
@@ -321,16 +335,20 @@ class YouTube(object):
         :param str signature:
             Signature.
         :param str url:
-            url of JavaScript file.
+            url of javascript file.
         """
         reg_exp = re.compile(r'\.sig\|\|([a-zA-Z0-9$]+)\(')
         if not self._js_code:
-            js = urlopen(url).read().decode()
+            response = urlopen(url)
+            if not response:
+                # Oh no! we lost internets or something blocked us.
+                return False
+            js = response.read().decode("utf-8")
             self._js_code = (js if not self._js_code else self._js_code)
         try:
             results = reg_exp.search(self._js_code)
             if results:
-                # return the first matching group
+                # Return the first matching group.
                 func = next(g for g in results.groups() if g is not None)
 
             jsi = JSInterpreter(self._js_code)
@@ -341,10 +359,10 @@ class YouTube(object):
                               "has changed the cipher algorithm. Notify this "
                               "issue on GitHub: %s" % e)
 
-    def _extract_fmt(self, text):
+    def _get_encoding_profile(self, text):
         """YouTube does not pass you a completely valid URLencoded form, I
-        suspect this is suppose to act as a deterrent... Nothing some regex
-        couldn't handle.
+        suspect this is supposed to be some sort of a deterrent but nothing
+        regex can't handle.
 
         :param str text:
             The malformed data contained within each url node.
@@ -353,6 +371,8 @@ class YouTube(object):
         itag = reg_exp.findall(text)
         if itag and len(itag) == 1:
             itag = int(itag[0])
+            # Given an itag, refer to the YouTube encoding dict to get the
+            # properties (media type, resolution, etc) of the video.
             attr = YT_ENCODING.get(itag, None)
             if not attr:
                 return itag, None
@@ -360,6 +380,13 @@ class YouTube(object):
 
     def _add_video(self, url, filename, **kwargs):
         """Adds new video object to videos.
+
+        :param str url:
+            The signed url to the video.
+        :param str filename:
+            The filename for the video.
+        :param kwargs:
+            Additional properties to set for the video object.
         """
         video = Video(url, filename, **kwargs)
         self._videos.append(video)
