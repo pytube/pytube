@@ -12,7 +12,7 @@ except ImportError:
     from urllib.parse import urlparse, parse_qs, unquote
     from urllib.request import urlopen
 
-from .exceptions import MultipleObjectsReturned, YouTubeError, CipherError, \
+from .exceptions import MultipleObjectsReturned, PytubeError, CipherError, \
     DoesNotExist, AgeRestricted
 from .jsinterp import JSInterpreter
 from .models import Video
@@ -56,6 +56,11 @@ YT_ENCODING_KEYS = (
 
 class YouTube(object):
     def __init__(self, url=None):
+        """Initializes YouTube API wrapper.
+
+        :param str url:
+            The url to the YouTube video.
+        """
         self._filename = None
         self._video_url = None
         self._js_code = False
@@ -76,53 +81,20 @@ class YouTube(object):
         :param str url:
             The url to the YouTube video.
         """
-        warnings.warn("url setter deprecated, use `from_url()` "
+        warnings.warn("url setter deprecated, use ``from_url()`` "
                       "instead.", DeprecationWarning)
         self.from_url(url)
 
-    def from_url(self, url):
-        """Sets the url for the video.
-
-        :param str url:
-            The url to the YouTube video.
-        """
-        self._video_url = url
-
-        # Reset the filename incase it was previously set.
-        self._filename = None
-
-        # Get the video details.
-        video_data = self.get_video_data()
-
-        # Set the title.
-        self.title = video_data.get("args", {}).get("title")
-
-        # Rewrite and add the url to the javascript, we'll need to fetch this
-        # if the YouTube doesn't give us the signature.
-        js_url = "http:" + video_data.get("assets", {}).get("js")
-
-        # Just make these easily accessible as variables.
-        stream_map = video_data.get("args", {}).get("stream_map")
-        video_urls = stream_map.get("url")
-
-        # For each video url, identify the encoding profile and add it to list
-        # of available videos.
-        for i, url in enumerate(video_urls):
-            try:
-                itag, encoding_profile = self._get_encoding_profile(url)
-                if not encoding_profile:
-                    log.warn("unable to identify profile for itag=%s", itag)
-                    continue
-            except (TypeError, KeyError) as e:
-                log.exception("passing on exception %s", e)
-                continue
-
-            # Check if we have the signature, otherwise we'll need to get the
-            # cipher from the js.
-            if "signature=" not in url:
-                signature = self._get_cipher(stream_map["s"][i], js_url)
-                url = "{}&signature={}".format(url, signature)
-            self._add_video(url, self.filename, **encoding_profile)
+    @property
+    def video_id(self):
+        """Gets the video id by parsing and extracting it from the url."""
+        parts = urlparse(self._video_url)
+        qs = getattr(parts, 'query')
+        if qs:
+            video_id = parse_qs(qs).get('v')
+            if video_id:
+                return video_id.pop()
+        return False
 
     @property
     def filename(self):
@@ -152,22 +124,13 @@ class YouTube(object):
         :param str filename:
             The filename of the video.
         """
+        # TODO: Check if the filename contains the file extension and either
+        # strip it or raise an exception.
         self._filename = filename
         if self.get_videos():
             for video in self.get_videos():
                 video.filename = filename
         return True
-
-    @property
-    def video_id(self):
-        """Gets the video id by parsing and extracting it from the url."""
-        parts = urlparse(self._video_url)
-        qs = getattr(parts, 'query')
-        if qs:
-            video_id = parse_qs(qs).get('v')
-            if video_id:
-                return video_id.pop()
-        return False
 
     def get_videos(self):
         """Gets all videos."""
@@ -181,6 +144,52 @@ class YouTube(object):
         warnings.warn("videos property deprecated. Use ``get_videos()`` "
                       "instead.", DeprecationWarning)
         return self._videos
+
+    def from_url(self, url):
+        """Sets the url for the video.
+
+        :param str url:
+            The url to the YouTube video.
+        """
+        self._video_url = url
+
+        # Reset the filename incase it was previously set.
+        self._filename = None
+
+        # Get the video details.
+        video_data = self.get_video_data()
+
+        # Set the title.
+        self.title = video_data.get("args", {}).get("title")
+
+        # Rewrite and add the url to the javascript, we'll need to fetch this
+        # if the YouTube doesn't give us the signature.
+        js_url = "http:" + video_data.get("assets", {}).get("js")
+
+        # Just make these easily accessible as variables.
+        stream_map = video_data.get("args", {}).get("stream_map")
+        video_urls = stream_map.get("url")
+
+        # For each video url, identify the encoding profile and add it to list
+        # of available videos.
+        for idx, url in enumerate(video_urls):
+            try:
+                itag, encoding_profile = self._get_encoding_profile(url)
+                if not encoding_profile:
+                    log.warn("unable to identify profile for itag=%s", itag)
+                    continue
+            except (TypeError, KeyError) as e:
+                log.exception("passing on exception %s", e)
+                continue
+
+            # Check if we have the signature, otherwise we'll need to get the
+            # cipher from the js.
+            if "signature=" not in url:
+                log.debug('signature not in url, attempting to resolve the '
+                          'cipher...')
+                signature = self._get_cipher(stream_map["s"][idx], js_url)
+                url = "{}&signature={}".format(url, signature)
+            self._add_video(url, self.filename, **encoding_profile)
 
     def get(self, extension=None, resolution=None, profile=None):
         """Gets a single video given a file extention (and/or resolution
@@ -236,24 +245,19 @@ class YouTube(object):
 
     def get_video_data(self):
         """Gets the page and extracts out the video data."""
+        # Reset the filename incase it was previously set.
         self.title = None
-
         response = urlopen(self.url)
-
         if not response:
-            # That's a problem, give me internets.
-            return False
-        html = response.read().decode("utf-8")
+            raise PytubeError("Unable to open url: %s", self.url)
 
+        html = response.read().decode("utf-8")
         if "og:restrictions:age" in html:
             raise AgeRestricted("Age restricted video. Unable to download "
                                 "without being signed in.")
 
         # Extract out the json data from the html response body.
-        json_object = self._extract_json_data(html)
-
-        if not json_object:
-            raise YouTubeError("Unable to extract json.")
+        json_object = self._get_json_data(html)
 
         # Here we decode the stream map and bundle it into the json object. We
         # do this just so we just can return one object for the video data.
@@ -264,7 +268,7 @@ class YouTube(object):
         return json_object
 
     def _parse_stream_map(self, blob):
-        """A modified version of `urlparse.parse_qs` that's able to decode
+        """A modified version of ``urlparse.parse_qs`` that's able to decode
         YouTube's stream map.
 
         :param str blob:
@@ -281,6 +285,7 @@ class YouTube(object):
 
         # Split the comma separated videos.
         videos = blob.split(",")
+
         # Unquote the characters and split to parameters.
         videos = [video.split("&") for video in videos]
 
@@ -293,7 +298,7 @@ class YouTube(object):
         log.debug('decoded stream map: %s', dct)
         return dct
 
-    def _extract_json_data(self, html):
+    def _get_json_data(self, html):
         """Extract the json out from the html.
 
         :param str html:
@@ -302,14 +307,13 @@ class YouTube(object):
         # 18 represents the length of "ytplayer.config = ".
         start = html.find("ytplayer.config = ") + 18
         html = html[start:]
-        offset = self._find_json_offset(html)
 
+        offset = self._get_json_offset(html)
         if not offset:
-            log.warn("unable to find offset for the json data")
-            return None
+            raise PytubeError("Unable to extract json.")
         return json.loads(html[:offset])
 
-    def _find_json_offset(self, html):
+    def _get_json_offset(self, html):
         """Find where the json object starts.
 
         :param str html:
@@ -317,31 +321,32 @@ class YouTube(object):
         """
         brackets = []
         index = 1
-        for i, char in enumerate(html):
-            if char == "{":
+        # Determine the offset by pushing/popping brackets until all
+        # js expressions are closed.
+        for idx, ch in enumerate(html):
+            if ch == "{":
                 brackets.append("}")
-            elif char == "}":
+            elif ch == "}":
                 brackets.pop()
                 if len(brackets) == 0:
                     break
         else:
-            return None
-        return index + i
+            raise PytubeError("Unable to determine json offset.")
+        return index + idx
 
     def _get_cipher(self, signature, url):
-        """Get the signature using the cipher.
+        """Gets the signature using the cipher.
 
         :param str signature:
-            Signature.
+            The url signature.
         :param str url:
-            url of javascript file.
+            The url of the javascript file.
         """
         reg_exp = re.compile(r'\.sig\|\|([a-zA-Z0-9$]+)\(')
         if not self._js_code:
             response = urlopen(url)
             if not response:
-                # Oh no! we lost internets or something blocked us.
-                return False
+                raise PytubeError("Unable to open url: %s", self.url)
             js = response.read().decode("utf-8")
             self._js_code = (js if not self._js_code else self._js_code)
         try:
@@ -357,6 +362,7 @@ class YouTube(object):
             raise CipherError("Couldn't cipher the signature. Maybe YouTube "
                               "has changed the cipher algorithm. Notify this "
                               "issue on GitHub: %s" % e)
+        return False
 
     def _get_encoding_profile(self, text):
         """YouTube does not pass you a completely valid URLencoded form, I
@@ -376,6 +382,13 @@ class YouTube(object):
             if not attr:
                 return itag, None
             return itag, dict(zip(YT_ENCODING_KEYS, attr))
+        if not itag:
+            raise PytubeError("Unable to get encoding profile, no itag found.")
+        elif len(itag) > 1:
+            log.warn("Multiple itags found: %s", itag)
+            raise PytubeError("Unable to get encoding profile, multiple itags "
+                              "found.")
+        return False
 
     def _add_video(self, url, filename, **kwargs):
         """Adds new video object to videos.
