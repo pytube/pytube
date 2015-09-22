@@ -170,12 +170,13 @@ class YouTube(object):
         stream_map = video_data.get("args", {}).get("stream_map")
         video_urls = stream_map.get("url")
 
-        # For each video url, identify the encoding profile and add it to list
+        # For each video url, identify the quality profile and add it to list
         # of available videos.
         for idx, url in enumerate(video_urls):
+            log.debug("attempting to get quality profile from url: %s", url)
             try:
-                itag, encoding_profile = self._get_quality_profile(url)
-                if not encoding_profile:
+                itag, quality_profile = self._get_quality_profile_from_url(url)
+                if not quality_profile:
                     log.warn("unable to identify profile for itag=%s", itag)
                     continue
             except (TypeError, KeyError) as e:
@@ -189,7 +190,7 @@ class YouTube(object):
                           'cipher...')
                 signature = self._get_cipher(stream_map["s"][idx], js_url)
                 url = "{}&signature={}".format(url, signature)
-            self._add_video(url, self.filename, **encoding_profile)
+            self._add_video(url, self.filename, **quality_profile)
 
     def get(self, extension=None, resolution=None, profile=None):
         """Gets a single video given a file extention (and/or resolution
@@ -365,16 +366,16 @@ class YouTube(object):
                               "issue on GitHub: {}".format(e))
         return False
 
-    def _get_quality_profile(self, text):
-        """YouTube does not pass you a completely valid URLencoded form, I
-        suspect this is supposed to be some sort of a deterrent but nothing
-        regex can't handle.
+    def _get_quality_profile_from_url(self, url):
+        """Gets the quality profile given a video url. Normally we would just
+        use ``urlparse`` since itags are represented as a get parameter, but
+        YouTube doesn't pass a properly encoded url.
 
-        :param str text:
-            The malformed data contained within each url node.
+        :param str url:
+            The malformed encoded url.
         """
         reg_exp = re.compile('itag=(\d+)')
-        itag = reg_exp.findall(text)
+        itag = reg_exp.findall(url)
         if itag and len(itag) == 1:
             itag = int(itag[0])
             # Given an itag, refer to the YouTube quality profiles to get the
