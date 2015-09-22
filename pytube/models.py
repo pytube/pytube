@@ -4,14 +4,11 @@ from __future__ import unicode_literals, print_function
 from os import remove
 from os.path import normpath, isfile, isdir
 from time import clock
-import logging
 
 try:
     from urllib2 import urlopen
 except ImportError:
     from urllib.request import urlopen
-
-from pytube.utils import sizeof
 
 
 class Video(object):
@@ -26,7 +23,7 @@ class Video(object):
         :param resolution:
             The broadcasting standard of the video.
         :param url:
-            The url of the video. (e.g.: youtube.com/watch?v=..)
+            The url of the video. (e.g.: youtube.com/watch?v=...)
         :param filename:
             The filename (minus the extention) to save the video.
         """
@@ -62,8 +59,7 @@ class Video(object):
 
         # Check for conflicting filenames
         if isfile(fullpath) and not force_overwrite:
-            raise OSError("\Error: Conflicting filename:'{}'".format(
-                self.filename))
+            raise OSError("Conflicting filename:'{}'".format(self.filename))
 
         response = urlopen(self.url)
         meta_data = dict(response.info().items())
@@ -73,10 +69,6 @@ class Video(object):
         start = clock()
         try:
             with open(fullpath, 'wb') as dst_file:
-                # Print downloading message.
-                logging.info("Downloading: '%s.%s' (Bytes: %s) to path: %s",
-                             self.filename, self.extension, sizeof(file_size),
-                             path)
                 while True:
                     self._buffer = response.read(chunk_size)
                     if not self._buffer:
@@ -91,20 +83,15 @@ class Video(object):
 
         # Catch possible exceptions occurring during download
         except IOError:
-            raise IOError("Error: Failed to open file. Check that: ('{0}'), "
-                          "is a valid pathname. " "Or that ('{1}.{2}') is a "
-                          "valid filename.".format(path, self.filename,
-                                                   self.extension))
+            raise IOError("Failed to open file.")
 
         except BufferError:
-            raise BufferError("Error: Failed on writing buffer. Failed "
-                              "to write video to file.")
+            raise BufferError("Failed to write video to file.")
 
         except KeyboardInterrupt:
             remove(fullpath)
-            raise KeyboardInterrupt("Interrupt signal given. Deleting "
-                                    "incomplete video('{0}.{1}')."
-                                    .format(self.filename, self.extension))
+            raise KeyboardInterrupt(
+                "Interrupt signal given. Deleting incomplete video.")
 
     def __repr__(self):
         """A cleaner representation of the class instance."""
