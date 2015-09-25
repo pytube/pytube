@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function
-from os import remove
-from os.path import normpath, isfile, isdir
+from __future__ import unicode_literals
+import os
 from time import clock
 
 try:
@@ -32,14 +31,13 @@ class Video(object):
 
     def download(self, path='', chunk_size=8 * 1024, on_progress=None,
                  on_finish=None, force_overwrite=False):
-        """Downloads the file of the URL defined within the class
-        instance.
+        """Downloads the video.
 
         :param str path:
             The destination output directory.
         :param int chunk_size:
-            File size (in bytes) to write to buffer at a time (default: 8
-            bytes).
+            File size (in bytes) to write to buffer at a time. By default,
+            this is set to 8 bytes.
         :param func on_progress:
             The function to be called every time the buffer is written
             to. Arguments passed are the bytes recieved, file size, and start
@@ -50,15 +48,15 @@ class Video(object):
         :param bool force_overwrite:
             Force a file overwrite if conflicting one exists.
         """
-        if isdir(normpath(path)):
-            path = (normpath(path) + '/' if path else '')
+        if os.path.isdir(os.path.normpath(path)):
+            path = (os.path.normpath(path) + '/' if path else '')
             fullpath = '{}{}.{}'.format(path, self.filename, self.extension)
         else:
-            fullpath = normpath(path)
+            fullpath = os.path.normpath(path)
 
         # TODO: Move this into cli, this kind of logic probably shouldn't be
         # handled by the library.
-        if isfile(fullpath) and not force_overwrite:
+        if os.path.isfile(fullpath) and not force_overwrite:
             raise OSError("Conflicting filename:'{}'".format(self.filename))
 
         response = urlopen(self.url)
@@ -95,7 +93,7 @@ class Video(object):
         except KeyboardInterrupt:
             # TODO: Move this into the cli, ``KeyboardInterrupt`` handling
             # should be taken care of by the client.
-            remove(fullpath)
+            os.remove(fullpath)
             raise KeyboardInterrupt("Interrupt signal given. Deleting "
                                     "incomplete video.")
 

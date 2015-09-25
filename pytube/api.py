@@ -55,6 +55,8 @@ YT_QUALITY_PROFILE_KEYS = (
 
 
 class YouTube(object):
+    """Class representation of a single instance of a YouTube session.
+    """
     def __init__(self, url=None):
         """Initializes YouTube API wrapper.
 
