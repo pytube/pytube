@@ -174,11 +174,3 @@ Library Usage
     # Note: If you wanted to choose the output directory, simply pass it as an
     # argument to the download method.
     video.download('/tmp/')
-
-Philosophy
-==========
-
-My only real goal for this is to never require any third party dependancies,
-to keep it simple and make it reliable.
-
-.. _PyVideos: http://pyvideo.org/

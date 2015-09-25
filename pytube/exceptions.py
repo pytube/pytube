@@ -4,8 +4,8 @@ class MultipleObjectsReturned(Exception):
     pass
 
 
-class YouTubeError(Exception):
-    """The REST interface returned an error.
+class PytubeError(Exception):
+    """Something specific to the wrapper failed.
     """
     pass
 
