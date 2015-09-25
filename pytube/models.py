@@ -15,49 +15,49 @@ class Video(object):
     """Class representation of a single instance of a YouTube video.
     """
     def __init__(self, url, filename, **attributes):
-        """
-        Define the variables required to declare a new video.
+        """Sets-up the video object.
 
-        :param extention:
-            The file extention the video should be saved as.
-        :param resolution:
-            The broadcasting standard of the video.
-        :param url:
-            The url of the video. (e.g.: youtube.com/watch?v=...)
-        :param filename:
+        :param str url:
+            The url of the video. (e.g.: https://youtube.com/watch?v=...)
+        :param str filename:
             The filename (minus the extention) to save the video.
+        :param **attributes:
+            Additional keyword arguments for additional quality profile
+            attribures.
         """
-
         self.url = url
         self.filename = filename
+        # TODO: this a bit hacky, rewrite to be explicit.
         self.__dict__.update(**attributes)
 
     def download(self, path='', chunk_size=8 * 1024, on_progress=None,
                  on_finish=None, force_overwrite=False):
-        """
-        Downloads the file of the URL defined within the class
+        """Downloads the file of the URL defined within the class
         instance.
 
-        :param path:
-            Destination directory
-        :param chunk_size:
+        :param str path:
+            The destination output directory.
+        :param int chunk_size:
             File size (in bytes) to write to buffer at a time (default: 8
             bytes).
-        :param on_progress:
-            A function to be called every time the buffer was written
-            out. Arguments passed are the current and the full size.
-        :param on_finish:
-            To be called when the download is finished. The full path to the
-            file is passed as an argument.
+        :param func on_progress:
+            The function to be called every time the buffer is written
+            to. Arguments passed are the bytes recieved, file size, and start
+            datetime.
+        :param func on_finish:
+            The function to be called when the download is complete. Arguments
+            passed are the full path to downloaded the file.
+        :param bool force_overwrite:
+            Force a file overwrite if conflicting one exists.
         """
-
         if isdir(normpath(path)):
             path = (normpath(path) + '/' if path else '')
-            fullpath = '{0}{1}.{2}'.format(path, self.filename, self.extension)
+            fullpath = '{}{}.{}'.format(path, self.filename, self.extension)
         else:
             fullpath = normpath(path)
 
-        # Check for conflicting filenames
+        # TODO: Move this into cli, this kind of logic probably shouldn't be
+        # handled by the library.
         if isfile(fullpath) and not force_overwrite:
             raise OSError("Conflicting filename:'{}'".format(self.filename))
 
@@ -71,8 +71,12 @@ class Video(object):
             with open(fullpath, 'wb') as dst_file:
                 while True:
                     self._buffer = response.read(chunk_size)
+                    # If the buffer is empty (aka no bytes remaining).
                     if not self._buffer:
                         if on_finish:
+                            # TODO: We possibly want to flush the
+                            # `_bytes_recieved`` buffer before we call
+                            # ``on_finish()``.
                             on_finish(fullpath)
                         break
 
@@ -81,7 +85,7 @@ class Video(object):
                     if on_progress:
                         on_progress(self._bytes_received, file_size, start)
 
-        # Catch possible exceptions occurring during download
+        # Catch possible exceptions occurring during download.
         except IOError:
             raise IOError("Failed to open file.")
 
@@ -89,16 +93,24 @@ class Video(object):
             raise BufferError("Failed to write video to file.")
 
         except KeyboardInterrupt:
+            # TODO: Move this into the cli, ``KeyboardInterrupt`` handling
+            # should be taken care of by the client.
             remove(fullpath)
-            raise KeyboardInterrupt(
-                "Interrupt signal given. Deleting incomplete video.")
+            raise KeyboardInterrupt("Interrupt signal given. Deleting "
+                                    "incomplete video.")
 
     def __repr__(self):
-        """A cleaner representation of the class instance."""
-        return "<Video: {0} (.{1}) - {2} - {3}>".format(
+        """A clean representation of the class instance."""
+        return "<Video: {} (.{}) - {} - {}>".format(
             self.video_codec, self.extension, self.resolution, self.profile)
 
     def __lt__(self, other):
+        """The "less than" (lt) method is used for comparing video object to
+        one another. This useful when sorting.
+
+        :param Video other:
+            The instance of the other video instance for comparison.
+        """
         if isinstance(other, Video):
             v1 = "{0} {1}".format(self.extension, self.resolution)
             v2 = "{0} {1}".format(other.extension, other.resolution)
