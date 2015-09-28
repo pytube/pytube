@@ -13,21 +13,38 @@ except ImportError:
 class Video(object):
     """Class representation of a single instance of a YouTube video.
     """
-    def __init__(self, url, filename, **attributes):
+    def __init__(self, url, filename, extension, resolution, video_codec,
+                 profile, video_bitrate, audio_codec, audio_bitrate):
         """Sets-up the video object.
 
         :param str url:
             The url of the video. (e.g.: https://youtube.com/watch?v=...)
         :param str filename:
             The filename (minus the extention) to save the video.
-        :param **attributes:
-            Additional keyword arguments for additional quality profile
-            attribures.
+        :param str extention:
+            The desired file extention (e.g.: mp4, flv, webm).
+        :param str resolution:
+            The broadcasting standard (e.g.: 720p, 1080p).
+        :param str video_codec:
+            The codec used to encode the video.
+        :param str profile:
+            The arbitrary quality profile.
+        :param str video_bitrate:
+            The bitrate of the video over sampling interval.
+        :param str audio_codec:
+            The codec used to encode the audio.
+        :param str audio_bitrate:
+            The bitrate of the video's audio over sampling interval.
         """
         self.url = url
         self.filename = filename
-        # TODO: this a bit hacky, rewrite to be explicit.
-        self.__dict__.update(**attributes)
+        self.extension = extension
+        self.resolution = resolution
+        self.video_codec = video_codec
+        self.profile = profile
+        self.video_bitrate = video_bitrate
+        self.audio_codec = audio_codec
+        self.audio_bitrate = audio_bitrate
 
     def download(self, path='', chunk_size=8 * 1024, on_progress=None,
                  on_finish=None, force_overwrite=False):
@@ -48,34 +65,35 @@ class Video(object):
         :param bool force_overwrite:
             Force a file overwrite if conflicting one exists.
         """
-        if os.path.isdir(os.path.normpath(path)):
-            path = (os.path.normpath(path) + '/' if path else '')
-            fullpath = '{}{}.{}'.format(path, self.filename, self.extension)
-        else:
-            fullpath = os.path.normpath(path)
-
+        path = os.path.normpath(path)
+        if os.path.isdir(path):
+            filename = "{}.{}".format(self.filename, self.extension)
+            path = os.path.join(path, filename)
+        # TODO: If it's not a path, this should raise an ``OSError``.
         # TODO: Move this into cli, this kind of logic probably shouldn't be
         # handled by the library.
-        if os.path.isfile(fullpath) and not force_overwrite:
+        if os.path.isfile(path) and not force_overwrite:
             raise OSError("Conflicting filename:'{}'".format(self.filename))
-
+        # TODO: Split up the downloading and OS jazz into separate functions.
         response = urlopen(self.url)
         meta_data = dict(response.info().items())
         file_size = int(meta_data.get("Content-Length") or
                         meta_data.get("content-length"))
         self._bytes_received = 0
         start = clock()
+        # TODO: Let's get rid of this whole try/except block, let ``OSErrors``
+        # fail loudly.
         try:
-            with open(fullpath, 'wb') as dst_file:
+            with open(path, 'wb') as dst_file:
                 while True:
                     self._buffer = response.read(chunk_size)
-                    # If the buffer is empty (aka no bytes remaining).
+                    # Check if the buffer is empty (aka no bytes remaining).
                     if not self._buffer:
                         if on_finish:
                             # TODO: We possibly want to flush the
                             # `_bytes_recieved`` buffer before we call
                             # ``on_finish()``.
-                            on_finish(fullpath)
+                            on_finish(path)
                         break
 
                     self._bytes_received += len(self._buffer)
@@ -83,17 +101,11 @@ class Video(object):
                     if on_progress:
                         on_progress(self._bytes_received, file_size, start)
 
-        # Catch possible exceptions occurring during download.
-        except IOError:
-            raise IOError("Failed to open file.")
-
-        except BufferError:
-            raise BufferError("Failed to write video to file.")
-
         except KeyboardInterrupt:
             # TODO: Move this into the cli, ``KeyboardInterrupt`` handling
-            # should be taken care of by the client.
-            os.remove(fullpath)
+            # should be taken care of by the client. Also you should be allowed
+            # to disable this.
+            os.remove(path)
             raise KeyboardInterrupt("Interrupt signal given. Deleting "
                                     "incomplete video.")
 
@@ -106,7 +118,7 @@ class Video(object):
         """The "less than" (lt) method is used for comparing video object to
         one another. This useful when sorting.
 
-        :param Video other:
+        :param other:
             The instance of the other video instance for comparison.
         """
         if isinstance(other, Video):
