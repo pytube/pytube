@@ -4,13 +4,25 @@ class MultipleObjectsReturned(Exception):
     pass
 
 
-class YouTubeError(Exception):
-    """The REST interface returned an error.
+class PytubeError(Exception):
+    """Something specific to the wrapper failed.
     """
     pass
 
 
 class CipherError(Exception):
     """The _cipher method returned an error.
+    """
+    pass
+
+
+class DoesNotExist(Exception):
+    """The requested video does not exist.
+    """
+    pass
+
+
+class AgeRestricted(Exception):
+    """The requested video has an age restriction.
     """
     pass
