@@ -46,7 +46,7 @@ class Video(object):
         self.audio_codec = audio_codec
         self.audio_bitrate = audio_bitrate
 
-    def download(self, path='', chunk_size=8 * 1024, on_progress=None,
+    def download(self, path, chunk_size=8 * 1024, on_progress=None,
                  on_finish=None, force_overwrite=False):
         """Downloads the video.
 
@@ -56,14 +56,14 @@ class Video(object):
             File size (in bytes) to write to buffer at a time. By default,
             this is set to 8 bytes.
         :param func on_progress:
-            The function to be called every time the buffer is written
+            *Optional* function to be called every time the buffer is written
             to. Arguments passed are the bytes recieved, file size, and start
             datetime.
         :param func on_finish:
-            The function to be called when the download is complete. Arguments
+            *Optional* callback function when download is complete. Arguments
             passed are the full path to downloaded the file.
         :param bool force_overwrite:
-            Force a file overwrite if conflicting one exists.
+            *Optional* force a file overwrite if conflicting one exists.
         """
         path = os.path.normpath(path)
         if os.path.isdir(path):
