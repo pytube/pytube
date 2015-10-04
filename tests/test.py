@@ -19,12 +19,14 @@ class TestYouTube(unittest.TestCase):
         self.filename = 'Pulp Fiction - Dancing Scene'
         self.yt = YouTube(self.url)
         #: don't hard code, make is universal
-        self.videos = ['<Video: MPEG-4 Visual (.3gp) - 144p - Simple>',
-                    '<Video: MPEG-4 Visual (.3gp) - 240p - Simple>',
-                   '<Video: Sorenson H.263 (.flv) - 240p - N/A>',
-                   '<Video: H.264 (.mp4) - 360p - Baseline>',
-                   '<Video: H.264 (.mp4) - 720p - High>',
-                   '<Video: VP8 (.webm) - 360p - N/A>']
+        self.videos = [
+            '<Video: MPEG-4 Visual (.3gp) - 144p - Simple>',
+            '<Video: MPEG-4 Visual (.3gp) - 240p - Simple>',
+            '<Video: Sorenson H.263 (.flv) - 240p - N/A>',
+            '<Video: H.264 (.mp4) - 360p - Baseline>',
+            '<Video: H.264 (.mp4) - 720p - High>',
+            '<Video: VP8 (.webm) - 360p - N/A>'
+        ]
         # using flv since it has only once video
         self.flv = '<Video: Sorenson H.263 (.flv) - 240p - N/A>'
 
@@ -46,7 +48,7 @@ class TestYouTube(unittest.TestCase):
 
     def test_get_false(self):
         with self.assertRaises(MultipleObjectsReturned):
-                self.yt.get()
+            self.yt.get()
 
     def test_get_true(self):
         self.assertEqual(str(self.yt.get('flv')), self.flv)
