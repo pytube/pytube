@@ -373,8 +373,8 @@ class YouTube(object):
         use ``urlparse`` since itags are represented as a get parameter, but
         YouTube doesn't pass a properly encoded url.
 
-        :param str url:
-            The malformed encoded url.
+        :param str video_url:
+            The malformed url-encoded video_url.
         """
         reg_exp = re.compile('itag=(\d+)')
         itag = reg_exp.findall(video_url)
