@@ -1,60 +1,71 @@
 #!/usr/bin/env/python
 # -*- coding: utf-8 -*-
 
-import unittest
-from pytube import YouTube
+import mock
+from nose.tools import eq_, raises
+from pytube import api
 from pytube.exceptions import MultipleObjectsReturned
 
-SHOW_ERROR_MESSAGES = True
 
-
-class TestYouTube(unittest.TestCase):
-    """Test all methods of Youtube class"""
-
+class TestPytube(object):
     def setUp(self):
-        """Set up the all attributes required for a particular video."""
+        url = 'http://www.youtube.com/watch?v=9bZkp7q19f0'
+        self.mock_js = open('tests/mock_video.js').read()
+        self.mock_html = open('tests/mock_video.html').read()
+        with mock.patch('pytube.api.urlopen') as urlopen:
+            urlopen.return_value.read.return_value = self.mock_html
+            self.yt = api.YouTube()
+            self.yt._js_code = self.mock_js
+            self.yt.from_url(url)
 
-        self.url = "https://www.youtube.com/watch?v=Ik-RsDGPI5Y"
-        self.video_id = 'Ik-RsDGPI5Y'
-        self.filename = 'Pulp Fiction - Dancing Scene'
-        self.yt = YouTube(self.url)
-        #: don't hard code, make is universal
-        self.videos = [
-            '<Video: MPEG-4 Visual (.3gp) - 144p - Simple>',
-            '<Video: MPEG-4 Visual (.3gp) - 240p - Simple>',
-            '<Video: Sorenson H.263 (.flv) - 240p - N/A>',
-            '<Video: H.264 (.mp4) - 360p - Baseline>',
-            '<Video: H.264 (.mp4) - 720p - High>',
-            '<Video: VP8 (.webm) - 360p - N/A>'
-        ]
-        # using flv since it has only once video
-        self.flv = '<Video: Sorenson H.263 (.flv) - 240p - N/A>'
+    def test_get_video_id(self):
+        """Resolve the video id from url"""
+        eq_(self.yt.video_id, '9bZkp7q19f0')
 
-    def test_url(self):
-        self.assertEqual(self.yt.url, self.url)
+    def test_auto_filename(self):
+        """Generate safe filename based on video title"""
+        expected = u'PSY - GANGNAM STYLE(\uac15\ub0a8\uc2a4\ud0c0\uc77c) MV'
 
-    def test_video_id(self):
-        self.assertEqual(self.yt.video_id, self.video_id)
+        eq_(self.yt.filename, expected)
 
-    def test_filename(self):
-        self.assertEqual(self.yt.filename, self.filename)
+    def test_manual_filename(self):
+        """Manually set a filename"""
+        expected = u'PSY - Gangnam Style'
 
-    def test_get_videos(self):
-        self.assertEqual(map(str, self.yt.get_videos()), self.videos)
+        self.yt.set_filename(expected)
+        eq_(self.yt.filename, expected)
 
-    def test_get_video_data(self):
-        self.assertEqual((self.yt.get_video_data()['args']['loaderUrl']),
-                         self.url)
+    def test_get_all_videos(self):
+        """Get all videos"""
+        eq_(len(self.yt.get_videos()), 6)
 
-    def test_get_false(self):
-        with self.assertRaises(MultipleObjectsReturned):
-            self.yt.get()
+    def test_filter_video_by_extension(self):
+        """Filter videos by filetype"""
+        eq_(len(self.yt.filter('mp4')), 2)
+        eq_(len(self.yt.filter('3gp')), 2)
+        eq_(len(self.yt.filter('webm')), 1)
+        eq_(len(self.yt.filter('flv')), 1)
 
-    def test_get_true(self):
-        self.assertEqual(str(self.yt.get('flv')), self.flv)
+    def test_filter_video_by_extension_and_resolution(self):
+        """Filter videos by file extension and resolution"""
+        eq_(len(self.yt.filter('mp4', '720p')), 1)
+        eq_(len(self.yt.filter('mp4', '1080p')), 0)
 
-    def test_filter(self):
-        self.assertEqual(str(self.yt.filter('flv')[0]), self.flv)
+    def test_filter_video_by_extension_resolution_profile(self):
+        """Filter videos by file extension, resolution, and profile"""
+        eq_(len(self.yt.filter('mp4', '360p', 'Baseline')), 1)
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_filter_video_by_profile(self):
+        """Filter videos by file profile"""
+        eq_(len(self.yt.filter(profile='Simple')), 2)
+
+    def test_filter_video_by_resolution(self):
+        """Filter videos by resolution"""
+        eq_(len(self.yt.filter(resolution='360p')), 2)
+
+    @raises(MultipleObjectsReturned)
+    def test_get_multiple_itmes(self):
+        """.get(...) cannot return more than one video"""
+        self.yt.get(profile='Simple')
+        self.yt.get('mp4')
+        self.yt.get(resolution='240p')
