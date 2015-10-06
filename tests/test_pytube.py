@@ -15,7 +15,7 @@ class TestPytube(object):
         with mock.patch('pytube.api.urlopen') as urlopen:
             urlopen.return_value.read.return_value = self.mock_html
             self.yt = api.YouTube()
-            self.yt._js_code = self.mock_js
+            self.yt._js_cache = self.mock_js
             self.yt.from_url(url)
 
     def test_get_video_id(self):
