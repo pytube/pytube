@@ -393,7 +393,8 @@ class YouTube(object):
                 return itag, None
             # Here we just combine the quality profile keys to the
             # corresponding quality profile, referenced by the itag.
-            return itag, dict(list(zip(YT_QUALITY_PROFILE_KEYS, quality_profile)))
+            return itag, dict(list(zip(
+                YT_QUALITY_PROFILE_KEYS, quality_profile)))
         if not itag:
             raise PytubeError("Unable to get encoding profile, no itag found.")
         elif len(itag) > 1:
