@@ -23,23 +23,23 @@ log = logging.getLogger(__name__)
 # YouTube quality and codecs id map.
 YT_QUALITY_PROFILES = {
     # flash
-    5: ["flv", "240p", "Sorenson H.263", "N/A", "0.25", "MP3", "64"],
+    5: ("flv", "240p", "Sorenson H.263", "N/A", "0.25", "MP3", "64"),
 
     # 3gp
-    17: ["3gp", "144p", "MPEG-4 Visual", "Simple", "0.05", "AAC", "24"],
-    36: ["3gp", "240p", "MPEG-4 Visual", "Simple", "0.17", "AAC", "38"],
+    17: ("3gp", "144p", "MPEG-4 Visual", "Simple", "0.05", "AAC", "24"),
+    36: ("3gp", "240p", "MPEG-4 Visual", "Simple", "0.17", "AAC", "38"),
 
     # webm
-    43: ["webm", "360p", "VP8", "N/A", "0.5", "Vorbis", "128"],
-    100: ["webm", "360p", "VP8", "3D", "N/A", "Vorbis", "128"],
+    43: ("webm", "360p", "VP8", "N/A", "0.5", "Vorbis", "128"),
+    100: ("webm", "360p", "VP8", "3D", "N/A", "Vorbis", "128"),
 
     # mpeg4
-    18: ["mp4", "360p", "H.264", "Baseline", "0.5", "AAC", "96"],
-    22: ["mp4", "720p", "H.264", "High", "2-2.9", "AAC", "192"],
-    82: ["mp4", "360p", "H.264", "3D", "0.5", "AAC", "96"],
-    83: ["mp4", "240p", "H.264", "3D", "0.5", "AAC", "96"],
-    84: ["mp4", "720p", "H.264", "3D", "2-2.9", "AAC", "152"],
-    85: ["mp4", "1080p", "H.264", "3D", "2-2.9", "AAC", "152"],
+    18: ("mp4", "360p", "H.264", "Baseline", "0.5", "AAC", "96"),
+    22: ("mp4", "720p", "H.264", "High", "2-2.9", "AAC", "192"),
+    82: ("mp4", "360p", "H.264", "3D", "0.5", "AAC", "96"),
+    83: ("mp4", "240p", "H.264", "3D", "0.5", "AAC", "96"),
+    84: ("mp4", "720p", "H.264", "3D", "2-2.9", "AAC", "152"),
+    85: ("mp4", "1080p", "H.264", "3D", "2-2.9", "AAC", "152"),
 }
 
 # The keys corresponding to the quality/codec map above.
@@ -373,8 +373,8 @@ class YouTube(object):
         use ``urlparse`` since itags are represented as a get parameter, but
         YouTube doesn't pass a properly encoded url.
 
-        :param str url:
-            The malformed encoded url.
+        :param str video_url:
+            The malformed url-encoded video_url.
         """
         reg_exp = re.compile('itag=(\d+)')
         itag = reg_exp.findall(video_url)
