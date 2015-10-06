@@ -155,8 +155,10 @@ class YouTube(object):
         """
         self._video_url = url
 
-        # Reset the filename incase it was previously set.
+        # Reset the filename and videos list in case the same instance is
+        # reused.
         self._filename = None
+        self._videos = []
 
         # Get the video details.
         video_data = self.get_video_data()
