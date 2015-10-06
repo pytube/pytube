@@ -1,19 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 from pytube import __version__
-import os
-
 
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
 
+with open('README.rst') as readme_file:
+    readme = readme_file.read()
 
-def open_file(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname))
-
+with open('LICENSE.txt') as readme_file:
+    license = readme_file.read()
 
 setup(
     name="pytube",
@@ -21,8 +19,7 @@ setup(
     author="Nick Ficano",
     author_email="nficano@gmail.com",
     packages=['pytube'],
-    url="http://pytube.nickficano.com",
-    license=open_file('LICENSE.txt').read(),
+    license=license,
     scripts=['scripts/pytube'],
     classifiers=[
         "Development Status :: 4 - Beta",
@@ -40,8 +37,8 @@ setup(
         "Topic :: Internet",
         "Topic :: Multimedia :: Video"
     ],
-    description="A simple, yet versatile package for downloading "
-                "YouTube videos.",
-    long_description=open_file('README.rst').read(),
+    description=("A simple, yet versatile Python library (and command-line) "
+                 "for downloading YouTube videos."),
+    long_description=readme,
     zip_safe=True,
 )
