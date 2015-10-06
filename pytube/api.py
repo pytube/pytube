@@ -65,7 +65,7 @@ class YouTube(object):
         """
         self._filename = None
         self._video_url = None
-        self._js_code = False
+        self._js_cache = None
         self._videos = []
         if url:
             self.from_url(url)
@@ -155,8 +155,10 @@ class YouTube(object):
         """
         self._video_url = url
 
-        # Reset the filename incase it was previously set.
+        # Reset the filename and videos list in case the same instance is
+        # reused.
         self._filename = None
+        self._videos = []
 
         # Get the video details.
         video_data = self.get_video_data()
@@ -193,6 +195,9 @@ class YouTube(object):
                 signature = self._get_cipher(stream_map["s"][idx], js_url)
                 url = "{}&signature={}".format(url, signature)
             self._add_video(url, self.filename, **quality_profile)
+        # Clear the cached js. Make sure to keep this at the end of
+        # ``from_url()`` so we can mock inject the js in unit tests.
+        self._js_cache = None
 
     def get(self, extension=None, resolution=None, profile=None):
         """Gets a single video given a file extention (and/or resolution
@@ -348,18 +353,19 @@ class YouTube(object):
             The url of the javascript file.
         """
         reg_exp = re.compile(r'\.sig\|\|([a-zA-Z0-9$]+)\(')
-        if not self._js_code:
+        # Cache the js since ``_get_cipher()`` will be called for each video.
+        if not self._js_cache:
             response = urlopen(url)
             if not response:
                 raise PytubeError("Unable to open url: {}".format(self.url))
-            self._js_code = response.read().decode("utf-8")
+            self._js_cache = response.read().decode("utf-8")
         try:
-            matches = reg_exp.search(self._js_code)
+            matches = reg_exp.search(self._js_cache)
             if matches:
                 # Return the first matching group.
                 func = next(g for g in matches.groups() if g is not None)
             # Load js into JS Python interpreter.
-            jsi = JSInterpreter(self._js_code)
+            jsi = JSInterpreter(self._js_cache)
             initial_function = jsi.extract_function(func)
             return initial_function([signature])
         except Exception as e:
