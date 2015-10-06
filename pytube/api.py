@@ -193,7 +193,7 @@ class YouTube(object):
                 log.debug('signature not in url, attempting to resolve the '
                           'cipher...')
                 signature = self._get_cipher(stream_map["s"][idx], js_url)
-                url = "{}&signature={}".format(url, signature)
+                url = "{0}&signature={1}".format(url, signature)
             self._add_video(url, self.filename, **quality_profile)
         # Clear the cached js. Make sure to keep this at the end of
         # ``from_url()`` so we can mock inject the js in unit tests.
@@ -259,7 +259,7 @@ class YouTube(object):
         self.title = None
         response = urlopen(self.url)
         if not response:
-            raise PytubeError("Unable to open url: {}".format(self.url))
+            raise PytubeError("Unable to open url: {0}".format(self.url))
 
         html = response.read().decode("utf-8")
         if "og:restrictions:age" in html:
@@ -357,7 +357,7 @@ class YouTube(object):
         if not self._js_cache:
             response = urlopen(url)
             if not response:
-                raise PytubeError("Unable to open url: {}".format(self.url))
+                raise PytubeError("Unable to open url: {0}".format(self.url))
             self._js_cache = response.read().decode("utf-8")
         try:
             matches = reg_exp.search(self._js_cache)
@@ -371,7 +371,7 @@ class YouTube(object):
         except Exception as e:
             raise CipherError("Couldn't cipher the signature. Maybe YouTube "
                               "has changed the cipher algorithm. Notify this "
-                              "issue on GitHub: {}".format(e))
+                              "issue on GitHub: {0}".format(e))
         return False
 
     def _get_quality_profile_from_url(self, video_url):
