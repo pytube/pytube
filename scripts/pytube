@@ -7,7 +7,7 @@ import argparse
 
 from pytube import YouTube
 from pytube.utils import print_status, FullPaths
-from pytube.exceptions import YouTubeError
+from pytube.exceptions import PytubeError
 from pprint import pprint
 
 
@@ -33,7 +33,7 @@ def main():
             ext = video.extension
             res = video.resolution
             videos.append("{} {}".format(ext, res))
-    except YouTubeError:
+    except PytubeError:
         print("Incorrect video URL.")
         sys.exit(1)
 
