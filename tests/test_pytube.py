@@ -10,8 +10,12 @@ from pytube.exceptions import MultipleObjectsReturned
 class TestPytube(object):
     def setUp(self):
         url = 'http://www.youtube.com/watch?v=9bZkp7q19f0'
-        self.mock_js = open('tests/mock_video.js').read()
-        self.mock_html = open('tests/mock_video.html').read()
+        with open('tests/mock_video.js') as fh:
+            self.mock_js = fh.read()
+
+        with open('tests/mock_video.html') as fh:
+            self.mock_html = fh.read()
+
         with mock.patch('pytube.api.urlopen') as urlopen:
             urlopen.return_value.read.return_value = self.mock_html
             self.yt = api.YouTube()
@@ -65,7 +69,7 @@ class TestPytube(object):
 
     @raises(MultipleObjectsReturned)
     def test_get_multiple_itmes(self):
-        """.get(...) cannot return more than one video"""
+        """get(...) cannot return more than one video"""
         self.yt.get(profile='Simple')
         self.yt.get('mp4')
         self.yt.get(resolution='240p')

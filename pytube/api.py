@@ -65,7 +65,7 @@ class YouTube(object):
         """
         self._filename = None
         self._video_url = None
-        self._js_cache = False
+        self._js_cache = None
         self._videos = []
         if url:
             self.from_url(url)
@@ -194,7 +194,7 @@ class YouTube(object):
                 url = "{}&signature={}".format(url, signature)
             self._add_video(url, self.filename, **quality_profile)
         # Clear the cached js. Make sure to keep this at the end of
-        # ``from_url()`` so we can mock inject the js in tests.
+        # ``from_url()`` so we can mock inject the js in unit tests.
         self._js_cache = None
 
     def get(self, extension=None, resolution=None, profile=None):
