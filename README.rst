@@ -2,7 +2,12 @@
 pytube
 ======
 
-A lightweight, dependency-free Python library for downloading YouTube Videos.
+.. image:: https://travis-ci.org/nficano/pytube.svg?branch=master
+   :alt: Build status
+   :target: https://travis-ci.org/nficano/pytube
+
+*pytube* is a lightweight, dependency-free Python library (and cli) for
+ downloading YouTube Videos.
 
 Description
 ===========
