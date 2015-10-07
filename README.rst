@@ -2,26 +2,38 @@
 pytube
 ======
 
-A lightweight, dependency-free Python library for downloading YouTube Videos.
+.. image:: https://travis-ci.org/nficano/pytube.svg?branch=master
+   :alt: Build status
+   :target: https://travis-ci.org/nficano/pytube
+
+.. image:: https://coveralls.io/repos/nficano/pytube/badge.svg?branch=master&service=github
+  :target: https://coveralls.io/github/nficano/pytube?branch=master
+
+*pytube* is a lightweight, dependency-free Python library (and command line utility) for downloading YouTube Videos.
 
 Description
 ===========
 
-Downloading videos from YouTube shouldn't require some bloated library, it's
-unusual to have to do so in the first place. So I present to you, PyTube!
+YouTube is the most popular video-sharing platform in the world and as a hacker you may encounter a situation where you want to script something to download videos.  For this I give to you *pytube*.
+
+*pytube* makes *zero assumptions*, meaning there is no built-in method to say get the "best" quality video, *pytube* simply exposes all available videos (or available permutations of codecs, resolution, and quality profiles for a given video) making you responsible for defining what "best" is.
+
+*pytube* makes pipelining easy by allowing you to specify callback functions for download events like ``complete`` or ``step``.
+
+*pytube* also includes a cli, allowing you to download videos right from terminal.
 
 Requirements
 ============
 
-- Python 2.6+ (2.7 or 3.4 recommended)
-- PIP (for some installation methods)
-- GIT (for some installation methods)
+- Python 2.6+ (2.7 or 3.4+ recommended)
+- pip (for some installation methods)
+- git (for some installation methods)
 
 Installation
 ============
 
-If you are on Mac OS X or Linux, chances are that one of the following two
-commands will work for you:
+If you're on Mac OS X or Linux, chances are that one of the following commands
+will work for you:
 
 Using PIP via PyPI
 
@@ -29,7 +41,7 @@ Using PIP via PyPI
 
     pip install pytube
 
-Using PIP via Github
+Using pip via Github
 
 .. code:: bash
 
@@ -41,7 +53,7 @@ Adding to your ``requirements.txt`` file (run ``pip install -r requirements.txt`
 
     git+ssh://git@github.com/nficano/pytube#egg=pytube
 
-Manually via GIT
+Manually via git
 
 .. code:: bash
 
@@ -89,7 +101,7 @@ Library Usage
 
     from pytube import YouTube
 
-    # not necessary, just for demo purposes
+    # not necessary, just for demo purposes.
     from pprint import pprint
 
     yt = YouTube("http://www.youtube.com/watch?v=Ik-RsDGPI5Y")

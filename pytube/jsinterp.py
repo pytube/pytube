@@ -117,8 +117,8 @@ class JSInterpreter(object):
             pass
 
         m = re.match(
-            r'(?P<var>%s)\.(?P<member>[^(]+)(?:\(+(?P<args>[^()]*)\))?$' % _NAME_RE,
-            expr)
+            r'(?P<var>{0})\.(?P<member>[^(]+)(?:\(+(?P<args>[^()]*)\))?$'
+            .format(_NAME_RE), expr)
         if m:
             variable = m.group('var')
             member = m.group('member')
@@ -210,8 +210,8 @@ class JSInterpreter(object):
         obj = {}
         obj_m = re.search(
             (r'(?:var\s+)?%s\s*=\s*\{' % re.escape(objname)) +
-            r'\s*(?P<fields>([a-zA-Z$0-9]+\s*:\s*function\(.*?\)\s*\{.*?\})*)' +
-            r'\}\s*;',
+            r'\s*(?P<fields>([a-zA-Z$0-9]+\s*:\s*' +
+            r'function\(.*?\)\s*\{.*?\})*)\}\s*;',
             self.code)
         fields = obj_m.group('fields')
         # Currently, it only supports function definitions
@@ -221,7 +221,8 @@ class JSInterpreter(object):
             fields)
         for f in fields_m:
             argnames = f.group('args').split(',')
-            obj[f.group('key')] = self.build_function(argnames, f.group('code'))
+            obj[f.group('key')] = self.build_function(
+                argnames, f.group('code'))
 
         return obj
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env/python
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 import mock
 from nose.tools import eq_, raises
@@ -28,13 +29,13 @@ class TestPytube(object):
 
     def test_auto_filename(self):
         """Generate safe filename based on video title"""
-        expected = u'PSY - GANGNAM STYLE(\uac15\ub0a8\uc2a4\ud0c0\uc77c) MV'
+        expected = 'PSY - GANGNAM STYLE(\uac15\ub0a8\uc2a4\ud0c0\uc77c) MV'
 
         eq_(self.yt.filename, expected)
 
     def test_manual_filename(self):
         """Manually set a filename"""
-        expected = u'PSY - Gangnam Style'
+        expected = 'PSY - Gangnam Style'
 
         self.yt.set_filename(expected)
         eq_(self.yt.filename, expected)

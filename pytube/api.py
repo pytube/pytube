@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 import json
 import logging
 import re
@@ -193,7 +193,7 @@ class YouTube(object):
                 log.debug('signature not in url, attempting to resolve the '
                           'cipher...')
                 signature = self._get_cipher(stream_map["s"][idx], js_url)
-                url = "{}&signature={}".format(url, signature)
+                url = "{0}&signature={1}".format(url, signature)
             self._add_video(url, self.filename, **quality_profile)
         # Clear the cached js. Make sure to keep this at the end of
         # ``from_url()`` so we can mock inject the js in unit tests.
@@ -259,9 +259,9 @@ class YouTube(object):
         self.title = None
         response = urlopen(self.url)
         if not response:
-            raise PytubeError("Unable to open url: {}".format(self.url))
+            raise PytubeError("Unable to open url: {0}".format(self.url))
 
-        html = response.read().decode("utf-8")
+        html = response.read()
         if "og:restrictions:age" in html:
             raise AgeRestricted("Age restricted video. Unable to download "
                                 "without being signed in.")
@@ -357,8 +357,8 @@ class YouTube(object):
         if not self._js_cache:
             response = urlopen(url)
             if not response:
-                raise PytubeError("Unable to open url: {}".format(self.url))
-            self._js_cache = response.read().decode("utf-8")
+                raise PytubeError("Unable to open url: {0}".format(self.url))
+            self._js_cache = response.read()
         try:
             matches = reg_exp.search(self._js_cache)
             if matches:
@@ -371,7 +371,7 @@ class YouTube(object):
         except Exception as e:
             raise CipherError("Couldn't cipher the signature. Maybe YouTube "
                               "has changed the cipher algorithm. Notify this "
-                              "issue on GitHub: {}".format(e))
+                              "issue on GitHub: {0}".format(e))
         return False
 
     def _get_quality_profile_from_url(self, video_url):
@@ -393,7 +393,8 @@ class YouTube(object):
                 return itag, None
             # Here we just combine the quality profile keys to the
             # corresponding quality profile, referenced by the itag.
-            return itag, dict(zip(YT_QUALITY_PROFILE_KEYS, quality_profile))
+            return itag, dict(list(zip(
+                YT_QUALITY_PROFILE_KEYS, quality_profile)))
         if not itag:
             raise PytubeError("Unable to get encoding profile, no itag found.")
         elif len(itag) > 1:

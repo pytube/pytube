@@ -19,6 +19,7 @@ setup(
     author="Nick Ficano",
     author_email="nficano@gmail.com",
     packages=['pytube'],
+    url="https://github.com/nficano/pytube",
     license=license,
     scripts=['scripts/pytube'],
     classifiers=[
@@ -30,8 +31,9 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.0",
+        "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Utilities",
         "Topic :: Internet",
