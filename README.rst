@@ -9,13 +9,25 @@ pytube
 .. image:: https://coveralls.io/repos/nficano/pytube/badge.svg?branch=master&service=github
   :target: https://coveralls.io/github/nficano/pytube?branch=master
 
-*pytube* is a lightweight, dependency-free Python library (and cli) for downloading YouTube Videos.
+*pytube* is a lightweight, dependency-free Python library (and command line utility) for downloading YouTube Videos.
 
 Description
 ===========
 
-Downloading videos from YouTube shouldn't require some bloated library, it's
-unusual to have to do so in the first place. So I present to you, PyTube!
+YouTube is the most popular video-sharing platform in the world and as a hacker
+you may encounter a situation where you want to script something to download
+videos.  For this I give to you *pytube*.
+
+*pytube* makes *zero assumptions*, meaning there is no built-in method to say
+ get the "best" quality video. *pytube* simply exposes all available videos (or
+ permutations of codecs, resolution, and quality profiles for a given video)
+ making you responsible for defining what "best" is.
+
+*pytube* makes pipelining easy by allowing you to specify callback functions
+ download events like ``complete`` or ``step``.
+
+*pytube* also includes a cli, allowing you to download videos right from
+ terminal.
 
 Requirements
 ============
