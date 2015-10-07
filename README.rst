@@ -2,6 +2,10 @@
 pytube
 ======
 
+.. image:: https://travis-ci.org/nficano/pytube.svg?branch=master
+   :alt: Build status
+   :target: https://travis-ci.org/nficano/pytube
+
 .. image:: https://coveralls.io/repos/nficano/pytube/badge.svg?branch=master&service=github
   :target: https://coveralls.io/github/nficano/pytube?branch=master
 
