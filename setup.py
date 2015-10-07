@@ -19,6 +19,7 @@ setup(
     author="Nick Ficano",
     author_email="nficano@gmail.com",
     packages=['pytube'],
+    url="https://github.com/nficano/pytube",
     license=license,
     scripts=['scripts/pytube'],
     classifiers=[
