@@ -37,47 +37,17 @@ YouTube is the most popular video-sharing platform in the world and as a hacker 
 
 Finally *pytube* also includes a command-line utility, allowing you to quickly download videos right from terminal.
 
-Requirements
-============
-
-- Python 2.6+ (2.7 or 3.4+ recommended)
-- pip (for some installation methods)
-- git (for some installation methods)
-
 Installation
 ============
 
-If you're on Mac OS X or Linux, chances are that one of the following commands
-will work for you:
-
-Using PIP via PyPI
+Download using pip via pypi.
 
 .. code:: bash
 
     pip install pytube
 
-Using pip via Github
 
-.. code:: bash
-
-    pip install git+git://github.com/nficano/pytube#egg=pytube
-
-Adding to your ``requirements.txt`` file (run ``pip install -r requirements.txt`` afterwards)
-
-.. code:: bash
-
-    git+ssh://git@github.com/nficano/pytube#egg=pytube
-
-Manually via git
-
-.. code:: bash
-
-    git clone git://github.com/NFicano/pytube pytube
-    cd pytube
-    python setup.py install
-
-
-Command-Line Usage
+Command-line usage
 ==================
 
 You can download a video by simply passing the ``-e`` (or ``--extension=``) switch and
@@ -109,7 +79,7 @@ and/or optionally choose the filename (``-f`` or ``--filename=``):
 
 
 
-Library Usage
+Library usage
 =============
 
 .. code:: python
