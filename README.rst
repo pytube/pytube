@@ -20,15 +20,15 @@ unusual to have to do so in the first place. So I present to you, PyTube!
 Requirements
 ============
 
-- Python 2.6+ (2.7 or 3.4 recommended)
-- PIP (for some installation methods)
-- GIT (for some installation methods)
+- Python 2.6+ (2.7 or 3.4+ recommended)
+- pip (for some installation methods)
+- git (for some installation methods)
 
 Installation
 ============
 
-If you are on Mac OS X or Linux, chances are that one of the following two
-commands will work for you:
+If you're on Mac OS X or Linux, chances are that one of the following commands
+will work for you:
 
 Using PIP via PyPI
 
@@ -36,7 +36,7 @@ Using PIP via PyPI
 
     pip install pytube
 
-Using PIP via Github
+Using pip via Github
 
 .. code:: bash
 
@@ -48,7 +48,7 @@ Adding to your ``requirements.txt`` file (run ``pip install -r requirements.txt`
 
     git+ssh://git@github.com/nficano/pytube#egg=pytube
 
-Manually via GIT
+Manually via git
 
 .. code:: bash
 
@@ -96,7 +96,7 @@ Library Usage
 
     from pytube import YouTube
 
-    # not necessary, just for demo purposes
+    # not necessary, just for demo purposes.
     from pprint import pprint
 
     yt = YouTube("http://www.youtube.com/watch?v=Ik-RsDGPI5Y")
