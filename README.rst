@@ -14,20 +14,13 @@ pytube
 Description
 ===========
 
-YouTube is the most popular video-sharing platform in the world and as a hacker
-you may encounter a situation where you want to script something to download
-videos.  For this I give to you *pytube*.
+YouTube is the most popular video-sharing platform in the world and as a hacker you may encounter a situation where you want to script something to download videos.  For this I give to you *pytube*.
 
-*pytube* makes *zero assumptions*, meaning there is no built-in method to say
- get the "best" quality video. *pytube* simply exposes all available videos (or
- permutations of codecs, resolution, and quality profiles for a given video)
- making you responsible for defining what "best" is.
+*pytube* makes *zero assumptions*, meaning there is no built-in method to say get the "best" quality video. *pytube* simply exposes all available videos (or permutations of codecs, resolution, and quality profiles for a given video) making you responsible for defining what "best" is.
 
-*pytube* makes pipelining easy by allowing you to specify callback functions
- download events like ``complete`` or ``step``.
+*pytube* makes pipelining easy by allowing you to specify callback functions download events like ``complete`` or ``step``.
 
-*pytube* also includes a cli, allowing you to download videos right from
- terminal.
+*pytube* also includes a cli, allowing you to download videos right from  terminal.
 
 Requirements
 ============
