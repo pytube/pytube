@@ -2,12 +2,12 @@
 pytube
 ======
 
-.. image:: https://img.shields.io/pypi/dm/pytube.svg
-  :alt: Pypi downloads per month
-  :target: https://pypi.python.org/pypi/pytube/
-
 .. image:: https://img.shields.io/pypi/v/pytube.svg
   :alt: Pypi
+  :target: https://pypi.python.org/pypi/pytube/
+
+.. image:: https://img.shields.io/pypi/dm/pytube.svg
+  :alt: Pypi downloads per month
   :target: https://pypi.python.org/pypi/pytube/
 
 .. image:: https://travis-ci.org/nficano/pytube.svg?branch=master
