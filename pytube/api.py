@@ -255,7 +255,7 @@ class YouTube(object):
         if not response:
             raise PytubeError("Unable to open url: {0}".format(self.url))
 
-        html = response.read()
+        html = response.read().decode()
         if "og:restrictions:age" in html:
             raise AgeRestricted("Age restricted video. Unable to download "
                                 "without being signed in.")
