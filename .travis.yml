@@ -6,7 +6,7 @@ python:
   - "3.4"
   - "3.5"
 # command to install dependencies
-install: "pip install -r dev_requirements.txt"
+install: "pip install -r tests/requirements.txt"
 # command to run tests
 script: nosetests
 branches:
