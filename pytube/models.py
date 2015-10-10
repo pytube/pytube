@@ -13,8 +13,9 @@ except ImportError:
 class Video(object):
     """Class representation of a single instance of a YouTube video.
     """
-    def __init__(self, url, filename, extension, resolution, video_codec,
-                 profile, video_bitrate, audio_codec, audio_bitrate):
+    def __init__(self, url, filename, extension, resolution=None,
+                 video_codec=None, profile=None, video_bitrate=None,
+                 audio_codec=None, audio_bitrate=None):
         """Sets-up the video object.
 
         :param str url:
@@ -24,17 +25,17 @@ class Video(object):
         :param str extention:
             The desired file extention (e.g.: mp4, flv, webm).
         :param str resolution:
-            The broadcasting standard (e.g.: 720p, 1080p).
+            *Optional* The broadcasting standard (e.g.: 720p, 1080p).
         :param str video_codec:
-            The codec used to encode the video.
+            *Optional* The codec used to encode the video.
         :param str profile:
-            The arbitrary quality profile.
+            *Optional* The arbitrary quality profile.
         :param str video_bitrate:
-            The bitrate of the video over sampling interval.
+            *Optional* The bitrate of the video over sampling interval.
         :param str audio_codec:
-            The codec used to encode the audio.
+            *Optional* The codec used to encode the audio.
         :param str audio_bitrate:
-            The bitrate of the video's audio over sampling interval.
+            *Optional* The bitrate of the video's audio over sampling interval.
         """
         self.url = url
         self.filename = filename
@@ -111,7 +112,7 @@ class Video(object):
 
     def __repr__(self):
         """A clean representation of the class instance."""
-        return "<Video: {} (.{}) - {} - {}>".format(
+        return "<Video: {0} (.{1}) - {2} - {3}>".format(
             self.video_codec, self.extension, self.resolution, self.profile)
 
     def __lt__(self, other):
