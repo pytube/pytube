@@ -11,11 +11,12 @@ from pytube.exceptions import MultipleObjectsReturned
 class TestPytube(object):
     def setUp(self):
         url = 'http://www.youtube.com/watch?v=9bZkp7q19f0'
-        with open('tests/mock_video.js') as fh:
-            self.mock_js = fh.read()
 
-        with open('tests/mock_video.html') as fh:
+        with open('tests/mock_data/youtube_gangnam_style.html') as fh:
             self.mock_html = fh.read()
+
+        with open('tests/mock_data/youtube_gangnam_style.js') as fh:
+            self.mock_js = fh.read()
 
         with mock.patch('pytube.api.urlopen') as urlopen:
             urlopen.return_value.read.return_value = self.mock_html

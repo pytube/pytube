@@ -5,13 +5,7 @@ import json
 import logging
 import re
 import warnings
-try:
-    from urllib2 import urlopen
-    from urlparse import urlparse, parse_qs, unquote
-except ImportError:
-    from urllib.parse import urlparse, parse_qs, unquote
-    from urllib.request import urlopen
-
+from .compat import urlopen, urlparse, parse_qs, unquote
 from .exceptions import MultipleObjectsReturned, PytubeError, CipherError, \
     DoesNotExist, AgeRestricted
 from .jsinterp import JSInterpreter

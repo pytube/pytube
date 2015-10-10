@@ -2,67 +2,52 @@
 pytube
 ======
 
+.. image:: https://img.shields.io/pypi/v/pytube.svg
+  :alt: Pypi
+  :target: https://pypi.python.org/pypi/pytube/
+
+.. image:: https://img.shields.io/pypi/dm/pytube.svg
+  :alt: Pypi downloads per month
+  :target: https://pypi.python.org/pypi/pytube/
+
+.. image:: https://img.shields.io/pypi/pyversions/pytube.svg
+  :alt: Python Versions
+  :target: https://pypi.python.org/pypi/pytube/
+
 .. image:: https://travis-ci.org/nficano/pytube.svg?branch=master
    :alt: Build status
    :target: https://travis-ci.org/nficano/pytube
 
 .. image:: https://coveralls.io/repos/nficano/pytube/badge.svg?branch=master&service=github
+  :alt: Coverage
   :target: https://coveralls.io/github/nficano/pytube?branch=master
 
-*pytube* is a lightweight, dependency-free Python library (and command line utility) for downloading YouTube Videos.
+*pytube* is a lightweight, dependency-free Python library (and command-line utility) for downloading YouTube Videos.
 
 Description
 ===========
 
-YouTube is the most popular video-sharing platform in the world and as a hacker you may encounter a situation where you want to script something to download videos.  For this I give to you *pytube*.
+YouTube is the most popular video-sharing platform in the world and as a hacker you may encounter a situation where you want to script something to download videos.  For this I present to you *pytube*.
 
-*pytube* makes *zero assumptions*, meaning there is no built-in method to say get the "best" quality video, *pytube* simply exposes all available videos (or available permutations of codecs, resolution, and quality profiles for a given video) making you responsible for defining what "best" is.
+*pytube* is a lightweight library written in Python. It has no third party dependencies and aims to be highly reliable.
 
-*pytube* makes pipelining easy by allowing you to specify callback functions for download events like ``complete`` or ``step``.
+*pytube* makes *zero assumptions*, meaning there is no built-in method to get say the *"best"* quality video, *pytube* simply exposes all the available formats and resolutions, giving you the developer the power to define what *"best"* is.
 
-*pytube* also includes a cli, allowing you to download videos right from terminal.
+*pytube* also makes pipelining easy, allowing you to specify callback functions for different download events, such as  ``on progress`` or ``on complete``.
 
-Requirements
-============
-
-- Python 2.6+ (2.7 or 3.4+ recommended)
-- pip (for some installation methods)
-- git (for some installation methods)
+Finally *pytube* also includes a command-line utility, allowing you to quickly download videos right from terminal.
 
 Installation
 ============
 
-If you're on Mac OS X or Linux, chances are that one of the following commands
-will work for you:
-
-Using PIP via PyPI
+Download using pip via pypi.
 
 .. code:: bash
 
     pip install pytube
 
-Using pip via Github
 
-.. code:: bash
-
-    pip install git+git://github.com/nficano/pytube#egg=pytube
-
-Adding to your ``requirements.txt`` file (run ``pip install -r requirements.txt`` afterwards)
-
-.. code:: bash
-
-    git+ssh://git@github.com/nficano/pytube#egg=pytube
-
-Manually via git
-
-.. code:: bash
-
-    git clone git://github.com/NFicano/pytube pytube
-    cd pytube
-    python setup.py install
-
-
-Command-Line Usage
+Command-line usage
 ==================
 
 You can download a video by simply passing the ``-e`` (or ``--extension=``) switch and
@@ -94,7 +79,7 @@ and/or optionally choose the filename (``-f`` or ``--filename=``):
 
 
 
-Library Usage
+Library usage
 =============
 
 .. code:: python
