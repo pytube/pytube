@@ -68,13 +68,13 @@ class Video(object):
         """
         path = os.path.normpath(path)
         if os.path.isdir(path):
-            filename = "{}.{}".format(self.filename, self.extension)
+            filename = "{0}.{1}".format(self.filename, self.extension)
             path = os.path.join(path, filename)
         # TODO: If it's not a path, this should raise an ``OSError``.
         # TODO: Move this into cli, this kind of logic probably shouldn't be
         # handled by the library.
         if os.path.isfile(path) and not force_overwrite:
-            raise OSError("Conflicting filename:'{}'".format(self.filename))
+            raise OSError("Conflicting filename:'{0}'".format(self.filename))
         # TODO: Split up the downloading and OS jazz into separate functions.
         response = urlopen(self.url)
         meta_data = dict(response.info().items())
@@ -107,8 +107,8 @@ class Video(object):
             # should be taken care of by the client. Also you should be allowed
             # to disable this.
             os.remove(path)
-            raise KeyboardInterrupt("Interrupt signal given. Deleting "
-                                    "incomplete video.")
+            raise KeyboardInterrupt(
+                "Interrupt signal given. Deleting incomplete video.")
 
     def __repr__(self):
         """A clean representation of the class instance."""
