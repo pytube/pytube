@@ -217,7 +217,7 @@ class YouTube(object):
                 result.append(v)
         matches = len(result)
         if matches <= 0:
-            return DoesNotExist("No videos met this criteria.")
+            raise DoesNotExist("No videos met this criteria.")
         elif matches == 1:
             return result[0]
         else:
