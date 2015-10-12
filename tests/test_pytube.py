@@ -1,7 +1,7 @@
 #!/usr/bin/env/python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
+import warnings
 import mock
 from nose.tools import eq_, raises
 from pytube import api
@@ -94,3 +94,31 @@ class TestPytube(object):
             urlopen.return_value.read.return_value = mock_html
             yt = api.YouTube()
             yt.from_url(url)
+
+    def test_deprecation_warnings_on_url_set(self):
+        """Deprecation warnings get triggered on url set"""
+        with warnings.catch_warnings(record=True) as w:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter("always")
+            with mock.patch('pytube.api.urlopen') as urlopen:
+                urlopen.return_value.read.return_value = self.mock_html
+                yt = api.YouTube()
+                yt._js_cache = self.mock_js
+                yt.url = 'http://www.youtube.com/watch?v=9bZkp7q19f0'
+            eq_(len(w), 1)
+
+    def test_deprecation_warnings_on_filename_set(self):
+        """Deprecation warnings get triggered on filename set"""
+        with warnings.catch_warnings(record=True) as w:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter("always")
+            self.yt.filename = 'Gangnam Style'
+            eq_(len(w), 1)
+
+    def test_deprecation_warnings_on_videos_get(self):
+        """Deprecation warnings get triggered on video getter"""
+        with warnings.catch_warnings(record=True) as w:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter("always")
+            self.yt.videos
+            eq_(len(w), 1)
