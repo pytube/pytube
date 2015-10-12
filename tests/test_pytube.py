@@ -6,7 +6,7 @@ import mock
 from nose.tools import eq_, raises
 from pytube import api
 from pytube.exceptions import MultipleObjectsReturned, AgeRestricted, \
-    DoesNotExist
+    DoesNotExist, PytubeError
 
 
 class TestPytube(object):
@@ -122,3 +122,13 @@ class TestPytube(object):
             warnings.simplefilter("always")
             self.yt.videos
             eq_(len(w), 1)
+
+    def test_get_json_offset(self):
+        """Find the offset in the html for where the js starts"""
+        offset = self.yt._get_json_offset(self.mock_html)
+        eq_(offset, 312)
+
+    @raises(PytubeError)
+    def test_get_json_offset_with_bad_html(self):
+        """Raise exception if json offset cannot be found"""
+        self.yt._get_json_offset('asdfasdf')

@@ -90,7 +90,6 @@ class YouTube(object):
             video_id = parse_qs(qs).get('v')
             if video_id:
                 return video_id.pop()
-        return False
 
     @property
     def filename(self):
