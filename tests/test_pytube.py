@@ -25,19 +25,6 @@ class TestPytube(object):
             self.yt._js_cache = self.mock_js
             self.yt.from_url(url)
 
-    @raises(AgeRestricted)
-    def test_age_restricted_video(self):
-        """Raise exception on age restricted video"""
-        url = 'http://www.youtube.com/watch?v=nzNgkc6t260'
-
-        with open('tests/mock_data/youtube_age_restricted.html') as fh:
-            mock_html = fh.read()
-
-        with mock.patch('pytube.api.urlopen') as urlopen:
-            urlopen.return_value.read.return_value = mock_html
-            yt = api.YouTube()
-            yt.from_url(url)
-
     def test_get_video_id(self):
         """Resolve the video id from url"""
         eq_(self.yt.video_id, '9bZkp7q19f0')
@@ -94,3 +81,16 @@ class TestPytube(object):
     def test_get_does_not_exist(self):
         """get(...) must return something"""
         self.yt.get('mp4', '1080p')
+
+    @raises(AgeRestricted)
+    def test_age_restricted_video(self):
+        """Raise exception on age restricted video"""
+        url = 'http://www.youtube.com/watch?v=nzNgkc6t260'
+
+        with open('tests/mock_data/youtube_age_restricted.html') as fh:
+            mock_html = fh.read()
+
+        with mock.patch('pytube.api.urlopen') as urlopen:
+            urlopen.return_value.read.return_value = mock_html
+            yt = api.YouTube()
+            yt.from_url(url)
