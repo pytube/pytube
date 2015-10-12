@@ -5,7 +5,8 @@ from __future__ import unicode_literals
 import mock
 from nose.tools import eq_, raises
 from pytube import api
-from pytube.exceptions import MultipleObjectsReturned
+from pytube.exceptions import MultipleObjectsReturned, AgeRestricted, \
+    DoesNotExist
 
 
 class TestPytube(object):
@@ -23,6 +24,19 @@ class TestPytube(object):
             self.yt = api.YouTube()
             self.yt._js_cache = self.mock_js
             self.yt.from_url(url)
+
+    @raises(AgeRestricted)
+    def test_age_restricted_video(self):
+        """Raise exception on age restricted video"""
+        url = 'http://www.youtube.com/watch?v=nzNgkc6t260'
+
+        with open('tests/mock_data/youtube_age_restricted.html') as fh:
+            mock_html = fh.read()
+
+        with mock.patch('pytube.api.urlopen') as urlopen:
+            urlopen.return_value.read.return_value = mock_html
+            yt = api.YouTube()
+            yt.from_url(url)
 
     def test_get_video_id(self):
         """Resolve the video id from url"""
@@ -70,8 +84,13 @@ class TestPytube(object):
         eq_(len(self.yt.filter(resolution='360p')), 2)
 
     @raises(MultipleObjectsReturned)
-    def test_get_multiple_itmes(self):
+    def test_get_multiple_items(self):
         """get(...) cannot return more than one video"""
         self.yt.get(profile='Simple')
         self.yt.get('mp4')
         self.yt.get(resolution='240p')
+
+    @raises(DoesNotExist)
+    def test_get_does_not_exist(self):
+        """get(...) must return something"""
+        self.yt.get('mp4', '1080p')
