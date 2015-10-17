@@ -319,7 +319,11 @@ class YouTube(object):
             json_start_pattern = "ytplayer.config = "
         else:
             json_start_pattern = bytes("ytplayer.config = ", 'UTF-8')
-        start = html.find(json_start_pattern) + 18
+        pattern_idx = html.find(json_start_pattern)
+        #In case video is unable to play
+        if(pattern_idx == -1):
+            raise PytubeError("Unable to find start pattern.")
+        start = pattern_idx + 18
         html = html[start:]
 
         offset = self._get_json_offset(html)
