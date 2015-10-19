@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+ 
 import json
 import logging
 import re
@@ -11,7 +11,7 @@ from .exceptions import MultipleObjectsReturned, PytubeError, CipherError, \
 from .jsinterp import JSInterpreter
 from .models import Video
 from .utils import safe_filename
-
+ 
 log = logging.getLogger(__name__)
 
 # YouTube quality and codecs id map.
@@ -255,7 +255,12 @@ class YouTube(object):
             raise PytubeError("Unable to open url: {0}".format(self.url))
 
         html = response.read()
-        if "og:restrictions:age" in html:
+        if(type(html) == type("string")):
+            restriction_pattern = "og:restrictions:age"
+        else:
+            restriction_pattern = bytes("og:restrictions:age", 'UTF-8')
+
+        if restriction_pattern in html:
             raise AgeRestricted("Age restricted video. Unable to download "
                                 "without being signed in.")
 
@@ -308,13 +313,26 @@ class YouTube(object):
             The raw html of the page.
         """
         # 18 represents the length of "ytplayer.config = ".
-        start = html.find("ytplayer.config = ") + 18
+        if(type(html) == type("string")):
+            json_start_pattern = "ytplayer.config = "
+        else:
+            json_start_pattern = bytes("ytplayer.config = ", 'UTF-8')
+        pattern_idx = html.find(json_start_pattern)
+        #In case video is unable to play
+        if(pattern_idx == -1):
+            raise PytubeError("Unable to find start pattern.")
+        start = pattern_idx + 18
         html = html[start:]
 
         offset = self._get_json_offset(html)
         if not offset:
             raise PytubeError("Unable to extract json.")
-        return json.loads(html[:offset])
+        if(type(html) == type("string")):
+            json_content = json.loads(html[:offset])
+        else:
+            json_content = json.loads(html[:offset].decode('UTF-8'))
+         
+        return json_content
 
     def _get_json_offset(self, html):
         """Find where the json object starts.
@@ -322,16 +340,18 @@ class YouTube(object):
         :param str html:
             The raw html of the YouTube page.
         """
-        brackets = []
+        unmatched_brackets_num = 0
         index = 1
         # Determine the offset by pushing/popping brackets until all
         # js expressions are closed.
         for idx, ch in enumerate(html):
+            if(type(ch) == type(50)):
+                ch = chr(ch)
             if ch == "{":
-                brackets.append("}")
+                unmatched_brackets_num += 1
             elif ch == "}":
-                brackets.pop()
-                if len(brackets) == 0:
+                unmatched_brackets_num -= 1
+                if unmatched_brackets_num == 0:
                     break
         else:
             raise PytubeError("Unable to determine json offset.")
