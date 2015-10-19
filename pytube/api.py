@@ -11,9 +11,7 @@ from .exceptions import MultipleObjectsReturned, PytubeError, CipherError, \
 from .jsinterp import JSInterpreter
 from .models import Video
 from .utils import safe_filename
-import platform
  
-python_version = platform.python_version()
 log = logging.getLogger(__name__)
 
 # YouTube quality and codecs id map.
@@ -257,7 +255,7 @@ class YouTube(object):
             raise PytubeError("Unable to open url: {0}".format(self.url))
 
         html = response.read()
-        if(python_version.startswith("2")):
+        if(type(html) == type("string")):
             restriction_pattern = "og:restrictions:age"
         else:
             restriction_pattern = bytes("og:restrictions:age", 'UTF-8')
@@ -315,7 +313,7 @@ class YouTube(object):
             The raw html of the page.
         """
         # 18 represents the length of "ytplayer.config = ".
-        if(python_version.startswith("2")):
+        if(type(html) == type("string")):
             json_start_pattern = "ytplayer.config = "
         else:
             json_start_pattern = bytes("ytplayer.config = ", 'UTF-8')
@@ -329,7 +327,7 @@ class YouTube(object):
         offset = self._get_json_offset(html)
         if not offset:
             raise PytubeError("Unable to extract json.")
-        if(python_version.startswith("2")):
+        if(type(html) == type("string")):
             json_content = json.loads(html[:offset])
         else:
             json_content = json.loads(html[:offset].decode('UTF-8'))
@@ -347,7 +345,7 @@ class YouTube(object):
         # Determine the offset by pushing/popping brackets until all
         # js expressions are closed.
         for idx, ch in enumerate(html):
-            if(python_version.startswith("3")):
+            if(type(ch) != type(chr(50))):
                 ch = chr(ch)
             if ch == "{":
                 unmatched_brackets_num += 1
