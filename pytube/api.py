@@ -73,12 +73,12 @@ class YouTube(object):
     @url.setter
     def url(self, url):
         """Sets the url for the video (This method is deprecated. Use
-        ``from_url()`` instead).
+        `from_url()` instead).
 
         :param str url:
             The url to the YouTube video.
         """
-        warnings.warn("url setter deprecated, use ``from_url()`` "
+        warnings.warn("url setter deprecated, use `from_url()` "
                       "instead.", DeprecationWarning)
         self.from_url(url)
 
