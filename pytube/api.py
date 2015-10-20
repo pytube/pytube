@@ -337,8 +337,6 @@ class YouTube(object):
         """
         unmatched_brackets_num = 0
         index = 1
-        # Determine the offset by pushing/popping brackets until all
-        # js expressions are closed.
         for idx, ch in enumerate(html):
             if isinstance(ch, int):
                 ch = chr(ch)
