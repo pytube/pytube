@@ -104,13 +104,13 @@ class YouTube(object):
 
     @filename.setter
     def filename(self, filename):
-        """Sets the filename (This method is deprecated. Use ``set_filename()``
+        """Sets the filename (This method is deprecated. Use `set_filename()`
         instead).
 
         :param str filename:
             The filename of the video.
         """
-        warnings.warn("filename setter deprecated. Use ``set_filename()`` "
+        warnings.warn("filename setter deprecated. Use `set_filename()` "
                       "instead.", DeprecationWarning)
         self.set_filename(filename)
 
@@ -134,10 +134,10 @@ class YouTube(object):
 
     @property
     def videos(self):
-        """Gets all videos. (This method is deprecated. Use ``get_videos()``
+        """Gets all videos. (This method is deprecated. Use `get_videos()`
         instead.
         """
-        warnings.warn("videos property deprecated. Use ``get_videos()`` "
+        warnings.warn("videos property deprecated. Use `get_videos()` "
                       "instead.", DeprecationWarning)
         return self._videos
 
@@ -190,7 +190,7 @@ class YouTube(object):
                 url = "{0}&signature={1}".format(url, signature)
             self._add_video(url, self.filename, **quality_profile)
         # Clear the cached js. Make sure to keep this at the end of
-        # ``from_url()`` so we can mock inject the js in unit tests.
+        # `from_url()` so we can mock inject the js in unit tests.
         self._js_cache = None
 
     def get(self, extension=None, resolution=None, profile=None):
@@ -277,7 +277,7 @@ class YouTube(object):
         return json_object
 
     def _parse_stream_map(self, blob):
-        """A modified version of ``urlparse.parse_qs`` that's able to decode
+        """A modified version of `urlparse.parse_qs` that's able to decode
         YouTube's stream map.
 
         :param str blob:
@@ -358,7 +358,7 @@ class YouTube(object):
             The url of the javascript file.
         """
         reg_exp = re.compile(r'\.sig\|\|([a-zA-Z0-9$]+)\(')
-        # Cache the js since ``_get_cipher()`` will be called for each video.
+        # Cache the js since `_get_cipher()` will be called for each video.
         if not self._js_cache:
             response = urlopen(url)
             if not response:
@@ -381,7 +381,7 @@ class YouTube(object):
 
     def _get_quality_profile_from_url(self, video_url):
         """Gets the quality profile given a video url. Normally we would just
-        use ``urlparse`` since itags are represented as a get parameter, but
+        use `urlparse` since itags are represented as a get parameter, but
         YouTube doesn't pass a properly encoded url.
 
         :param str video_url:
