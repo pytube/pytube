@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 from future_builtins import zip
+from collections import defaultdict
 import json
 import logging
 import re
@@ -283,14 +284,7 @@ class YouTube(object):
         :param str blob:
             An encoded blob of text containing the stream map data.
         """
-        dct = {
-            "itag": [],
-            "url": [],
-            "quality": [],
-            "fallback_host": [],
-            "s": [],
-            "type": []
-        }
+        dct = defaultdict(list)
 
         # Split the comma separated videos.
         videos = blob.split(",")
@@ -303,7 +297,7 @@ class YouTube(object):
         for video in videos:
             for kv in video:
                 key, value = kv.split("=")
-                dct.get(key, []).append(unquote(value))
+                dct[key].append(unquote(value))
         log.debug("decoded stream map: %s", dct)
         return dct
 
