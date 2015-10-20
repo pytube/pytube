@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
-from future_builtins import zip
 from collections import defaultdict
 import json
 import logging
