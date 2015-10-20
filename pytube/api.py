@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from future_builtins import zip
 import json
 import logging
 import re
@@ -14,7 +16,7 @@ from .utils import safe_filename
 log = logging.getLogger(__name__)
 
 # YouTube quality and codecs id map.
-YT_QUALITY_PROFILES = {
+QUALITY_PROFILES = {
     # flash
     5: ("flv", "240p", "Sorenson H.263", "N/A", "0.25", "MP3", "64"),
 
@@ -36,7 +38,7 @@ YT_QUALITY_PROFILES = {
 }
 
 # The keys corresponding to the quality/codec map above.
-YT_QUALITY_PROFILE_KEYS = (
+QUALITY_PROFILE_KEYS = (
     "extension",
     "resolution",
     "video_codec",
@@ -400,13 +402,12 @@ class YouTube(object):
             itag = int(itag[0])
             # Given an itag, refer to the YouTube quality profiles to get the
             # properties (media type, resolution, etc.) of the video.
-            quality_profile = YT_QUALITY_PROFILES.get(itag)
+            quality_profile = QUALITY_PROFILES.get(itag)
             if not quality_profile:
                 return itag, None
             # Here we just combine the quality profile keys to the
             # corresponding quality profile, referenced by the itag.
-            return itag, dict(list(zip(
-                YT_QUALITY_PROFILE_KEYS, quality_profile)))
+            return itag, dict(list(zip(QUALITY_PROFILE_KEYS, quality_profile)))
         if not itag:
             raise PytubeError("Unable to get encoding profile, no itag found.")
         elif len(itag) > 1:
