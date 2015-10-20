@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
- 
 import json
 import logging
 import re
@@ -11,7 +10,7 @@ from .exceptions import MultipleObjectsReturned, PytubeError, CipherError, \
 from .jsinterp import JSInterpreter
 from .models import Video
 from .utils import safe_filename
- 
+
 log = logging.getLogger(__name__)
 
 # YouTube quality and codecs id map.
@@ -38,13 +37,13 @@ YT_QUALITY_PROFILES = {
 
 # The keys corresponding to the quality/codec map above.
 YT_QUALITY_PROFILE_KEYS = (
-    'extension',
-    'resolution',
-    'video_codec',
-    'profile',
-    'video_bitrate',
-    'audio_codec',
-    'audio_bitrate'
+    "extension",
+    "resolution",
+    "video_codec",
+    "profile",
+    "video_bitrate",
+    "audio_codec",
+    "audio_bitrate"
 )
 
 
@@ -85,9 +84,9 @@ class YouTube(object):
     def video_id(self):
         """Gets the video id by parsing and extracting it from the url."""
         parts = urlparse(self._video_url)
-        qs = getattr(parts, 'query')
+        qs = getattr(parts, "query")
         if qs:
-            video_id = parse_qs(qs).get('v')
+            video_id = parse_qs(qs).get("v")
             if video_id:
                 return video_id.pop()
 
@@ -183,8 +182,8 @@ class YouTube(object):
             # Check if we have the signature, otherwise we'll need to get the
             # cipher from the js.
             if "signature=" not in url:
-                log.debug('signature not in url, attempting to resolve the '
-                          'cipher...')
+                log.debug("signature not in url, attempting to resolve the "
+                          "cipher.")
                 signature = self._get_cipher(stream_map["s"][idx], js_url)
                 url = "{0}&signature={1}".format(url, signature)
             self._add_video(url, self.filename, **quality_profile)
@@ -255,10 +254,10 @@ class YouTube(object):
             raise PytubeError("Unable to open url: {0}".format(self.url))
 
         html = response.read()
-        if(type(html) == type("string")):
+        if isinstance(html, str):
             restriction_pattern = "og:restrictions:age"
         else:
-            restriction_pattern = bytes("og:restrictions:age", 'UTF-8')
+            restriction_pattern = bytes("og:restrictions:age", "utf-8")
 
         if restriction_pattern in html:
             raise AgeRestricted("Age restricted video. Unable to download "
@@ -271,7 +270,7 @@ class YouTube(object):
         # do this just so we just can return one object for the video data.
         encoded_stream_map = json_object.get("args", {}).get(
             "url_encoded_fmt_stream_map")
-        json_object['args']['stream_map'] = self._parse_stream_map(
+        json_object["args"]["stream_map"] = self._parse_stream_map(
             encoded_stream_map)
         return json_object
 
@@ -303,7 +302,7 @@ class YouTube(object):
             for kv in video:
                 key, value = kv.split("=")
                 dct.get(key, []).append(unquote(value))
-        log.debug('decoded stream map: %s', dct)
+        log.debug("decoded stream map: %s", dct)
         return dct
 
     def _get_json_data(self, html):
@@ -313,12 +312,12 @@ class YouTube(object):
             The raw html of the page.
         """
         # 18 represents the length of "ytplayer.config = ".
-        if(type(html) == type("string")):
+        if isinstance(html, str):
             json_start_pattern = "ytplayer.config = "
         else:
-            json_start_pattern = bytes("ytplayer.config = ", 'UTF-8')
+            json_start_pattern = bytes("ytplayer.config = ", "utf-8")
         pattern_idx = html.find(json_start_pattern)
-        #In case video is unable to play
+        # In case video is unable to play
         if(pattern_idx == -1):
             raise PytubeError("Unable to find start pattern.")
         start = pattern_idx + 18
@@ -327,11 +326,11 @@ class YouTube(object):
         offset = self._get_json_offset(html)
         if not offset:
             raise PytubeError("Unable to extract json.")
-        if(type(html) == type("string")):
+        if isinstance(html, str):
             json_content = json.loads(html[:offset])
         else:
-            json_content = json.loads(html[:offset].decode('UTF-8'))
-         
+            json_content = json.loads(html[:offset].decode("utf-8"))
+
         return json_content
 
     def _get_json_offset(self, html):
@@ -345,7 +344,7 @@ class YouTube(object):
         # Determine the offset by pushing/popping brackets until all
         # js expressions are closed.
         for idx, ch in enumerate(html):
-            if(type(ch) == type(50)):
+            if isinstance(ch, int):
                 ch = chr(ch)
             if ch == "{":
                 unmatched_brackets_num += 1
