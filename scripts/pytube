@@ -68,7 +68,7 @@ def main():
         vid = max(videos)
     elif args.res:
         # There might be several videos in the same resolution
-        videos = yt.filter(res=args.res)
+        videos = yt.filter(resolution=args.res)
         # Check if we have a video
         if not videos:
             print("There are no videos in the specified in the specified "
