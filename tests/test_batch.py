@@ -9,7 +9,6 @@ from pytube.exceptions import MultipleObjectsReturned, AgeRestricted, \
     DoesNotExist, PytubeError
 import filecmp
 
-
 class TestPytube(object):
 	def setUp(self):
 		url = 'http://www.youtube.com/watch?v=C0DPdy98e4c'
