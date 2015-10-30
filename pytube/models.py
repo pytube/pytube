@@ -74,7 +74,7 @@ class Video(object):
         # TODO: Move this into cli, this kind of logic probably shouldn't be
         # handled by the library.
         if os.path.isfile(path) and not force_overwrite:
-            raise OSError("Conflicting filename:'{0}'".format(self.filename))
+            raise OSError("Conflicting filename:'{0}'".format(path))
         # TODO: Split up the downloading and OS jazz into separate functions.
         response = urlopen(self.url)
         meta_data = dict(response.info().items())

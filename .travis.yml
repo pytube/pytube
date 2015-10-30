@@ -14,3 +14,4 @@ branches:
     - master
 after_success:
   coveralls
+  
