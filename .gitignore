@@ -28,3 +28,6 @@ doc/_build
 doc/aws_hostname.1
 
 .coverage
+
+#my test file
+mytest.py

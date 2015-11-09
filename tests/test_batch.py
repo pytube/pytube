@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import warnings
 import mock
 from nose.tools import eq_, raises
-from pytube import batch
+from pytube.contrib import batch
 from pytube.exceptions import MultipleObjectsReturned, AgeRestricted, \
     DoesNotExist, PytubeError
 import filecmp
@@ -14,7 +14,7 @@ class TestBatch(object):
     def __init__(self):
         self.url = 'http://www.youtube.com/watch?v=C0DPdy98e4c'
         self.video_id = "C0DPdy98e4c"
-        self.path = 'test/mock_data/'
+        self.path = 'tests/mock_data/'
 
     def test_batch_download(self):
         id_list = [self.video_id]

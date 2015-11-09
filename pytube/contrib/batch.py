@@ -3,7 +3,7 @@
  
 from pytube import YouTube
 import os
-from .exceptions import MultipleObjectsReturned, PytubeError, CipherError, \
+from pytube.exceptions import MultipleObjectsReturned, PytubeError, CipherError, \
     DoesNotExist, AgeRestricted
 
 class Batch(object):
