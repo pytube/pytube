@@ -17,6 +17,13 @@ pkg
 *.egg
 *.egg-info
 
+#python build files
+*.pyc           #python2
+__pycache__/    #python3
+
+#my test file
+mytest.py
+
 # Debian Files
 debian/files
 debian/python-beaver*
@@ -28,6 +35,3 @@ doc/_build
 doc/aws_hostname.1
 
 .coverage
-
-#my test file
-mytest.py
