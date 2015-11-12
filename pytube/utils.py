@@ -45,7 +45,8 @@ def sizeof(bytes):
     """Takes the size of file or folder in bytes and returns size formatted in
     KB, MB, GB, TB or PB.
 
-    :params bytes: size of the file in bytes
+    :params bytes:
+        Size of the file in bytes
     """
     alternative = [
         (1024 ** 5, ' PB'),
@@ -74,16 +75,19 @@ def print_status(progress, file_size, start):
     This function - when passed as `on_progress` to `Video.download` - prints
     out the current download progress.
 
-    :params progress: The lenght of the currently downloaded bytes.
-    :params file_size: The total size of the video.
-    :params start: time when started
+    :params progress:
+        The lenght of the currently downloaded bytes.
+    :params file_size:
+        The total size of the video.
+    :params start:
+        The time when started
     """
 
-    percentDone = int(progress) * 100. / file_size
+    percent_done = int(progress) * 100. / file_size
     done = int(50 * progress / int(file_size))
     dt = (clock() - start)
     if dt > 0:
         stdout.write("\r  [%s%s][%3.2f%%] %s at %s/s\r " %
-                     ('=' * done, ' ' * (50 - done), percentDone,
+                     ('=' * done, ' ' * (50 - done), percent_done,
                       sizeof(file_size), sizeof(progress // dt)))
     stdout.flush()
