@@ -37,6 +37,15 @@ YouTube is the most popular video-sharing platform in the world and as a hacker 
 
 Finally *pytube* also includes a command-line utility, allowing you to quickly download videos right from terminal.
 
+Fix for CipherError *Update December 2015*
+==========================================
+
+If you're using version <=6.1.3, you'll need to run the following to fix *pytube* for some videos.
+
+.. code:: bash
+
+    pip install -U pytube
+
 Installation
 ============
 
@@ -76,7 +85,7 @@ and/or optionally choose the filename (``-f`` or ``--filename=``):
 .. code:: bash
 
    $ pytube -e mp4 -f Dancing Scene from Pulp Fiction http://www.youtube.com/watch?v=Ik-RsDGPI5Y
-   
+
 You can also specify a resolution or desired filetype:
 
 .. code:: bash
