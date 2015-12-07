@@ -8,6 +8,7 @@ class ExtractorError(Exception):
     """Something specific to the js parser failed.
     """
 
+
 class PytubeError(Exception):
     """Something specific to the wrapper failed.
     """
