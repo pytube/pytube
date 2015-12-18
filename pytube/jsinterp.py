@@ -1,8 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 import json
 import operator
 import re
+
+from .exceptions import ExtractorError
 
 _OPERATORS = [
     ('|', operator.or_),
@@ -32,7 +35,7 @@ class JSInterpreter(object):
 
     def interpret_statement(self, stmt, local_vars, allow_recursion=100):
         if allow_recursion < 0:
-            raise Exception('Recursion limit reached')
+            raise ExtractorError('Recursion limit reached')
 
         should_abort = False
         stmt = stmt.lstrip()
@@ -75,7 +78,7 @@ class JSInterpreter(object):
                             expr = json.dumps(sub_result) + remaining_expr
                         break
             else:
-                raise Exception('Premature end of parens in %r' % expr)
+                raise ExtractorError('Premature end of parens in %r' % expr)
 
         for op, opfunc in _ASSIGN_OPERATORS:
             m = re.match(r'''(?x)
@@ -117,8 +120,8 @@ class JSInterpreter(object):
             pass
 
         m = re.match(
-            r'(?P<var>{0})\.(?P<member>[^(]+)(?:\(+(?P<args>[^()]*)\))?$'
-            .format(_NAME_RE), expr)
+            r'(?P<var>%s)\.(?P<member>[^(]+)(?:\(+(?P<args>[^()]*)\))?$' % _NAME_RE,
+            expr)
         if m:
             variable = m.group('var')
             member = m.group('member')
@@ -184,12 +187,12 @@ class JSInterpreter(object):
             x, abort = self.interpret_statement(
                 m.group('x'), local_vars, allow_recursion - 1)
             if abort:
-                raise Exception(
+                raise ExtractorError(
                     'Premature left-side return of %s in %r' % (op, expr))
             y, abort = self.interpret_statement(
                 m.group('y'), local_vars, allow_recursion - 1)
             if abort:
-                raise Exception(
+                raise ExtractorError(
                     'Premature right-side return of %s in %r' % (op, expr))
             return opfunc(x, y)
 
@@ -204,14 +207,14 @@ class JSInterpreter(object):
                 self._functions[fname] = self.extract_function(fname)
             return self._functions[fname](argvals)
 
-        raise Exception('Unsupported JS expression %r' % expr)
+        raise ExtractorError('Unsupported JS expression %r' % expr)
 
     def extract_object(self, objname):
         obj = {}
         obj_m = re.search(
             (r'(?:var\s+)?%s\s*=\s*\{' % re.escape(objname)) +
-            r'\s*(?P<fields>([a-zA-Z$0-9]+\s*:\s*' +
-            r'function\(.*?\)\s*\{.*?\})*)\}\s*;',
+            r'\s*(?P<fields>([a-zA-Z$0-9]+\s*:\s*function\(.*?\)\s*\{.*?\}(?:,\s*)?)*)' +
+            r'\}\s*;',
             self.code)
         fields = obj_m.group('fields')
         # Currently, it only supports function definitions
@@ -221,21 +224,20 @@ class JSInterpreter(object):
             fields)
         for f in fields_m:
             argnames = f.group('args').split(',')
-            obj[f.group('key')] = self.build_function(
-                argnames, f.group('code'))
+            obj[f.group('key')] = self.build_function(argnames, f.group('code'))
 
         return obj
 
     def extract_function(self, funcname):
         func_m = re.search(
             r'''(?x)
-                (?:function\s+%s|[{;]%s\s*=\s*function)\s*
+                (?:function\s+%s|[{;]%s\s*=\s*function|var\s+%s\s*=\s*function)\s*
                 \((?P<args>[^)]*)\)\s*
                 \{(?P<code>[^}]+)\}''' % (
-                re.escape(funcname), re.escape(funcname)),
+                re.escape(funcname), re.escape(funcname), re.escape(funcname)),
             self.code)
         if func_m is None:
-            raise Exception('Could not find JS function %r' % funcname)
+            raise ExtractorError('Could not find JS function %r' % funcname)
         argnames = func_m.group('args').split(',')
 
         return self.build_function(argnames, func_m.group('code'))
