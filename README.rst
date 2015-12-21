@@ -37,15 +37,6 @@ YouTube is the most popular video-sharing platform in the world and as a hacker 
 
 Finally *pytube* also includes a command-line utility, allowing you to quickly download videos right from terminal.
 
-Fix for CipherError
-==========================================
-
-*Update December 2015* If you're using version <=6.1.3, you'll need to run the following to fix *pytube* for some videos.
-
-.. code:: bash
-
-    pip install -U pytube
-
 Installation
 ============
 
