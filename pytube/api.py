@@ -170,7 +170,7 @@ class YouTube(object):
 
         # For each video url, identify the quality profile and add it to list
         # of available videos.
-        for idx, url in enumerate(video_urls):
+        for i, url in enumerate(video_urls):
             log.debug("attempting to get quality profile from url: %s", url)
             try:
                 itag, quality_profile = self._get_quality_profile_from_url(url)
@@ -186,7 +186,7 @@ class YouTube(object):
             if "signature=" not in url:
                 log.debug("signature not in url, attempting to resolve the "
                           "cipher.")
-                signature = self._get_cipher(stream_map["s"][idx], js_url)
+                signature = self._get_cipher(stream_map["s"][i], js_url)
                 url = "{0}&signature={1}".format(url, signature)
             self._add_video(url, self.filename, **quality_profile)
         # Clear the cached js. Make sure to keep this at the end of
@@ -336,7 +336,7 @@ class YouTube(object):
         """
         unmatched_brackets_num = 0
         index = 1
-        for idx, ch in enumerate(html):
+        for i, ch in enumerate(html):
             if isinstance(ch, int):
                 ch = chr(ch)
             if ch == "{":
@@ -347,7 +347,7 @@ class YouTube(object):
                     break
         else:
             raise PytubeError("Unable to determine json offset.")
-        return index + idx
+        return index + i
 
     def _get_cipher(self, signature, url):
         """Gets the signature using the cipher.
