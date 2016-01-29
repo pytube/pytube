@@ -363,7 +363,7 @@ class YouTube(object):
             response = urlopen(url)
             if not response:
                 raise PytubeError("Unable to open url: {0}".format(self.url))
-            self._js_cache = response.read()
+            self._js_cache = response.read().decode()
         try:
             matches = reg_exp.search(self._js_cache)
             if matches:
