@@ -132,3 +132,9 @@ class TestPytube(object):
     def test_get_json_offset_with_bad_html(self):
         """Raise exception if json offset cannot be found"""
         self.yt._get_json_offset('asdfasdf')
+
+    def test_YT_create_from_url(self):
+        'test creation of YouYube Object from url'
+        url = 'http://www.youtube.com/watch?v=9bZkp7q19f0'
+
+        yt = api.YouTube(url)
