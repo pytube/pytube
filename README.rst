@@ -140,7 +140,7 @@ Library usage
     pprint(yt.filter(resolution='480p'))
 
     # [<Video: H.264 (.flv) - 480p>,
-    # <Video: VP8 (.webm) - 480p>]
+    #  <Video: VP8 (.webm) - 480p>]
 
     # To select a video by a specific resolution and filetype you can use the get
     # method.
@@ -162,7 +162,7 @@ Library usage
     # <Video: VP8 (.webm) - 360p>,
     # <Video: VP8 (.webm) - 480p>]
 
-    # Notice we have two H.264 (.mp4) available to us... now if we try to call get()
+    # Since we have two H.264 (.mp4) available to us... now if we try to call get()
     # on mp4...
 
     video = yt.get('mp4')
@@ -174,6 +174,6 @@ Library usage
     # Okay, let's download it!
     video.download()
 
-    # Note: If you wanted to choose the output directory, simply pass it as an
+    # If you wanted to choose the output directory, simply pass it as an
     # argument to the download method.
     video.download('/tmp/')
