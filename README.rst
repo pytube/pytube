@@ -47,44 +47,6 @@ Download using pip via pypi.
     pip install pytube
 
 
-Command-line usage
-==================
-
-You can download a video by simply passing the ``-e`` (or ``--extension=``) switch and
-setting it to the desired filetype:
-
-.. code:: bash
-
-   $ pytube -e mp4 http://www.youtube.com/watch?v=Ik-RsDGPI5Y
-
-
-Same thing for specifying a resolution:
-
-.. code:: bash
-
-   $ pytube -r 720p http://www.youtube.com/watch?v=Ik-RsDGPI5Y
-
-
-You can also specify a download file path (``-p`` or ``--path=``):
-
-.. code:: bash
-
-   $ pytube -e mp4 -p ~/Downloads/ http://www.youtube.com/watch?v=Ik-RsDGPI5Y
-
-and/or optionally choose the filename (``-f`` or ``--filename=``):
-
-.. code:: bash
-
-   $ pytube -e mp4 -f Dancing Scene from Pulp Fiction http://www.youtube.com/watch?v=Ik-RsDGPI5Y
-
-You can also specify a resolution or desired filetype:
-
-.. code:: bash
-
-   $ pytube -e mp4 -r 720p http://www.youtube.com/watch?v=Ik-RsDGPI5Y
-
-
-
 Library usage
 =============
 
@@ -177,3 +139,39 @@ Library usage
     # If you wanted to choose the output directory, simply pass it as an
     # argument to the download method.
     video.download('/tmp/')
+
+Command-line usage
+==================
+
+You can download a video by simply passing the ``-e`` (or ``--extension=``) switch and
+setting it to the desired filetype:
+
+.. code:: bash
+
+   $ pytube -e mp4 http://www.youtube.com/watch?v=Ik-RsDGPI5Y
+
+
+Same thing for specifying a resolution:
+
+.. code:: bash
+
+   $ pytube -r 720p http://www.youtube.com/watch?v=Ik-RsDGPI5Y
+
+
+You can also specify a download file path (``-p`` or ``--path=``):
+
+.. code:: bash
+
+   $ pytube -e mp4 -p ~/Downloads/ http://www.youtube.com/watch?v=Ik-RsDGPI5Y
+
+and/or optionally choose the filename (``-f`` or ``--filename=``):
+
+.. code:: bash
+
+   $ pytube -e mp4 -f Dancing Scene from Pulp Fiction http://www.youtube.com/watch?v=Ik-RsDGPI5Y
+
+You can also specify a resolution or desired filetype:
+
+.. code:: bash
+
+   $ pytube -e mp4 -r 720p http://www.youtube.com/watch?v=Ik-RsDGPI5Y
