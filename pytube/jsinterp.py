@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 import json
 import operator
 import re
 
-from .utils import (
-    ExtractorError,
-)
+from .exceptions import ExtractorError
 
 _OPERATORS = [
     ('|', operator.or_),
