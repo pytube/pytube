@@ -133,11 +133,7 @@ Library usage
     # In this case, we'll need to specify both the codec (mp4) and resolution
     # (either 360p or 720p).
 
-    # Okay, let's download it!
-    video.download()
-
-    # If you wanted to choose the output directory, simply pass it as an
-    # argument to the download method.
+    # Okay, let's download it! (a destination directory is required)
     video.download('/tmp/')
 
 Command-line usage
