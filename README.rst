@@ -6,10 +6,6 @@ pytube
   :alt: Pypi
   :target: https://pypi.python.org/pypi/pytube/
 
-.. image:: https://img.shields.io/pypi/dm/pytube.svg
-  :alt: Pypi downloads per month
-  :target: https://pypi.python.org/pypi/pytube/
-
 .. image:: https://img.shields.io/pypi/pyversions/pytube.svg
   :alt: Python Versions
   :target: https://pypi.python.org/pypi/pytube/
