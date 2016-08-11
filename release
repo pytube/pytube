@@ -15,7 +15,7 @@ fi
 
 echo -e "\n${GREEN}STARTING RELEASE PROCESS${COLOR_OFF}\n"
 
-git status | grep "working directory clean" &> /dev/null
+git status | grep "working tree clean" &> /dev/null
 if [ ! $? -eq 0 ]; then # working directory is NOT clean
     echo -e "${RED}WARNING: You have uncomitted changes, you may have forgotten something${COLOR_OFF}\n"
     exit
