@@ -5,9 +5,9 @@ import sys
 import os
 import argparse
 
-from pytube import YouTube
-from pytube.utils import print_status, FullPaths
-from pytube.exceptions import PytubeError
+from . import YouTube
+from .utils import print_status, FullPaths
+from .exceptions import PytubeError
 from pprint import pprint
 
 

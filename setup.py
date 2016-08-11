@@ -21,7 +21,11 @@ setup(
     packages=['pytube'],
     url="https://github.com/nficano/pytube",
     license=license,
-    scripts=['scripts/pytube'],
+    entry_points={
+        'console_scripts': [
+            'pytube = pytube.__main__:main',
+        ],
+    },
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
@@ -47,4 +51,5 @@ setup(
     description=("A Python library for downloading YouTube videos."),
     long_description=readme,
     zip_safe=True,
+
 )
