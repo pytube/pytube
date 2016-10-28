@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 import json
 import operator
 import re
-
 from .exceptions import ExtractorError
 
 _OPERATORS = [
