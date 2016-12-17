@@ -58,7 +58,7 @@ Library usage
     # Once set, you can see all the codec and quality options YouTube has made
     # available for the perticular video by printing videos.
 
-    pprint(yt.get_videos())
+    print(yt.get_videos())
 
     # [<Video: MPEG-4 Visual (.3gp) - 144p>,
     #  <Video: MPEG-4 Visual (.3gp) - 240p>,
