@@ -58,7 +58,7 @@ Library usage
     # Once set, you can see all the codec and quality options YouTube has made
     # available for the perticular video by printing videos.
 
-    pprint(yt.get_videos())
+    print(yt.get_videos())
 
     # [<Video: MPEG-4 Visual (.3gp) - 144p>,
     #  <Video: MPEG-4 Visual (.3gp) - 240p>,
@@ -82,7 +82,7 @@ Library usage
     yt.set_filename('Dancing Scene from Pulp Fiction')
 
     # You can also filter the criteria by filetype.
-    pprint(yt.filter('flv'))
+    print(yt.filter('flv'))
 
     # [<Video: Sorenson H.263 (.flv) - 240p>,
     #  <Video: H.264 (.flv) - 360p>,
@@ -95,7 +95,7 @@ Library usage
     # <Video: H.264 (.mp4) - 720p>
 
     # You can also get all videos for a given resolution
-    pprint(yt.filter(resolution='480p'))
+    print(yt.filter(resolution='480p'))
 
     # [<Video: H.264 (.flv) - 480p>,
     #  <Video: VP8 (.webm) - 480p>]
@@ -108,7 +108,7 @@ Library usage
     # NOTE: get() can only be used if and only if one object matches your criteria.
     # for example:
 
-    pprint(yt.videos)
+    print(yt.videos)
 
     #[<Video: MPEG-4 Visual (.3gp) - 144p>,
     # <Video: MPEG-4 Visual (.3gp) - 240p>,
