@@ -187,7 +187,11 @@ class YouTube(object):
 
         # Rewrite and add the url to the javascript file, we'll need to fetch
         # this if YouTube doesn't provide us with the signature.
-        js_url = "http:" + video_data.get("assets", {}).get("js")
+        js_partial_url = video_data.get("assets", {}).get("js")
+        if js_partial_url.startswith('//'):
+            js_url = 'http:' + js_partial_url
+        elif js_partial_url.startswith('/'):
+            js_url = 'https://youtube.com' + js_partial_url
 
         # Just make these easily accessible as variables.
         stream_map = video_data.get("args", {}).get("stream_map")
@@ -382,7 +386,7 @@ class YouTube(object):
         :param str url:
             The url of the javascript file.
         """
-        reg_exp = re.compile(r'\.sig\|\|([a-zA-Z0-9$]+)\(')
+        reg_exp = re.compile(r'"signature",\s?([a-zA-Z0-9$]+)\(')
         # Cache the js since `_get_cipher()` will be called for each video.
         if not self._js_cache:
             response = urlopen(url)
