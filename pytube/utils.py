@@ -50,7 +50,9 @@ def sizeof(byts):
     """
     sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB']
     power = int(math.floor(math.log(byts, 1024)))
-    return str(int(byts/float(1024**power)))+' '+(sizes[power] if byts != 1 else 'byte')
+    value = int(byts/float(1024**power))
+    suffix = sizes[power] if byts != 1 else 'byte'
+    return '{0} {1}'.format(value, suffix)
 
 def print_status(progress, file_size, start):
     """
