@@ -67,9 +67,11 @@ class Video(object):
             *Optional* force a file overwrite if conflicting one exists.
         """
         path = os.path.normpath(path)
-        if os.path.isdir(path):
-            filename = "{0}.{1}".format(self.filename, self.extension)
-            path = os.path.join(path, filename)
+        if not os.path.isdir(path):
+            raise OSError('Make sure path exists.')
+
+        filename = "{0}.{1}".format(self.filename, self.extension)
+        path = os.path.join(path, filename)
         # TODO: If it's not a path, this should raise an ``OSError``.
         # TODO: Move this into cli, this kind of logic probably shouldn't be
         # handled by the library.
