@@ -79,9 +79,7 @@ class Video(object):
             raise OSError("Conflicting filename:'{0}'".format(self.filename))
         # TODO: Split up the downloading and OS jazz into separate functions.
         response = urlopen(self.url)
-        meta_data = dict(response.info().items())
-        file_size = int(meta_data.get("Content-Length") or
-                        meta_data.get("content-length"))
+        file_size = self.file_size(response)
         self._bytes_received = 0
         start = clock()
         # TODO: Let's get rid of this whole try/except block, let ``OSErrors``
@@ -111,6 +109,16 @@ class Video(object):
             os.remove(path)
             raise KeyboardInterrupt(
                 "Interrupt signal given. Deleting incomplete video.")
+
+    def file_size(self, response):
+        """Gets the file size from the response
+
+        :param response:
+            Response of a opened url.
+        """
+        meta_data = dict(response.info().items())
+        return int(meta_data.get("Content-Length") or
+                   meta_data.get("content-length"))
 
     def __repr__(self):
         """A clean representation of the class instance."""
