@@ -23,6 +23,8 @@ def main():
                         dest="path", help=("The path to save the video to."))
     parser.add_argument("--filename", "-f", dest="filename", help=(
         "The filename, without extension, to save the video in."))
+    parser.add_argument("--show_available", "-s", action='store_true',
+            dest='show_available', help=("Prints a list of available formats for download."))
 
     args = parser.parse_args()
 
@@ -32,10 +34,16 @@ def main():
         for i, video in enumerate(yt.get_videos()):
             ext = video.extension
             res = video.resolution
-            videos.append("{} {}".format(ext, res))
+            videos.append("{:<15} {:<15}".format(ext, res))
     except PytubeError:
         print("Incorrect video URL.")
         sys.exit(1)
+
+    if args.show_available:
+        print("{:<15} {:<15}".format("Resolution", "Extension"))
+        print("-"*25)
+        print("\n".join(videos))
+        sys.exit(0)
 
     if args.filename:
         yt.set_filename(args.filename)
