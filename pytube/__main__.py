@@ -93,7 +93,7 @@ def main():
             except (ValueError, IndexError):
                 print("Requires an integer in range 0-{}".format(len(videos) - 1))
             except KeyboardInterrupt:
-                pass
+                break
 
     try:
         vid.download(path=args.path, on_progress=print_status)
