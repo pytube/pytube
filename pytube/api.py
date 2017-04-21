@@ -11,7 +11,7 @@ from .exceptions import MultipleObjectsReturned, PytubeError, CipherError, \
     DoesNotExist, AgeRestricted
 from .jsinterp import JSInterpreter
 from .models import Video
-from .utils import safe_filename
+from .utils import safe_filename,get_itag
 
 log = logging.getLogger(__name__)
 
@@ -87,7 +87,8 @@ class YouTube(object):
         self._video_url = None
         self._js_cache = None
         self._videos = []
-        if url:
+        self.audio_url = None
+        if url is not None:
             self.from_url(url)
 
     @property
@@ -196,7 +197,6 @@ class YouTube(object):
         # Just make these easily accessible as variables.
         stream_map = video_data.get("args", {}).get("stream_map")
         video_urls = stream_map.get("url")
-
         # For each video url, identify the quality profile and add it to list
         # of available videos.
         for i, url in enumerate(video_urls):
@@ -217,10 +217,15 @@ class YouTube(object):
                           "cipher.")
                 signature = self._get_cipher(stream_map["s"][i], js_url)
                 url = "{0}&signature={1}".format(url, signature)
+            # if everything goes ok, append the video to the list
+            # self._videos
             self._add_video(url, self.filename, **quality_profile)
+
         # Clear the cached js. Make sure to keep this at the end of
         # `from_url()` so we can mock inject the js in unit tests.
         self._js_cache = None
+        # set the audio_url to 1080p Video instance if present
+        self._set_audio_url()
 
     def get(self, extension=None, resolution=None, profile=None):
         """Gets a single video given a file extention (and/or resolution
@@ -279,6 +284,7 @@ class YouTube(object):
     def get_video_data(self):
         """Gets the page and extracts out the video data."""
         # Reset the filename incase it was previously set.
+        hd_1080p = False
         self.title = None
         response = urlopen(self.url)
         if not response:
@@ -301,8 +307,22 @@ class YouTube(object):
         # do this just so we just can return one object for the video data.
         encoded_stream_map = json_object.get("args", {}).get(
             "url_encoded_fmt_stream_map")
+
         json_object["args"]["stream_map"] = self._parse_stream_map(
             encoded_stream_map)
+        # get the url for the 1080p video stream and append it to
+        # the json_object['args']['stream_map']['url']
+        adaptive_fmts = self._parse_stream_map(json_object["args"]["adaptive_fmts"])
+        _urls = adaptive_fmts["url"]
+        for url in _urls:
+            itag = get_itag(url)
+            if itag == 137:
+                hd_1080p = True
+                json_object["args"]["stream_map"].get("url").append(url)
+            # set the self.audio_url in here
+            if hd_1080p and itag in (140, 171, 249,):
+                self.audio_url = url
+                break
         return json_object
 
     def _parse_stream_map(self, blob):
@@ -416,25 +436,17 @@ class YouTube(object):
         :param str video_url:
             The malformed url-encoded video_url.
         """
-        reg_exp = re.compile('itag=(\d+)')
-        itag = reg_exp.findall(video_url)
-        if itag and len(itag) == 1:
-            itag = int(itag[0])
-            # Given an itag, refer to the YouTube quality profiles to get the
-            # properties (media type, resolution, etc.) of the video.
-            quality_profile = QUALITY_PROFILES.get(itag)
-            if not quality_profile:
-                return itag, None
-            # Here we just combine the quality profile keys to the
-            # corresponding quality profile, referenced by the itag.
-            return itag, dict(list(zip(QUALITY_PROFILE_KEYS, quality_profile)))
+        itag = get_itag(video_url)
         if not itag:
             raise PytubeError("Unable to get encoding profile, no itag found.")
-        elif len(itag) > 1:
-            log.warn("Multiple itags found: %s", itag)
-            raise PytubeError("Unable to get encoding profile, multiple itags "
-                              "found.")
-        return False
+        # Given an itag, refer to the YouTube quality profiles to get the
+        # properties (media type, resolution, etc.) of the video.
+        quality_profile = QUALITY_PROFILES.get(itag)
+        if not quality_profile:
+            return itag, None
+        # Here we just combine the quality profile keys to the
+        # corresponding quality profile, referenced by the itag.
+        return itag, dict(list(zip(QUALITY_PROFILE_KEYS, quality_profile)))
 
     def _add_video(self, url, filename, **kwargs):
         """Adds new video object to videos.
@@ -446,7 +458,21 @@ class YouTube(object):
         :param kwargs:
             Additional properties to set for the video object.
         """
+        # create the Video instances
         video = Video(url, filename, **kwargs)
         self._videos.append(video)
         self._videos.sort()
         return True
+
+    def _set_audio_url(self):
+        """
+        Private method to set the audio_url attribute
+        to a Video instance with 1080p resolution.
+        :return:
+        """
+        # if there is audio_url present set it to the
+        # 1080p Video instance
+        if self.audio_url is not None:
+            for video in self._videos:
+                if video.resolution == '1080p':
+                    video.audio_url = self.audio_url

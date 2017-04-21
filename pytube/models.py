@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import os
-from time import clock
+from utils import download_youtube_data, FFMpeg
 
 try:
     from urllib2 import urlopen
@@ -46,69 +46,48 @@ class Video(object):
         self.video_bitrate = video_bitrate
         self.audio_codec = audio_codec
         self.audio_bitrate = audio_bitrate
+        # audio url for the 1080p stream
+        self.audio_url = None
 
-    def download(self, path, chunk_size=8 * 1024, on_progress=None,
-                 on_finish=None, force_overwrite=False):
+    def download(self, base_path, force_overwrite=False):
         """Downloads the video.
 
-        :param str path:
+        :param str base_path:
             The destination output directory.
-        :param int chunk_size:
-            File size (in bytes) to write to buffer at a time. By default,
-            this is set to 8 bytes.
-        :param func on_progress:
-            *Optional* function to be called every time the buffer is written
-            to. Arguments passed are the bytes recieved, file size, and start
-            datetime.
-        :param func on_finish:
-            *Optional* callback function when download is complete. Arguments
-            passed are the full path to downloaded the file.
         :param bool force_overwrite:
             *Optional* force a file overwrite if conflicting one exists.
         """
-        path = os.path.normpath(path)
-        if os.path.isdir(path):
-            filename = "{0}.{1}".format(self.filename, self.extension)
-            path = os.path.join(path, filename)
-        # TODO: If it's not a path, this should raise an ``OSError``.
-        # TODO: Move this into cli, this kind of logic probably shouldn't be
-        # handled by the library.
-        if os.path.isfile(path) and not force_overwrite:
-            raise OSError("Conflicting filename:'{0}'".format(self.filename))
-        # TODO: Split up the downloading and OS jazz into separate functions.
-        response = urlopen(self.url)
-        meta_data = dict(response.info().items())
-        file_size = int(meta_data.get("Content-Length") or
-                        meta_data.get("content-length"))
-        self._bytes_received = 0
-        start = clock()
-        # TODO: Let's get rid of this whole try/except block, let ``OSErrors``
-        # fail loudly.
-        try:
-            with open(path, 'wb') as dst_file:
-                while True:
-                    self._buffer = response.read(chunk_size)
-                    # Check if the buffer is empty (aka no bytes remaining).
-                    if not self._buffer:
-                        if on_finish:
-                            # TODO: We possibly want to flush the
-                            # `_bytes_recieved`` buffer before we call
-                            # ``on_finish()``.
-                            on_finish(path)
-                        break
+        # check if the base_path exists or not
+        if not os.path.exists(base_path):
+            raise OSError('Please provide an existing base path')
+        base_path = os.path.normpath(base_path)
+        # create the video path to save the video stream
+        video_name = '.'.join([self.filename, self.extension])
+        video_path = os.path.join(base_path, video_name)
+        # download the video data
+        video = download_youtube_data(url=self.url, path=video_path,
+                                      force_overwrite=force_overwrite)
+        # check if self.audio_url is not None, if so then download
+        # the audio stream too and add it to the video
+        if self.audio_url is not None:
+            # is it always the .webm extension for the audio stream?
+            audio_path = os.path.join(base_path, 'audio.webm')
+            audio = download_youtube_data(url=self.audio_url,
+                                          path=audio_path)
+            if audio and video:
+                # add the audio stream to the video stream
+                output = '.'.join(['%s-%s' % (self.filename, self.resolution),
+                                   self.extension])
+                output = os.path.join(base_path, output)
+                # instantiate the FFMpeg instance
+                f = FFMpeg()
+                f.add_audio_stream(video_path, audio_path, output)
+                # remove the separate streams when done with ffmpeg
+                os.remove(video_path)
+                os.remove(audio_path)
+                return True
 
-                    self._bytes_received += len(self._buffer)
-                    dst_file.write(self._buffer)
-                    if on_progress:
-                        on_progress(self._bytes_received, file_size, start)
-
-        except KeyboardInterrupt:
-            # TODO: Move this into the cli, ``KeyboardInterrupt`` handling
-            # should be taken care of by the client. Also you should be allowed
-            # to disable this.
-            os.remove(path)
-            raise KeyboardInterrupt(
-                "Interrupt signal given. Deleting incomplete video.")
+        return video
 
     def __repr__(self):
         """A clean representation of the class instance."""

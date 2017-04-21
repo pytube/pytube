@@ -31,3 +31,16 @@ class AgeRestricted(Exception):
     """The requested video has an age restriction.
     """
     pass
+
+
+class FFMpegDoesNotExistError(Exception):
+    """
+    The ffmpeg binary does not exist.
+    """
+    pass
+
+
+class FFMpegAlreadyExistsError(Exception):
+    """File to be processed with ffmpeg
+    already exists"""
+    pass
