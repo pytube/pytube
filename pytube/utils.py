@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import argparse
 import re
+import math
 
 from os import path
 from sys import stdout
@@ -41,34 +42,17 @@ def safe_filename(text, max_length=200):
     return truncate(filename)
 
 
-def sizeof(bytes):
+def sizeof(byts):
     """Takes the size of file or folder in bytes and returns size formatted in
     KB, MB, GB, TB or PB.
-
-    :params bytes:
+    :params byts:
         Size of the file in bytes
     """
-    alternative = [
-        (1024 ** 5, ' PB'),
-        (1024 ** 4, ' TB'),
-        (1024 ** 3, ' GB'),
-        (1024 ** 2, ' MB'),
-        (1024 ** 1, ' KB'),
-        (1024 ** 0, (' byte', ' bytes')),
-    ]
-
-    for factor, suffix in alternative:
-        if bytes >= factor:
-            break
-    amount = int(bytes / factor)
-    if isinstance(suffix, tuple):
-        singular, multiple = suffix
-        if amount == 1:
-            suffix = singular
-        else:
-            suffix = multiple
-    return "%s%s" % (str(amount), suffix)
-
+    sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB']
+    power = int(math.floor(math.log(byts, 1024)))
+    value = int(byts/float(1024**power))
+    suffix = sizes[power] if byts != 1 else 'byte'
+    return '{0} {1}'.format(value, suffix)
 
 def print_status(progress, file_size, start):
     """
@@ -87,7 +71,7 @@ def print_status(progress, file_size, start):
     done = int(50 * progress / int(file_size))
     dt = (clock() - start)
     if dt > 0:
-        stdout.write("\r  [%s%s][%3.2f%%] %s at %s/s\r " %
+        stdout.write("\r  [%s%s][%3.2f%%] %s at %s/s " %
                      ('=' * done, ' ' * (50 - done), percent_done,
                       sizeof(file_size), sizeof(progress // dt)))
     stdout.flush()

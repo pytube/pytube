@@ -148,6 +148,28 @@ Same thing for specifying a resolution:
 .. code:: bash
 
    $ pytube -r 720p http://www.youtube.com/watch?v=Ik-RsDGPI5Y
+   
+When run without a resolution or extension, it shows a list of available formats to download
+
+.. code:: bash
+
+   $ pytube http://www.youtube.com/watch?v=Ik-RsDGPI5Y
+   	 Resolution      Extension      
+	----------------------------
+	0  3gp             144p           
+	1  3gp             240p           
+	2  mp4             360p           
+	3  mp4             720p           
+	4  webm            360p           
+	Enter choice: 
+   
+
+You can see a list of available formats by passing the ``-s`` (or ``--show-available``) flag
+
+.. code:: bash
+
+   $ pytube -s http://www.youtube.com/watch?v=Ik-RsDGPI5Y
+   
 
 
 You can also specify a download file path (``-p`` or ``--path=``):

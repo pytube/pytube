@@ -23,6 +23,8 @@ def main():
                         dest="path", help=("The path to save the video to."))
     parser.add_argument("--filename", "-f", dest="filename", help=(
         "The filename, without extension, to save the video in."))
+    parser.add_argument("--show_available", "-s", action='store_true',
+            dest='show_available', help=("Prints a list of available formats for download."))
 
     args = parser.parse_args()
 
@@ -32,10 +34,14 @@ def main():
         for i, video in enumerate(yt.get_videos()):
             ext = video.extension
             res = video.resolution
-            videos.append("{} {}".format(ext, res))
+            videos.append((ext, res))
     except PytubeError:
         print("Incorrect video URL.")
         sys.exit(1)
+
+    if args.show_available:
+        print_available_vids(videos)
+        sys.exit(0)
 
     if args.filename:
         yt.set_filename(args.filename)
@@ -44,7 +50,7 @@ def main():
         if not all([args.ext, args.res]):
             print("Make sure you give either of the below specified "
                   "format/resolution combination.")
-            pprint(videos)
+            print_available_vids(videos)
             sys.exit(1)
 
     if args.ext and args.res:
@@ -78,13 +84,28 @@ def main():
         vid = max(videos)
     else:
         # If nothing is specified get the highest resolution one
-        vid = max(yt.get_videos())
+        print_available_vids(videos)
+        while True:
+            try:
+                choice = int(input("Enter choice: "))
+                vid = yt.get(*videos[choice])
+                break
+            except (ValueError, IndexError):
+                print("Requires an integer in range 0-{}".format(len(videos) - 1))
+            except KeyboardInterrupt:
+                sys.exit(2)
 
     try:
         vid.download(path=args.path, on_progress=print_status)
     except KeyboardInterrupt:
         print("Download interrupted.")
         sys.exit(1)
+
+def print_available_vids(videos):
+    formatString = "{:<2} {:<15} {:<15}"
+    print(formatString.format("", "Resolution", "Extension"))
+    print("-"*28)
+    print("\n".join([formatString.format(index, *formatTuple) for index, formatTuple in enumerate(videos)]))
 
 if __name__ == '__main__':
     main()
