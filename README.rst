@@ -188,8 +188,3 @@ and/or optionally choose the filename (``-f`` or ``--filename=``):
 
    $ pytube -e mp4 -f "Dancing Scene from Pulp Fiction" http://www.youtube.com/watch?v=Ik-RsDGPI5Y
 
-You can also specify a resolution or desired filetype:
-
-.. code:: bash
-
-   $ pytube -e mp4 -r 720p http://www.youtube.com/watch?v=Ik-RsDGPI5Y
