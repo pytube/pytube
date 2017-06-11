@@ -190,8 +190,15 @@ You can also specify a resolution or desired filetype:
 
    $ pytube -e mp4 -r 720p http://www.youtube.com/watch?v=Ik-RsDGPI5Y
 
-How to release
-==============
+Development
+===========
+
+Development of this happens on GitHub, patches including tests, documentation are very welcome, as well as bug reports and collaborators are welcome! Also please open an issue if this tool does not function as you'd expect.
+
+How to release updates
+----------------------
+
+Execute the following commands:
 
 .. code:: bash
 
