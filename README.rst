@@ -193,7 +193,7 @@ You can also specify a resolution or desired filetype:
 Development
 ===========
 
-Development of this happens on GitHub, patches including tests, documentation are very welcome, as well as bug reports and collaborators are welcome! Also please open an issue if this tool does not function as you'd expect.
+Development of this happens on GitHub, patches including tests, documentation are very welcome, as well as bug reports and feature contributions are welcome! Also please open an issue if this tool does not function as you'd expect.
 
 How to release updates
 ----------------------
