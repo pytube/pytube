@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from pytube import __version__
-
 try:
     from setuptools import setup
 except ImportError:
@@ -15,7 +13,7 @@ with open('LICENSE.txt') as readme_file:
 
 setup(
     name="pytube",
-    version=__version__,
+    version="6.2.2",
     author="Nick Ficano",
     author_email="nficano@gmail.com",
     packages=['pytube'],
