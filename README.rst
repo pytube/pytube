@@ -198,7 +198,7 @@ Development of this happens on GitHub, patches including tests, documentation ar
 How to release updates
 ----------------------
 
-If this is the first time you're releasing to pypi, you'll need to install ``pip install -r tests/dev_requirements.txt``.
+If this is the first time you're releasing to pypi, you'll need to run: ``pip install -r tests/dev_requirements.txt``.
 
 Once complete, execute the following commands:
 
