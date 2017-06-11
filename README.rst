@@ -6,10 +6,6 @@ pytube
   :alt: Pypi
   :target: https://pypi.python.org/pypi/pytube/
 
-.. image:: https://img.shields.io/pypi/pyversions/pytube.svg
-  :alt: Python Versions
-  :target: https://pypi.python.org/pypi/pytube/
-
 .. image:: https://travis-ci.org/nficano/pytube.svg?branch=master
    :alt: Build status
    :target: https://travis-ci.org/nficano/pytube
