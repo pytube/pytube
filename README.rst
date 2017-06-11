@@ -6,10 +6,6 @@ pytube
   :alt: Pypi
   :target: https://pypi.python.org/pypi/pytube/
 
-.. image:: https://img.shields.io/pypi/pyversions/pytube.svg
-  :alt: Python Versions
-  :target: https://pypi.python.org/pypi/pytube/
-
 .. image:: https://travis-ci.org/nficano/pytube.svg?branch=master
    :alt: Build status
    :target: https://travis-ci.org/nficano/pytube
@@ -60,7 +56,7 @@ Library usage
     yt = YouTube("http://www.youtube.com/watch?v=Ik-RsDGPI5Y")
 
     # Once set, you can see all the codec and quality options YouTube has made
-    # available for the perticular video by printing videos.
+    # available for the particular video by printing videos.
 
     print(yt.get_videos())
 
@@ -152,28 +148,28 @@ Same thing for specifying a resolution:
 .. code:: bash
 
    $ pytube -r 720p http://www.youtube.com/watch?v=Ik-RsDGPI5Y
-   
+
 When run without a resolution or extension, it shows a list of available formats to download
 
 .. code:: bash
 
    $ pytube http://www.youtube.com/watch?v=Ik-RsDGPI5Y
-   	 Resolution      Extension      
-	----------------------------
-	0  3gp             144p           
-	1  3gp             240p           
-	2  mp4             360p           
-	3  mp4             720p           
-	4  webm            360p           
-	Enter choice: 
-   
+     Resolution      Extension
+    ----------------------------
+    0  3gp             144p
+    1  3gp             240p
+    2  mp4             360p
+    3  mp4             720p
+    4  webm            360p
+    Enter choice:
+
 
 You can see a list of available formats by passing the ``-s`` (or ``--show-available``) flag
 
 .. code:: bash
 
    $ pytube -s http://www.youtube.com/watch?v=Ik-RsDGPI5Y
-   
+
 
 
 You can also specify a download file path (``-p`` or ``--path=``):
@@ -188,3 +184,24 @@ and/or optionally choose the filename (``-f`` or ``--filename=``):
 
    $ pytube -e mp4 -f "Dancing Scene from Pulp Fiction" http://www.youtube.com/watch?v=Ik-RsDGPI5Y
 
+Development
+===========
+
+Development of this happens on GitHub, patches including tests, documentation are very welcome, as well as bug reports and feature contributions are welcome! Also please open an issue if this tool does not function as you'd expect.
+
+How to release updates
+----------------------
+
+If this is the first time you're releasing to pypi, you'll need to run: ``pip install -r tests/dev_requirements.txt``.
+
+Once complete, execute the following commands:
+
+.. code:: bash
+
+   $ git checkout master
+   $ bumpversion [major|minor|patch]
+   $
+   $ python setup.py sdist bdist_wheel upload
+   $
+   $ bumpversion --no-tag patch
+   $ git push origin master --tags
