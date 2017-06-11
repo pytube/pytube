@@ -198,12 +198,16 @@ Development of this happens on GitHub, patches including tests, documentation ar
 How to release updates
 ----------------------
 
-Execute the following commands:
+If this is the first time you're releasing to pypi, you'll need to install ``pip install -r tests/dev_requirements.txt``.
+
+Once complete, execute the following commands:
 
 .. code:: bash
 
    $ git checkout master
    $ bumpversion [major|minor|patch]
+   $
    $ python setup.py sdist bdist_wheel upload
+   $
    $ bumpversion --no-tag patch
    $ git push origin master --tags
