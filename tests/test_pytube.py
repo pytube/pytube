@@ -1,12 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 import warnings
+
 import mock
-from nose.tools import eq_, raises
+from nose.tools import eq_
+from nose.tools import raises
+
 from pytube import api
-from pytube.exceptions import MultipleObjectsReturned, AgeRestricted, \
-    DoesNotExist, PytubeError
+from pytube.exceptions import AgeRestricted
+from pytube.exceptions import DoesNotExist
+from pytube.exceptions import MultipleObjectsReturned
+from pytube.exceptions import PytubeError
 
 
 class TestPytube(object):
@@ -99,7 +105,7 @@ class TestPytube(object):
         """Deprecation warnings get triggered on url set"""
         with warnings.catch_warnings(record=True) as w:
             # Cause all warnings to always be triggered.
-            warnings.simplefilter("always")
+            warnings.simplefilter('always')
             with mock.patch('pytube.api.urlopen') as urlopen:
                 urlopen.return_value.read.return_value = self.mock_html
                 yt = api.YouTube()
@@ -111,7 +117,7 @@ class TestPytube(object):
         """Deprecation warnings get triggered on filename set"""
         with warnings.catch_warnings(record=True) as w:
             # Cause all warnings to always be triggered.
-            warnings.simplefilter("always")
+            warnings.simplefilter('always')
             self.yt.filename = 'Gangnam Style'
             eq_(len(w), 1)
 
@@ -119,7 +125,7 @@ class TestPytube(object):
         """Deprecation warnings get triggered on video getter"""
         with warnings.catch_warnings(record=True) as w:
             # Cause all warnings to always be triggered.
-            warnings.simplefilter("always")
+            warnings.simplefilter('always')
             self.yt.videos
             eq_(len(w), 1)
 
@@ -132,9 +138,3 @@ class TestPytube(object):
     def test_get_json_offset_with_bad_html(self):
         """Raise exception if json offset cannot be found"""
         self.yt._get_json_offset('asdfasdf')
-
-    def test_YT_create_from_url(self):
-        'test creation of YouYube Object from url'
-        url = 'http://www.youtube.com/watch?v=9bZkp7q19f0'
-
-        yt = api.YouTube(url)

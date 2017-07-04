@@ -1,0 +1,22 @@
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    sha: v0.8.0
+    hooks:
+    -   id: autopep8-wrapper
+    -   id: check-ast
+    -   id: check-case-conflict
+    -   id: check-merge-conflict
+    -   id: detect-private-key
+    -   id: double-quote-string-fixer
+    -   id: end-of-file-fixer
+    -   id: flake8
+    -   id: requirements-txt-fixer
+    -   id: trailing-whitespace
+-   repo: https://github.com/asottile/reorder_python_imports
+    sha: v0.3.4
+    hooks:
+    -   id: reorder-python-imports
+        language_version: python3.6
+-   repo: https://github.com/Lucas-C/pre-commit-hooks-safety
+    sha: v1.1.0
+    hooks:
+    -   id: python-safety-dependencies-check

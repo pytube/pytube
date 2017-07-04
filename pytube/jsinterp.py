@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 import json
 import operator
 import re
+
 from .exceptions import ExtractorError
 
 _OPERATORS = [
@@ -118,9 +120,8 @@ class JSInterpreter(object):
         except ValueError:
             pass
 
-        m = re.match(
-            r'(?P<var>%s)\.(?P<member>[^(]+)(?:\(+(?P<args>[^()]*)\))?$' % _NAME_RE,
-            expr)
+        m = re.match(r'(?P<var>%s)\.(?P<member>[^(]+)'
+                     r'(?:\(+(?P<args>[^()]*)\))?$' % _NAME_RE, expr)
         if m:
             variable = m.group('var')
             member = m.group('member')
@@ -212,7 +213,8 @@ class JSInterpreter(object):
         obj = {}
         obj_m = re.search(
             (r'(?:var\s+)?%s\s*=\s*\{' % re.escape(objname)) +
-            r'\s*(?P<fields>([a-zA-Z$0-9]+\s*:\s*function\(.*?\)\s*\{.*?\}(?:,\s*)?)*)' +
+            r'\s*(?P<fields>([a-zA-Z$0-9]+\s*:\s*function\(.*?\)\s*\'' +
+            r'{.*?\}(?:,\s*)?)*)' +
             r'\}\s*;',
             self.code)
         fields = obj_m.group('fields')
@@ -223,7 +225,8 @@ class JSInterpreter(object):
             fields)
         for f in fields_m:
             argnames = f.group('args').split(',')
-            obj[f.group('key')] = self.build_function(argnames, f.group('code'))
+            obj[f.group('key')] = self.build_function(
+                argnames, f.group('code'))
 
         return obj
 

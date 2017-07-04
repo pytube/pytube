@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 import os
 from time import clock
 
@@ -13,6 +14,7 @@ except ImportError:
 class Video(object):
     """Class representation of a single instance of a YouTube video.
     """
+
     def __init__(self, url, filename, extension, resolution=None,
                  video_codec=None, profile=None, video_bitrate=None,
                  audio_codec=None, audio_bitrate=None):
@@ -70,7 +72,7 @@ class Video(object):
         if not os.path.isdir(path):
             raise OSError('Make sure path exists.')
 
-        filename = "{0}.{1}".format(self.filename, self.extension)
+        filename = '{0}.{1}'.format(self.filename, self.extension)
         path = os.path.join(path, filename)
         # TODO: If it's not a path, this should raise an ``OSError``.
         # TODO: Move this into cli, this kind of logic probably shouldn't be
@@ -108,7 +110,7 @@ class Video(object):
             # to disable this.
             os.remove(path)
             raise KeyboardInterrupt(
-                "Interrupt signal given. Deleting incomplete video.")
+                'Interrupt signal given. Deleting incomplete video.')
 
     def file_size(self, response):
         """Gets the file size from the response
@@ -117,12 +119,12 @@ class Video(object):
             Response of a opened url.
         """
         meta_data = dict(response.info().items())
-        return int(meta_data.get("Content-Length") or
-                   meta_data.get("content-length"))
+        return int(meta_data.get('Content-Length') or
+                   meta_data.get('content-length'))
 
     def __repr__(self):
         """A clean representation of the class instance."""
-        return "<Video: {0} (.{1}) - {2} - {3}>".format(
+        return '<Video: {0} (.{1}) - {2} - {3}>'.format(
             self.video_codec, self.extension, self.resolution, self.profile)
 
     def __lt__(self, other):
@@ -133,6 +135,6 @@ class Video(object):
             The instance of the other video instance for comparison.
         """
         if isinstance(other, Video):
-            v1 = "{0} {1}".format(self.extension, self.resolution)
-            v2 = "{0} {1}".format(other.extension, other.resolution)
+            v1 = '{0} {1}'.format(self.extension, self.resolution)
+            v2 = '{0} {1}'.format(other.extension, other.resolution)
             return (v1 > v2) - (v1 < v2) < 0

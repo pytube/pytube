@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import argparse
-import re
 import math
-
+import re
 from os import path
 from sys import stdout
 from time import clock
@@ -11,6 +10,7 @@ from time import clock
 
 class FullPaths(argparse.Action):
     """Expand user- and relative-paths"""
+
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, path.abspath(path.expanduser(values)))
 
@@ -50,9 +50,10 @@ def sizeof(byts):
     """
     sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB']
     power = int(math.floor(math.log(byts, 1024)))
-    value = int(byts/float(1024**power))
+    value = int(byts / float(1024**power))
     suffix = sizes[power] if byts != 1 else 'byte'
     return '{0} {1}'.format(value, suffix)
+
 
 def print_status(progress, file_size, start):
     """
@@ -71,7 +72,7 @@ def print_status(progress, file_size, start):
     done = int(50 * progress / int(file_size))
     dt = (clock() - start)
     if dt > 0:
-        stdout.write("\r  [%s%s][%3.2f%%] %s at %s/s " %
+        stdout.write('\r  [%s%s][%3.2f%%] %s at %s/s ' %
                      ('=' * done, ' ' * (50 - done), percent_done,
                       sizeof(file_size), sizeof(progress // dt)))
     stdout.flush()
