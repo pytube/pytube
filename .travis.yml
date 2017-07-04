@@ -13,6 +13,7 @@ python:
 install: "pip install -r tests/requirements.txt"
 # command to run tests
 script: nosetests
+sudo: required
 branches:
   only:
     - master
