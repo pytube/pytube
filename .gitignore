@@ -28,3 +28,4 @@ doc/_build
 doc/aws_hostname.1
 
 .coverage
+.cache

@@ -120,8 +120,10 @@ class JSInterpreter(object):
         except ValueError:
             pass
 
-        m = re.match(r'(?P<var>%s)\.(?P<member>[^(]+)'
-                     r'(?:\(+(?P<args>[^()]*)\))?$' % _NAME_RE, expr)
+        m = re.match(
+            r'(?P<var>%s)\.(?P<member>[^(]+)'
+            '(?:\(+(?P<args>[^()]*)\))?$' % _NAME_RE,
+            expr)
         if m:
             variable = m.group('var')
             member = m.group('member')
@@ -213,9 +215,8 @@ class JSInterpreter(object):
         obj = {}
         obj_m = re.search(
             (r'(?:var\s+)?%s\s*=\s*\{' % re.escape(objname)) +
-            r'\s*(?P<fields>([a-zA-Z$0-9]+\s*:\s*function\(.*?\)\s*\'' +
-            r'{.*?\}(?:,\s*)?)*)' +
-            r'\}\s*;',
+            r'\s*(?P<fields>([a-zA-Z$0-9]+\s*:\s*function\(.*?\)\s*\{.*?\}'
+            r'(?:,\s*)?)*)' + r'\}\s*;',
             self.code)
         fields = obj_m.group('fields')
         # Currently, it only supports function definitions

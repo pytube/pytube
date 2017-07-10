@@ -9,13 +9,11 @@ python:
   - "3.6-dev"
   - "3.7-dev"
   - "nightly"
-# command to install dependencies
-install: "pip install -r tests/requirements.txt"
-# command to run tests
-script: nosetests
+install:
+  - pip install -r requirements.txt
+  - pip install -r tests/requirements.txt
+before_script: flake8
+script: pytest --cov=pytest
 sudo: required
-branches:
-  only:
-    - master
 after_success:
   coveralls
