@@ -18,7 +18,7 @@ def test_video_id(yt_video):
 
 def test_auto_filename(yt_video):
     """Generate safe filename based on video title"""
-    expected = 'PSY - GANGNAM STYLE(강남스타일) MV'
+    expected = u'PSY - GANGNAM STYLE(강남스타일) MV'
     assert yt_video.filename == expected
 
 
