@@ -13,7 +13,7 @@ with open('LICENSE') as readme_file:
 
 setup(
     name='pytube',
-    version='6.4.2',
+    version='6.4.3',
     author='Nick Ficano',
     author_email='nficano@gmail.com',
     packages=['pytube'],
