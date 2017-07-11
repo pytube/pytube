@@ -1,2 +1,2 @@
-include *.txt
-include *.rst
+include README.rst LICENSE NOTICE HISTORY.rst pytest.ini
+recursive-include tests *.py
