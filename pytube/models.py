@@ -15,9 +15,11 @@ class Video(object):
     """Class representation of a single instance of a YouTube video.
     """
 
-    def __init__(self, url, filename, extension, resolution=None,
-                 video_codec=None, profile=None, video_bitrate=None,
-                 audio_codec=None, audio_bitrate=None):
+    def __init__(
+        self, url, filename, extension, resolution=None,
+        video_codec=None, profile=None, video_bitrate=None,
+        audio_codec=None, audio_bitrate=None,
+    ):
         """Sets-up the video object.
 
         :param str url:
@@ -49,8 +51,10 @@ class Video(object):
         self.audio_codec = audio_codec
         self.audio_bitrate = audio_bitrate
 
-    def download(self, path, chunk_size=8 * 1024, on_progress=None,
-                 on_finish=None, force_overwrite=False):
+    def download(
+        self, path, chunk_size=8 * 1024, on_progress=None,
+        on_finish=None, force_overwrite=False,
+    ):
         """Downloads the video.
 
         :param str path:
@@ -110,7 +114,8 @@ class Video(object):
             # to disable this.
             os.remove(path)
             raise KeyboardInterrupt(
-                'Interrupt signal given. Deleting incomplete video.')
+                'Interrupt signal given. Deleting incomplete video.',
+            )
 
     def file_size(self, response):
         """Gets the file size from the response
@@ -125,7 +130,8 @@ class Video(object):
     def __repr__(self):
         """A clean representation of the class instance."""
         return '<Video: {0} (.{1}) - {2} - {3}>'.format(
-            self.video_codec, self.extension, self.resolution, self.profile)
+            self.video_codec, self.extension, self.resolution, self.profile,
+        )
 
     def __lt__(self, other):
         """The "less than" (lt) method is used for comparing video object to

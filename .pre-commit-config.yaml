@@ -20,3 +20,7 @@
     sha: v1.1.0
     hooks:
     -   id: python-safety-dependencies-check
+-   repo: https://github.com/asottile/add-trailing-comma
+    sha: v0.6.4
+    hooks:
+    -   id: add-trailing-comma

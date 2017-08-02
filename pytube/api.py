@@ -67,7 +67,7 @@ QUALITY_PROFILES = {
     303: ('webm', '1080p HFR', 'vp9', 'n/a', '5', '', ''),
     308: ('webm', '1440p HFR', 'vp9', 'n/a', '10', '', ''),
     313: ('webm', '2160p', 'vp9', 'n/a', '13-15', '', ''),
-    315: ('webm', '2160p HFR', 'vp9', 'n/a', '20-25', '', '')
+    315: ('webm', '2160p HFR', 'vp9', 'n/a', '20-25', '', ''),
 }
 
 # The keys corresponding to the quality/codec map above.
@@ -78,7 +78,7 @@ QUALITY_PROFILE_KEYS = (
     'profile',
     'video_bitrate',
     'audio_codec',
-    'audio_bitrate'
+    'audio_bitrate',
 )
 
 
@@ -112,8 +112,10 @@ class YouTube(object):
         :param str url:
             The url to the YouTube video.
         """
-        warnings.warn('url setter deprecated, use `from_url()` '
-                      'instead.', DeprecationWarning)
+        warnings.warn(
+            'url setter deprecated, use `from_url()` '
+            'instead.', DeprecationWarning,
+        )
         self.from_url(url)
 
     @property
@@ -144,8 +146,10 @@ class YouTube(object):
         :param str filename:
             The filename of the video.
         """
-        warnings.warn('filename setter deprecated. Use `set_filename()` '
-                      'instead.', DeprecationWarning)
+        warnings.warn(
+            'filename setter deprecated. Use `set_filename()` '
+            'instead.', DeprecationWarning,
+        )
         self.set_filename(filename)
 
     def set_filename(self, filename):
@@ -171,8 +175,10 @@ class YouTube(object):
         """Gets all videos. (This method is deprecated. Use `get_videos()`
         instead.
         """
-        warnings.warn('videos property deprecated. Use `get_videos()` '
-                      'instead.', DeprecationWarning)
+        warnings.warn(
+            'videos property deprecated. Use `get_videos()` '
+            'instead.', DeprecationWarning,
+        )
         return self._videos
 
     def from_url(self, url):
@@ -222,8 +228,10 @@ class YouTube(object):
             # Check if we have the signature, otherwise we'll need to get the
             # cipher from the js.
             if 'signature=' not in url:
-                log.debug('signature not in url, attempting to resolve the '
-                          'cipher.')
+                log.debug(
+                    'signature not in url, attempting to resolve the '
+                    'cipher.',
+                )
                 signature = self._get_cipher(stream_map['s'][i], js_url)
                 url = '{0}&signature={1}'.format(url, signature)
             self._add_video(url, self.filename, **quality_profile)
@@ -300,8 +308,10 @@ class YouTube(object):
             restriction_pattern = bytes('og:restrictions:age', 'utf-8')
 
         if restriction_pattern in html:
-            raise AgeRestricted('Age restricted video. Unable to download '
-                                'without being signed in.')
+            raise AgeRestricted(
+                'Age restricted video. Unable to download '
+                'without being signed in.',
+            )
 
         # Extract out the json data from the html response body.
         json_object = self._get_json_data(html)
@@ -309,9 +319,11 @@ class YouTube(object):
         # Here we decode the stream map and bundle it into the json object. We
         # do this just so we just can return one object for the video data.
         encoded_stream_map = json_object.get('args', {}).get(
-            'url_encoded_fmt_stream_map')
+            'url_encoded_fmt_stream_map',
+        )
         json_object['args']['stream_map'] = self._parse_stream_map(
-            encoded_stream_map)
+            encoded_stream_map,
+        )
         return json_object
 
     def _parse_stream_map(self, blob):
@@ -441,8 +453,10 @@ class YouTube(object):
             raise PytubeError('Unable to get encoding profile, no itag found.')
         elif len(itag) > 1:
             log.warn('Multiple itags found: %s', itag)
-            raise PytubeError('Unable to get encoding profile, multiple itags '
-                              'found.')
+            raise PytubeError(
+                'Unable to get encoding profile, multiple itags '
+                'found.',
+            )
         return False
 
     def _add_video(self, url, filename, **kwargs):

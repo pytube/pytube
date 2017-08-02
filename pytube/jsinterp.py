@@ -71,7 +71,8 @@ class JSInterpreter(object):
                     if parens_count == 0:
                         sub_expr = expr[1:m.start()]
                         sub_result = self.interpret_expression(
-                            sub_expr, local_vars, allow_recursion)
+                            sub_expr, local_vars, allow_recursion,
+                        )
                         remaining_expr = expr[m.end():].strip()
                         if not remaining_expr:
                             return sub_result
@@ -82,19 +83,23 @@ class JSInterpreter(object):
                 raise ExtractorError('Premature end of parens in %r' % expr)
 
         for op, opfunc in _ASSIGN_OPERATORS:
-            m = re.match(r'''(?x)
+            m = re.match(
+                r'''(?x)
                 (?P<out>%s)(?:\[(?P<index>[^\]]+?)\])?
                 \s*%s
-                (?P<expr>.*)$''' % (_NAME_RE, re.escape(op)), expr)
+                (?P<expr>.*)$''' % (_NAME_RE, re.escape(op)), expr,
+            )
             if not m:
                 continue
             right_val = self.interpret_expression(
-                m.group('expr'), local_vars, allow_recursion - 1)
+                m.group('expr'), local_vars, allow_recursion - 1,
+            )
 
             if m.groupdict().get('index'):
                 lvar = local_vars[m.group('out')]
                 idx = self.interpret_expression(
-                    m.group('index'), local_vars, allow_recursion)
+                    m.group('index'), local_vars, allow_recursion,
+                )
                 assert isinstance(idx, int)
                 cur = lvar[idx]
                 val = opfunc(cur, right_val)
@@ -111,7 +116,8 @@ class JSInterpreter(object):
 
         var_m = re.match(
             r'(?!if|return|true|false)(?P<name>%s)$' % _NAME_RE,
-            expr)
+            expr,
+        )
         if var_m:
             return local_vars[var_m.group('name')]
 
@@ -123,7 +129,8 @@ class JSInterpreter(object):
         m = re.match(
             r'(?P<var>%s)\.(?P<member>[^(]+)'
             '(?:\(+(?P<args>[^()]*)\))?$' % _NAME_RE,
-            expr)
+            expr,
+        )
         if m:
             variable = m.group('var')
             member = m.group('member')
@@ -149,7 +156,8 @@ class JSInterpreter(object):
             else:
                 argvals = tuple([
                     self.interpret_expression(v, local_vars, allow_recursion)
-                    for v in arg_str.split(',')])
+                    for v in arg_str.split(',')
+                ])
 
             if member == 'split':
                 assert argvals == ('',)
@@ -175,11 +183,13 @@ class JSInterpreter(object):
             return obj[member](argvals)
 
         m = re.match(
-            r'(?P<in>%s)\[(?P<idx>.+)\]$' % _NAME_RE, expr)
+            r'(?P<in>%s)\[(?P<idx>.+)\]$' % _NAME_RE, expr,
+        )
         if m:
             val = local_vars[m.group('in')]
             idx = self.interpret_expression(
-                m.group('idx'), local_vars, allow_recursion - 1)
+                m.group('idx'), local_vars, allow_recursion - 1,
+            )
             return val[idx]
 
         for op, opfunc in _OPERATORS:
@@ -187,24 +197,30 @@ class JSInterpreter(object):
             if not m:
                 continue
             x, abort = self.interpret_statement(
-                m.group('x'), local_vars, allow_recursion - 1)
+                m.group('x'), local_vars, allow_recursion - 1,
+            )
             if abort:
                 raise ExtractorError(
-                    'Premature left-side return of %s in %r' % (op, expr))
+                    'Premature left-side return of %s in %r' % (op, expr),
+                )
             y, abort = self.interpret_statement(
-                m.group('y'), local_vars, allow_recursion - 1)
+                m.group('y'), local_vars, allow_recursion - 1,
+            )
             if abort:
                 raise ExtractorError(
-                    'Premature right-side return of %s in %r' % (op, expr))
+                    'Premature right-side return of %s in %r' % (op, expr),
+                )
             return opfunc(x, y)
 
         m = re.match(
-            r'^(?P<func>%s)\((?P<args>[a-zA-Z0-9_$,]+)\)$' % _NAME_RE, expr)
+            r'^(?P<func>%s)\((?P<args>[a-zA-Z0-9_$,]+)\)$' % _NAME_RE, expr,
+        )
         if m:
             fname = m.group('func')
             argvals = tuple([
                 int(v) if v.isdigit() else local_vars[v]
-                for v in m.group('args').split(',')])
+                for v in m.group('args').split(',')
+            ])
             if fname not in self._functions:
                 self._functions[fname] = self.extract_function(fname)
             return self._functions[fname](argvals)
@@ -217,17 +233,20 @@ class JSInterpreter(object):
             (r'(?:var\s+)?%s\s*=\s*\{' % re.escape(objname)) +
             r'\s*(?P<fields>([a-zA-Z$0-9]+\s*:\s*function\(.*?\)\s*\{.*?\}'
             r'(?:,\s*)?)*)' + r'\}\s*;',
-            self.code)
+            self.code,
+        )
         fields = obj_m.group('fields')
         # Currently, it only supports function definitions
         fields_m = re.finditer(
             r'(?P<key>[a-zA-Z$0-9]+)\s*:\s*function'
             r'\((?P<args>[a-z,]+)\){(?P<code>[^}]+)}',
-            fields)
+            fields,
+        )
         for f in fields_m:
             argnames = f.group('args').split(',')
             obj[f.group('key')] = self.build_function(
-                argnames, f.group('code'))
+                argnames, f.group('code'),
+            )
 
         return obj
 
@@ -237,8 +256,10 @@ class JSInterpreter(object):
                 (?:function\s+%s|[{;,]\s*%s\s*=\s*function|var\s+%s\s*=\s*function)\s*
                 \((?P<args>[^)]*)\)\s*
                 \{(?P<code>[^}]+)\}''' % (
-                re.escape(funcname), re.escape(funcname), re.escape(funcname)),
-            self.code)
+                re.escape(funcname), re.escape(funcname), re.escape(funcname),
+            ),
+            self.code,
+        )
         if func_m is None:
             raise ExtractorError('Could not find JS function %r' % funcname)
         argnames = func_m.group('args').split(',')

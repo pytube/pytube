@@ -34,8 +34,10 @@ def safe_filename(text, max_length=200):
 
     # Removing these SHOULD make most filename safe for a wide range of
     # operating systems.
-    paranoid = ['\"', '\#', '\$', '\%', '\'', '\*', '\,', '\.', '\/', '\:',
-                '\;', '\<', '\>', '\?', '\\', '\^', '\|', '\~', '\\\\']
+    paranoid = [
+        '\"', '\#', '\$', '\%', '\'', '\*', '\,', '\.', '\/', '\:',
+        '\;', '\<', '\>', '\?', '\\', '\^', '\|', '\~', '\\\\',
+    ]
 
     blacklist = re.compile('|'.join(ntfs + paranoid), re.UNICODE)
     filename = blacklist.sub('', text)
@@ -73,6 +75,8 @@ def print_status(progress, file_size, start):
     dt = (clock() - start)
     if dt > 0:
         stdout.write('\r  [%s%s][%3.2f%%] %s at %s/s ' %
-                     ('=' * done, ' ' * (50 - done), percent_done,
-                      sizeof(file_size), sizeof(progress // dt)))
+                     (
+                         '=' * done, ' ' * (50 - done), percent_done,
+                         sizeof(file_size), sizeof(progress // dt),
+                     ))
     stdout.flush()

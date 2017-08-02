@@ -17,19 +17,19 @@ def main():
     parser = argparse.ArgumentParser(description='YouTube video downloader')
     parser.add_argument(
         'url',
-        help='The URL of the Video to be downloaded'
+        help='The URL of the Video to be downloaded',
     )
     parser.add_argument(
         '--extension',
         '-e',
         dest='ext',
-        help='The requested format of the video'
+        help='The requested format of the video',
     )
     parser.add_argument(
         '--resolution',
         '-r',
         dest='res',
-        help='The requested resolution'
+        help='The requested resolution',
     )
     parser.add_argument(
         '--path',
@@ -37,7 +37,7 @@ def main():
         action=FullPaths,
         default=os.getcwd(),
         dest='path',
-        help='The path to save the video to.'
+        help='The path to save the video to.',
     )
     parser.add_argument(
         '--filename',
@@ -50,7 +50,7 @@ def main():
         '-s',
         action='store_true',
         dest='show_available',
-        help='Prints a list of available formats for download.'
+        help='Prints a list of available formats for download.',
     )
 
     args = parser.parse_args()
@@ -75,8 +75,10 @@ def main():
 
     if args.ext or args.res:
         if not all([args.ext, args.res]):
-            print('Make sure you give either of the below specified '
-                  'format/resolution combination.')
+            print(
+                'Make sure you give either of the below specified '
+                'format/resolution combination.',
+            )
             print_available_vids(videos)
             sys.exit(1)
 
@@ -85,8 +87,10 @@ def main():
         vid = yt.get(args.ext, args.res)
         # Check if there's a video returned
         if not vid:
-            print("There's no video with the specified format/resolution "
-                  'combination.')
+            print(
+                "There's no video with the specified format/resolution "
+                'combination.',
+            )
             pprint(videos)
             sys.exit(1)
 
@@ -104,8 +108,10 @@ def main():
         videos = yt.filter(resolution=args.res)
         # Check if we have a video
         if not videos:
-            print('There are no videos in the specified in the specified '
-                  'resolution.')
+            print(
+                'There are no videos in the specified in the specified '
+                'resolution.',
+            )
             sys.exit(1)
         # Select the highest resolution one
         vid = max(videos)
@@ -134,8 +140,10 @@ def print_available_vids(videos):
     formatString = '{:<2} {:<15} {:<15}'
     print(formatString.format('', 'Resolution', 'Extension'))
     print('-' * 28)
-    print('\n'.join([formatString.format(index, *formatTuple)
-                     for index, formatTuple in enumerate(videos)]))
+    print('\n'.join([
+        formatString.format(index, *formatTuple)
+        for index, formatTuple in enumerate(videos)
+    ]))
 
 
 if __name__ == '__main__':
