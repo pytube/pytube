@@ -154,7 +154,7 @@ When run without a resolution or extension, it shows a list of available formats
 .. code:: bash
 
    $ pytube http://www.youtube.com/watch?v=Ik-RsDGPI5Y
-     Resolution      Extension
+       Extension       Resolution
     ----------------------------
     0  3gp             144p
     1  3gp             240p
