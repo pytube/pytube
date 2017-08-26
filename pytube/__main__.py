@@ -58,7 +58,7 @@ def main():
     try:
         yt = YouTube(args.url)
         videos = []
-        for i, video in enumerate(yt.get_videos()):
+        for _, video in enumerate(yt.get_videos()):
             ext = video.extension
             res = video.resolution
             videos.append((ext, res))
@@ -131,10 +131,10 @@ def main():
 
 
 def print_available_vids(videos):
-    formatString = '{:<2} {:<15} {:<15}'
-    print(formatString.format('', 'Resolution', 'Extension'))
+    format_string = '{:<2} {:<15} {:<15}'
+    print(format_string.format('', 'Extension', 'Resolution'))
     print('-' * 28)
-    print('\n'.join([formatString.format(index, *formatTuple)
+    print('\n'.join([format_string.format(index, *formatTuple)
                      for index, formatTuple in enumerate(videos)]))
 
 
