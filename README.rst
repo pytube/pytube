@@ -187,7 +187,8 @@ and/or optionally choose the filename (``-f`` or ``--filename=``):
 Development
 ===========
 
-Development of this happens on GitHub, patches including tests, documentation are very welcome, as well as bug reports and feature contributions are welcome! Also please open an issue if this tool does not function as you'd expect.
+Development of "python-lambda" is facilitated exclusively on GitHub. Contributions in the form of patches, tests and feature creation and/or requests are very welcome and highly encouraged. Please open an issue if this tool does not function as you'd expect.
+
 
 How to release updates
 ----------------------
@@ -198,10 +199,16 @@ Once complete, execute the following commands:
 
 .. code:: bash
 
-   $ git checkout master
-   $ bumpversion [major|minor|patch]
-   $
-   $ python setup.py sdist bdist_wheel upload
-   $
-   $ bumpversion --no-tag patch
-   $ git push origin master --tags
+    git checkout master
+
+    # Increment the version number and tag the release.
+    bumpversion [major|minor|patch]
+
+    # Upload the distribution to PyPi
+    python setup.py sdist bdist_wheel upload
+
+    # Since master often contains work-in-progress changes, increment the version
+    # to a patch release to prevent inaccurate attribution.
+    bumpversion --no-tag patch
+
+    git push origin master --tags
