@@ -237,7 +237,8 @@ class YouTube(object):
                 )
                 signature = self._get_cipher(stream_map['s'][i], js_url)
                 url = '{0}&signature={1}'.format(url, signature)
-            self._add_video(url, self.filename, thumbnail_url=thumbnail_url, **quality_profile)
+            self._add_video(url, self.filename, thumbnail_url=thumbnail_url,
+                            **quality_profile)
         # Clear the cached js. Make sure to keep this at the end of
         # `from_url()` so we can mock inject the js in unit tests.
         self._js_cache = None
