@@ -21,8 +21,8 @@ class Stream:
     """The media stream container"""
 
     def __init__(self, stream, player_config, monostate):
-        # A dictionary shared between all instances of :class:`Stream` (Borg
-        # pattern).
+        # A dictionary shared between all instances of :class:`Stream <Stream>`
+        # (Borg pattern).
         self._monostate = monostate
 
         self.abr = None   # average bitrate (audio streams only)

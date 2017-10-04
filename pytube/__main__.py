@@ -3,7 +3,7 @@
 pytube.__main__
 ~~~~~~~~~~~~~~~
 
-This module implements the core interface for pytube.
+This module implements the core developer interface for pytube.
 
 """
 import json
@@ -20,16 +20,44 @@ class YouTube:
         self, url=None, defer_init=False, on_progress_callback=None,
         on_complete_callback=None,
     ):
-        self.js = None
-        self.js_url = None
-        self.vid_info = None
-        self.vid_info_url = None
-        self.watch_html = None
-        self.player_config = None
-        self.fmt_streams = []
+        """Constructs a :class:`YouTube <YouTube>`.
+
+        :param str url:
+            A valid YouTube watch URL.
+        :param bool defer_init:
+            Defers executing any network requests.
+        :param func on_progress_callback:
+            (Optional) User defined callback function for stream download
+            progress events.
+        :param func on_complete_callback:
+            (Optional) User defined callback function for stream download
+            complete events.
+        """
+        self.js = None      # js fetched by js_url
+        self.js_url = None  # the url to the js, parsed from watch html
+
+        # note: vid_info can possibly be removed, the fmt stream data contained
+        # in here doesn't compute a usable signature and the rest of the data
+        # may be redundant.
+
+        self.vid_info = None      # content fetched by vid_info_url
+        self.vid_info_url = None  # the url to vid info, parsed from watch html
+
+        self.watch_html = None     # the html of /watch?v=<video_id>
+        self.player_config = None  # inline js in the html containing streams
+
+        self.fmt_streams = []  # list of :class:`Stream <Stream>` instances
+
+        # video_id part of /watch?v=<video_id>
         self.video_id = extract.video_id(url)
+
+        # https://www.youtube.com/watch?v=<video_id>
         self.watch_url = extract.watch_url(self.video_id)
+
+        # A dictionary shared between all instances of :class:`Stream <Stream>`
+        # (Borg pattern).
         self.stream_monostate = {
+            # user defined callback functions
             'on_progress': on_progress_callback,
             'on_complete': on_complete_callback,
         }
@@ -86,7 +114,20 @@ class YouTube:
         return StreamQuery([s for s in self.fmt_streams if s.is_dash])
 
     def register_on_progress_callback(self, fn):
+        """Registers an on download progess callback function after object
+        initialization.
+
+        :param func fn:
+            A callback function that takes ``stream``, ``chunk``,
+            ``file_handle``, ``bytes_remaining`` as parameters.
+        """
         self._monostate['on_progress'] = fn
 
     def register_on_complete_callback(self, fn):
+        """Registers an on download complete callback function after object
+        initialization.
+
+        :param func fn:
+            A callback function that takes ``stream`` and  ``file_handle``.
+        """
         self._monostate['on_complete'] = fn
