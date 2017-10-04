@@ -18,7 +18,7 @@ class Video(object):
     def __init__(
         self, url, filename, extension, resolution=None,
         video_codec=None, profile=None, video_bitrate=None,
-        audio_codec=None, audio_bitrate=None,
+        audio_codec=None, audio_bitrate=None, thumbnail_url=None
     ):
         """Sets-up the video object.
 
@@ -40,6 +40,8 @@ class Video(object):
             *Optional* The codec used to encode the audio.
         :param str audio_bitrate:
             *Optional* The bitrate of the video's audio over sampling interval.
+        :param str thumbnail_url:
+            *Optional* The url to the video's thumbnail.
         """
         self.url = url
         self.filename = filename
@@ -50,6 +52,7 @@ class Video(object):
         self.video_bitrate = video_bitrate
         self.audio_codec = audio_codec
         self.audio_bitrate = audio_bitrate
+        self.thumbnail_url = thumbnail_url
 
     def download(
         self, path, chunk_size=8 * 1024, on_progress=None,
