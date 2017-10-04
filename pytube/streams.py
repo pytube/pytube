@@ -4,13 +4,14 @@ pytube.streams
 ~~~~~~~~~~~~~~
 
 A container object for the media stream (video only / audio only / video+audio
-combined). This was referred to as Video in the legacy pytube version, but has
-been renamed to accommodate DASH (which serves the audio and video separately).
+combined). This was referred to as ``Video`` in the legacy pytube version, but
+has been renamed to accommodate DASH (which serves the audio and video
+separately).
 """
 import os
 import re
 
-from pytube import download
+from pytube import request
 from pytube.helpers import memoize
 from pytube.helpers import safe_filename
 from pytube.itags import get_format_profile
@@ -20,7 +21,7 @@ class Stream:
     """The media stream container"""
 
     def __init__(self, stream, player_config, monostate):
-        # A dictionary shared between all instances of the Stream class (Borg
+        # A dictionary shared between all instances of :class:`Stream` (Borg
         # pattern).
         self._monostate = monostate
 
@@ -71,7 +72,7 @@ class Stream:
     @property
     def is_dash(self):
         """Whether the stream is DASH."""
-        # if codecs has 2 elements (e.g.: ['vp8', 'vorbis']): 2 % 2 = 0
+        # if codecs has two elements (e.g.: ['vp8', 'vorbis']): 2 % 2 = 0
         # if codecs has one element (e.g.: ['vp8']) 1 % 2 = 1
         return len(self.codecs) % 2
 
@@ -105,7 +106,7 @@ class Stream:
     @memoize
     def filesize(self):
         """The file size of the media stream in bytes."""
-        headers = download.headers(self.url)
+        headers = request.get(self.url, headers=True)
         return int(headers['Content-Length'])
 
     @property
@@ -118,7 +119,7 @@ class Stream:
         return '{filename}.{s.subtype}'.format(filename=filename, s=self)
 
     def download(self, output_path=None):
-        """Download the media stream to disk."""
+        """Write the media stream to disk."""
 
         # TODO(nficano): allow a filename to specified.
         # use the provided output path or use working directory if one is not
@@ -130,7 +131,7 @@ class Stream:
         bytes_remaining = self.filesize
 
         with open(fp, 'wb') as fh:
-            for chunk in download.stream(self.url):
+            for chunk in request.get(self.url, streaming=True):
                 # reduce the (bytes) remainder by the length of the chunk.
                 bytes_remaining -= len(chunk)
                 # send to the on_progress callback.

@@ -8,9 +8,9 @@ This module implements the core interface for pytube.
 """
 import json
 
-from pytube import download
 from pytube import extract
 from pytube import mixins
+from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
 
@@ -54,15 +54,15 @@ class YouTube:
         self.build_stream_objects(dash_fmts)
 
     def prefetch(self):
-        self.watch_html = download.get(url=self.watch_url)
+        self.watch_html = request.get(url=self.watch_url)
         self.vid_info_url = extract.video_info_url(
             video_id=self.video_id,
             watch_url=self.watch_url,
             watch_html=self.watch_html,
         )
         self.js_url = extract.js_url(self.watch_html)
-        self.js = download.get(url=self.js_url)
-        self.vid_info = download.get(url=self.vid_info_url)
+        self.js = request.get(url=self.js_url)
+        self.vid_info = request.get(url=self.vid_info_url)
         self.player_config = extract.get_ytplayer_config(self.watch_html)
 
     def build_stream_objects(self, fmt):
