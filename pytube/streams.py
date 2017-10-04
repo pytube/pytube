@@ -102,28 +102,17 @@ class Stream:
                 self.on_progress(chunk, fh, bytes_remaining)
 
     def __repr__(self):
-        parts = [
-            'itag="{self.itag}"',
-            'mime_type="{self.mime_type}"',
-        ]
+        parts = ['itag="{s.itag}"', 'mime_type="{s.mime_type}"']
         if self.is_video:
-            parts.extend([
-                'res="{self.resolution}"',
-                'fps="{self.fps}fps"',
-            ])
+            parts.extend(['res="{s.resolution}"', 'fps="{s.fps}fps"'])
             if not self.is_dash:
                 parts.extend([
-                    'vcodec="{self.video_codec}"',
-                    'acodec="{self.audio_codec}"',
+                    'vcodec="{s.video_codec}"',
+                    'acodec="{s.audio_codec}"',
                 ])
             else:
-                parts.extend([
-                    'vcodec="{self.video_codec}"',
-                ])
+                parts.extend(['vcodec="{s.video_codec}"'])
         else:
-            parts.extend([
-                'abr="{self.abr}"',
-                'acodec="{self.audio_codec}"',
-            ])
-        parts = ' '.join(parts)
-        return '<Stream: {parts}>'.format(self=self)
+            parts.extend(['abr="{s.abr}"', 'acodec="{s.audio_codec}"'])
+        parts = ' '.join(parts).format(s=self)
+        return '<Stream: {parts}>'.format(parts=parts)
