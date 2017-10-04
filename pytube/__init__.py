@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # flake8: noqa
 # noreorder
 from pytube.query import StreamQuery
