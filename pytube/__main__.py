@@ -1,150 +1,92 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
+"""
+pytube.__main__
+~~~~~~~~~~~~~~~
 
-import argparse
-import os
-import sys
-from pprint import pprint
+This module implements the core interface for pytube.
 
-from . import YouTube
-from .exceptions import PytubeError
-from .utils import FullPaths
-from .utils import print_status
+"""
+import json
+
+from pytube import download
+from pytube import extract
+from pytube import mixins
+from pytube.query import StreamQuery
+from pytube.streams import Stream
 
 
-def main():
-    parser = argparse.ArgumentParser(description='YouTube video downloader')
-    parser.add_argument(
-        'url',
-        help='The URL of the Video to be downloaded',
-    )
-    parser.add_argument(
-        '--extension',
-        '-e',
-        dest='ext',
-        help='The requested format of the video',
-    )
-    parser.add_argument(
-        '--resolution',
-        '-r',
-        dest='res',
-        help='The requested resolution',
-    )
-    parser.add_argument(
-        '--path',
-        '-p',
-        action=FullPaths,
-        default=os.getcwd(),
-        dest='path',
-        help='The path to save the video to.',
-    )
-    parser.add_argument(
-        '--filename',
-        '-f',
-        dest='filename',
-        help='The filename, without extension, to save the video in.',
-    )
-    parser.add_argument(
-        '--show_available',
-        '-s',
-        action='store_true',
-        dest='show_available',
-        help='Prints a list of available formats for download.',
-    )
+class YouTube:
+    def __init__(
+        self, url=None, defer_init=False, on_progress_callback=None,
+        on_complete_callback=None,
+    ):
+        self.js = None
+        self.js_url = None
+        self.vid_info = None
+        self.vid_info_url = None
+        self.watch_html = None
+        self.player_config = None
+        self.fmt_streams = []
+        self.video_id = extract.video_id(url)
+        self.watch_url = extract.watch_url(self.video_id)
+        self.shared_stream_state = {
+            'on_progress': on_progress_callback,
+            'on_complete': on_complete_callback,
+        }
 
-    args = parser.parse_args()
+        if url and not defer_init:
+            self.init()
 
-    try:
-        yt = YouTube(args.url)
-        videos = []
-        for i, video in enumerate(yt.get_videos()):
-            ext = video.extension
-            res = video.resolution
-            videos.append((ext, res))
-    except PytubeError:
-        print('Incorrect video URL.')
-        sys.exit(1)
+    def init(self):
+        self.prefetch()
+        self.vid_info = extract.decode_video_info(self.vid_info)
 
-    if args.show_available:
-        print_available_vids(videos)
-        sys.exit(0)
+        trad_fmts = 'url_encoded_fmt_stream_map'
+        dash_fmts = 'adaptive_fmts'
+        mixins.apply_fmt_decoder(self.vid_info, trad_fmts)
+        mixins.apply_fmt_decoder(self.vid_info, dash_fmts)
+        mixins.apply_fmt_decoder(self.player_config['args'], trad_fmts)
+        mixins.apply_fmt_decoder(self.player_config['args'], dash_fmts)
+        mixins.apply_cipher(self.player_config['args'], trad_fmts, self.js)
+        mixins.apply_cipher(self.player_config['args'], dash_fmts, self.js)
+        mixins.apply(self.player_config['args'], 'player_response', json.loads)
+        self.build_stream_objects(trad_fmts)
+        self.build_stream_objects(dash_fmts)
 
-    if args.filename:
-        yt.set_filename(args.filename)
+    def prefetch(self):
+        self.watch_html = download.get(url=self.watch_url)
+        self.vid_info_url = extract.video_info_url(
+            video_id=self.video_id,
+            watch_url=self.watch_url,
+            watch_html=self.watch_html,
+        )
+        self.js_url = extract.js_url(self.watch_html)
+        self.js = download.get(url=self.js_url)
+        self.vid_info = download.get(url=self.vid_info_url)
+        self.player_config = extract.get_ytplayer_config(self.watch_html)
 
-    if args.ext or args.res:
-        if not all([args.ext, args.res]):
-            print(
-                'Make sure you give either of the below specified '
-                'format/resolution combination.',
+    def build_stream_objects(self, fmt):
+        streams = self.player_config['args'][fmt]
+        for stream in streams:
+            video = Stream(
+                stream=stream,
+                player_config=self.player_config,
+                shared_stream_state=self.shared_stream_state,
             )
-            print_available_vids(videos)
-            sys.exit(1)
+            self.fmt_streams.append(video)
 
-    if args.ext and args.res:
-        # There's only ope video that matches both so get it
-        vid = yt.get(args.ext, args.res)
-        # Check if there's a video returned
-        if not vid:
-            print(
-                "There's no video with the specified format/resolution "
-                'combination.',
-            )
-            pprint(videos)
-            sys.exit(1)
+    @property
+    def streams(self):
+        """Interface to query non-dash streams."""
+        return StreamQuery([s for s in self.fmt_streams if not s.is_dash])
 
-    elif args.ext:
-        # There are several videos with the same extension
-        videos = yt.filter(extension=args.ext)
-        # Check if we have a video
-        if not videos:
-            print('There are no videos in the specified format.')
-            sys.exit(1)
-        # Select the highest resolution one
-        vid = max(videos)
-    elif args.res:
-        # There might be several videos in the same resolution
-        videos = yt.filter(resolution=args.res)
-        # Check if we have a video
-        if not videos:
-            print(
-                'There are no videos in the specified in the specified '
-                'resolution.',
-            )
-            sys.exit(1)
-        # Select the highest resolution one
-        vid = max(videos)
-    else:
-        # If nothing is specified get the highest resolution one
-        print_available_vids(videos)
-        while True:
-            try:
-                choice = int(input('Enter choice: '))
-                vid = yt.get(*videos[choice])
-                break
-            except (ValueError, IndexError):
-                print('Requires an integer in range 0-{}'
-                      .format(len(videos) - 1))
-            except KeyboardInterrupt:
-                sys.exit(2)
+    @property
+    def dash_streams(self):
+        """Interface to query dash streams."""
+        return StreamQuery([s for s in self.fmt_streams if s.is_dash])
 
-    try:
-        vid.download(path=args.path, on_progress=print_status)
-    except KeyboardInterrupt:
-        print('Download interrupted.')
-        sys.exit(1)
+    def register_on_progress_callback(self, fn):
+        self.shared_stream_state['on_progress'] = fn
 
-
-def print_available_vids(videos):
-    formatString = '{:<2} {:<15} {:<15}'
-    print(formatString.format('', 'Resolution', 'Extension'))
-    print('-' * 28)
-    print('\n'.join([
-        formatString.format(index, *formatTuple)
-        for index, formatTuple in enumerate(videos)
-    ]))
-
-
-if __name__ == '__main__':
-    main()
+    def register_on_complete_callback(self, fn):
+        self.shared_stream_state['on_complete'] = fn
