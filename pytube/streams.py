@@ -3,6 +3,9 @@
 pytube.streams
 ~~~~~~~~~~~~~~
 
+A container object for the media stream (video only / audio only / video+audio
+combined). This was referred to as Video in the legacy pytube version, but has
+been renamed to accommodate DASH (which serves the audio and video separately).
 """
 import os
 import re
@@ -14,27 +17,51 @@ from pytube.itags import get_format_profile
 
 
 class Stream:
-    def __init__(self, stream, player_config, shared_stream_state):
-        self.shared_stream_state = shared_stream_state
-        self.abr = None
-        self.audio_codec = None
-        self.codecs = None
-        self.fps = None
-        self.itag = None
-        self.mime_type = None
-        self.res = None
-        self.subtype = None
-        self.type = None
-        self.url = None
-        self.video_codec = None
+    """The media stream container"""
 
+    def __init__(self, stream, player_config, monostate):
+        # A dictionary shared between all instances of the Stream class (Borg
+        # pattern).
+        self._monostate = monostate
+
+        self.abr = None   # average bitrate (audio streams only)
+        self.fps = None   # frames per second (video streams only)
+        self.itag = None  # stream format id (youtube nomenclature)
+        self.res = None   # resolution (e.g.: 480p, 720p, 1080p)
+        self.url = None   # signed download url
+
+        self.mime_type = None  # content identifer (e.g.: video/mp4)
+        self.type = None       # the part of the mime before the slash
+        self.subtype = None    # the part of the mime after the slash
+
+        self.codecs = []         # audio/video encoders (e.g.: vp8, mp4a)
+        self.audio_codec = None  # audio codec of the stream (e.g.: vorbis)
+        self.video_codec = None  # video codec of the stream (e.g.: vp8)
+
+        # Iterates over the key/values of stream and sets them as class
+        # attributes. This is an anti-pattern and should be removed.
         self.set_attributes_from_dict(stream)
+
+        # Additional information about the stream format, such as resolution,
+        # frame rate, and whether the stream is live (HLS) or 3D.
         self.fmt_profile = get_format_profile(self.itag)
+
+        # Same as above, except for the format profile attributes.
         self.set_attributes_from_dict(self.fmt_profile)
 
+        # The player configuration which contains information like the video
+        # title.
+        # TODO(nficano): this should be moved to the momostate.
         self.player_config = player_config
+
+        # 'video/webm; codecs="vp8, vorbis"' -> 'video/webm', ['vp8', 'vorbis']
         self.mime_type, self.codecs = self.parse_type()
+
+        # 'video/webm' -> 'video', 'webm'
         self.type, self.subtype = self.mime_type.split('/')
+
+        # ['vp8', 'vorbis'] -> video_codec: vp8, audio_codec: vorbis. DASH
+        # streams return NoneType for audio/video depending.
         self.video_codec, self.audio_codec = self.parse_codecs()
 
     def set_attributes_from_dict(self, dct):
@@ -43,14 +70,19 @@ class Stream:
 
     @property
     def is_dash(self):
+        """Whether the stream is DASH."""
+        # if codecs has 2 elements (e.g.: ['vp8', 'vorbis']): 2 % 2 = 0
+        # if codecs has one element (e.g.: ['vp8']) 1 % 2 = 1
         return len(self.codecs) % 2
 
     @property
     def is_audio(self):
+        """Whether the stream only contains audio (DASH only)."""
         return self.type == 'audio'
 
     @property
     def is_video(self):
+        """Whether the stream only contains video (DASH only)."""
         return self.type == 'video'
 
     def parse_codecs(self):
@@ -72,34 +104,53 @@ class Stream:
     @property
     @memoize
     def filesize(self):
+        """The file size of the media stream in bytes."""
         headers = download.headers(self.url)
         return int(headers['Content-Length'])
 
     @property
     def default_filename(self):
+        """A generated filename based on the video title, but sanitized for the
+        filesystem.
+        """
         title = self.player_config['args']['title']
         filename = safe_filename(title)
         return '{filename}.{s.subtype}'.format(filename=filename, s=self)
 
+    def download(self, output_path=None):
+        """Download the media stream to disk."""
+
+        # TODO(nficano): allow a filename to specified.
+        # use the provided output path or use working directory if one is not
+        # provided.
+        output_path = output_path or os.getcwd()
+
+        # file path
+        fp = os.path.join(output_path, self.default_filename)
+        bytes_remaining = self.filesize
+
+        with open(fp, 'wb') as fh:
+            for chunk in download.stream(self.url):
+                # reduce the (bytes) remainder by the length of the chunk.
+                bytes_remaining -= len(chunk)
+                # send to the on_progress callback.
+                self.on_progress(chunk, fh, bytes_remaining)
+
     def on_progress(self, chunk, file_handler, bytes_remaining):
+        """The on progress callback. This function writes the binary data to
+        the file, then checks if an additional callback is defined in the
+        monostate. This is exposed to allow things like displaying a progress
+        bar.
+        """
         file_handler.write(chunk)
-        on_progress = self.shared_stream_state['on_progress']
+        on_progress = self._monostate['on_progress']
         if on_progress:
             on_progress(self, chunk, bytes_remaining)
 
     def on_complete(self, fh):
-        on_complete = self.shared_stream_state['on_complete']
+        on_complete = self._monostate['on_complete']
         if on_complete:
             on_complete(self, fh)
-
-    def download(self, output_path=None):
-        output_path = output_path or os.getcwd()
-        fp = os.path.join(output_path, self.default_filename)
-        bytes_remaining = self.filesize
-        with open(fp, 'wb') as fh:
-            for chunk in download.stream(self.url):
-                bytes_remaining -= len(chunk)
-                self.on_progress(chunk, fh, bytes_remaining)
 
     def __repr__(self):
         parts = ['itag="{s.itag}"', 'mime_type="{s.mime_type}"']

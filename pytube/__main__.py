@@ -29,7 +29,7 @@ class YouTube:
         self.fmt_streams = []
         self.video_id = extract.video_id(url)
         self.watch_url = extract.watch_url(self.video_id)
-        self.shared_stream_state = {
+        self.stream_monostate = {
             'on_progress': on_progress_callback,
             'on_complete': on_complete_callback,
         }
@@ -71,7 +71,7 @@ class YouTube:
             video = Stream(
                 stream=stream,
                 player_config=self.player_config,
-                shared_stream_state=self.shared_stream_state,
+                monostate=self.stream_monostate,
             )
             self.fmt_streams.append(video)
 
@@ -86,7 +86,7 @@ class YouTube:
         return StreamQuery([s for s in self.fmt_streams if s.is_dash])
 
     def register_on_progress_callback(self, fn):
-        self.shared_stream_state['on_progress'] = fn
+        self._monostate['on_progress'] = fn
 
     def register_on_complete_callback(self, fn):
-        self.shared_stream_state['on_complete'] = fn
+        self._monostate['on_complete'] = fn
