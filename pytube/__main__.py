@@ -11,8 +11,8 @@ import json
 from pytube import download
 from pytube import extract
 from pytube import mixins
-from pytube.query import StreamQuery
-from pytube.streams import Stream
+from pytube import Stream
+from pytube import StreamQuery
 
 
 class YouTube:
