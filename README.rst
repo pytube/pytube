@@ -48,19 +48,19 @@ Library usage
 
 .. code:: python
 
-    >>> from pytube import YouTube
+   >>> from pytube import YouTube
 
-    >>> yt = YouTube("http://www.youtube.com/watch?v=9bZkp7q19f0")
+   >>> yt = YouTube("http://www.youtube.com/watch?v=9bZkp7q19f0")
 
-    >>> # Once set, you can see all the codec and quality options YouTube has made
-    >>> # available for the particular video by printing videos.
+   >>> # Once set, you can see all the codec and quality options YouTube has made
+   >>> # available for the particular video by printing videos.
 
-    >>> yt.streams.all()
-    [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
-    <Stream: itag="43" mime_type="video/webm" res="360p" fps="30fps" vcodec="vp8.0" acodec="vorbis">,
-    <Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">,
-    <Stream: itag="36" mime_type="video/3gpp" res="240p" fps="30fps" vcodec="mp4v.20.3" acodec="mp4a.40.2">,
-    <Stream: itag="17" mime_type="video/3gpp" res="144p" fps="30fps" vcodec="mp4v.20.3" acodec="mp4a.40.2">]
+   >>> yt.streams.all()
+   [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
+   <Stream: itag="43" mime_type="video/webm" res="360p" fps="30fps" vcodec="vp8.0" acodec="vorbis">,
+   <Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">,
+   <Stream: itag="36" mime_type="video/3gpp" res="240p" fps="30fps" vcodec="mp4v.20.3" acodec="mp4a.40.2">,
+   <Stream: itag="17" mime_type="video/3gpp" res="144p" fps="30fps" vcodec="mp4v.20.3" acodec="mp4a.40.2">]
 
    >>> # for dash streams
    [<Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028">,
@@ -87,22 +87,22 @@ Library usage
    <Stream: itag="250" mime_type="audio/webm" abr="70kbps" acodec="opus">,
    <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus">]
 
-    >>> # Notice that the list is ordered by lowest resolution to highest. If you
-    >>> # wanted the highest resolution available for a specific file type, you
-    >>> # can do:
-    >>> yt.dash_streams.first()
-    <Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028">
+   >>> # Notice that the list is ordered by lowest resolution to highest. If you
+   >>> # wanted the highest resolution available for a specific file type, you
+   >>> # can do:
+   >>> yt.dash_streams.first()
+   <Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028">
 
-    >>> # You can also get all videos for a given resolution
-    >>> yt.dash_streams.filter(resolution='720p').all()
-    [<Stream: itag="136" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.4d401f">,
-    <Stream: itag="247" mime_type="video/webm" res="720p" fps="30fps" vcodec="vp9">]
+   >>> # You can also get all videos for a given resolution
+   >>> yt.dash_streams.filter(resolution='720p').all()
+   [<Stream: itag="136" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.4d401f">,
+   <Stream: itag="247" mime_type="video/webm" res="720p" fps="30fps" vcodec="vp9">]
 
-    >>> # To select a video by a specific itag you can use the get method.
-    >>> yt.dash_streams.get(251)
-    <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus">
+   >>> # To select a video by a specific itag you can use the get method.
+   >>> yt.dash_streams.get(251)
+   <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus">
 
-    # Okay, let's download it!
+   >>> # Okay, let's download it!
    >>> yt.dash_streams.get(251).download()
 
 Command-line usage
@@ -136,16 +136,16 @@ Once complete, execute the following commands:
 
 .. code:: bash
 
-    git checkout master
+   git checkout master
 
-    # Increment the version number and tag the release.
-    bumpversion [major|minor|patch]
+   # Increment the version number and tag the release.
+   bumpversion [major|minor|patch]
 
-    # Upload the distribution to PyPi
-    python setup.py sdist bdist_wheel upload
+   # Upload the distribution to PyPi
+   python setup.py sdist bdist_wheel upload
 
-    # Since master often contains work-in-progress changes, increment the version
-    # to a patch release to prevent inaccurate attribution.
-    bumpversion --no-tag patch
+   # Since master often contains work-in-progress changes, increment the version
+   # to a patch release to prevent inaccurate attribution.
+   bumpversion --no-tag patch
 
-    git push origin master --tags
+   git push origin master --tags
