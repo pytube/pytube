@@ -21,3 +21,4 @@ from pytube.streams import Stream
 from pytube.__main__ import YouTube
 
 logger = create_logger()
+logger.info('%s v%s', __title__, __version__)

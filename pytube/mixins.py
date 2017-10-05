@@ -4,6 +4,7 @@ pytube.mixins
 ~~~~~~~~~~~~~
 
 """
+import json
 import logging
 
 from pytube import cipher
@@ -22,11 +23,13 @@ def apply_signature(video_info, fmt, js):
             continue
         signature = cipher.get_signature(js, stream['s'])
         logger.debug(
-            'descrambling url signature %s ', stream['s'], extra={
-                's': stream['s'],
-                'signature': signature,
-                'itag': stream['itag'],
-            },
+            'finished descrambling signature for itag=%s\n%s',
+            stream['itag'], json.dumps(
+                {
+                    's': stream['s'],
+                    'signature': signature,
+                }, indent=2,
+            ),
         )
         stream_map[i]['url'] = url + '&signature=' + signature
 

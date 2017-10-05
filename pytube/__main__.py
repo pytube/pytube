@@ -78,6 +78,7 @@ class YouTube(object):
         the instances of :class:`Stream <Stream>`.
 
         """
+        logger.info('init started')
         self.prefetch()
         self.vid_info = extract.decode_video_info(self.vid_info)
 
@@ -101,6 +102,7 @@ class YouTube(object):
         # build instances of :class:`Stream <Stream>`
         self.build_stream_objects(trad_fmts)
         self.build_stream_objects(dash_fmts)
+        logger.info('init finished successfully')
 
     def prefetch(self):
         """Eagerly executes all necessary network requests so all other
@@ -126,7 +128,6 @@ class YouTube(object):
         instances of :class:`Stream <Stream>` for each media stream.
 
         """
-        logger.info('building Stream instances')
         streams = self.player_config['args'][fmt]
         for stream in streams:
             video = Stream(
