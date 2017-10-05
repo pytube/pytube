@@ -16,3 +16,5 @@ script: pytest
 sudo: required
 after_success:
   coveralls
+notifications:
+  slack: watchcloud:rNoT5kJJakPqwLSKuev6oa4C
