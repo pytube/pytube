@@ -6,10 +6,10 @@ pytube.extract
 """
 import json
 import re
-from urllib.parse import parse_qsl
-from urllib.parse import quote
-from urllib.parse import urlencode
 
+from pytube.compat import parse_qsl
+from pytube.compat import quote
+from pytube.compat import urlencode
 from pytube.helpers import memoize
 
 

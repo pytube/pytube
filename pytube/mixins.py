@@ -4,10 +4,9 @@ pytube.mixins
 ~~~~~~~~~~~~~
 
 """
-from urllib.parse import parse_qsl
-from urllib.parse import unquote
-
 from pytube import cipher
+from pytube.compat import parse_qsl
+from pytube.compat import unquote
 
 
 def apply_signature(video_info, fmt, js):

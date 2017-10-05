@@ -5,7 +5,7 @@ pytube.request
 
 Implements a simple wrapper around urlopen.
 """
-from urllib.request import urlopen
+from pytube.compat import urlopen
 
 
 def get(url, headers=False, streaming=False, chunk_size=8 * 1024):
