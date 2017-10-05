@@ -84,26 +84,26 @@ class YouTube(object):
         self.prefetch()
         self.vid_info = extract.decode_video_info(self.vid_info)
 
-        trad_fmts = 'url_encoded_fmt_stream_map'
-        dash_fmts = 'adaptive_fmts'
-        config_args = self.player_config['args']
+        progressive_fmts = 'url_encoded_fmt_stream_map'
+        adaptive_fmts = 'adaptive_fmts'
+        stream_manifest = self.player_config['args']
 
         # unscrambles the data necessary to access the streams and metadata.
-        mixins.apply_fmt_decoder(self.vid_info, trad_fmts)
-        mixins.apply_fmt_decoder(self.vid_info, dash_fmts)
-        mixins.apply_fmt_decoder(config_args, trad_fmts)
-        mixins.apply_fmt_decoder(config_args, dash_fmts)
+        mixins.apply_fmt_decoder(self.vid_info, progressive_fmts)
+        mixins.apply_fmt_decoder(self.vid_info, adaptive_fmts)
+        mixins.apply_fmt_decoder(stream_manifest, progressive_fmts)
+        mixins.apply_fmt_decoder(stream_manifest, adaptive_fmts)
 
         # apply the signature to the download url.
-        mixins.apply_signature(config_args, trad_fmts, self.js)
-        mixins.apply_signature(config_args, dash_fmts, self.js)
+        mixins.apply_signature(stream_manifest, progressive_fmts, self.js)
+        mixins.apply_signature(stream_manifest, adaptive_fmts, self.js)
 
         # load the player_response object (contains subtitle information)
-        apply_mixin(config_args, 'player_response', json.loads)
+        apply_mixin(stream_manifest, 'player_response', json.loads)
 
         # build instances of :class:`Stream <Stream>`
-        self.build_stream_objects(trad_fmts)
-        self.build_stream_objects(dash_fmts)
+        self.initialize_stream_objects(progressive_fmts)
+        self.initialize_stream_objects(adaptive_fmts)
         logger.info('init finished successfully')
 
     def prefetch(self):
@@ -125,7 +125,7 @@ class YouTube(object):
         ])
         self.player_config = extract.get_ytplayer_config(self.watch_html)
 
-    def build_stream_objects(self, fmt):
+    def initialize_stream_objects(self, fmt):
         """Takes the unscrambled stream data and uses it to initialize
         instances of :class:`Stream <Stream>` for each media stream.
 
@@ -141,20 +141,20 @@ class YouTube(object):
 
     @property
     @memoize
-    def streams(self):
-        """Interface to query non-dash streams."""
+    def progressive_streams(self):
+        """Interface to query progressive download streams."""
         return StreamQuery([s for s in self.fmt_streams if not s.is_dash])
 
     @property
     @memoize
-    def dash_streams(self):
-        """Interface to query dash streams."""
+    def adaptive_streams(self):
+        """Interface to query adaptive (DASH) streams."""
         return StreamQuery([s for s in self.fmt_streams if s.is_dash])
 
     @property
     @memoize
-    def all_streams(self):
-        """Interface to query both dash and traditional streams."""
+    def streams(self):
+        """Interface to query both adaptive (DASH) and progressive streams."""
         return StreamQuery([s for s in self.fmt_streams])
 
     def register_on_progress_callback(self, fn):
