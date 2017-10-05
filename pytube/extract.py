@@ -20,7 +20,7 @@ def video_id(url):
 
 def watch_url(video_id):
     return (
-        'http://www.youtube.com/watch?v={video_id}'
+        'https://www.youtube.com/watch?v={video_id}'
         .format(video_id=video_id)
     )
 
