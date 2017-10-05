@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+pytube.logging
+~~~~~~~~~~~~~~
+
+This module implements a lightweight json log formatter and log factory.
+"""
 import datetime as dt
 import json
 import logging
