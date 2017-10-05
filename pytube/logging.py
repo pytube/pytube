@@ -5,6 +5,8 @@ pytube.logging
 
 This module implements a log factory.
 """
+from __future__ import absolute_import
+
 import logging
 
 

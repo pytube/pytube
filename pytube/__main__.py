@@ -6,6 +6,8 @@ pytube.__main__
 This module implements the core developer interface for pytube.
 
 """
+from __future__ import absolute_import
+
 import json
 import logging
 
