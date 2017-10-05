@@ -1,4 +1,7 @@
 language: python
+cache:
+  - apt
+  - pip
 python:
   - "2.7"
   - "3.3"
