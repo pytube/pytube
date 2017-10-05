@@ -14,6 +14,7 @@ from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
 from pytube.helpers import apply_mixin
+from pytube.helpers import memoize
 
 
 class YouTube(object):
@@ -130,11 +131,13 @@ class YouTube(object):
             self.fmt_streams.append(video)
 
     @property
+    @memoize
     def streams(self):
         """Interface to query non-dash streams."""
         return StreamQuery([s for s in self.fmt_streams if not s.is_dash])
 
     @property
+    @memoize
     def dash_streams(self):
         """Interface to query dash streams."""
         return StreamQuery([s for s in self.fmt_streams if s.is_dash])
