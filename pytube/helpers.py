@@ -10,6 +10,10 @@ import functools
 import re
 
 
+def apply_mixin(dct, key, func, *args, **kwargs):
+    dct[key] = func(dct[key], *args, **kwargs)
+
+
 def truncate(text, max_length=200):
     return text[:max_length].rsplit(' ', 0)[0]
 

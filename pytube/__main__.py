@@ -13,9 +13,11 @@ from pytube import mixins
 from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
+from pytube.helpers import apply_mixin
 
 
-class YouTube:
+class YouTube(object):
+
     def __init__(
         self, url=None, defer_init=False, on_progress_callback=None,
         on_complete_callback=None,
@@ -32,6 +34,7 @@ class YouTube:
         :param func on_complete_callback:
             (Optional) User defined callback function for stream download
             complete events.
+
         """
         self.js = None      # js fetched by js_url
         self.js_url = None  # the url to the js, parsed from watch html
@@ -66,22 +69,41 @@ class YouTube:
             self.init()
 
     def init(self):
+        """Makes all necessary network requests, data transforms, and popluates
+        the instances of :class:`Stream <Stream>`.
+
+        """
         self.prefetch()
         self.vid_info = extract.decode_video_info(self.vid_info)
 
         trad_fmts = 'url_encoded_fmt_stream_map'
         dash_fmts = 'adaptive_fmts'
+        config_args = self.player_config['args']
+
+        # unscrambles the data necessary to access the streams and metadata.
         mixins.apply_fmt_decoder(self.vid_info, trad_fmts)
         mixins.apply_fmt_decoder(self.vid_info, dash_fmts)
-        mixins.apply_fmt_decoder(self.player_config['args'], trad_fmts)
-        mixins.apply_fmt_decoder(self.player_config['args'], dash_fmts)
-        mixins.apply_cipher(self.player_config['args'], trad_fmts, self.js)
-        mixins.apply_cipher(self.player_config['args'], dash_fmts, self.js)
-        mixins.apply(self.player_config['args'], 'player_response', json.loads)
+        mixins.apply_fmt_decoder(config_args, trad_fmts)
+        mixins.apply_fmt_decoder(config_args, dash_fmts)
+
+        # apply the signature to the download url.
+        mixins.apply_signature(config_args, trad_fmts, self.js)
+        mixins.apply_signature(config_args, dash_fmts, self.js)
+
+        # load the player_response object (contains subtitle information)
+        apply_mixin(config_args, 'player_response', json.loads)
+
+        # build instances of :class:`Stream <Stream>`
         self.build_stream_objects(trad_fmts)
         self.build_stream_objects(dash_fmts)
 
     def prefetch(self):
+        """Eagerly executes all necessary network requests so all other
+        operations don't does need to make calls outside of the interpreter
+        which blocks for long periods of time.
+
+        """
+        # TODO(nficano): execute these concurrently.
         self.watch_html = request.get(url=self.watch_url)
         self.vid_info_url = extract.video_info_url(
             video_id=self.video_id,
@@ -94,6 +116,10 @@ class YouTube:
         self.player_config = extract.get_ytplayer_config(self.watch_html)
 
     def build_stream_objects(self, fmt):
+        """Takes the unscrambled stream data and uses it to initialize
+        instances of :class:`Stream <Stream>` for each media stream.
+
+        """
         streams = self.player_config['args'][fmt]
         for stream in streams:
             video = Stream(

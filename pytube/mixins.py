@@ -10,11 +10,7 @@ from urllib.parse import unquote
 from pytube import cipher
 
 
-def apply(dct, key, fn):
-    dct[key] = fn(dct[key])
-
-
-def apply_cipher(video_info, fmt, js):
+def apply_signature(video_info, fmt, js):
     stream_map = video_info[fmt]
     for i, stream in enumerate(stream_map):
         url = stream['url']

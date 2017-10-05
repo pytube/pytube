@@ -17,10 +17,20 @@ from pytube.helpers import safe_filename
 from pytube.itags import get_format_profile
 
 
-class Stream:
-    """The media stream container"""
+class Stream(object):
 
     def __init__(self, stream, player_config, monostate):
+        """Constructs a :class:`Stream <Stream>`.
+
+        :param dict stream:
+            The unscrambled data extracted from YouTube.
+        :param dict player_config:
+            The data object containing video media data like title and
+            keywords.
+        :param dict monostate:
+            Dictionary of data shared across all instances of
+            :class:`Stream <Stream>`.
+        """
         # A dictionary shared between all instances of :class:`Stream <Stream>`
         # (Borg pattern).
         self._monostate = monostate
