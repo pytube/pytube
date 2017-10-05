@@ -151,6 +151,12 @@ class YouTube(object):
         """Interface to query dash streams."""
         return StreamQuery([s for s in self.fmt_streams if s.is_dash])
 
+    @property
+    @memoize
+    def all_streams(self):
+        """Interface to query both dash and traditional streams."""
+        return StreamQuery([s for s in self.fmt_streams])
+
     def register_on_progress_callback(self, fn):
         """Registers an on download progess callback function after object
         initialization.
