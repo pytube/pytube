@@ -4,10 +4,14 @@ pytube.cipher
 ~~~~~~~~~~~~~
 
 """
+import logging
 import re
 from itertools import chain
 
 from pytube.helpers import memoize
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_initial_function_name(js):

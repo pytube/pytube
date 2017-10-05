@@ -7,6 +7,7 @@ This module implements the core developer interface for pytube.
 
 """
 import json
+import logging
 
 from pytube import extract
 from pytube import mixins
@@ -15,6 +16,9 @@ from pytube import Stream
 from pytube import StreamQuery
 from pytube.helpers import apply_mixin
 from pytube.helpers import memoize
+
+
+logger = logging.getLogger(__name__)
 
 
 class YouTube(object):
@@ -122,6 +126,7 @@ class YouTube(object):
         instances of :class:`Stream <Stream>` for each media stream.
 
         """
+        logger.info('building Stream instances')
         streams = self.player_config['args'][fmt]
         for stream in streams:
             video = Stream(

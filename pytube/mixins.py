@@ -4,9 +4,14 @@ pytube.mixins
 ~~~~~~~~~~~~~
 
 """
+import logging
+
 from pytube import cipher
 from pytube.compat import parse_qsl
 from pytube.compat import unquote
+
+
+logger = logging.getLogger(__name__)
 
 
 def apply_signature(video_info, fmt, js):
@@ -16,6 +21,13 @@ def apply_signature(video_info, fmt, js):
         if 'signature=' in url:
             continue
         signature = cipher.get_signature(js, stream['s'])
+        logger.debug(
+            'descrambling url signature %s ', stream['s'], extra={
+                's': stream['s'],
+                'signature': signature,
+                'itag': stream['itag'],
+            },
+        )
         stream_map[i]['url'] = url + '&signature=' + signature
 
 
