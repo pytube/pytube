@@ -104,7 +104,6 @@ class YouTube(object):
         which blocks for long periods of time.
 
         """
-        # TODO(nficano): execute these concurrently.
         self.watch_html = request.get(url=self.watch_url)
         self.vid_info_url = extract.video_info_url(
             video_id=self.video_id,
@@ -112,8 +111,10 @@ class YouTube(object):
             watch_html=self.watch_html,
         )
         self.js_url = extract.js_url(self.watch_html)
-        self.js = request.get(url=self.js_url)
-        self.vid_info = request.get(url=self.vid_info_url)
+        self.js, self.vid_info = request.get(urls=[
+            self.js_url,
+            self.vid_info_url,
+        ])
         self.player_config = extract.get_ytplayer_config(self.watch_html)
 
     def build_stream_objects(self, fmt):

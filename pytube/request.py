@@ -5,14 +5,23 @@ pytube.request
 
 Implements a simple wrapper around urlopen.
 """
+import multiprocessing
+
 from pytube.compat import urlopen
 
 
-def get(url, headers=False, streaming=False, chunk_size=8 * 1024):
+def get(
+    url=None, urls=[], processes=2, headers=False,
+    streaming=False, chunk_size=8 * 1024,
+):
     """Sends an http GET request.
 
     :param str url:
         The URL to perform the GET request for.
+    :param list urls:
+        List of URLs to perform the GET request for concurrently.
+    :param int processes:
+        How many worker processes to start.
     :param bool headers:
         Only return the http headers.
     :param bool streaming:
@@ -20,12 +29,20 @@ def get(url, headers=False, streaming=False, chunk_size=8 * 1024):
     :param int chunk_size:
         The size in bytes of each chunk.
     """
-    response = urlopen(url)
-    if streaming:
-        return stream_response(response, chunk_size)
-    elif headers:
-        return dict(response.info().items())
-    return response.read().decode('utf-8')
+    if urls:
+        pool = multiprocessing.Pool(processes=processes)
+        return pool.map(get, urls)
+    else:
+        response = urlopen(url)
+        if streaming:
+            return stream_response(response, chunk_size)
+        elif headers:
+            return dict(response.info().items())
+        return (
+            response
+            .read()
+            .decode('utf-8')
+        )
 
 
 def stream_response(response, chunk_size=8 * 1024):
