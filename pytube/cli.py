@@ -12,7 +12,7 @@ import argparse
 import os
 import sys
 
-from youtube import YouTube
+from pytube import YouTube
 
 
 def main():

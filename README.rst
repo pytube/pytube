@@ -48,141 +48,78 @@ Library usage
 
 .. code:: python
 
-    from pytube import YouTube
+    >>> from pytube import YouTube
 
-    # not necessary, just for demo purposes.
-    from pprint import pprint
+    >>> yt = YouTube("http://www.youtube.com/watch?v=9bZkp7q19f0")
 
-    yt = YouTube("http://www.youtube.com/watch?v=Ik-RsDGPI5Y")
+    >>> # Once set, you can see all the codec and quality options YouTube has made
+    >>> # available for the particular video by printing videos.
 
-    # Once set, you can see all the codec and quality options YouTube has made
-    # available for the particular video by printing videos.
+    >>> yt.streams.all()
+    [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
+    <Stream: itag="43" mime_type="video/webm" res="360p" fps="30fps" vcodec="vp8.0" acodec="vorbis">,
+    <Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">,
+    <Stream: itag="36" mime_type="video/3gpp" res="240p" fps="30fps" vcodec="mp4v.20.3" acodec="mp4a.40.2">,
+    <Stream: itag="17" mime_type="video/3gpp" res="144p" fps="30fps" vcodec="mp4v.20.3" acodec="mp4a.40.2">]
 
-    print(yt.get_videos())
+   >>> # for dash streams
+   [<Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028">,
+   <Stream: itag="248" mime_type="video/webm" res="1080p" fps="30fps" vcodec="vp9">,
+   <Stream: itag="136" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.4d401f">,
+   <Stream: itag="247" mime_type="video/webm" res="720p" fps="30fps" vcodec="vp9">,
+   <Stream: itag="135" mime_type="video/mp4" res="480p" fps="30fps" vcodec="avc1.4d401e">,
+   <Stream: itag="244" mime_type="video/webm" res="480p" fps="30fps" vcodec="vp9">,
+   <Stream: itag="134" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.4d401e">,
+   <Stream: itag="243" mime_type="video/webm" res="360p" fps="30fps" vcodec="vp9">,
+   <Stream: itag="133" mime_type="video/mp4" res="240p" fps="30fps" vcodec="avc1.4d4015">,
+   <Stream: itag="242" mime_type="video/webm" res="240p" fps="30fps" vcodec="vp9">,
+   <Stream: itag="160" mime_type="video/mp4" res="144p" fps="30fps" vcodec="avc1.4d400c">,
+   <Stream: itag="278" mime_type="video/webm" res="144p" fps="30fps" vcodec="vp9">,
+   <Stream: itag="140" mime_type="audio/mp4" abr="128kbps" acodec="mp4a.40.2">,
+   <Stream: itag="171" mime_type="audio/webm" abr="128kbps" acodec="vorbis">,
+   <Stream: itag="249" mime_type="audio/webm" abr="50kbps" acodec="opus">,
+   <Stream: itag="250" mime_type="audio/webm" abr="70kbps" acodec="opus">,
+   <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus">]
 
-    # [<Video: MPEG-4 Visual (.3gp) - 144p>,
-    #  <Video: MPEG-4 Visual (.3gp) - 240p>,
-    #  <Video: Sorenson H.263 (.flv) - 240p>,
-    #  <Video: H.264 (.flv) - 360p>,
-    #  <Video: H.264 (.flv) - 480p>,
-    #  <Video: H.264 (.mp4) - 360p>,
-    #  <Video: H.264 (.mp4) - 720p>,
-    #  <Video: VP8 (.webm) - 360p>,
-    #  <Video: VP8 (.webm) - 480p>]
+   >>> # You can also filter the criteria by filetype.
+   >>> yt.dash_streams.filter(audio_codec='opus').all()
+   [<Stream: itag="249" mime_type="audio/webm" abr="50kbps" acodec="opus">,
+   <Stream: itag="250" mime_type="audio/webm" abr="70kbps" acodec="opus">,
+   <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus">]
 
-    # The filename is automatically generated based on the video title.  You
-    # can override this by manually setting the filename.
+    >>> # Notice that the list is ordered by lowest resolution to highest. If you
+    >>> # wanted the highest resolution available for a specific file type, you
+    >>> # can do:
+    >>> yt.dash_streams.first()
+    <Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028">
 
-    # view the auto generated filename:
-    print(yt.filename)
+    >>> # You can also get all videos for a given resolution
+    >>> yt.dash_streams.filter(resolution='720p').all()
+    [<Stream: itag="136" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.4d401f">,
+    <Stream: itag="247" mime_type="video/webm" res="720p" fps="30fps" vcodec="vp9">]
 
-    # Pulp Fiction - Dancing Scene [HD]
+    >>> # To select a video by a specific itag you can use the get method.
+    >>> yt.dash_streams.get(251)
+    <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus">
 
-    # set the filename:
-    yt.set_filename('Dancing Scene from Pulp Fiction')
-
-    # You can also filter the criteria by filetype.
-    print(yt.filter('flv'))
-
-    # [<Video: Sorenson H.263 (.flv) - 240p>,
-    #  <Video: H.264 (.flv) - 360p>,
-    #  <Video: H.264 (.flv) - 480p>]
-
-    # Notice that the list is ordered by lowest resolution to highest. If you
-    # wanted the highest resolution available for a specific file type, you
-    # can simply do:
-    print(yt.filter('mp4')[-1])
-    # <Video: H.264 (.mp4) - 720p>
-
-    # You can also get all videos for a given resolution
-    print(yt.filter(resolution='480p'))
-
-    # [<Video: H.264 (.flv) - 480p>,
-    #  <Video: VP8 (.webm) - 480p>]
-
-    # To select a video by a specific resolution and filetype you can use the get
-    # method.
-
-    video = yt.get('mp4', '720p')
-
-    # NOTE: get() can only be used if and only if one object matches your criteria.
-    # for example:
-
-    print(yt.videos)
-
-    #[<Video: MPEG-4 Visual (.3gp) - 144p>,
-    # <Video: MPEG-4 Visual (.3gp) - 240p>,
-    # <Video: Sorenson H.263 (.flv) - 240p>,
-    # <Video: H.264 (.flv) - 360p>,
-    # <Video: H.264 (.flv) - 480p>,
-    # <Video: H.264 (.mp4) - 360p>,
-    # <Video: H.264 (.mp4) - 720p>,
-    # <Video: VP8 (.webm) - 360p>,
-    # <Video: VP8 (.webm) - 480p>]
-
-    # Since we have two H.264 (.mp4) available to us... now if we try to call get()
-    # on mp4...
-
-    video = yt.get('mp4')
-    # MultipleObjectsReturned: 2 videos met criteria.
-
-    # In this case, we'll need to specify both the codec (mp4) and resolution
-    # (either 360p or 720p).
-
-    # Okay, let's download it! (a destination directory is required)
-    video.download('/tmp/')
+    # Okay, let's download it!
+   >>> yt.dash_streams.get(251).download()
 
 Command-line usage
 ==================
 
-You can download a video by simply passing the ``-e`` (or ``--extension=``) switch and
-setting it to the desired filetype:
+You can download a video by simply passing the ``--itag`` switch:
 
 .. code:: bash
 
-   $ pytube -e mp4 http://www.youtube.com/watch?v=Ik-RsDGPI5Y
+   $ pytube http://www.youtube.com/watch?v=Ik-RsDGPI5Y --itag=22
 
 
-Same thing for specifying a resolution:
-
-.. code:: bash
-
-   $ pytube -r 720p http://www.youtube.com/watch?v=Ik-RsDGPI5Y
-
-When run without a resolution or extension, it shows a list of available formats to download
+To list all available formats use the ``--list`` switch:
 
 .. code:: bash
 
    $ pytube http://www.youtube.com/watch?v=Ik-RsDGPI5Y
-     Resolution      Extension
-    ----------------------------
-    0  3gp             144p
-    1  3gp             240p
-    2  mp4             360p
-    3  mp4             720p
-    4  webm            360p
-    Enter choice:
-
-
-You can see a list of available formats by passing the ``-s`` (or ``--show-available``) flag
-
-.. code:: bash
-
-   $ pytube -s http://www.youtube.com/watch?v=Ik-RsDGPI5Y
-
-
-
-You can also specify a download file path (``-p`` or ``--path=``):
-
-.. code:: bash
-
-   $ pytube -e mp4 -p ~/Downloads/ http://www.youtube.com/watch?v=Ik-RsDGPI5Y
-
-and/or optionally choose the filename (``-f`` or ``--filename=``):
-
-.. code:: bash
-
-   $ pytube -e mp4 -f "Dancing Scene from Pulp Fiction" http://www.youtube.com/watch?v=Ik-RsDGPI5Y
 
 Development
 ===========
