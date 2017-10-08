@@ -3,6 +3,7 @@
 from __future__ import print_function
 
 import argparse
+import json
 import os
 import sys
 
@@ -24,14 +25,35 @@ def main():
             'available to download'
         ),
     )
+    parser.add_argument(
+        '--build-debug-report', action='store_true', help=(
+            'Save the html and js to disk'
+        ),
+    )
     args = parser.parse_args()
     if not args.url:
         parser.print_help()
         sys.exit(1)
     if args.list:
         display_streams(args.url)
+    elif args.build_debug_report:
+        build_debug_report(args.url)
     elif args.itag:
         download(args.url, args.itag)
+
+
+def build_debug_report(url):
+    yt = YouTube(url)
+    fp = os.path.join(
+        os.getcwd(),
+        'yt-video-{yt.video_id}.json'.format(yt=yt),
+    )
+    with open(fp, 'w') as fh:
+        fh.write(json.dumps({
+            'js': yt.js,
+            'watch_html': yt.watch_html,
+            'video_info': yt.vid_info,
+        }))
 
 
 def get_terminal_size():
