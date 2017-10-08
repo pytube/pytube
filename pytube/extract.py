@@ -7,11 +7,11 @@ This module is responsible for all non-cipher related data extraction
 (primarily used during data pre-fetching).
 """
 import json
-import re
 
 from pytube.compat import quote
 from pytube.compat import urlencode
 from pytube.helpers import memoize
+from pytube.helpers import regex_search
 
 
 def video_id(url):
@@ -21,8 +21,7 @@ def video_id(url):
         A url YouTube id containing a video_id.
 
     """
-    pattern = re.compile(r'.*(?:v=|/v/|^)(?P<id>[^&]*)')
-    return pattern.search(url).group(1)
+    return regex_search(r'.*(?:v=|/v/|^)(?P<id>[^&]*)', url, group=1)
 
 
 def watch_url(video_id):
@@ -48,14 +47,15 @@ def video_info_url(video_id, watch_url, watch_html):
     """
     # I'm not entirely sure what ``t`` represents. Looks to represent a
     # boolean.
-    t = re.compile('\W[\'"]?t[\'"]?: ?[\'"](.+?)[\'"]')
+    pattern = r'\W[\'"]?t[\'"]?: ?[\'"](.+?)[\'"]'
+    t = regex_search(pattern, watch_html, group=0)
     params = urlencode({
         'video_id': video_id,
         'el': '$el',
         'ps': 'default',
         'eurl': quote(watch_url),
         'hl': 'en_US',
-        't': quote(t.search(watch_html).group(0)),
+        't': quote(t),
     })
     return 'https://youtube.com/get_video_info?' + params
 
@@ -73,6 +73,20 @@ def js_url(watch_html):
     return 'https://youtube.com' + base_js
 
 
+def mime_type_codec(mime_type_codec):
+    """Parses the type data, which contains mime type and codecs serialized
+    together (e.g.: 'audio/webm; codecs="opus"'), and splits them into
+    separate elements. (e.g.: 'audio/webm', ['opus'])
+
+    :param str mime_type_codec:
+        String containing mime type and codecs.
+
+    """
+    pattern = r'(\w+\/\w+)\;\scodecs=\"([a-zA-Z-0-9.,\s]*)\"'
+    mime_type, codecs = regex_search(pattern, mime_type_codec, groups=True)
+    return mime_type, [c.strip() for c in codecs.split(',')]
+
+
 @memoize
 def get_ytplayer_config(watch_html):
     """The ``ytplayer_config`` is json data embedded within the watch html and
@@ -82,5 +96,6 @@ def get_ytplayer_config(watch_html):
         The html contents of the watch page.
 
     """
-    pattern = re.compile(r';ytplayer\.config\s*=\s*({.*?});')
-    return json.loads(pattern.search(watch_html).group(1))
+    pattern = r';ytplayer\.config\s*=\s*({.*?});'
+    yt_player_config = regex_search(pattern, watch_html, group=1)
+    return json.loads(yt_player_config)

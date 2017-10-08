@@ -50,7 +50,7 @@ def regex_search(pattern, string, groups=False, group=None, flags=0):
     else:
         if groups:
             return results.groups()
-        elif group:
+        elif group is not None:
             return results.group(group)
         else:
             return results

@@ -13,8 +13,8 @@ from __future__ import absolute_import
 import json
 import logging
 import os
-import re
 
+from pytube import extract
 from pytube import request
 from pytube.helpers import memoize
 from pytube.helpers import safe_filename
@@ -73,7 +73,7 @@ class Stream(object):
         self.player_config = player_config
 
         # 'video/webm; codecs="vp8, vorbis"' -> 'video/webm', ['vp8', 'vorbis']
-        self.mime_type, self.codecs = self.parse_type()
+        self.mime_type, self.codecs = extract.mime_type_codec(self.type)
 
         # 'video/webm' -> 'video', 'webm'
         self.type, self.subtype = self.mime_type.split('/')
@@ -120,16 +120,6 @@ class Stream(object):
         elif self.is_audio:
             audio = self.codecs[0]
         return video, audio
-
-    def parse_type(self):
-        """Parses the type data, which contains mime type and codecs serialized
-        together (e.g.: 'audio/webm; codecs="opus"'), and splits them into
-        separate elements. (e.g.: 'audio/webm', ['opus'])
-
-        """
-        regex = re.compile(r'(\w+\/\w+)\;\scodecs=\"([a-zA-Z-0-9.,\s]*)\"')
-        mime_type, codecs = regex.search(self.type).groups()
-        return mime_type, [c.strip() for c in codecs.split(',')]
 
     @property
     @memoize
