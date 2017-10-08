@@ -15,7 +15,7 @@ install:
   - pip install -r requirements.txt
   - pip install -r tests/requirements.txt
 before_script: flake8
-script: pytest
+script: pytest --cov-report term-missing --cov=pytube
 sudo: required
 after_success:
   coveralls

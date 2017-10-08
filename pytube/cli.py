@@ -43,6 +43,11 @@ def main():
 
 
 def build_debug_report(url):
+    """Serialize the request data to json for offline debugging.
+
+    :param str url:
+        A valid YouTube watch URL.
+    """
     yt = YouTube(url)
     fp = os.path.join(
         os.getcwd(),
