@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """This module contains all non-cipher related data extraction logic."""
 import json
+from collections import OrderedDict
 
 from pytube.compat import quote
 from pytube.compat import urlencode
@@ -43,15 +44,17 @@ def video_info_url(video_id, watch_url, watch_html):
     # boolean.
     pattern = r'\W[\'"]?t[\'"]?: ?[\'"](.+?)[\'"]'
     t = regex_search(pattern, watch_html, group=0)
-    params = urlencode({
-        'video_id': video_id,
-        'el': '$el',
-        'ps': 'default',
-        'eurl': quote(watch_url),
-        'hl': 'en_US',
-        't': quote(t),
-    })
-    return 'https://youtube.com/get_video_info?' + params
+    # Here we use ``OrderedDict`` so that the output is consistant between
+    # Python 2.7+.
+    params = OrderedDict([
+        ('video_id', video_id),
+        ('el', '$el'),
+        ('ps', 'default'),
+        ('eurl', quote(watch_url)),
+        ('hl', 'en_US'),
+        ('t', quote(t)),
+    ])
+    return 'https://youtube.com/get_video_info?' + urlencode(params)
 
 
 def js_url(watch_html):
