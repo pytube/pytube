@@ -3,7 +3,9 @@
 pytube.__main__
 ~~~~~~~~~~~~~~~
 
-This module implements the core developer interface for pytube.
+This module implements the core developer interface for pytube. This class does
+minimal heavy lifting and instead relies on many small (mostly pure) functions
+to handle the extraction, pattern matching, etc. to make testing easier.
 
 """
 from __future__ import absolute_import
@@ -16,6 +18,7 @@ from pytube import mixins
 from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
+from pytube.compat import parse_qsl
 from pytube.helpers import apply_mixin
 from pytube.helpers import memoize
 
@@ -82,16 +85,16 @@ class YouTube(object):
         logger.info('init started')
         self.prefetch()
 
-        self.vid_info = extract.decode_video_info(self.vid_info)
+        self.vid_info = {k: v for k, v in parse_qsl(self.vid_info)}
+        self.player_config = extract.get_ytplayer_config(self.watch_html)
 
         progressive_fmts = 'url_encoded_fmt_stream_map'
         adaptive_fmts = 'adaptive_fmts'
         config_args = self.player_config['args']
 
+        # unscramble the progressive and adaptive stream manifests.
         mixins.apply_descrambler(self.vid_info, progressive_fmts)
         mixins.apply_descrambler(self.vid_info, adaptive_fmts)
-
-        # unscrambles the data necessary to access the streams and metadata.
         mixins.apply_descrambler(config_args, progressive_fmts)
         mixins.apply_descrambler(config_args, adaptive_fmts)
 
@@ -124,7 +127,6 @@ class YouTube(object):
             self.js_url,
             self.vid_info_url,
         ])
-        self.player_config = extract.get_ytplayer_config(self.watch_html)
 
     def initialize_stream_objects(self, fmt):
         """Takes the unscrambled stream data and uses it to initialize
