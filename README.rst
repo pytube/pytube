@@ -16,10 +16,6 @@ pytube
 
 *pytube* is a lightweight, dependency-free Python library (and command-line utility) for downloading YouTube Videos.
 
-A call for contributors
-=======================
-With pytube and `python-lambda <https://github.com/nficano/python-lambda/>`_ both continuing to gain momentum, I'm calling for contributors to help build out new features, review pull requests, fix bugs, and maintain overall code quality. If you're interested, please email me at nficano[at]gmail.com.
-
 Description
 ===========
 
@@ -46,25 +42,19 @@ Download using pip via pypi.
 Library usage
 =============
 
-.. code:: python
+.. code-block:: python
 
    >>> from pytube import YouTube
+   >>> yt = YouTube('http://www.youtube.com/watch?v=9bZkp7q19f0')
 
-   >>> yt = YouTube("http://www.youtube.com/watch?v=9bZkp7q19f0")
-
-   >>> # Once set, you can see all the codec and quality options YouTube has made
-   >>> # available for the particular video by printing videos.
-
+   >>> # Let's show the available streams:
    >>> yt.streams.all()
    [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
    <Stream: itag="43" mime_type="video/webm" res="360p" fps="30fps" vcodec="vp8.0" acodec="vorbis">,
    <Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">,
    <Stream: itag="36" mime_type="video/3gpp" res="240p" fps="30fps" vcodec="mp4v.20.3" acodec="mp4a.40.2">,
-   <Stream: itag="17" mime_type="video/3gpp" res="144p" fps="30fps" vcodec="mp4v.20.3" acodec="mp4a.40.2">]
-
-   >>> # for dash streams
-   >>> yt.dash_streams.all()
-   [<Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028">,
+   <Stream: itag="17" mime_type="video/3gpp" res="144p" fps="30fps" vcodec="mp4v.20.3" acodec="mp4a.40.2">,
+   <Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028">,
    <Stream: itag="248" mime_type="video/webm" res="1080p" fps="30fps" vcodec="vp9">,
    <Stream: itag="136" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.4d401f">,
    <Stream: itag="247" mime_type="video/webm" res="720p" fps="30fps" vcodec="vp9">,
@@ -82,45 +72,8 @@ Library usage
    <Stream: itag="250" mime_type="audio/webm" abr="70kbps" acodec="opus">,
    <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus">]
 
-   >>> # You can also filter the criteria by filetype.
-   >>> yt.dash_streams.filter(audio_codec='opus').all()
-   [<Stream: itag="249" mime_type="audio/webm" abr="50kbps" acodec="opus">,
-   <Stream: itag="250" mime_type="audio/webm" abr="70kbps" acodec="opus">,
-   <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus">]
-
-   >>> # Notice that the list is ordered by lowest resolution to highest. If you
-   >>> # wanted the highest resolution available for a specific file type, you
-   >>> # can do:
-   >>> yt.dash_streams.first()
-   <Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028">
-
-   >>> # You can also get all videos for a given resolution
-   >>> yt.dash_streams.filter(resolution='720p').all()
-   [<Stream: itag="136" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.4d401f">,
-   <Stream: itag="247" mime_type="video/webm" res="720p" fps="30fps" vcodec="vp9">]
-
-   >>> # To select a video by a specific itag you can use the get method.
-   >>> yt.dash_streams.get(251)
-   <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus">
-
-   >>> # Okay, let's download it!
-   >>> yt.dash_streams.get(251).download()
-
-Command-line usage
-==================
-
-You can download a video by simply passing the ``--itag`` switch:
-
-.. code:: bash
-
-   $ pytube http://www.youtube.com/watch?v=Ik-RsDGPI5Y --itag=22
-
-
-To list all available formats use the ``--list`` switch:
-
-.. code:: bash
-
-   $ pytube http://www.youtube.com/watch?v=Ik-RsDGPI5Y
+   >>> # neat. let's download this first one.
+   >>> yt.streams.first().download()
 
 Development
 ===========
