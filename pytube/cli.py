@@ -1,19 +1,29 @@
 # -*- coding: utf-8 -*-
 """A simple command line application to download youtube videos."""
+from __future__ import absolute_import
 from __future__ import print_function
 
 import argparse
 import json
+import logging
 import os
 import sys
 
+from pytube import __version__
 from pytube import YouTube
+
+
+logger = logging.getLogger(__name__)
 
 
 def main():
     """Command line application to download youtube videos."""
     parser = argparse.ArgumentParser(description=main.__doc__)
     parser.add_argument('url', help='The YouTube /watch url', nargs='?')
+    parser.add_argument(
+        '-v', '--version', action='version',
+        version='%(prog)s ' + __version__,
+    )
     parser.add_argument(
         '--itag', type=int, help=(
             'The itag for the desired stream'
@@ -26,11 +36,17 @@ def main():
         ),
     )
     parser.add_argument(
+        '-v', '--verbose', action='count', default=0, dest='verbose_count',
+        help='Verbosity level',
+    )
+    parser.add_argument(
         '--build-debug-report', action='store_true', help=(
             'Save the html and js to disk'
         ),
     )
+
     args = parser.parse_args()
+    logger.setLevel(max(3 - args.verbose_count, 0) * 10)
     if not args.url:
         parser.print_help()
         sys.exit(1)
@@ -131,8 +147,11 @@ def download(url, itag):
         fn=stream.default_filename,
         fs=stream.filesize,
     ))
-    stream.download()
-    sys.stdout.write('\n')
+    try:
+        stream.download()
+        sys.stdout.write('\n')
+    except KeyboardInterrupt:
+        sys.exit()
 
 
 def display_streams(url):
