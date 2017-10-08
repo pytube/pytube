@@ -27,4 +27,4 @@ logger.info('%s v%s', __title__, __version__)
 
 # Workaround for multiprocessing support on Windows.
 # https://github.com/nficano/pytube/issues/158
-# freeze_support()
+freeze_support()
