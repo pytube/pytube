@@ -33,7 +33,7 @@ def main():
     args = parser.parse_args()
     if not args.url:
         parser.print_help()
-        exit(1)
+        sys.exit(1)
     if args.list:
         display_streams(args.url)
     elif args.itag:
@@ -46,28 +46,35 @@ def get_terminal_size():
     return int(rows), int(columns)
 
 
-def render_progress_percentage(bar, percent):
-    """Writes the updated progress bar percentage and filled area.
+def display_progress_bar(bytes_received, filesize, ch='█', scale=0.55):
+    """Displays a simple, pretty progress bar.
 
-    :param str bar:
-        The filled and unfilled remainder chars of the progress bar.
-    :param int percent:
-        Numerical representation of progress completion.
+    Example:
+    ~~~~~~~~
+    PSY - GANGNAM STYLE(강남스타일) MV.mp4
+    ↳ |███████████████████████████████████████| 100.0%
+
+    :param int bytes_received:
+        The delta between the total file size (bytes) and bytes already
+        written to disk.
+    :param int filesize:
+        File size of the media stream in bytes.
+    :param ch str:
+        Character to use for presenting progress segment.
+    :param float scale:
+        Scale multipler to reduce progress bar size.
+
     """
-    text = ' ↳ |{bar}| {percent}%\r'.format(bar=bar, percent=percent)
-    sys.stdout.write(text)
-    sys.stdout.flush()
-
-
-def display_progress_bar(count, total, ch='█', scale=0.55):
     _, columns = get_terminal_size()
     max_width = int(columns * scale)
 
-    filled = int(round(max_width * count / float(total)))
+    filled = int(round(max_width * bytes_received / float(filesize)))
     remaining = max_width - filled
     bar = ch * filled + ' ' * remaining
-    percent = round(100.0 * count / float(total), 1)
-    render_progress_percentage(bar, percent)
+    percent = round(100.0 * bytes_received / float(filesize), 1)
+    text = ' ↳ |{bar}| {percent}%\r'.format(bar=bar, percent=percent)
+    sys.stdout.write(text)
+    sys.stdout.flush()
 
 
 def on_progress(stream, file_handle, bytes_remaining):
@@ -78,12 +85,12 @@ def on_progress(stream, file_handle, bytes_remaining):
     :param :class:`_io.BufferedWriter <BufferedWriter>` file_handle:
         The file handle where the media is being written to.
     :param int bytes_remaining:
-        The delta between the total file size in bytes and amount already
-        downloaded.
+        How many bytes have been downloaded.
+
     """
-    total = stream.filesize
-    count = total - bytes_remaining
-    display_progress_bar(count, total)
+    filesize = stream.filesize
+    bytes_received = filesize - bytes_remaining
+    display_progress_bar(bytes_received, filesize)
 
 
 def download(url, itag):
@@ -112,6 +119,7 @@ def display_streams(url):
 
     :param str url:
         A valid YouTube watch URL.
+
     """
     yt = YouTube(url)
     for stream in yt.streams.all():
