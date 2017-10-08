@@ -38,6 +38,9 @@ Download using pip via pypi.
 
     pip install pytube
 
+Basic Usage
+===========
+
 Behold, the power of pytube:
 
 .. code-block:: python
