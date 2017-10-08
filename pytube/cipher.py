@@ -3,6 +3,17 @@
 pytube.cipher
 ~~~~~~~~~~~~~
 
+YouTube's strategy to restrict downloading videos is to send a ciphered version
+of the signature to the client, along with the decryption algorithm obfuscated
+in JavaScript. For the clients to play the videos, JavaScript must take the
+ciphered version, pass it through a series of "transform functions," and then
+signs the media URL with the output. On the backend, they verify that the
+signature sent in the GET parameters is valid, and then returns the content
+(video/audio stream) or 403 unauthorized accordingly.
+
+This module is responsible for (1) finding and extracting those "transform
+functions" (2) maps them to Python equivalents and (3) taking the ciphered
+signature and decoding it.
 """
 from __future__ import absolute_import
 
@@ -18,6 +29,10 @@ logger = logging.getLogger(__name__)
 
 def get_initial_function_name(js):
     """Extracts the name of the function responsible for computing the signature.
+
+    :param str js:
+        The contents of the base.js asset file.
+
     """
     # c&&d.set("signature", EE(c));
     pattern = r'"signature",\s?([a-zA-Z0-9$]+)\('
@@ -33,6 +48,9 @@ def get_transform_plan(js):
     """Extracts the "transform plan", that is, the functions the original
     signature is passed through to decode the actual signature.
 
+    :param str js:
+        The contents of the base.js asset file.
+
     Sample Output:
     ~~~~~~~~~~~~~~
     ['DE.AJ(a,15)',
@@ -43,6 +61,7 @@ def get_transform_plan(js):
      'DE.kT(a,8)',
      'DE.VR(a,3)',
      'DE.kT(a,21)']
+
     """
     name = re.escape(get_initial_function_name(js))
     pattern = r'%s=function\(\w\){[a-z=\.\(\"\)]*;(.*);(?:.+)}' % name
@@ -62,6 +81,12 @@ def get_transform_object(js, var):
     function call ``DE.AJ(a,15)`` returned by the transform plan, "DE" would be
     the var.
 
+    :param str js:
+        The contents of the base.js asset file.
+    :param str var:
+        The obfuscated variable name that stores an object with all functions
+        that descrambles the signature.
+
     Sample Output:
     ~~~~~~~~~~~~~~
     ['AJ:function(a){a.reverse()}',
@@ -80,7 +105,18 @@ def get_transform_object(js, var):
     )
 
 
+@memoize
 def get_transform_map(js, var):
+    """Builds a lookup table of obfuscated JavaScript function names to the
+    Python equivalents.
+
+    :param str js:
+        The contents of the base.js asset file.
+    :param str var:
+        The obfuscated variable name that stores an object with all functions
+        that descrambles the signature.
+
+    """
     transform_object = get_transform_object(js, var)
     mapper = {}
     for obj in transform_object:
@@ -92,7 +128,9 @@ def get_transform_map(js, var):
 
 
 def reverse(arr, b):
-    """Immutable equivalent to function(a){a.reverse()}.
+    """Immutable equivalent to function(a, b) { a.reverse() }. This method
+    takes an unused ``b`` variable as their transform functions universally
+    sent two arguments.
 
     Example usage:
     ~~~~~~~~~~~~~~
@@ -103,7 +141,7 @@ def reverse(arr, b):
 
 
 def splice(arr, b):
-    """Immutable equivalent to function(a,b){a.splice(0,b)}.
+    """Immutable equivalent to function(a, b) { a.splice(0, b) }.
 
     Example usage:
     ~~~~~~~~~~~~~~
@@ -115,7 +153,7 @@ def splice(arr, b):
 
 def swap(arr, b):
     """Immutable equivalent to:
-    function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c}.
+    function(a, b) { var c=a[0];a[0]=a[b%a.length];a[b]=c }.
 
     Example usage:
     ~~~~~~~~~~~~~~
@@ -127,7 +165,11 @@ def swap(arr, b):
 
 
 def map_functions(js_func):
-    """Maps the javascript function to its Python equivalent.
+    """For a given JavaScript transform function, return the Python equivalent.
+
+    :param str js_func:
+        The JavaScript version of the transform function.
+
     """
     mapper = (
         # function(a){a.reverse()}
@@ -145,6 +187,21 @@ def map_functions(js_func):
 
 
 def parse_function(js_func):
+    """Breaks a JavaScript transform function down into a two element tuple
+    containing the function name and some integer-based modifier.
+
+    Sample Input:
+    ~~~~~~~~~~~~~
+    DE.AJ(a,15)
+
+    Sample Output:
+    ~~~~~~~~~~~~~~
+    ('AJ', 15)
+
+    :param str js_func:
+        The JavaScript version of the transform function.
+
+    """
     pattern = r'\w+\.(\w+)\(\w,(\d+)\)'
     regex = re.compile(pattern)
     return (
@@ -155,12 +212,21 @@ def parse_function(js_func):
 
 
 @memoize
-def get_signature(js, signature):
+def get_signature(js, ciphered_signature):
+    """Taking the ciphered signature, applies the transform functions and
+    returns the decrypted version.
+
+    :param str js:
+        The contents of the base.js asset file.
+    :param str ciphered_signature:
+        The ciphered signature sent in the ``player_config``.
+
+    """
     tplan = get_transform_plan(js)
     # DE.AJ(a,15) => DE, AJ(a,15)
     var, _ = tplan[0].split('.')
     tmap = get_transform_map(js, var)
-    signature = [s for s in signature]
+    signature = [s for s in ciphered_signature]
 
     for js_func in tplan:
         name, argument = parse_function(js_func)
