@@ -38,68 +38,9 @@ Download using pip via pypi.
 
     pip install pytube
 
-
-Library usage
-=============
+Behold, the power of pytube:
 
 .. code-block:: python
 
    >>> from pytube import YouTube
-   >>> yt = YouTube('http://www.youtube.com/watch?v=9bZkp7q19f0')
-
-   >>> # Let's show the available streams:
-   >>> yt.streams.all()
-   [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
-   <Stream: itag="43" mime_type="video/webm" res="360p" fps="30fps" vcodec="vp8.0" acodec="vorbis">,
-   <Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">,
-   <Stream: itag="36" mime_type="video/3gpp" res="240p" fps="30fps" vcodec="mp4v.20.3" acodec="mp4a.40.2">,
-   <Stream: itag="17" mime_type="video/3gpp" res="144p" fps="30fps" vcodec="mp4v.20.3" acodec="mp4a.40.2">,
-   <Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028">,
-   <Stream: itag="248" mime_type="video/webm" res="1080p" fps="30fps" vcodec="vp9">,
-   <Stream: itag="136" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.4d401f">,
-   <Stream: itag="247" mime_type="video/webm" res="720p" fps="30fps" vcodec="vp9">,
-   <Stream: itag="135" mime_type="video/mp4" res="480p" fps="30fps" vcodec="avc1.4d401e">,
-   <Stream: itag="244" mime_type="video/webm" res="480p" fps="30fps" vcodec="vp9">,
-   <Stream: itag="134" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.4d401e">,
-   <Stream: itag="243" mime_type="video/webm" res="360p" fps="30fps" vcodec="vp9">,
-   <Stream: itag="133" mime_type="video/mp4" res="240p" fps="30fps" vcodec="avc1.4d4015">,
-   <Stream: itag="242" mime_type="video/webm" res="240p" fps="30fps" vcodec="vp9">,
-   <Stream: itag="160" mime_type="video/mp4" res="144p" fps="30fps" vcodec="avc1.4d400c">,
-   <Stream: itag="278" mime_type="video/webm" res="144p" fps="30fps" vcodec="vp9">,
-   <Stream: itag="140" mime_type="audio/mp4" abr="128kbps" acodec="mp4a.40.2">,
-   <Stream: itag="171" mime_type="audio/webm" abr="128kbps" acodec="vorbis">,
-   <Stream: itag="249" mime_type="audio/webm" abr="50kbps" acodec="opus">,
-   <Stream: itag="250" mime_type="audio/webm" abr="70kbps" acodec="opus">,
-   <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus">]
-
-   >>> # neat. let's download this first one.
-   >>> yt.streams.first().download()
-
-Development
-===========
-
-Development of "pytube" is facilitated exclusively on GitHub. Contributions in the form of patches, tests and feature creation and/or requests are very welcome and highly encouraged. Please open an issue if this tool does not function as you'd expect.
-
-
-How to release updates
-----------------------
-
-If this is the first time you're releasing to pypi, you'll need to run: ``pip install -r tests/dev_requirements.txt``.
-
-Once complete, execute the following commands:
-
-.. code:: bash
-
-   git checkout master
-
-   # Increment the version number and tag the release.
-   bumpversion [major|minor|patch]
-
-   # Upload the distribution to PyPi
-   python setup.py sdist bdist_wheel upload
-
-   # Since master often contains work-in-progress changes, increment the version
-   # to a patch release to prevent inaccurate attribution.
-   bumpversion --no-tag patch
-
-   git push origin master --tags
+   >>> YouTube('http://youtube.com/watch?v=9bZkp7q19f0').streams.first().download()
