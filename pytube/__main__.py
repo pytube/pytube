@@ -86,20 +86,20 @@ class YouTube(object):
 
         progressive_fmts = 'url_encoded_fmt_stream_map'
         adaptive_fmts = 'adaptive_fmts'
-        stream_manifest = self.player_config['args']
+        config_args = self.player_config['args']
 
         # unscrambles the data necessary to access the streams and metadata.
-        mixins.apply_fmt_decoder(self.vid_info, progressive_fmts)
-        mixins.apply_fmt_decoder(self.vid_info, adaptive_fmts)
-        mixins.apply_fmt_decoder(stream_manifest, progressive_fmts)
-        mixins.apply_fmt_decoder(stream_manifest, adaptive_fmts)
+        mixins.apply_parse_qs(self.vid_info, progressive_fmts)
+        mixins.apply_parse_qs(self.vid_info, adaptive_fmts)
+        mixins.apply_parse_qs(config_args, progressive_fmts)
+        mixins.apply_parse_qs(config_args, adaptive_fmts)
 
         # apply the signature to the download url.
-        mixins.apply_signature(stream_manifest, progressive_fmts, self.js)
-        mixins.apply_signature(stream_manifest, adaptive_fmts, self.js)
+        mixins.apply_signature(config_args, progressive_fmts, self.js)
+        mixins.apply_signature(config_args, adaptive_fmts, self.js)
 
         # load the player_response object (contains subtitle information)
-        apply_mixin(stream_manifest, 'player_response', json.loads)
+        apply_mixin(config_args, 'player_response', json.loads)
 
         # build instances of :class:`Stream <Stream>`
         self.initialize_stream_objects(progressive_fmts)
@@ -130,12 +130,13 @@ class YouTube(object):
         instances of :class:`Stream <Stream>` for each media stream.
 
         :param str fmt:
-            Key in player config containing progressive download or adaptive
-            streams (e.g.: "url_encoded_fmt_stream_map" or "adaptive_fmts")
+            Key in stream manifest ("player_config") containing progressive
+            download or adaptive streams (e.g.: "url_encoded_fmt_stream_map" or
+            "adaptive_fmts").
 
         """
-        streams = self.player_config['args'][fmt]
-        for stream in streams:
+        stream_manifest = self.player_config['args'][fmt]
+        for stream in stream_manifest:
             video = Stream(
                 stream=stream,
                 player_config=self.player_config,

@@ -11,7 +11,7 @@ import re
 
 
 def apply_mixin(dct, key, func, *args, **kwargs):
-    """Applies an inplace data mutation to a dictionary.
+    """Applies an in-place data mutation to a dictionary.
 
     :param dict dct:
         Dictionary to apply mixin function to.

@@ -3,6 +3,8 @@
 pytube.itags
 ~~~~~~~~~~~~
 
+This module contains a lookup table of YouTube's format identifier codes
+(itags) to some additional meta data not specified in the media manifest.
 """
 
 ITAGS = {
@@ -91,6 +93,11 @@ ITAGS = {
 
 
 def get_format_profile(itag):
+    """Returns additional format information for a given itag.
+
+    :param str itag:
+        YouTube format identifier code.
+    """
     res, bitrate, vcodec, note, fps = ITAGS[int(itag)]
     return {
         'resolution': res,
