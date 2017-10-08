@@ -44,7 +44,7 @@ def regex_search(pattern, string, groups=False, group=None, flags=0):
     )
     if not results:
         raise RegexMatchError(
-            'Regex Pattern ({pattern}) had zero matches'
+            'regex pattern ({pattern}) had zero matches'
             .format(pattern=pattern),
         )
     else:
