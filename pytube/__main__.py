@@ -129,6 +129,10 @@ class YouTube(object):
         """Takes the unscrambled stream data and uses it to initialize
         instances of :class:`Stream <Stream>` for each media stream.
 
+        :param str fmt:
+            Key in player config containing progressive download or adaptive
+            streams (e.g.: "url_encoded_fmt_stream_map" or "adaptive_fmts")
+
         """
         streams = self.player_config['args'][fmt]
         for stream in streams:
@@ -143,13 +147,13 @@ class YouTube(object):
     @memoize
     def progressive_streams(self):
         """Interface to query progressive download streams."""
-        return StreamQuery([s for s in self.fmt_streams if not s.is_dash])
+        return StreamQuery([s for s in self.fmt_streams if not s.is_adaptive])
 
     @property
     @memoize
     def adaptive_streams(self):
         """Interface to query adaptive (DASH) streams."""
-        return StreamQuery([s for s in self.fmt_streams if s.is_dash])
+        return StreamQuery([s for s in self.fmt_streams if s.is_adaptive])
 
     @property
     @memoize
@@ -157,21 +161,21 @@ class YouTube(object):
         """Interface to query both adaptive (DASH) and progressive streams."""
         return StreamQuery([s for s in self.fmt_streams])
 
-    def register_on_progress_callback(self, fn):
+    def register_on_progress_callback(self, func):
         """Registers an on download progess callback function after object
         initialization.
 
-        :param func fn:
+        :param callable func:
             A callback function that takes ``stream``, ``chunk``,
             ``file_handle``, ``bytes_remaining`` as parameters.
         """
-        self._monostate['on_progress'] = fn
+        self._monostate['on_progress'] = func
 
-    def register_on_complete_callback(self, fn):
+    def register_on_complete_callback(self, func):
         """Registers an on download complete callback function after object
         initialization.
 
-        :param func fn:
+        :param callable func:
             A callback function that takes ``stream`` and  ``file_handle``.
         """
-        self._monostate['on_complete'] = fn
+        self._monostate['on_complete'] = func

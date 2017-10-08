@@ -80,7 +80,7 @@ class Stream(object):
             setattr(self, key, val)
 
     @property
-    def is_dash(self):
+    def is_adaptive(self):
         """Whether the stream is DASH."""
         # if codecs has two elements (e.g.: ['vp8', 'vorbis']): 2 % 2 = 0
         # if codecs has one element (e.g.: ['vp8']) 1 % 2 = 1
@@ -99,7 +99,7 @@ class Stream(object):
     def parse_codecs(self):
         video = None
         audio = None
-        if not self.is_dash:
+        if not self.is_adaptive:
             video, audio = self.codecs
         elif self.is_video:
             video = self.codecs[0]
@@ -167,7 +167,7 @@ class Stream(object):
         parts = ['itag="{s.itag}"', 'mime_type="{s.mime_type}"']
         if self.is_video:
             parts.extend(['res="{s.resolution}"', 'fps="{s.fps}fps"'])
-            if not self.is_dash:
+            if not self.is_adaptive:
                 parts.extend([
                     'vcodec="{s.video_codec}"',
                     'acodec="{s.audio_codec}"',
