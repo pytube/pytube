@@ -14,7 +14,7 @@ class StreamQuery:
         """Constructs a :class:`StreamQuery <StreamQuery>`.
         """
 
-        # list of :class:`Stream <Stream>` instances
+        # list of :class:`Stream <Stream>` instances.
         self.fmt_streams = fmt_streams
         self.itag_index = {int(s.itag): s for s in fmt_streams}
 

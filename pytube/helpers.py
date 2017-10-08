@@ -6,8 +6,54 @@ pytube.helpers
 Various helper functions implemented by pytube.
 
 """
+from __future__ import absolute_import
+
 import functools
+import json
+import logging
 import re
+
+from pytube.exceptions import RegexMatchError
+
+
+logger = logging.getLogger(__name__)
+
+
+def regex_search(pattern, string, groups=False, group=None, flags=0):
+    """Shortcut method to search a string for a given pattern.
+
+    :param str pattern:
+        A regular expression pattern.
+    :param str string:
+        A target string to search.
+    :param bool groups:
+        Should the return value be ``.groups()``.
+    :param int group:
+        Index of group to return.
+    """
+    regex = re.compile(pattern, flags)
+    results = regex.search(string)
+    logger.debug(
+        'finished regex search: %s',
+        json.dumps(
+            {
+                'pattern': pattern,
+                'results': results.group(0),
+            }, indent=2,
+        ),
+    )
+    if not results:
+        raise RegexMatchError(
+            'Regex Pattern ({pattern}) had zero matches'
+            .format(pattern=pattern),
+        )
+    else:
+        if groups:
+            return results.groups()
+        elif group:
+            return results.group(group)
+        else:
+            return results
 
 
 def apply_mixin(dct, key, func, *args, **kwargs):

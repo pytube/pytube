@@ -22,6 +22,7 @@ import re
 from itertools import chain
 
 from pytube.helpers import memoize
+from pytube.helpers import regex_search
 
 
 logger = logging.getLogger(__name__)
@@ -36,12 +37,8 @@ def get_initial_function_name(js):
     """
     # c&&d.set("signature", EE(c));
     pattern = r'"signature",\s?([a-zA-Z0-9$]+)\('
-    regex = re.compile(pattern)
-    return (
-        regex
-        .search(js)
-        .group(1)
-    )
+    logger.debug('finding initial function name')
+    return regex_search(pattern, js, group=1)
 
 
 def get_transform_plan(js):
@@ -65,13 +62,8 @@ def get_transform_plan(js):
     """
     name = re.escape(get_initial_function_name(js))
     pattern = r'%s=function\(\w\){[a-z=\.\(\"\)]*;(.*);(?:.+)}' % name
-    regex = re.compile(pattern)
-    return (
-        regex
-        .search(js)
-        .group(1)
-        .split(';')
-    )
+    logger.debug('getting transform plan')
+    return regex_search(pattern, js, group=1).split(';')
 
 
 def get_transform_object(js, var):
@@ -95,11 +87,9 @@ def get_transform_object(js, var):
 
     """
     pattern = r'var %s={(.*?)};' % re.escape(var)
-    regex = re.compile(pattern, re.DOTALL)
+    logger.debug('getting transform object')
     return (
-        regex
-        .search(js)
-        .group(1)
+        regex_search(pattern, js, group=1, flags=re.DOTALL)
         .replace('\n', ' ')
         .split(', ')
     )
@@ -188,7 +178,7 @@ def map_functions(js_func):
 
 def parse_function(js_func):
     """Breaks a JavaScript transform function down into a two element tuple
-    containing the function name and some integer-based modifier.
+    containing the function name and some integer-based argument.
 
     Sample Input:
     ~~~~~~~~~~~~~
@@ -203,12 +193,8 @@ def parse_function(js_func):
 
     """
     pattern = r'\w+\.(\w+)\(\w,(\d+)\)'
-    regex = re.compile(pattern)
-    return (
-        regex
-        .search(js_func)
-        .groups()
-    )
+    logger.debug('parsing transform function')
+    return regex_search(pattern, js_func, groups=True)
 
 
 @memoize
@@ -231,4 +217,8 @@ def get_signature(js, ciphered_signature):
     for js_func in tplan:
         name, argument = parse_function(js_func)
         signature = tmap[name](signature, int(argument))
+        logger.debug(
+            'getting signature: %s(sig, %s) => %s', name, argument,
+            ''.join(signature),
+        )
     return ''.join(signature)
