@@ -82,15 +82,12 @@ class YouTube(object):
         """
         logger.info('init started')
         self.prefetch()
-        self.vid_info = extract.decode_video_info(self.vid_info)
 
         progressive_fmts = 'url_encoded_fmt_stream_map'
         adaptive_fmts = 'adaptive_fmts'
         config_args = self.player_config['args']
 
         # unscrambles the data necessary to access the streams and metadata.
-        mixins.apply_descrambler(self.vid_info, progressive_fmts)
-        mixins.apply_descrambler(self.vid_info, adaptive_fmts)
         mixins.apply_descrambler(config_args, progressive_fmts)
         mixins.apply_descrambler(config_args, adaptive_fmts)
 
