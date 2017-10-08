@@ -46,9 +46,8 @@ class YouTube(object):
         self.js = None      # js fetched by js_url
         self.js_url = None  # the url to the js, parsed from watch html
 
-        # note: vid_info can possibly be removed, the fmt stream data contained
-        # in here doesn't compute a usable signature and the rest of the data
-        # may be redundant.
+        # note: vid_info may eventually be removed. It sounds like it once had
+        # additional formats, but that doesn't appear to still be the case.
 
         self.vid_info = None      # content fetched by vid_info_url
         self.vid_info_url = None  # the url to vid info, parsed from watch html
@@ -83,9 +82,14 @@ class YouTube(object):
         logger.info('init started')
         self.prefetch()
 
+        self.vid_info = extract.decode_video_info(self.vid_info)
+
         progressive_fmts = 'url_encoded_fmt_stream_map'
         adaptive_fmts = 'adaptive_fmts'
         config_args = self.player_config['args']
+
+        mixins.apply_descrambler(self.vid_info, progressive_fmts)
+        mixins.apply_descrambler(self.vid_info, adaptive_fmts)
 
         # unscrambles the data necessary to access the streams and metadata.
         mixins.apply_descrambler(config_args, progressive_fmts)
