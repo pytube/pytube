@@ -51,15 +51,15 @@ def apply_signature(config_args, fmt, js):
         stream_manifest[i]['url'] = url + '&signature=' + signature
 
 
-def apply_parse_qs(dct, key):
-    """Parses query string key/values into dictionary, and then applies it
-    in-place.
+def apply_descrambler(stream_data, key):
+    """Applies various in-place transforms to YouTube's media stream data.
 
     :param dict dct:
         Dictionary containing query string encoded values.
     :param str key:
         Name of the key in dictionary.
     """
-    dct[key] = [
-        {k: unquote(v) for k, v in parse_qsl(i)} for i in dct[key].split(',')
+    stream_data[key] = [
+        {k: unquote(v) for k, v in parse_qsl(i)}
+        for i in stream_data[key].split(',')
     ]

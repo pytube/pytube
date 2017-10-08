@@ -89,10 +89,10 @@ class YouTube(object):
         config_args = self.player_config['args']
 
         # unscrambles the data necessary to access the streams and metadata.
-        mixins.apply_parse_qs(self.vid_info, progressive_fmts)
-        mixins.apply_parse_qs(self.vid_info, adaptive_fmts)
-        mixins.apply_parse_qs(config_args, progressive_fmts)
-        mixins.apply_parse_qs(config_args, adaptive_fmts)
+        mixins.apply_descrambler(self.vid_info, progressive_fmts)
+        mixins.apply_descrambler(self.vid_info, adaptive_fmts)
+        mixins.apply_descrambler(config_args, progressive_fmts)
+        mixins.apply_descrambler(config_args, adaptive_fmts)
 
         # apply the signature to the download url.
         mixins.apply_signature(config_args, progressive_fmts, self.js)
