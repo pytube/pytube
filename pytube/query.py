@@ -46,7 +46,6 @@ class StreamQuery:
             (optional) Average bitrate (ABR) refers to the average amount of
             data transferred per unit of time (e.g.: 64kbps, 192kbps)
         :param str bitrate:
-
             (optional) Alias to ``abr``.
         :param str video_codec:
             (optional) Digital video compression format (e.g.: vp9, mp4v.20.3).
