@@ -11,39 +11,48 @@ import re
 
 
 def apply_mixin(dct, key, func, *args, **kwargs):
+    """Applies an inplace data mutation to a dictionary.
+
+    :param dict dct:
+        Dictionary to apply mixin function to.
+    :param str key:
+        Key within dictionary to apply mixin function to.
+    :param callable func:
+        Transform function to apply to dct[key].
+    :param \*args:
+        (optional) positional arguments that ``func`` takes.
+    :param \*\*kwargs:
+        (optional) keyword arguments that ``func`` takes.
+    """
     dct[key] = func(dct[key], *args, **kwargs)
 
 
-def truncate(text, max_length=200):
-    return text[:max_length].rsplit(' ', 0)[0]
+def safe_filename(s, max_length=255):
+    """Attempts to sanitize an arbitrary string making it safe to use as a
+    filename (see: https://en.wikipedia.org/wiki/Filename).
 
+    :param str text:
+        A string to make safe for use as a file name.
+    :param int max_length:
+        The maximum filename character length.
+    """
 
-def safe_filename(text, max_length=200):
-    """Sanitizes filenames for many operating systems."""
-    output_text = text
-
-    output_text = (
-        text
-        .replace('_', ' ')
-        .replace(':', ' -')
-    )
-
-    # NTFS forbids filenames containing characters in range 0-31 (0x00-0x1F)
-    ntfs_illegal_chars = [chr(i) for i in range(0, 31)]
-
-    # Removing these SHOULD make most filename safe for a wide range of
-    # operating systems.
-    misc_illegal_chars = [
+    # Characters in range 0-31 (0x00-0x1F) are not allowed in NTFS filenames.
+    ntfs_chrs = [chr(i) for i in range(0, 31)]
+    chrs = [
         '\"', '\#', '\$', '\%', '\'', '\*', '\,', '\.', '\/', '\:',
         '\;', '\<', '\>', '\?', '\\', '\^', '\|', '\~', '\\\\',
     ]
-    pattern = '|'.join(ntfs_illegal_chars + misc_illegal_chars)
-    forbidden_chars = re.compile(pattern, re.UNICODE)
-    filename = forbidden_chars.sub('', output_text)
-    return truncate(filename)
+    pattern = '|'.join(ntfs_chrs + chrs)
+    regex = re.compile(pattern, re.UNICODE)
+    filename = regex.sub('', s)
+    return filename[:max_length].rsplit(' ', 0)[0]
 
 
 def memoize(func):
+    """A function decorator that caches input arguments for return values, to
+    avoid recomputation on repeat calls.
+    """
     cache = func.cache = {}
 
     @functools.wraps(func)
