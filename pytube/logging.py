@@ -11,8 +11,9 @@ import logging
 
 
 def create_logger(level=logging.DEBUG):
-    fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    formatter = logging.Formatter(fmt)
+    fmt = '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
+    date_fmt = '%H:%M:%S'
+    formatter = logging.Formatter(fmt, datefmt=date_fmt)
 
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)

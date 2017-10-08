@@ -8,8 +8,8 @@ Applies in-place data mutations.
 """
 from __future__ import absolute_import
 
-import json
 import logging
+import pprint
 
 from pytube import cipher
 from pytube.compat import parse_qsl
@@ -46,7 +46,7 @@ def apply_signature(config_args, fmt, js):
 
         logger.debug(
             'finished descrambling signature for itag=%s\n%s',
-            stream['itag'], json.dumps(
+            stream['itag'], pprint.pprint(
                 {
                     's': stream['s'],
                     'signature': signature,
@@ -69,3 +69,4 @@ def apply_descrambler(stream_data, key):
         {k: unquote(v) for k, v in parse_qsl(i)}
         for i in stream_data[key].split(',')
     ]
+    logger.debug('applying descrambler\n%s', pprint.pprint(stream_data[key]))

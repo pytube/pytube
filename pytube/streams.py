@@ -10,9 +10,9 @@ separately).
 """
 from __future__ import absolute_import
 
-import json
 import logging
 import os
+import pprint
 
 from pytube import extract
 from pytube import request
@@ -181,8 +181,8 @@ class Stream(object):
         """
         file_handler.write(chunk)
         logger.debug(
-            'download progress %s',
-            json.dumps(
+            'download progress\n%s',
+            pprint.pprint(
                 {
                     'chunk_size': len(chunk),
                     'bytes_remaining': bytes_remaining,

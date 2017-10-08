@@ -9,8 +9,8 @@ Various helper functions implemented by pytube.
 from __future__ import absolute_import
 
 import functools
-import json
 import logging
+import pprint
 import re
 
 from pytube.exceptions import RegexMatchError
@@ -35,7 +35,7 @@ def regex_search(pattern, string, groups=False, group=None, flags=0):
     results = regex.search(string)
     logger.debug(
         'finished regex search: %s',
-        json.dumps(
+        pprint.pprint(
             {
                 'pattern': pattern,
                 'results': results.group(0),

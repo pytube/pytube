@@ -18,9 +18,11 @@ signature and decoding it.
 from __future__ import absolute_import
 
 import logging
+import pprint
 import re
 from itertools import chain
 
+from pytube.exceptions import RegexMatchError
 from pytube.helpers import memoize
 from pytube.helpers import regex_search
 
@@ -173,7 +175,10 @@ def map_functions(js_func):
     for pattern, fn in mapper:
         if re.search(pattern, js_func):
             return fn
-    # TODO(nficano): raise error
+    raise RegexMatchError(
+        'could not find python equivalent function for: ',
+        js_func,
+    )
 
 
 def parse_function(js_func):
@@ -218,7 +223,13 @@ def get_signature(js, ciphered_signature):
         name, argument = parse_function(js_func)
         signature = tmap[name](signature, int(argument))
         logger.debug(
-            'getting signature: %s(sig, %s) => %s', name, argument,
-            ''.join(signature),
+            'applied transform function\n%s', pprint.pformat(
+                {
+                    'output': ''.join(signature),
+                    'js_function': name,
+                    'argument': int(argument),
+                    'function': tmap[name],
+                }, indent=2,
+            ),
         )
     return ''.join(signature)
