@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pytube.streams
-~~~~~~~~~~~~~~
+This module contrains a container for stream manifest data.
 
 A container object for the media stream (video only / audio only / video+audio
 combined). This was referred to as ``Video`` in the legacy pytube version, but
@@ -25,9 +24,10 @@ logger = logging.getLogger(__name__)
 
 
 class Stream(object):
+    """Container for stream manifest data."""
 
     def __init__(self, stream, player_config, monostate):
-        """Constructs a :class:`Stream <Stream>`.
+        """Construct a :class:`Stream <Stream>`.
 
         :param dict stream:
             The unscrambled data extracted from YouTube.
@@ -83,7 +83,7 @@ class Stream(object):
         self.video_codec, self.audio_codec = self.parse_codecs()
 
     def set_attributes_from_dict(self, dct):
-        """Sets class attributes from dictionary items."""
+        """Set class attributes from dictionary items."""
         for key, val in dct.items():
             setattr(self, key, val)
 
@@ -105,7 +105,9 @@ class Stream(object):
         return self.type == 'video'
 
     def parse_codecs(self):
-        """Parses a variable length sized list of codecs and returns a
+        """Get the video/audio codecs from list of codecs.
+
+        Parse a variable length sized list of codecs and returns a
         consitant two element tuple, with the video codec as the first element
         and audio as the second. Returns ``None`` if one is not available
         (adaptive only).
@@ -124,15 +126,13 @@ class Stream(object):
     @property
     @memoize
     def filesize(self):
-        """The file size of the media stream in bytes."""
+        """File size of the media stream in bytes."""
         headers = request.get(self.url, headers=True)
         return int(headers['Content-Length'])
 
     @property
     def default_filename(self):
-        """A generated filename based on the video title, but sanitized for the
-        filesystem.
-        """
+        """Generate filename based on the video title."""
         title = self.player_config['args']['title']
         filename = safe_filename(title)
         return '{filename}.{s.subtype}'.format(filename=filename, s=self)
@@ -145,7 +145,6 @@ class Stream(object):
             specified, defaults to the current working directory.
 
         """
-
         # TODO(nficano): allow a filename to specified.
         output_path = output_path or os.getcwd()
 
@@ -165,10 +164,11 @@ class Stream(object):
                 self.on_progress(chunk, fh, bytes_remaining)
 
     def on_progress(self, chunk, file_handler, bytes_remaining):
-        """The on progress callback. This function writes the binary data to
-        the file, then checks if an additional callback is defined in the
-        monostate. This is exposed to allow things like displaying a progress
-        bar.
+        """On progress callback function.
+
+        This function writes the binary data to the file, then checks if an
+        additional callback is defined in the monostate. This is exposed to
+        allow things like displaying a progress bar.
 
         :param str chunk:
             Segment of media file binary data, not yet written to disk.

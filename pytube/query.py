@@ -1,19 +1,12 @@
 # -*- coding: utf-8 -*-
-"""
-pytube.query
-~~~~~~~~~~~~
-
-The :class:`StreamQuery <StreamQuery>` class provides an interface for querying
-the available media streams.
-"""
+"""This module provides a query interface for media streams."""
 
 
 class StreamQuery:
+    """Interface for querying the available media streams."""
 
     def __init__(self, fmt_streams):
-        """Constructs a :class:`StreamQuery <StreamQuery>`.
-        """
-
+        """Construct a :class:`StreamQuery <StreamQuery>`."""
         # list of :class:`Stream <Stream>` instances.
         self.fmt_streams = fmt_streams
         self.itag_index = {int(s.itag): s for s in fmt_streams}
@@ -24,8 +17,7 @@ class StreamQuery:
             bitrate=None, video_codec=None, audio_codec=None,
             custom_filter_functions=None,
     ):
-        """Apply the given filtering criterion to a copy of this
-        :class:`StreamQuery <StreamQuery>`.
+        """Apply the given filtering criterion.
 
         :param int fps:
             (optional) The frames per second (30 or 60)
@@ -54,6 +46,7 @@ class StreamQuery:
         :param list custom_filter_functions:
             (optional) Interface for defining complex filters without
             subclassing.
+
         """
         filters = []
         if res or resolution:
@@ -90,10 +83,11 @@ class StreamQuery:
         return StreamQuery(fmt_streams)
 
     def get_by_itag(self, itag):
-        """Return an instance based on the given itag, or None if not found.
+        """Get a :class:`Stream <Stream>` for an itag, or None if not found.
 
         :param str itag:
             YouTube format identifier code.
+
         """
         try:
             return self.itag_index[itag]
@@ -101,7 +95,9 @@ class StreamQuery:
             pass
 
     def first(self):
-        """Return the first result of this query or None if the result doesn't
+        """Get the first element in the results.
+
+        Return the first result of this query or None if the result doesn't
         contain any streams.
 
         """
@@ -111,7 +107,9 @@ class StreamQuery:
             pass
 
     def last(self):
-        """Return the last result of this query or None if the result doesn't
+        """Get the last element in the results.
+
+        Return the last result of this query or None if the result doesn't
         contain any streams.
 
         """
@@ -121,9 +119,9 @@ class StreamQuery:
             pass
 
     def count(self):
-        """Return the count the query would return."""
+        """Get the count the query would return."""
         return len(self.fmt_streams)
 
     def all(self):
-        """Return the results represented by this query as a list."""
+        """Get all the results represented by this query as a list."""
         return self.fmt_streams

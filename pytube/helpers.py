@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-pytube.helpers
-~~~~~~~~~~~~~~
-
-Various helper functions implemented by pytube.
-
-"""
+"""Various helper functions implemented by pytube."""
 from __future__ import absolute_import
 
 import functools
@@ -57,7 +51,7 @@ def regex_search(pattern, string, groups=False, group=None, flags=0):
 
 
 def apply_mixin(dct, key, func, *args, **kwargs):
-    """Applies an in-place data mutation to a dictionary.
+    r"""Apply in-place data mutation to a dictionary.
 
     :param dict dct:
         Dictionary to apply mixin function to.
@@ -74,15 +68,16 @@ def apply_mixin(dct, key, func, *args, **kwargs):
 
 
 def safe_filename(s, max_length=255):
-    """Attempts to sanitize an arbitrary string making it safe to use as a
-    filename (see: https://en.wikipedia.org/wiki/Filename).
+    """Sanitize a string making it safe to use as a filename.
+
+    This function was based off the limitations outlined here:
+    https://en.wikipedia.org/wiki/Filename.
 
     :param str text:
         A string to make safe for use as a file name.
     :param int max_length:
         The maximum filename character length.
     """
-
     # Characters in range 0-31 (0x00-0x1F) are not allowed in NTFS filenames.
     ntfs_chrs = [chr(i) for i in range(0, 31)]
     chrs = [
@@ -96,9 +91,7 @@ def safe_filename(s, max_length=255):
 
 
 def memoize(func):
-    """A function decorator that caches input arguments for return values, to
-    avoid recomputation on repeat calls.
-    """
+    """Decorate that caches input arguments for return values."""
     cache = func.cache = {}
 
     @functools.wraps(func)

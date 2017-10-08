@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-pytube.extract
-~~~~~~~~~~~~~~
-
-This module is responsible for all non-cipher related data extraction
-(primarily used during data pre-fetching).
-"""
+"""This module contains all non-cipher related data extraction logic."""
 import json
 
 from pytube.compat import quote
@@ -15,7 +9,7 @@ from pytube.helpers import regex_search
 
 
 def video_id(url):
-    """The ``video_id`` part of /watch?v=<video_id>.
+    """Extract the ``video_id`` part of /watch?v=<video_id>.
 
     :param str url:
         A url YouTube id containing a video_id.
@@ -25,7 +19,7 @@ def video_id(url):
 
 
 def watch_url(video_id):
-    """Constructs a YouTube Watch url, given a video id.
+    """Construct a YouTube watch url, given a video id.
 
     :param str video_id:
         A YouTube video identifer.
@@ -35,7 +29,7 @@ def watch_url(video_id):
 
 
 def video_info_url(video_id, watch_url, watch_html):
-    """Contructs the video_info URL.
+    """Contruct the video_info url.
 
     :param str video_id:
         A YouTube video identifer.
@@ -61,8 +55,10 @@ def video_info_url(video_id, watch_url, watch_html):
 
 
 def js_url(watch_html):
-    """Constructs the base JavaScript url, which contains the decipher
-    transforms.
+    """Get the base JavaScript url.
+
+    Construct the base JavaScript url, which contains the decipher
+    "transforms".
 
     :param str watch_html:
         The html contents of the watch page.
@@ -74,9 +70,11 @@ def js_url(watch_html):
 
 
 def mime_type_codec(mime_type_codec):
-    """Parses the type data, which contains mime type and codecs serialized
-    together (e.g.: 'audio/webm; codecs="opus"'), and splits them into
-    separate elements. (e.g.: 'audio/webm', ['opus'])
+    """Parse the type data.
+
+    Breaks up the data in the ``type`` key of the manifest, which contains mime
+    type and codecs serialized together (e.g.: 'audio/webm; codecs="opus"'),
+    and splits them into separate elements. (e.g.: 'audio/webm', ['opus'])
 
     :param str mime_type_codec:
         String containing mime type and codecs.
@@ -89,8 +87,11 @@ def mime_type_codec(mime_type_codec):
 
 @memoize
 def get_ytplayer_config(watch_html):
-    """The ``ytplayer_config`` is json data embedded within the watch html and
-    serves as the primary source of obtaining the stream manifest data.
+    """Get the YouTube player configuration data from the watch html.
+
+    Extract the ``ytplayer_config``, which is json data embedded within the
+    watch html and serves as the primary source of obtaining the stream
+    manifest data.
 
     :param str watch_html:
         The html contents of the watch page.

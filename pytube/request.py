@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-pytube.request
-~~~~~~~~~~~~~~
-
-Implements a simple wrapper around urlopen.
-"""
+"""Implements a simple wrapper around urlopen."""
 import multiprocessing
 
 from pytube.compat import urlopen
@@ -14,7 +9,7 @@ def get(
     url=None, urls=[], processes=2, headers=False,
     streaming=False, chunk_size=8 * 1024,
 ):
-    """Sends an http GET request.
+    """Send an http GET request.
 
     :param str url:
         The URL to perform the GET request for.
@@ -46,7 +41,7 @@ def get(
 
 
 def stream_response(response, chunk_size=8 * 1024):
-    """Reads the :module:`urlopen` response in chunks."""
+    """Read the :module:`urlopen` response in chunks."""
     while True:
         buf = response.read(chunk_size)
         if not buf:

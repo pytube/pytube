@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-pytube.__main__
-~~~~~~~~~~~~~~~
+This module implements the core developer interface for pytube.
 
-This module implements the core developer interface for pytube. This class does
-minimal heavy lifting and instead relies on many small (mostly pure) functions
-to handle the extraction, pattern matching, etc. to make testing easier.
+The problem domain of the :class:`YouTube <YouTube> class focuses almost
+exclusively on the developer interface. Pytube offloads the heavy lifting to
+smaller peripheral modules and functions.
 
 """
 from __future__ import absolute_import
@@ -27,12 +26,13 @@ logger = logging.getLogger(__name__)
 
 
 class YouTube(object):
+    """Core developer interface for pytube."""
 
     def __init__(
         self, url=None, defer_init=False, on_progress_callback=None,
         on_complete_callback=None,
     ):
-        """Constructs a :class:`YouTube <YouTube>`.
+        """Construct a :class:`YouTube <YouTube>`.
 
         :param str url:
             A valid YouTube watch URL.
@@ -69,7 +69,7 @@ class YouTube(object):
         # A dictionary shared between all instances of :class:`Stream <Stream>`
         # (Borg pattern).
         self.stream_monostate = {
-            # user defined callback functions
+            # user defined callback functions.
             'on_progress': on_progress_callback,
             'on_complete': on_complete_callback,
         }
@@ -78,9 +78,12 @@ class YouTube(object):
             self.init()
 
     def init(self):
-        """Makes all necessary network requests, data transforms, and popluates
-        the instances of :class:`Stream <Stream>`.
+        """Download data, descramble it, and build Stream instances.
 
+        The initialization process takes advantage of Python's
+        "call-by-reference evaluation," which allows dictionary transforms to
+        be applied in-place, instead of holding references to mutations at each
+        interstitial step.
         """
         logger.info('init started')
         self.prefetch()
@@ -111,7 +114,9 @@ class YouTube(object):
         logger.info('init finished successfully')
 
     def prefetch(self):
-        """Eagerly executes all necessary network requests so all other
+        """Eagerly download all necessary data.
+
+        Eagerly executes all necessary network requests so all other
         operations don't does need to make calls outside of the interpreter
         which blocks for long periods of time.
 
@@ -129,7 +134,9 @@ class YouTube(object):
         ])
 
     def initialize_stream_objects(self, fmt):
-        """Takes the unscrambled stream data and uses it to initialize
+        """Convert manifest data to instances of :class:`Stream <Stream>`.
+
+        Take the unscrambled stream data and uses it to initialize
         instances of :class:`Stream <Stream>` for each media stream.
 
         :param str fmt:
@@ -166,8 +173,7 @@ class YouTube(object):
         return StreamQuery([s for s in self.fmt_streams])
 
     def register_on_progress_callback(self, func):
-        """Registers an on download progess callback function after object
-        initialization.
+        """Register a download progess callback function post initialization.
 
         :param callable func:
             A callback function that takes ``stream``, ``chunk``,
@@ -176,8 +182,7 @@ class YouTube(object):
         self._monostate['on_progress'] = func
 
     def register_on_complete_callback(self, func):
-        """Registers an on download complete callback function after object
-        initialization.
+        """Register a download complete callback function post initialization.
 
         :param callable func:
             A callback function that takes ``stream`` and  ``file_handle``.

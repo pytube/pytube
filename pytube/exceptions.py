@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-pytube.exceptions
-~~~~~~~~~~~~~~~~~
-
-pytube specific exception definitions.
-"""
+"""Library specific exception definitions."""
 import socket
 import sys
 from traceback import format_tb
@@ -13,9 +8,11 @@ from pytube.compat import URLError
 
 
 class PytubeError(Exception):
-    """Base pytube exception that all others inherent. This is done to not
-    pollute the built-in exceptions, which *could* result in unintended errors
-    being unexpectedly and incorrectly handled within implementers code.
+    """Base pytube exception that all others inherent.
+
+    This is done to not pollute the built-in exceptions, which *could* result
+    in unintended errors being unexpectedly and incorrectly handled within
+    implementers code.
     """
 
 
@@ -23,8 +20,7 @@ class ExtractError(PytubeError):
     """Data extraction based exception."""
 
     def __init__(self, msg, tb=None, expected=False, video_id=None):
-        """Constructs an instance of a :class:`ExtractError <ExtractError>`
-        exception.
+        """Construct an instance of a :class:`ExtractError <ExtractError>`.
 
         :param str msg:
             User defined error message.
@@ -56,7 +52,7 @@ class ExtractError(PytubeError):
         self.video_id = video_id
 
     def format_traceback(self):
-        """Pretty-print traceback"""
+        """Pretty-print the traceback."""
         if self.traceback:
             return ''.join(format_tb(self.traceback))
 

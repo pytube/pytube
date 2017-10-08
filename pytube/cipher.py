@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pytube.cipher
-~~~~~~~~~~~~~
+This module countains all logic necessary to decipher the signature.
 
 YouTube's strategy to restrict downloading videos is to send a ciphered version
 of the signature to the client, along with the decryption algorithm obfuscated
@@ -14,6 +13,7 @@ signature sent in the GET parameters is valid, and then returns the content
 This module is responsible for (1) finding and extracting those "transform
 functions" (2) maps them to Python equivalents and (3) taking the ciphered
 signature and decoding it.
+
 """
 from __future__ import absolute_import
 
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_initial_function_name(js):
-    """Extracts the name of the function responsible for computing the signature.
+    """Extract the name of the function responsible for computing the signature.
 
     :param str js:
         The contents of the base.js asset file.
@@ -44,8 +44,10 @@ def get_initial_function_name(js):
 
 
 def get_transform_plan(js):
-    """Extracts the "transform plan", that is, the functions the original
-    signature is passed through to decode the actual signature.
+    """Extract the "transform plan".
+
+    The "transform plan" is the functions the ciphered signature is passed
+    through to obtain the actual signature.
 
     :param str js:
         The contents of the base.js asset file.
@@ -69,11 +71,12 @@ def get_transform_plan(js):
 
 
 def get_transform_object(js, var):
-    """Extracts the "transform object" which contains the function definitions
-    referenced in the "transform plan". The ``var`` argument is the obfuscated
-    variable name which contains these functions, for example, given the
-    function call ``DE.AJ(a,15)`` returned by the transform plan, "DE" would be
-    the var.
+    """Extract the "transform object".
+
+    The "transform object" contains the function definitions referenced in the
+    "transform plan". The ``var`` argument is the obfuscated variable name
+    which contains these functions, for example, given the function call
+    ``DE.AJ(a,15)`` returned by the transform plan, "DE" would be the var.
 
     :param str js:
         The contents of the base.js asset file.
@@ -99,7 +102,9 @@ def get_transform_object(js, var):
 
 @memoize
 def get_transform_map(js, var):
-    """Builds a lookup table of obfuscated JavaScript function names to the
+    """Build a transform function lookup.
+
+    Build a lookup table of obfuscated JavaScript function names to the
     Python equivalents.
 
     :param str js:
@@ -120,9 +125,12 @@ def get_transform_map(js, var):
 
 
 def reverse(arr, b):
-    """Immutable equivalent to function(a, b) { a.reverse() }. This method
-    takes an unused ``b`` variable as their transform functions universally
-    sent two arguments.
+    """Reverse elements in a list.
+
+    This function is equivalent to: function(a, b) { a.reverse() }.
+
+    This method takes an unused ``b`` variable as their transform functions
+    universally sent two arguments.
 
     Example usage:
     ~~~~~~~~~~~~~~
@@ -133,7 +141,9 @@ def reverse(arr, b):
 
 
 def splice(arr, b):
-    """Immutable equivalent to function(a, b) { a.splice(0, b) }.
+    """Add/remove items to/from a list.
+
+    This function is equivalent to: function(a, b) { a.splice(0, b) }.
 
     Example usage:
     ~~~~~~~~~~~~~~
@@ -144,7 +154,9 @@ def splice(arr, b):
 
 
 def swap(arr, b):
-    """Immutable equivalent to:
+    """Swap positions at b modulus the list length.
+
+    This function is equivalent to:
     function(a, b) { var c=a[0];a[0]=a[b%a.length];a[b]=c }.
 
     Example usage:
@@ -182,7 +194,9 @@ def map_functions(js_func):
 
 
 def parse_function(js_func):
-    """Breaks a JavaScript transform function down into a two element tuple
+    """Parse the Javascript transform function.
+
+    Break a JavaScript transform function down into a two element tuple
     containing the function name and some integer-based argument.
 
     Sample Input:
@@ -204,7 +218,9 @@ def parse_function(js_func):
 
 @memoize
 def get_signature(js, ciphered_signature):
-    """Taking the ciphered signature, applies the transform functions and
+    """Decipher the signature.
+
+    Taking the ciphered signature, applies the transform functions and
     returns the decrypted version.
 
     :param str js:

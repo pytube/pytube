@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # flake8: noqa
-"""
-pytube.compat
-~~~~~~~~~~~~~
-
-Some py2/py3 compatibility support.
-"""
+"""Python 2/3 compatibility support."""
 import sys
 
 python_version = sys.version_info[0]

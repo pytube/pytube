@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-pytube.cli
-~~~~~~~~~~
-
-A simple command line application to download youtube videos.
-
-"""
+"""A simple command line application to download youtube videos."""
 from __future__ import print_function
 
 import argparse
@@ -16,7 +10,7 @@ from pytube import YouTube
 
 
 def main():
-    """A simple command line application to download youtube videos."""
+    """Command line application to download youtube videos."""
     parser = argparse.ArgumentParser(description=main.__doc__)
     parser.add_argument('url', help='The YouTube /watch url', nargs='?')
     parser.add_argument(
@@ -41,13 +35,13 @@ def main():
 
 
 def get_terminal_size():
-    """Returns the terminal size in rows and columns."""
+    """Return the terminal size in rows and columns."""
     rows, columns = os.popen('stty size', 'r').read().split()
     return int(rows), int(columns)
 
 
 def display_progress_bar(bytes_received, filesize, ch='█', scale=0.55):
-    """Displays a simple, pretty progress bar.
+    """Display a simple, pretty progress bar.
 
     Example:
     ~~~~~~~~
@@ -94,7 +88,7 @@ def on_progress(stream, file_handle, bytes_remaining):
 
 
 def download(url, itag):
-    """Begin downloading a YouTube video.
+    """Start downloading a YouTube video.
 
     :param str url:
         A valid YouTube watch URL.
@@ -115,7 +109,7 @@ def download(url, itag):
 
 
 def display_streams(url):
-    """Probes YouTube video and lists its available formats.
+    """Probe YouTube video and lists its available formats.
 
     :param str url:
         A valid YouTube watch URL.

@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-pytube.mixins
-~~~~~~~~~~~~~
-
-Applies in-place data mutations.
-
-"""
+"""Applies in-place data mutations."""
 from __future__ import absolute_import
 
 import logging
@@ -20,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def apply_signature(config_args, fmt, js):
-    """Applies the decrypted signature to the stream manifest.
+    """Apply the decrypted signature to the stream manifest.
 
     :param dict config_args:
         Details of the media streams available.
@@ -57,7 +51,7 @@ def apply_signature(config_args, fmt, js):
 
 
 def apply_descrambler(stream_data, key):
-    """Applies various in-place transforms to YouTube's media stream data.
+    """Apply various in-place transforms to YouTube's media stream data.
 
     :param dict dct:
         Dictionary containing query string encoded values.
