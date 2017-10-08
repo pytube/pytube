@@ -4,6 +4,7 @@ pytube.mixins
 ~~~~~~~~~~~~~
 
 Applies in-place data mutations.
+
 """
 from __future__ import absolute_import
 
@@ -29,12 +30,16 @@ def apply_signature(config_args, fmt, js):
         "adaptive_fmts").
     :param str js:
         The contents of the base.js asset file.
+
     """
     stream_manifest = config_args[fmt]
     for i, stream in enumerate(stream_manifest):
         url = stream['url']
 
         if 'signature=' in url:
+            # For certain videos, YouTube will just provide them pre-signed, in
+            # which case there's no real magic to download them and we can skip
+            # the whole signature decrambling entirely.
             continue
 
         signature = cipher.get_signature(js, stream['s'])
@@ -58,6 +63,7 @@ def apply_descrambler(stream_data, key):
         Dictionary containing query string encoded values.
     :param str key:
         Name of the key in dictionary.
+
     """
     stream_data[key] = [
         {k: unquote(v) for k, v in parse_qsl(i)}
