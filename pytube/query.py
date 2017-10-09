@@ -103,7 +103,7 @@ class StreamQuery:
             filters.append(lambda s: s.is_progressive)
 
         if adaptive:
-            filters.append(lambda s: s.is_progressive)
+            filters.append(lambda s: s.is_adaptive)
 
         if custom_filter_functions:
             for fn in custom_filter_functions:
@@ -113,6 +113,19 @@ class StreamQuery:
         for fn in filters:
             fmt_streams = list(filter(fn, fmt_streams))
         return StreamQuery(fmt_streams)
+
+    def order_by(self, attribute_name):
+        fmt_streams = sorted(
+            self.fmt_streams,
+            key=lambda s: getattr(s, attribute_name),
+        )
+        return StreamQuery(fmt_streams)
+
+    def desc(self):
+        return StreamQuery(self.fmt_streams[::-1])
+
+    def asc(self):
+        return self
 
     def get_by_itag(self, itag):
         """Get a :class:`Stream <Stream>` for an itag, or None if not found.

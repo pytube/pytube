@@ -38,12 +38,140 @@ Download using pip via pypi.
 
     pip install pytube
 
-Easy as Pie 💥
-==============
+Getting started
+===============
 
-Behold, the power of pytube:
+Let's begin with showing how easy it is to download a video with pytube:
 
 .. code-block:: python
 
    >>> from pytube import YouTube
    >>> YouTube('http://youtube.com/watch?v=9bZkp7q19f0').streams.first().download()
+
+This example will download the highest quality progressive download stream available.
+
+Next, let's explore how we would view what video streams are available:
+
+.. code-block:: python
+
+   >>> yt = YouTube('http://youtube.com/watch?v=9bZkp7q19f0')
+   >>> yt.streams.all()
+   [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
+   <Stream: itag="43" mime_type="video/webm" res="360p" fps="30fps" vcodec="vp8.0" acodec="vorbis">,
+   <Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">,
+   <Stream: itag="36" mime_type="video/3gpp" res="240p" fps="30fps" vcodec="mp4v.20.3" acodec="mp4a.40.2">,
+   <Stream: itag="17" mime_type="video/3gpp" res="144p" fps="30fps" vcodec="mp4v.20.3" acodec="mp4a.40.2">,
+   <Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028">,
+   <Stream: itag="248" mime_type="video/webm" res="1080p" fps="30fps" vcodec="vp9">,
+   <Stream: itag="136" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.4d401f">,
+   <Stream: itag="247" mime_type="video/webm" res="720p" fps="30fps" vcodec="vp9">,
+   <Stream: itag="135" mime_type="video/mp4" res="480p" fps="30fps" vcodec="avc1.4d401e">,
+   <Stream: itag="244" mime_type="video/webm" res="480p" fps="30fps" vcodec="vp9">,
+   <Stream: itag="134" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.4d401e">,
+   <Stream: itag="243" mime_type="video/webm" res="360p" fps="30fps" vcodec="vp9">,
+   <Stream: itag="133" mime_type="video/mp4" res="240p" fps="30fps" vcodec="avc1.4d4015">,
+   <Stream: itag="242" mime_type="video/webm" res="240p" fps="30fps" vcodec="vp9">,
+   <Stream: itag="160" mime_type="video/mp4" res="144p" fps="30fps" vcodec="avc1.4d400c">,
+   <Stream: itag="278" mime_type="video/webm" res="144p" fps="30fps" vcodec="vp9">,
+   <Stream: itag="140" mime_type="audio/mp4" abr="128kbps" acodec="mp4a.40.2">,
+   <Stream: itag="171" mime_type="audio/webm" abr="128kbps" acodec="vorbis">,
+   <Stream: itag="249" mime_type="audio/webm" abr="50kbps" acodec="opus">,
+   <Stream: itag="250" mime_type="audio/webm" abr="70kbps" acodec="opus">,
+   <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus">]
+
+You may notice that some streams listed have both a video codec and audio codec, while others have just video or just audio, this is a result of YouTube supporting a streaming technique called Dynamic Adaptive Streaming over HTTP (DASH).
+
+In the context of pytube, the implications are for the highest quality streams; you now need to download both the audio and video tracks and then post-process them with software like FFmpeg to merge them.
+
+The legacy streams that contain the audio and video in a single file (referred to as "progressive download") are still available, but only for resolutions 720p and below.
+
+To only view these progressive download streams:
+
+.. code:: bash
+
+    >>> yt.streams.filter(progressive=True).all()
+    [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
+    <Stream: itag="43" mime_type="video/webm" res="360p" fps="30fps" vcodec="vp8.0" acodec="vorbis">,
+    <Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">,
+    <Stream: itag="36" mime_type="video/3gpp" res="240p" fps="30fps" vcodec="mp4v.20.3" acodec="mp4a.40.2">,
+    <Stream: itag="17" mime_type="video/3gpp" res="144p" fps="30fps" vcodec="mp4v.20.3" acodec="mp4a.40.2">]
+
+Conversely, if you only want to see the DASH streams (also referred to as "adaptive") you can do:
+
+.. code:: bash
+
+    >>> yt.streams.filter(adaptive=True).all()
+    [<Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028">,
+    <Stream: itag="248" mime_type="video/webm" res="1080p" fps="30fps" vcodec="vp9">,
+    <Stream: itag="136" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.4d401f">,
+    <Stream: itag="247" mime_type="video/webm" res="720p" fps="30fps" vcodec="vp9">,
+    <Stream: itag="135" mime_type="video/mp4" res="480p" fps="30fps" vcodec="avc1.4d401e">,
+    <Stream: itag="244" mime_type="video/webm" res="480p" fps="30fps" vcodec="vp9">,
+    <Stream: itag="134" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.4d401e">,
+    <Stream: itag="243" mime_type="video/webm" res="360p" fps="30fps" vcodec="vp9">,
+    <Stream: itag="133" mime_type="video/mp4" res="240p" fps="30fps" vcodec="avc1.4d4015">,
+    <Stream: itag="242" mime_type="video/webm" res="240p" fps="30fps" vcodec="vp9">,
+    <Stream: itag="160" mime_type="video/mp4" res="144p" fps="30fps" vcodec="avc1.4d400c">,
+    <Stream: itag="278" mime_type="video/webm" res="144p" fps="30fps" vcodec="vp9">,
+    <Stream: itag="140" mime_type="audio/mp4" abr="128kbps" acodec="mp4a.40.2">,
+    <Stream: itag="171" mime_type="audio/webm" abr="128kbps" acodec="vorbis">,
+    <Stream: itag="249" mime_type="audio/webm" abr="50kbps" acodec="opus">,
+    <Stream: itag="250" mime_type="audio/webm" abr="70kbps" acodec="opus">,
+    <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus">]
+
+
+Pytube allows you to filter on every property available (see the documentation for the complete list), let's take a look at some of the most useful ones.
+
+To list the audio only streams:
+
+.. code:: bash
+
+    >>> yt.streams.filter(only_audio=True).all()
+    [<Stream: itag="140" mime_type="audio/mp4" abr="128kbps" acodec="mp4a.40.2">,
+    <Stream: itag="171" mime_type="audio/webm" abr="128kbps" acodec="vorbis">,
+    <Stream: itag="249" mime_type="audio/webm" abr="50kbps" acodec="opus">,
+    <Stream: itag="250" mime_type="audio/webm" abr="70kbps" acodec="opus">,
+    <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus">]
+
+
+To list only ``mp4`` streams:
+
+.. code:: bash
+
+    >>> yt.streams.filter(subtype='mp4').all()
+    [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
+    <Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">,
+    <Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028">,
+    <Stream: itag="136" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.4d401f">,
+    <Stream: itag="135" mime_type="video/mp4" res="480p" fps="30fps" vcodec="avc1.4d401e">,
+    <Stream: itag="134" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.4d401e">,
+    <Stream: itag="133" mime_type="video/mp4" res="240p" fps="30fps" vcodec="avc1.4d4015">,
+    <Stream: itag="160" mime_type="video/mp4" res="144p" fps="30fps" vcodec="avc1.4d400c">,
+    <Stream: itag="140" mime_type="audio/mp4" abr="128kbps" acodec="mp4a.40.2">]
+
+
+Multiple filters can also be specified:
+
+.. code:: bash
+
+    >>> yt.streams.filter(subtype='mp4', progressive=True).all()
+    >>> # this can also be expressed as:
+    >>> yt.streams.filter(subtype='mp4').filter(progressive=True).all()
+    [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
+    <Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">]
+
+You also have an interface to select streams by their itag, without needing to filter:
+
+.. code:: bash
+
+    >>> yt.streams.get_by_itag(22)
+    <Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">
+
+
+If you need to optimize for a specific feature, such as the "highest resolution" or "lowest average bitrate":
+
+.. code:: bash
+
+    >>> yt.streams.filter(progressive=True).order_by('resolution').desc().all()
+
+Note that ``order_by`` cannot be used if your attribute is undefined in any of the Stream instances, so be sure to apply a filter to remove those before calling it.
