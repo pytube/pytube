@@ -15,7 +15,6 @@ import pprint
 
 from pytube import extract
 from pytube import request
-from pytube.helpers import memoize
 from pytube.helpers import safe_filename
 from pytube.itags import get_format_profile
 
@@ -133,7 +132,6 @@ class Stream(object):
         return video, audio
 
     @property
-    @memoize
     def filesize(self):
         """File size of the media stream in bytes."""
         headers = request.get(self.url, headers=True)

@@ -2,7 +2,6 @@
 """Various helper functions implemented by pytube."""
 from __future__ import absolute_import
 
-import functools
 import logging
 import pprint
 import re
@@ -88,16 +87,3 @@ def safe_filename(s, max_length=255):
     regex = re.compile(pattern, re.UNICODE)
     filename = regex.sub('', s)
     return filename[:max_length].rsplit(' ', 0)[0]
-
-
-def memoize(func):
-    """Decorate that caches input arguments for return values."""
-    cache = func.cache = {}
-
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        key = str(args) + str(kwargs)
-        if key not in cache:
-            cache[key] = func(*args, **kwargs)
-        return cache[key]
-    return wrapper

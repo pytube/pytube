@@ -5,7 +5,6 @@ from collections import OrderedDict
 
 from pytube.compat import quote
 from pytube.compat import urlencode
-from pytube.helpers import memoize
 from pytube.helpers import regex_search
 
 
@@ -88,7 +87,6 @@ def mime_type_codec(mime_type_codec):
     return mime_type, [c.strip() for c in codecs.split(',')]
 
 
-@memoize
 def get_ytplayer_config(watch_html):
     """Get the YouTube player configuration data from the watch html.
 

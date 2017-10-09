@@ -34,6 +34,7 @@ def apply_signature(config_args, fmt, js):
             # For certain videos, YouTube will just provide them pre-signed, in
             # which case there's no real magic to download them and we can skip
             # the whole signature decrambling entirely.
+            logger.debug('signature found, skip decipher')
             continue
 
         signature = cipher.get_signature(js, stream['s'])
@@ -63,4 +64,7 @@ def apply_descrambler(stream_data, key):
         {k: unquote(v) for k, v in parse_qsl(i)}
         for i in stream_data[key].split(',')
     ]
-    logger.debug('applying descrambler\n%s', pprint.pformat(stream_data[key]))
+    logger.debug(
+        'applying descrambler\n%s',
+        pprint.pformat(stream_data[key], indent=2),
+    )

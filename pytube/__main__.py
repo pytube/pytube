@@ -19,7 +19,6 @@ from pytube import Stream
 from pytube import StreamQuery
 from pytube.compat import parse_qsl
 from pytube.helpers import apply_mixin
-from pytube.helpers import memoize
 
 
 logger = logging.getLogger(__name__)
@@ -159,7 +158,6 @@ class YouTube(object):
             self.fmt_streams.append(video)
 
     @property
-    @memoize
     def streams(self):
         """Interface to query both adaptive (DASH) and progressive streams."""
         return StreamQuery([s for s in self.fmt_streams])

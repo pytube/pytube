@@ -23,7 +23,6 @@ import re
 from itertools import chain
 
 from pytube.exceptions import RegexMatchError
-from pytube.helpers import memoize
 from pytube.helpers import regex_search
 
 
@@ -104,7 +103,6 @@ def get_transform_object(js, var):
     )
 
 
-@memoize
 def get_transform_map(js, var):
     """Build a transform function lookup.
 
@@ -235,7 +233,6 @@ def parse_function(js_func):
     return regex_search(pattern, js_func, groups=True)
 
 
-@memoize
 def get_signature(js, ciphered_signature):
     """Decipher the signature.
 
