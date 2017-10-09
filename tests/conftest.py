@@ -18,7 +18,7 @@ def gangnam_style():
         video = json.loads(fh.read())
     yt = YouTube(
         url='https://www.youtube.com/watch?v=9bZkp7q19f0',
-        defer_init=True,
+        defer_prefetch_init=True,
     )
     yt.watch_html = video['watch_html']
     yt.js = video['js']

@@ -29,7 +29,7 @@ class YouTube(object):
     """Core developer interface for pytube."""
 
     def __init__(
-        self, url=None, defer_init=False, on_progress_callback=None,
+        self, url=None, defer_prefetch_init=False, on_progress_callback=None,
         on_complete_callback=None,
     ):
         """Construct a :class:`YouTube <YouTube>`.
@@ -74,11 +74,16 @@ class YouTube(object):
             'on_complete': on_complete_callback,
         }
 
-        if url and not defer_init:
-            self.init()
+        if url and not defer_prefetch_init:
+            self.prefetch_init()
+
+    def prefetch_init(self):
+        """Download data, descramble it, and build Stream instances."""
+        self.prefetch()
+        self.init()
 
     def init(self):
-        """Download data, descramble it, and build Stream instances.
+        """descramble the stream data and build Stream instances.
 
         The initialization process takes advantage of Python's
         "call-by-reference evaluation," which allows dictionary transforms to
@@ -86,7 +91,6 @@ class YouTube(object):
         interstitial step.
         """
         logger.info('init started')
-        self.prefetch()
 
         self.vid_info = {k: v for k, v in parse_qsl(self.vid_info)}
         self.player_config = extract.get_ytplayer_config(self.watch_html)

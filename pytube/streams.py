@@ -95,13 +95,22 @@ class Stream(object):
         return len(self.codecs) % 2
 
     @property
-    def is_audio(self):
-        """Whether the stream only contains audio (adaptive only)."""
+    def is_progressive(self):
+        """Whether the stream is progressive."""
+        return not self.is_adaptive
+
+    @property
+    def includes_audio_track(self):
+        """Whether the stream only contains audio."""
+        if self.is_progressive:
+            return True
         return self.type == 'audio'
 
     @property
-    def is_video(self):
-        """Whether the stream only contains video (adaptive only)."""
+    def includes_video_track(self):
+        """Whether the stream only contains video."""
+        if self.is_progressive:
+            return True
         return self.type == 'video'
 
     def parse_codecs(self):
@@ -117,9 +126,9 @@ class Stream(object):
         audio = None
         if not self.is_adaptive:
             video, audio = self.codecs
-        elif self.is_video:
+        elif self.includes_video_track:
             video = self.codecs[0]
-        elif self.is_audio:
+        elif self.includes_audio_track:
             audio = self.codecs[0]
         return video, audio
 
@@ -182,7 +191,7 @@ class Stream(object):
         file_handler.write(chunk)
         logger.debug(
             'download progress\n%s',
-            pprint.pprint(
+            pprint.pformat(
                 {
                     'chunk_size': len(chunk),
                     'bytes_remaining': bytes_remaining,
@@ -211,7 +220,7 @@ class Stream(object):
         """Printable object representation."""
         # TODO(nficano): this can probably be written better.
         parts = ['itag="{s.itag}"', 'mime_type="{s.mime_type}"']
-        if self.is_video:
+        if self.includes_video_track:
             parts.extend(['res="{s.resolution}"', 'fps="{s.fps}fps"'])
             if not self.is_adaptive:
                 parts.extend([

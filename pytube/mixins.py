@@ -40,7 +40,7 @@ def apply_signature(config_args, fmt, js):
 
         logger.debug(
             'finished descrambling signature for itag=%s\n%s',
-            stream['itag'], pprint.pprint(
+            stream['itag'], pprint.pformat(
                 {
                     's': stream['s'],
                     'signature': signature,
@@ -63,4 +63,4 @@ def apply_descrambler(stream_data, key):
         {k: unquote(v) for k, v in parse_qsl(i)}
         for i in stream_data[key].split(',')
     ]
-    logger.debug('applying descrambler\n%s', pprint.pprint(stream_data[key]))
+    logger.debug('applying descrambler\n%s', pprint.pformat(stream_data[key]))

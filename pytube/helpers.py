@@ -29,7 +29,7 @@ def regex_search(pattern, string, groups=False, group=None, flags=0):
     results = regex.search(string)
     logger.debug(
         'finished regex search: %s',
-        pprint.pprint(
+        pprint.pformat(
             {
                 'pattern': pattern,
                 'results': results.group(0),

@@ -4,12 +4,15 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import argparse
+import datetime as dt
+import gzip
 import json
 import logging
 import os
 import sys
 
 from pytube import __version__
+from pytube import request
 from pytube import YouTube
 
 
@@ -21,7 +24,7 @@ def main():
     parser = argparse.ArgumentParser(description=main.__doc__)
     parser.add_argument('url', help='The YouTube /watch url', nargs='?')
     parser.add_argument(
-        '-v', '--version', action='version',
+        '--version', action='version',
         version='%(prog)s ' + __version__,
     )
     parser.add_argument(
@@ -36,45 +39,59 @@ def main():
         ),
     )
     parser.add_argument(
-        '-v', '--verbose', action='count', default=0, dest='verbose_count',
+        '-v', '--verbose', action='count', default=0, dest='verbosity',
         help='Verbosity level',
     )
     parser.add_argument(
-        '--build-debug-report', action='store_true', help=(
+        '--build-playback-report', action='store_true', help=(
             'Save the html and js to disk'
         ),
     )
 
     args = parser.parse_args()
-    logger.setLevel(max(3 - args.verbose_count, 0) * 10)
+    logging.getLogger().setLevel(max(3 - args.verbosity, 0) * 10)
+
     if not args.url:
         parser.print_help()
         sys.exit(1)
+
     if args.list:
         display_streams(args.url)
-    elif args.build_debug_report:
-        build_debug_report(args.url)
+
+    elif args.build_playback_report:
+        build_playback_report(args.url)
+
     elif args.itag:
         download(args.url, args.itag)
 
 
-def build_debug_report(url):
+def build_playback_report(url):
     """Serialize the request data to json for offline debugging.
 
     :param str url:
         A valid YouTube watch URL.
     """
     yt = YouTube(url)
+    ts = int(dt.datetime.utcnow().timestamp())
     fp = os.path.join(
         os.getcwd(),
-        'yt-video-{yt.video_id}.json'.format(yt=yt),
+        'yt-video-{yt.video_id}-{ts}.json.tar.gz'.format(yt=yt, ts=ts),
     )
-    with open(fp, 'w') as fh:
-        fh.write(json.dumps({
-            'js': yt.js,
-            'watch_html': yt.watch_html,
-            'video_info': yt.vid_info,
-        }))
+    js, watch_html, vid_info = request.get(urls=[
+        yt.js_url,
+        yt.watch_url,
+        yt.vid_info_url,
+    ])
+    with gzip.open(fp, 'wb') as fh:
+        fh.write(
+            json.dumps({
+                'url': url,
+                'js': js,
+                'watch_html': watch_html,
+                'video_info': vid_info,
+            })
+            .encode('utf8'),
+        )
 
 
 def get_terminal_size():

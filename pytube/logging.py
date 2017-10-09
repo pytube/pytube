@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import logging
 
 
-def create_logger(level=logging.DEBUG):
+def create_logger(level=logging.ERROR):
     """Create a configured instance of logger.
 
     :param int level:

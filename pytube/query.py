@@ -15,6 +15,8 @@ class StreamQuery:
             self, fps=None, res=None, resolution=None, mime_type=None,
             type=None, subtype=None, file_extension=None, abr=None,
             bitrate=None, video_codec=None, audio_codec=None,
+            only_audio=None, only_video=None,
+            progressive=None, adaptive=None,
             custom_filter_functions=None,
     ):
         """Apply the given filtering criterion.
@@ -43,6 +45,16 @@ class StreamQuery:
             (optional) Digital video compression format (e.g.: vp9, mp4v.20.3).
         :param str audio_codec:
             (optional) Digital audio compression format (e.g.: vorbis, mp4).
+        :param bool progressive:
+            Excludes adaptive streams (one file contains both audio and video
+            tracks).
+        :param bool adaptive:
+            Excludes progressive streams (audio and video are on separate
+            tracks).
+        :param bool only_audio:
+            Excludes streams with video tracks.
+        :param bool only_video:
+            Excludes streams with audio tracks.
         :param list custom_filter_functions:
             (optional) Interface for defining complex filters without
             subclassing.
@@ -72,6 +84,26 @@ class StreamQuery:
 
         if audio_codec:
             filters.append(lambda s: s.audio_codec == audio_codec)
+
+        if only_audio:
+            filters.append(
+                lambda s: (
+                    s.includes_audio_track and not s.includes_video_track
+                ),
+            )
+
+        if only_video:
+            filters.append(
+                lambda s: (
+                    s.includes_video_track and not s.includes_audio_track
+                ),
+            )
+
+        if progressive:
+            filters.append(lambda s: s.is_progressive)
+
+        if adaptive:
+            filters.append(lambda s: s.is_progressive)
 
         if custom_filter_functions:
             for fn in custom_filter_functions:
