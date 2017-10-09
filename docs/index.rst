@@ -3,28 +3,49 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pytube
-=================
+pytube
+======
+Release v\ |version|. (:ref:`Installation <install>`)
 
-pytube is a lightweight, dependency-free Python library (and command-line utility) for downloading YouTube Videos.
+.. image:: https://img.shields.io/pypi/v/pytube.svg
+  :alt: Pypi
+  :target: https://pypi.python.org/pypi/pytube/
 
-Installation
-------------
+.. image:: https://travis-ci.org/nficano/pytube.svg?branch=master
+   :alt: Build status
+   :target: https://travis-ci.org/nficano/pytube
 
-.. code-block:: bash
+.. image:: https://readthedocs.org/projects/python-pytube/badge/?version=latest
+  :target: http://python-pytube.readthedocs.io/en/latest/?badge=latest
+  :alt: Documentation Status
 
-   pip install pytube
+.. image:: https://coveralls.io/repos/nficano/pytube/badge.svg?branch=master&service=github
+  :alt: Coverage
+  :target: https://coveralls.io/github/nficano/pytube?branch=master
 
-Getting started
----------------
+**pytube** is a lightweight, Pythonic, dependency-free, library (and command-line utility) for downloading YouTube Videos.
 
-Coming soon.
+-------------------
 
-API Reference
--------------
+**Behold, the balance of simplicity versus flexibility of pytube**::
 
-If you are looking for information on a specific function, class or
-method, this part of the documentation is for you.
+    >>> YouTube('http://youtube.com/watch?v=9bZkp7q19f0').streams.first().download()
+    >>> yt = YouTube('http://youtube.com/watch?v=9bZkp7q19f0')
+    >>> yt.streams
+        .filter(progressive=True, subtype='mp4')
+        .order_by('resolution')
+        .desc()
+        .first()
+        .download()
+
+The User Guide
+--------------
+This part of the documentation begins with some background information about the project, then focuses on step-by-step instructions for getting the most out of pytube.
+
+The API Documentation / Guide
+-----------------------------
+
+If you are looking for information on a specific function, class, or method, this part of the documentation is for you.
 
 .. toctree::
    :maxdepth: 2
