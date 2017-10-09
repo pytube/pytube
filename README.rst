@@ -16,6 +16,11 @@ pytube
 
 *pytube* is a lightweight, dependency-free Python library (and command-line utility) for downloading YouTube Videos.
 
+Version 7 Preview
+=================
+
+Oct 4, 2017: I've taking the liberty to do a complete rewrite of pytube. It was a bit like declaring tech-debt bankruptcy. This new release will address 90% of outstanding issues and will include almost every feature request. To preview, checkout: https://github.com/nficano/pytube/tree/7.0.0
+
 A call for contributors
 =======================
 With pytube and `python-lambda <https://github.com/nficano/python-lambda/>`_ both continuing to gain momentum, I'm calling for contributors to help build out new features, review pull requests, fix bugs, and maintain overall code quality. If you're interested, please email me at nficano[at]gmail.com.
