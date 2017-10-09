@@ -41,7 +41,7 @@ def get(
 
 
 def stream_response(response, chunk_size=8 * 1024):
-    """Read the :module:`urlopen` response in chunks."""
+    """Read the response in chunks."""
     while True:
         buf = response.read(chunk_size)
         if not buf:

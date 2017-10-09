@@ -53,15 +53,17 @@ def get_transform_plan(js):
         The contents of the base.js asset file.
 
     Sample Output:
-    ~~~~~~~~~~~~~~
-    ['DE.AJ(a,15)',
-     'DE.VR(a,3)',
-     'DE.AJ(a,51)',
-     'DE.VR(a,3)',
-     'DE.kT(a,51)',
-     'DE.kT(a,8)',
-     'DE.VR(a,3)',
-     'DE.kT(a,21)']
+
+    .. code-block:: python
+
+       ['DE.AJ(a,15)',
+       'DE.VR(a,3)',
+       'DE.AJ(a,51)',
+       'DE.VR(a,3)',
+       'DE.kT(a,51)',
+       'DE.kT(a,8)',
+       'DE.VR(a,3)',
+       'DE.kT(a,21)']
 
     """
     name = re.escape(get_initial_function_name(js))
@@ -85,10 +87,12 @@ def get_transform_object(js, var):
         that descrambles the signature.
 
     Sample Output:
-    ~~~~~~~~~~~~~~
-    ['AJ:function(a){a.reverse()}',
-     'VR:function(a,b){a.splice(0,b)}',
-     'kT:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c}']
+
+    .. code-block:: python
+
+       ['AJ:function(a){a.reverse()}',
+        'VR:function(a,b){a.splice(0,b)}',
+        'kT:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c}']
 
     """
     pattern = r'var %s={(.*?)};' % re.escape(var)
@@ -127,7 +131,11 @@ def get_transform_map(js, var):
 def reverse(arr, b):
     """Reverse elements in a list.
 
-    This function is equivalent to: function(a, b) { a.reverse() }.
+    This function is equivalent to:
+
+    .. code-block:: javascript
+
+       function(a, b) { a.reverse() }.
 
     This method takes an unused ``b`` variable as their transform functions
     universally sent two arguments.
@@ -143,7 +151,11 @@ def reverse(arr, b):
 def splice(arr, b):
     """Add/remove items to/from a list.
 
-    This function is equivalent to: function(a, b) { a.splice(0, b) }.
+    This function is equivalent to:
+
+    .. code-block:: javascript
+
+       function(a, b) { a.splice(0, b) }.
 
     Example usage:
     ~~~~~~~~~~~~~~
@@ -157,7 +169,10 @@ def swap(arr, b):
     """Swap positions at b modulus the list length.
 
     This function is equivalent to:
-    function(a, b) { var c=a[0];a[0]=a[b%a.length];a[b]=c }.
+
+    .. code-block:: javascript
+
+       function(a, b) { var c=a[0];a[0]=a[b%a.length];a[b]=c }.
 
     Example usage:
     ~~~~~~~~~~~~~~
@@ -199,13 +214,17 @@ def parse_function(js_func):
     Break a JavaScript transform function down into a two element tuple
     containing the function name and some integer-based argument.
 
-    Sample Input:
-    ~~~~~~~~~~~~~
-    DE.AJ(a,15)
+    Sample input:
+
+    .. code-block:: javascript
+
+       DE.AJ(a,15)
 
     Sample Output:
-    ~~~~~~~~~~~~~~
-    ('AJ', 15)
+
+    .. code-block:: python
+
+       ('AJ', 15)
 
     :param str js_func:
         The JavaScript version of the transform function.

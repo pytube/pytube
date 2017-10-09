@@ -31,3 +31,8 @@ doc/aws_hostname.1
 .cache
 _run.py
 _devfiles/*
+
+_build
+_static
+_templates
+_autosummary
