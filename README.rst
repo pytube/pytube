@@ -14,6 +14,10 @@ pytube
   :alt: Coverage
   :target: https://coveralls.io/github/nficano/pytube?branch=master
 
+.. image:: https://readthedocs.org/projects/python-pytube/badge/?version=latest
+  :target: http://python-pytube.readthedocs.io/en/latest/?badge=latest
+  :alt: Documentation Status
+
 *pytube* is a lightweight, dependency-free Python library (and command-line utility) for downloading YouTube Videos.
 
 Description
