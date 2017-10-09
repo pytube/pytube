@@ -32,11 +32,11 @@ Release v\ |version|. (:ref:`Installation <install>`)
     >>> YouTube('http://youtube.com/watch?v=9bZkp7q19f0').streams.first().download()
     >>> yt = YouTube('http://youtube.com/watch?v=9bZkp7q19f0')
     >>> yt.streams
-        .filter(progressive=True, subtype='mp4')
-        .order_by('resolution')
-        .desc()
-        .first()
-        .download()
+    ... .filter(progressive=True, subtype='mp4')
+    ... .order_by('resolution')
+    ... .desc()
+    ... .first()
+    ... .download()
 
 The User Guide
 --------------
