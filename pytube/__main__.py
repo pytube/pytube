@@ -160,18 +160,6 @@ class YouTube(object):
 
     @property
     @memoize
-    def progressive_streams(self):
-        """Interface to query progressive download streams."""
-        return StreamQuery([s for s in self.fmt_streams if not s.is_adaptive])
-
-    @property
-    @memoize
-    def adaptive_streams(self):
-        """Interface to query adaptive (DASH) streams."""
-        return StreamQuery([s for s in self.fmt_streams if s.is_adaptive])
-
-    @property
-    @memoize
     def streams(self):
         """Interface to query both adaptive (DASH) and progressive streams."""
         return StreamQuery([s for s in self.fmt_streams])
