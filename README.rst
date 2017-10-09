@@ -34,7 +34,7 @@ Installation
 
 Download using pip via pypi.
 
-.. code:: bash
+.. code-block:: bash
 
     pip install pytube
 
@@ -87,7 +87,7 @@ The legacy streams that contain the audio and video in a single file (referred t
 
 To only view these progressive download streams:
 
-.. code:: bash
+.. code-block:: python
 
     >>> yt.streams.filter(progressive=True).all()
     [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
@@ -98,7 +98,7 @@ To only view these progressive download streams:
 
 Conversely, if you only want to see the DASH streams (also referred to as "adaptive") you can do:
 
-.. code:: bash
+.. code-block:: python
 
     >>> yt.streams.filter(adaptive=True).all()
     [<Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028">,
@@ -124,7 +124,7 @@ Pytube allows you to filter on every property available (see the documentation f
 
 To list the audio only streams:
 
-.. code:: bash
+.. code-block:: python
 
     >>> yt.streams.filter(only_audio=True).all()
     [<Stream: itag="140" mime_type="audio/mp4" abr="128kbps" acodec="mp4a.40.2">,
@@ -136,7 +136,7 @@ To list the audio only streams:
 
 To list only ``mp4`` streams:
 
-.. code:: bash
+.. code-block:: python
 
     >>> yt.streams.filter(subtype='mp4').all()
     [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
@@ -152,7 +152,7 @@ To list only ``mp4`` streams:
 
 Multiple filters can also be specified:
 
-.. code:: bash
+.. code-block:: python
 
     >>> yt.streams.filter(subtype='mp4', progressive=True).all()
     >>> # this can also be expressed as:
@@ -162,7 +162,7 @@ Multiple filters can also be specified:
 
 You also have an interface to select streams by their itag, without needing to filter:
 
-.. code:: bash
+.. code-block:: python
 
     >>> yt.streams.get_by_itag(22)
     <Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">
@@ -170,8 +170,47 @@ You also have an interface to select streams by their itag, without needing to f
 
 If you need to optimize for a specific feature, such as the "highest resolution" or "lowest average bitrate":
 
-.. code:: bash
+.. code-block:: python
+
     >>> yt.streams.filter(progressive=True).order_by('resolution').desc().all()
 
-
 Note that ``order_by`` cannot be used if your attribute is undefined in any of the Stream instances, so be sure to apply a filter to remove those before calling it.
+
+If your application requires post-processing logic, pytube allows you to specify an "on download complete" callback function:
+
+.. code-block:: python
+
+    >>> def convert_to_aac(stream, file_handle):
+            # do work
+    >>> yt.register_on_complete_callback(convert_to_aac)
+
+
+Similarly, if your application requires on-download progress logic, pytube exposes a callback for this as well:
+
+.. code-block:: python
+
+    >>> def show_progress_bar(stream, chunk, file_handle, bytes_remaining):
+            # do work
+    >>> yt.register_on_progress_callback(show_progress_bar)
+
+
+
+Command-line interface
+======================
+
+pytube also ships with a tiny cli interface for downloading and probing videos.
+
+Let's start with downloading:
+
+.. code-block:: bash
+
+    pytube http://youtube.com/watch?v=9bZkp7q19f0 --itag=22
+
+To view available streams:
+
+.. code-block:: bash
+
+    pytube http://youtube.com/watch?v=9bZkp7q19f0 --list
+
+
+Finally, if you're filing a bug report, the cli contains a switch called ``--build-playback-report``, which bundles up the state, allowing others to easily replay your issue.
