@@ -83,7 +83,7 @@ class YouTube(object):
         self.init()
 
     def init(self):
-        """descramble the stream data and build Stream instances.
+        """Descramble the stream data and build Stream instances.
 
         The initialization process takes advantage of Python's
         "call-by-reference evaluation," which allows dictionary transforms to

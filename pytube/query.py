@@ -115,6 +115,11 @@ class StreamQuery:
         return StreamQuery(fmt_streams)
 
     def order_by(self, attribute_name):
+        """Apply a sort order to a resultset.
+
+        :param str attribute_name:
+            The name of the attribute to sort by.
+        """
         fmt_streams = sorted(
             self.fmt_streams,
             key=lambda s: getattr(s, attribute_name),
@@ -122,9 +127,11 @@ class StreamQuery:
         return StreamQuery(fmt_streams)
 
     def desc(self):
+        """Sort streams in descending order."""
         return StreamQuery(self.fmt_streams[::-1])
 
     def asc(self):
+        """Sort streams in ascending order."""
         return self
 
     def get_by_itag(self, itag):
