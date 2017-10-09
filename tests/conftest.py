@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Reusable dependency injected testing components."""
+from __future__ import unicode_literals
+
 import gzip
 import json
 import os
@@ -13,8 +15,8 @@ def load_from_playback_file(filename):
     cur_dir = os.path.dirname(os.path.realpath(__file__))
     fp = os.path.join(cur_dir, 'mocks', filename)
     video = None
-    with gzip.open(fp, 'r') as fh:
-        video = json.loads(fh.read())
+    with gzip.open(fp, 'rb') as fh:
+        video = json.loads(fh.read().decode('utf-8'))
     yt = YouTube(
         url='https://www.youtube.com/watch?v=9bZkp7q19f0',
         defer_prefetch_init=True,
