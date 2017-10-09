@@ -27,7 +27,7 @@ Release v\ |version|. (:ref:`Installation <install>`)
 
 -------------------
 
-**Behold, the balance of simplicity versus flexibility of pytube**::
+**Behold, a perfect balance of simplicity versus flexibility**::
 
     >>> YouTube('http://youtube.com/watch?v=9bZkp7q19f0').streams.first().download()
     >>> yt = YouTube('http://youtube.com/watch?v=9bZkp7q19f0')
