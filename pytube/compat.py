@@ -1,14 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # flake8: noqa
+"""Python 2/3 compatibility support."""
 import sys
 
-PY2 = sys.version_info[0] == 2
-PY3 = sys.version_info[0] == 3
+python_version = sys.version_info[0]
 
-if PY2:
+if python_version == 2:
+    from urllib import urlencode
+    from urllib2 import URLError
+    from urllib2 import quote
+    from urllib2 import unquote
     from urllib2 import urlopen
-    from urlparse import urlparse, parse_qs, unquote
-if PY3:
-    from urllib.parse import urlparse, parse_qs, unquote
+    from urlparse import parse_qsl
+
+elif python_version == 3:
+    from urllib.error import URLError
+    from urllib.parse import parse_qsl
+    from urllib.parse import quote
+    from urllib.parse import unquote
+    from urllib.parse import urlencode
     from urllib.request import urlopen

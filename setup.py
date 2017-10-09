@@ -21,7 +21,7 @@ setup(
     license=license,
     entry_points={
         'console_scripts': [
-            'pytube = pytube.__main__:main',
+            'pytube = pytube.cli:main',
         ],
     },
     classifiers=[

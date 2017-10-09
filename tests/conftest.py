@@ -1,24 +1,27 @@
-import mock
+# -*- coding: utf-8 -*-
+"""Reusable dependency injected testing components."""
+import json
+import os
+
 import pytest
 
-from pytube import api
+from pytube import YouTube
 
 
 @pytest.fixture
-def yt_video():
-    url = 'http://www.youtube.com/watch?v=9bZkp7q19f0'
-    mock_html = None
-    mock_js = None
-
-    with open('tests/mock_data/youtube_gangnam_style.html') as fh:
-        mock_html = fh.read()
-
-    with open('tests/mock_data/youtube_gangnam_style.js') as fh:
-        mock_js = fh.read()
-
-    with mock.patch('pytube.api.urlopen') as urlopen:
-        urlopen.return_value.read.return_value = mock_html
-        yt = api.YouTube()
-        yt._js_cache = mock_js
-        yt.from_url(url)
-        return yt
+def gangnam_style():
+    """Youtube instance initialized with video id 9bZkp7q19f0."""
+    cur_dir = os.path.dirname(os.path.realpath(__file__))
+    fp = os.path.join(cur_dir, 'mocks', 'yt-video-9bZkp7q19f0.json')
+    video = None
+    with open(fp, 'r') as fh:
+        video = json.loads(fh.read())
+    yt = YouTube(
+        url='https://www.youtube.com/watch?v=9bZkp7q19f0',
+        defer_prefetch_init=True,
+    )
+    yt.watch_html = video['watch_html']
+    yt.js = video['js']
+    yt.vid_info = video['video_info']
+    yt.init()
+    return yt

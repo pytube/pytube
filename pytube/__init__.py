@@ -1,21 +1,29 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # flake8: noqa
+# noreorder
+"""
+Pytube is a Python library for downloading YouTube Videos.
+
+Pytube aims to be lightweight, dependency-free, extensively documented and
+follows best practice patterns.
+
+"""
 __title__ = 'pytube'
 __version__ = '6.4.3'
 __author__ = 'Nick Ficano'
 __license__ = 'MIT License'
 __copyright__ = 'Copyright 2017 Nick Ficano'
 
-from .api import YouTube
+from multiprocessing import freeze_support
 
-# Set default logging handler to avoid "No handler found" warnings.
-import logging
-try:  # Python 2.7+
-    from logging import NullHandler
-except ImportError:
-    class NullHandler(logging.Handler):
-        def emit(self, record):
-            pass
+from pytube.logging import create_logger
+from pytube.query import StreamQuery
+from pytube.streams import Stream
+from pytube.__main__ import YouTube
 
-logging.getLogger(__name__).addHandler(NullHandler())
+logger = create_logger()
+logger.info('%s v%s', __title__, __version__)
+
+# Workaround for multiprocessing support on Windows.
+# https://github.com/nficano/pytube/issues/158
+freeze_support()

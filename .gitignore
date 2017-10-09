@@ -29,3 +29,5 @@ doc/aws_hostname.1
 
 .coverage
 .cache
+_run.py
+_devfiles/*
