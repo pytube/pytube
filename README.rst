@@ -38,8 +38,8 @@ Download using pip via pypi.
 
     pip install pytube
 
-Easy as Py 💥
-=============
+Easy as Pie 💥
+==============
 
 Behold, the power of pytube:
 
