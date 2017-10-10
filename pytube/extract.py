@@ -15,6 +15,7 @@ def video_id(url):
         A url YouTube id containing a video_id.
 
     """
+    # TODO(nficano): support url-shortened version
     return regex_search(r'.*(?:v=|/v/|^)(?P<id>[^&]*)', url, group=1)
 
 

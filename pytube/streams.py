@@ -179,7 +179,7 @@ class Stream(object):
 
         :param str chunk:
             Segment of media file binary data, not yet written to disk.
-        :param :class:`_io.BufferedWriter <BufferedWriter>` file_handle:
+        :param :class:`~_io.BufferedWriter` file_handle:
             The file handle where the media is being written to.
         :param int bytes_remaining:
             The delta between the total file size in bytes and amount already
@@ -203,8 +203,7 @@ class Stream(object):
 
     def on_complete(self, file_handle):
         """On download complete handler function.
-
-        :param :class:`_io.BufferedWriter <BufferedWriter>` file_handle:
+        :param :class:`~_io.BufferedWriter` file_handle:
             The file handle where the media is being written to.
 
         """
