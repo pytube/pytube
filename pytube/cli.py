@@ -136,8 +136,10 @@ def on_progress(stream, file_handle, bytes_remaining):
 
     :param object stream:
         An instance of :class:`Stream <Stream>` being downloaded.
-    :param :class:`~_io.BufferedWriter` file_handle:
+    :param file_handle:
         The file handle where the media is being written to.
+    :type file_handle:
+        :class:`_io.BufferedWriter`
     :param int bytes_remaining:
         How many bytes have been downloaded.
 

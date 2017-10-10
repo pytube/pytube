@@ -180,8 +180,10 @@ class Stream(object):
 
         :param str chunk:
             Segment of media file binary data, not yet written to disk.
-        :param BufferedWriter file_handle:
+        :param file_handle:
             The file handle where the media is being written to.
+        :type file_handle:
+            :class:`~_io.BufferedWriter`
         :param int bytes_remaining:
             The delta between the total file size in bytes and amount already
             downloaded.
@@ -207,7 +209,7 @@ class Stream(object):
         :param file_handle:
             The file handle where the media is being written to.
         :type file_handle:
-            BufferedWriter
+            :class:`~_io.BufferedWriter`
 
         """
         logger.debug('download finished')
