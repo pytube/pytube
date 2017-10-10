@@ -32,20 +32,19 @@ def test_filters(test_input, expected, gangnam_style):
     assert result == expected
 
 
+@pytest.mark.parametrize('test_input', ['first', 'last'])
+def test_empty(test_input, gangnam_style):
+    query = gangnam_style.streams.filter(video_codec='vp20')
+    fn = getattr(query, test_input)
+    assert fn() is None
+
+
 def test_get_last(gangnam_style):
     assert gangnam_style.streams.last().itag == '251'
 
 
-def test_get_last_empty_results(gangnam_style):
-    assert not gangnam_style.streams.filter(video_codec='vp20').last()
-
-
 def test_get_first(gangnam_style):
     assert gangnam_style.streams.first().itag == '22'
-
-
-def test_get_first_empty_results(gangnam_style):
-    assert not gangnam_style.streams.filter(video_codec='vp20').first()
 
 
 def test_order_by(gangnam_style):
