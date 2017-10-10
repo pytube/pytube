@@ -26,21 +26,21 @@ def regex_search(pattern, string, groups=False, group=None, flags=0):
     """
     regex = re.compile(pattern, flags)
     results = regex.search(string)
-    logger.debug(
-        'finished regex search: %s',
-        pprint.pformat(
-            {
-                'pattern': pattern,
-                'results': results.group(0),
-            }, indent=2,
-        ),
-    )
     if not results:
         raise RegexMatchError(
             'regex pattern ({pattern}) had zero matches'
             .format(pattern=pattern),
         )
     else:
+        logger.debug(
+            'finished regex search: %s',
+            pprint.pformat(
+                {
+                    'pattern': pattern,
+                    'results': results.group(0),
+                }, indent=2,
+            ),
+        )
         if groups:
             return results.groups()
         elif group is not None:
