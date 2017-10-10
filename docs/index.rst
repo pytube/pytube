@@ -23,6 +23,10 @@ Release v\ |version|. (:ref:`Installation <install>`)
   :alt: Coverage
   :target: https://coveralls.io/github/nficano/pytube?branch=master
 
+.. image:: https://img.shields.io/pypi/pyversions/pytube.svg
+  :alt: Python Versions
+  :target: https://pypi.python.org/pypi/pytube/
+
 **pytube** is a lightweight, Pythonic, dependency-free, library (and command-line utility) for downloading YouTube Videos.
 
 -------------------
