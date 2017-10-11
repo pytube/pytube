@@ -169,7 +169,7 @@ class YouTube(object):
             A callback function that takes ``stream``, ``chunk``,
             ``file_handle``, ``bytes_remaining`` as parameters.
         """
-        self._monostate['on_progress'] = func
+        self.stream_monostate['on_progress'] = func
 
     def register_on_complete_callback(self, func):
         """Register a download complete callback function post initialization.
@@ -177,4 +177,4 @@ class YouTube(object):
         :param callable func:
             A callback function that takes ``stream`` and  ``file_handle``.
         """
-        self._monostate['on_complete'] = func
+        self.stream_monostate['on_complete'] = func

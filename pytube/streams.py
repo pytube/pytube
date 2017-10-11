@@ -170,6 +170,7 @@ class Stream(object):
                 bytes_remaining -= len(chunk)
                 # send to the on_progress callback.
                 self.on_progress(chunk, fh, bytes_remaining)
+            self.on_complete(fh)
 
     def on_progress(self, chunk, file_handler, bytes_remaining):
         """On progress callback function.
@@ -202,7 +203,7 @@ class Stream(object):
         on_progress = self._monostate['on_progress']
         if on_progress:
             logger.debug('calling on_progress callback %s', on_progress)
-            on_progress(self, chunk, bytes_remaining)
+            on_progress(self, chunk, file_handler, bytes_remaining)
 
     def on_complete(self, file_handle):
         """On download complete handler function.

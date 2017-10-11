@@ -27,3 +27,9 @@ def test_info_url(gangnam_style):
         '253D9bZkp7q19f0&hl=en_US&t=%252C%2522t%2522%253A%25221%2522'
     )
     assert video_info_url == expected
+
+
+def test_js_url(gangnam_style):
+    expected = 'https://youtube.com/yts/jsbin/player-vflOdyxa4/en_US/base.js'
+    result = extract.js_url(gangnam_style.watch_html)
+    assert expected == result
