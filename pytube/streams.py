@@ -141,7 +141,7 @@ class Stream(object):
     def default_filename(self):
         """Generate filename based on the video title."""
         title = self.player_config['args']['title']
-        filename = safe_filename(title)
+        filename = safe_filename(title).encode('utf-8')
         return '{filename}.{s.subtype}'.format(filename=filename, s=self)
 
     def download(self, output_path=None):
