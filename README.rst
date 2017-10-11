@@ -11,11 +11,11 @@ pytube
    :target: https://travis-ci.org/nficano/pytube
 
 .. image:: https://readthedocs.org/projects/python-pytube/badge/?version=latest
-  :target: http://python-pytube.readthedocs.io/en/latest/?badge=latest
   :alt: Documentation Status
+  :target: http://python-pytube.readthedocs.io/en/latest/?badge=latest
 
-.. image:: https://coveralls.io/repos/github/nficano/pytube/badge.svg?branch=master
-  :alt: Coverage
+.. image:: https://coveralls.io/repos/github/nficano/pytube/badge.svg?branch=master#23e6f7ac5623e96f
+  :alt: Code Coverage
   :target: https://coveralls.io/github/nficano/pytube?branch=master
 
 .. image:: https://img.shields.io/pypi/pyversions/pytube.svg
