@@ -51,7 +51,7 @@ def get_transform_plan(js):
     :param str js:
         The contents of the base.js asset file.
 
-    Sample Output:
+    **Sample Output**:
 
     .. code-block:: python
 
@@ -85,7 +85,7 @@ def get_transform_object(js, var):
         The obfuscated variable name that stores an object with all functions
         that descrambles the signature.
 
-    Sample Output:
+    **Sample Output**:
 
     .. code-block:: python
 
@@ -138,7 +138,7 @@ def reverse(arr, b):
     This method takes an unused ``b`` variable as their transform functions
     universally sent two arguments.
 
-    Example usage:
+    **Example usage**:
     ~~~~~~~~~~~~~~
     >>> reverse([1, 2, 3, 4])
     [4, 3, 2, 1]
@@ -155,7 +155,7 @@ def splice(arr, b):
 
        function(a, b) { a.splice(0, b) }.
 
-    Example usage:
+    **Example usage**:
     ~~~~~~~~~~~~~~
     >>> splice([1, 2, 3, 4], 2)
     [1, 2]
@@ -172,7 +172,7 @@ def swap(arr, b):
 
        function(a, b) { var c=a[0];a[0]=a[b%a.length];a[b]=c }.
 
-    Example usage:
+    **Example usage**:
     ~~~~~~~~~~~~~~
     >>> swap([1, 2, 3, 4], 2)
     [3, 2, 1, 4]
@@ -209,7 +209,7 @@ def map_functions(js_func):
 def parse_function(js_func):
     """Parse the Javascript transform function.
 
-    Break a JavaScript transform function down into a two element tuple
+    Break a JavaScript transform function down into a two element ``tuple``
     containing the function name and some integer-based argument.
 
     Sample input:
@@ -228,21 +228,22 @@ def parse_function(js_func):
         The JavaScript version of the transform function.
 
     """
-    pattern = r'\w+\.(\w+)\(\w,(\d+)\)'
     logger.debug('parsing transform function')
-    return regex_search(pattern, js_func, groups=True)
+    return regex_search(r'\w+\.(\w+)\(\w,(\d+)\)', js_func, groups=True)
 
 
 def get_signature(js, ciphered_signature):
     """Decipher the signature.
 
-    Taking the ciphered signature, applies the transform functions and
-    returns the decrypted version.
+    Taking the ciphered signature, applies the transform functions.
 
     :param str js:
         The contents of the base.js asset file.
     :param str ciphered_signature:
         The ciphered signature sent in the ``player_config``.
+    :rtype: str
+    :returns:
+       Decrypted signature required to download the media content.
 
     """
     tplan = get_transform_plan(js)

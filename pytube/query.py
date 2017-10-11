@@ -21,43 +21,82 @@ class StreamQuery:
     ):
         """Apply the given filtering criterion.
 
-        :param int fps:
-            (optional) The frames per second (30 or 60)
-        :param str resolution:
+        :param fps:
+            (optional) The frames per second.
+        :type fps:
+            int or None
+
+        :param resolution:
             (optional) Alias to ``res``.
-        :param str res:
-            (optional) The video resolution (e.g.: 480p, 720p, 1080p)
-        :param str mime_type:
+        :type res:
+            str or None
+
+        :param res:
+            (optional) The video resolution.
+        :type resolution:
+            str or None
+
+        :param mime_type:
             (optional) Two-part identifier for file formats and format contents
-            composed of a "type", a "subtype" (e.g.: video/mp4).
-        :param str type:
-            (optional) Type part of the ``mime_type`` (e.g.: "audio", "video").
-        :param str subtype:
-            (optional) Sub-type part of the ``mime_type`` (e.g.: "mp4", "mov").
-        :param str file_extension:
+            composed of a "type", a "subtype".
+        :type mime_type:
+            str or None
+
+        :param type:
+            (optional) Type part of the ``mime_type`` (e.g.: audio, video).
+        :type type:
+            str or None
+
+        :param subtype:
+            (optional) Sub-type part of the ``mime_type`` (e.g.: mp4, mov).
+        :type subtype:
+            str or None
+
+        :param file_extension:
             (optional) Alias to ``sub_type``.
-        :param str abr:
+        :type file_extension:
+            str or None
+
+        :param abr:
             (optional) Average bitrate (ABR) refers to the average amount of
-            data transferred per unit of time (e.g.: 64kbps, 192kbps)
-        :param str bitrate:
+            data transferred per unit of time (e.g.: 64kbps, 192kbps).
+        :type abr:
+            str or None
+
+        :param bitrate:
             (optional) Alias to ``abr``.
-        :param str video_codec:
-            (optional) Digital video compression format (e.g.: vp9, mp4v.20.3).
-        :param str audio_codec:
-            (optional) Digital audio compression format (e.g.: vorbis, mp4).
+        :type bitrate:
+            str or None
+
+        :param video_codec:
+            (optional) Video compression format.
+        :type video_codec:
+            str or None
+
+        :param audio_codec:
+            (optional) Audio compression format.
+        :type audio_codec:
+            str or None
+
         :param bool progressive:
             Excludes adaptive streams (one file contains both audio and video
             tracks).
+
         :param bool adaptive:
             Excludes progressive streams (audio and video are on separate
             tracks).
+
         :param bool only_audio:
             Excludes streams with video tracks.
+
         :param bool only_video:
             Excludes streams with audio tracks.
-        :param list custom_filter_functions:
+
+        :param custom_filter_functions:
             (optional) Interface for defining complex filters without
             subclassing.
+        :type custom_filter_functions:
+            list or None
 
         """
         filters = []
@@ -135,7 +174,7 @@ class StreamQuery:
         return self
 
     def get_by_itag(self, itag):
-        """Get a :class:`Stream <Stream>` for an itag, or None if not found.
+        """Get a :class:`Stream <Stream>` for an itag, or ``None`` if not found.
 
         :param str itag:
             YouTube format identifier code.
@@ -149,7 +188,7 @@ class StreamQuery:
     def first(self):
         """Get the first element in the results.
 
-        Return the first result of this query or None if the result doesn't
+        Return the first result of this query or ``None`` if the result doesn't
         contain any streams.
 
         """
@@ -161,7 +200,7 @@ class StreamQuery:
     def last(self):
         """Get the last element in the results.
 
-        Return the last result of this query or None if the result doesn't
+        Return the last result of this query or ``None`` if the result doesn't
         contain any streams.
 
         """

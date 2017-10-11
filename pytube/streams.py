@@ -183,7 +183,7 @@ class Stream(object):
         :param file_handle:
             The file handle where the media is being written to.
         :type file_handle:
-            :class:`~_io.BufferedWriter`
+            :py:class:`io.BufferedWriter`
         :param int bytes_remaining:
             The delta between the total file size in bytes and amount already
             downloaded.
@@ -206,10 +206,11 @@ class Stream(object):
 
     def on_complete(self, file_handle):
         """On download complete handler function.
+
         :param file_handle:
             The file handle where the media is being written to.
         :type file_handle:
-            :class:`~_io.BufferedWriter`
+            :py:class:`io.BufferedWriter`
 
         """
         logger.debug('download finished')

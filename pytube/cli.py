@@ -139,7 +139,7 @@ def on_progress(stream, file_handle, bytes_remaining):
     :param file_handle:
         The file handle where the media is being written to.
     :type file_handle:
-        :class:`_io.BufferedWriter`
+        :py:class:`io.BufferedWriter`
     :param int bytes_remaining:
         How many bytes have been downloaded.
 

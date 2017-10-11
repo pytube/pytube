@@ -75,12 +75,17 @@ def js_url(watch_html):
 def mime_type_codec(mime_type_codec):
     """Parse the type data.
 
-    Breaks up the data in the ``type`` key of the manifest, which contains mime
-    type and codecs serialized together (e.g.: 'audio/webm; codecs="opus"'),
-    and splits them into separate elements. (e.g.: 'audio/webm', ['opus'])
+    Breaks up the data in the ``type`` key of the manifest, which contains the
+    mime type and codecs serialized together, and splits them into separate
+    elements.
 
     :param str mime_type_codec:
-        String containing mime type and codecs.
+        String containing mime type and codecs, for example:
+        'audio/webm; codecs="opus"'
+    :rtype: tuple
+    :returns:
+        The mime type and a list of codecs, for example:
+        ('audio/webm', ['opus'])
 
     """
     pattern = r'(\w+\/\w+)\;\scodecs=\"([a-zA-Z-0-9.,\s]*)\"'
@@ -97,7 +102,9 @@ def get_ytplayer_config(watch_html):
 
     :param str watch_html:
         The html contents of the watch page.
-
+    :rtype: str
+    :returns:
+        Substring of the html containing the serialized manifest data.
     """
     pattern = r';ytplayer\.config\s*=\s*({.*?});'
     yt_player_config = regex_search(pattern, watch_html, group=1)
