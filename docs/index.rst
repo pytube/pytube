@@ -33,7 +33,7 @@ Release v\ |version|. (:ref:`Installation <install>`)
 
 **Behold, a perfect balance of simplicity versus flexibility**::
 
-    >>> YouTube('http://youtube.com/watch?v=9bZkp7q19f0').streams.first().download()
+    >>> YouTube('https://youtu.be/9bZkp7q19f0').streams.first().download()
     >>> yt = YouTube('http://youtube.com/watch?v=9bZkp7q19f0')
     >>> yt.streams
     ... .filter(progressive=True, file_extension='mp4')
