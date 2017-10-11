@@ -134,10 +134,8 @@ class YouTube(object):
             watch_html=self.watch_html,
         )
         self.js_url = extract.js_url(self.watch_html)
-        self.js, self.vid_info = request.get(urls=[
-            self.js_url,
-            self.vid_info_url,
-        ])
+        self.js = request.get(self.js_url)
+        self.vid_info = request.get(self.vid_info_url)
 
     def initialize_stream_objects(self, fmt):
         """Convert manifest data to instances of :class:`Stream <Stream>`.

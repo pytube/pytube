@@ -77,11 +77,11 @@ def build_playback_report(url):
         os.getcwd(),
         'yt-video-{yt.video_id}-{ts}.json.tar.gz'.format(yt=yt, ts=ts),
     )
-    js, watch_html, vid_info = request.get(urls=[
-        yt.js_url,
-        yt.watch_url,
-        yt.vid_info_url,
-    ])
+
+    js = request.get(yt.js_url)
+    watch_html = request.get(yt.watch_html)
+    vid_info = request.get(yt.vid_info_url)
+
     with gzip.open(fp, 'wb') as fh:
         fh.write(
             json.dumps({
