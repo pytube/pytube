@@ -18,6 +18,7 @@ from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
 from pytube.compat import parse_qsl
+from pytube.exceptions import AgeRestrictionError
 from pytube.helpers import apply_mixin
 
 
@@ -125,6 +126,8 @@ class YouTube(object):
 
         """
         self.watch_html = request.get(url=self.watch_url)
+        if extract.is_age_restricted(self.watch_html):
+            raise AgeRestrictionError('Content is age restricted')
         self.vid_info_url = extract.video_info_url(
             video_id=self.video_id,
             watch_url=self.watch_url,

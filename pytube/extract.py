@@ -5,7 +5,24 @@ from collections import OrderedDict
 
 from pytube.compat import quote
 from pytube.compat import urlencode
+from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search
+
+
+def is_age_restricted(watch_html):
+    """Check if content is age restricted.
+
+    :param str watch_html:
+        The html contents of the watch page.
+    :rtype: bool
+    :returns:
+        Whether or not the content is age restricted.
+    """
+    try:
+        regex_search(r'og:restrictions:age', watch_html, group=0)
+    except RegexMatchError:
+        return False
+    return True
 
 
 def video_id(url):
@@ -50,8 +67,7 @@ def video_info_url(video_id, watch_url, watch_html):
     """
     # I'm not entirely sure what ``t`` represents. Looks to represent a
     # boolean.
-    pattern = r'\W[\'"]?t[\'"]?: ?[\'"](.+?)[\'"]'
-    t = regex_search(pattern, watch_html, group=0)
+    t = regex_search(r'\W[\'"]?t[\'"]?: ?[\'"](.+?)[\'"]', watch_html, group=0)
     # Here we use ``OrderedDict`` so that the output is consistant between
     # Python 2.7+.
     params = OrderedDict([
