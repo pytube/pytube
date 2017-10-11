@@ -15,7 +15,6 @@ import pprint
 
 from pytube import extract
 from pytube import request
-from pytube.compat import u
 from pytube.helpers import safe_filename
 from pytube.itags import get_format_profile
 
@@ -142,7 +141,7 @@ class Stream(object):
     def default_filename(self):
         """Generate filename based on the video title."""
         title = self.player_config['args']['title']
-        filename = u(safe_filename(title))
+        filename = safe_filename(title)
         return '{filename}.{s.subtype}'.format(filename=filename, s=self)
 
     def download(self, output_path=None):

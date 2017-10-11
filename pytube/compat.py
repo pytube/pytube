@@ -14,7 +14,7 @@ if python_version == 2:
     from urllib2 import urlopen
     from urlparse import parse_qsl
 
-    def u(s):
+    def unicode(s):
         return s.encode('utf-8')
 
 elif python_version == 3:
@@ -25,5 +25,5 @@ elif python_version == 3:
     from urllib.parse import urlencode
     from urllib.request import urlopen
 
-    def u(s):
-        return s
+    def unicode(s):
+        return str(s)
