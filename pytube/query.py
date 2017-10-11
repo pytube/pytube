@@ -174,10 +174,14 @@ class StreamQuery:
         return self
 
     def get_by_itag(self, itag):
-        """Get a :class:`Stream <Stream>` for an itag, or ``None`` if not found.
+        """Get the corresponding :class:`Stream <Stream>` for a given itag.
 
         :param str itag:
             YouTube format identifier code.
+        :rtype: :class:`Stream <Stream>` or ``None``
+        :returns:
+            The :class:`Stream <Stream>` matching the given itag or ``None`` if
+            not found.
 
         """
         try:
@@ -186,10 +190,12 @@ class StreamQuery:
             pass
 
     def first(self):
-        """Get the first element in the results.
+        """Get the first :class:`Stream <Stream>` in the results.
 
-        Return the first result of this query or ``None`` if the result doesn't
-        contain any streams.
+        :rtype: :class:`Stream <Stream>` or ``None``
+        :returns:
+            the first result of this query or ``None`` if the result doesn't
+            contain any streams.
 
         """
         try:
@@ -198,10 +204,12 @@ class StreamQuery:
             pass
 
     def last(self):
-        """Get the last element in the results.
+        """Get the last :class:`Stream <Stream>` in the results.
 
-        Return the last result of this query or ``None`` if the result doesn't
-        contain any streams.
+        :rtype: :class:`Stream <Stream>` or ``None``
+        :returns:
+            Return the last result of this query or ``None`` if the result
+            doesn't contain any streams.
 
         """
         try:

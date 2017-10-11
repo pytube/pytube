@@ -51,19 +51,17 @@ def get_transform_plan(js):
     :param str js:
         The contents of the base.js asset file.
 
-    **Sample Output**:
+    **Example**:
 
-    .. code-block:: python
-
-       ['DE.AJ(a,15)',
-       'DE.VR(a,3)',
-       'DE.AJ(a,51)',
-       'DE.VR(a,3)',
-       'DE.kT(a,51)',
-       'DE.kT(a,8)',
-       'DE.VR(a,3)',
-       'DE.kT(a,21)']
-
+    >>> get_transform_plan(js)
+    ['DE.AJ(a,15)',
+    'DE.VR(a,3)',
+    'DE.AJ(a,51)',
+    'DE.VR(a,3)',
+    'DE.kT(a,51)',
+    'DE.kT(a,8)',
+    'DE.VR(a,3)',
+    'DE.kT(a,21)']
     """
     name = re.escape(get_initial_function_name(js))
     pattern = r'%s=function\(\w\){[a-z=\.\(\"\)]*;(.*);(?:.+)}' % name
@@ -85,13 +83,12 @@ def get_transform_object(js, var):
         The obfuscated variable name that stores an object with all functions
         that descrambles the signature.
 
-    **Sample Output**:
+    **Example**:
 
-    .. code-block:: python
-
-       ['AJ:function(a){a.reverse()}',
-        'VR:function(a,b){a.splice(0,b)}',
-        'kT:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c}']
+    >>> get_transform_object(js, 'DE')
+    ['AJ:function(a){a.reverse()}',
+    'VR:function(a,b){a.splice(0,b)}',
+    'kT:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c}']
 
     """
     pattern = r'var %s={(.*?)};' % re.escape(var)
@@ -133,13 +130,13 @@ def reverse(arr, b):
 
     .. code-block:: javascript
 
-       function(a, b) { a.reverse() }.
+       function(a, b) { a.reverse() }
 
     This method takes an unused ``b`` variable as their transform functions
     universally sent two arguments.
 
-    **Example usage**:
-    ~~~~~~~~~~~~~~
+    **Example**:
+
     >>> reverse([1, 2, 3, 4])
     [4, 3, 2, 1]
     """
@@ -153,10 +150,10 @@ def splice(arr, b):
 
     .. code-block:: javascript
 
-       function(a, b) { a.splice(0, b) }.
+       function(a, b) { a.splice(0, b) }
 
-    **Example usage**:
-    ~~~~~~~~~~~~~~
+    **Example**:
+
     >>> splice([1, 2, 3, 4], 2)
     [1, 2]
     """
@@ -170,10 +167,10 @@ def swap(arr, b):
 
     .. code-block:: javascript
 
-       function(a, b) { var c=a[0];a[0]=a[b%a.length];a[b]=c }.
+       function(a, b) { var c=a[0];a[0]=a[b%a.length];a[b]=c }
 
-    **Example usage**:
-    ~~~~~~~~~~~~~~
+    **Example**:
+
     >>> swap([1, 2, 3, 4], 2)
     [3, 2, 1, 4]
     """
@@ -212,20 +209,16 @@ def parse_function(js_func):
     Break a JavaScript transform function down into a two element ``tuple``
     containing the function name and some integer-based argument.
 
-    Sample input:
-
-    .. code-block:: javascript
-
-       DE.AJ(a,15)
-
-    Sample Output:
-
-    .. code-block:: python
-
-       ('AJ', 15)
-
     :param str js_func:
         The JavaScript version of the transform function.
+    :rtype: tuple
+    :returns:
+        two element tuple containing the function name and an argument.
+
+    **Example**:
+
+    >>> parse_function('DE.AJ(a,15)')
+    ('AJ', 15)
 
     """
     logger.debug('parsing transform function')

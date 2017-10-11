@@ -9,22 +9,30 @@ from pytube.helpers import regex_search
 
 
 def video_id(url):
-    """Extract the ``video_id`` part of /watch?v=<video_id>.
+    """Extract the ``video_id`` from a YouTube url.
+
+    This function supports the following patterns:
+
+    - :samp:`https://www.youtube.com/watch?v={video_id}`
+    - :samp:`https://youtu.be/{video_id}`
 
     :param str url:
-        A url YouTube id containing a video_id.
-
+        A YouTube url containing a video id.
+    :rtype: str
+    :returns:
+        YouTube video id.
     """
-    # TODO(nficano): support url-shortened version
-    return regex_search(r'.*(?:v=|/v/|^)(?P<id>[^&]*)', url, group=1)
+    return regex_search(r'(?:v=|\/)([0-9A-Za-z_-]{11}).*', url, group=1)
 
 
 def watch_url(video_id):
-    """Construct a YouTube watch url, given a video id.
+    """Construct a sanitized YouTube watch url, given a video id.
 
     :param str video_id:
         A YouTube video identifer.
-
+    :rtype: str
+    :returns:
+        Sanitized YouTube watch url.
     """
     return 'https://youtube.com/watch?v=' + video_id
 
@@ -79,13 +87,16 @@ def mime_type_codec(mime_type_codec):
     mime type and codecs serialized together, and splits them into separate
     elements.
 
+    **Example**:
+
+    >>> mime_type_codec('audio/webm; codecs="opus"')
+    ('audio/webm', ['opus'])
+
     :param str mime_type_codec:
-        String containing mime type and codecs, for example:
-        'audio/webm; codecs="opus"'
+        String containing mime type and codecs.
     :rtype: tuple
     :returns:
-        The mime type and a list of codecs, for example:
-        ('audio/webm', ['opus'])
+        The mime type and a list of codecs.
 
     """
     pattern = r'(\w+\/\w+)\;\scodecs=\"([a-zA-Z-0-9.,\s]*)\"'
@@ -104,7 +115,7 @@ def get_ytplayer_config(watch_html):
         The html contents of the watch page.
     :rtype: str
     :returns:
-        Substring of the html containing the serialized manifest data.
+        Substring of the html containing the encoded manifest data.
     """
     pattern = r';ytplayer\.config\s*=\s*({.*?});'
     yt_player_config = regex_search(pattern, watch_html, group=1)
