@@ -9,7 +9,7 @@ from pytube import Stream
 
 def test_filesize(cipher_signature, mocker):
     mocker.patch.object(request, 'get')
-    request.get.return_value = {'Content-Length': '6796391'}
+    request.get.return_value = {'content-length': '6796391'}
     assert cipher_signature.streams.first().filesize == 6796391
 
 
@@ -22,8 +22,8 @@ def test_default_filename(cipher_signature):
 def test_download(cipher_signature, mocker):
     mocker.patch.object(request, 'get')
     request.get.side_effect = [
-        {'Content-Length': '16384'},
-        {'Content-Length': '16384'},
+        {'content-length': '16384'},
+        {'content-length': '16384'},
         iter([str(random.getrandbits(8 * 1024))]),
     ]
     with mock.patch('pytube.streams.open', mock.mock_open(), create=True):
@@ -47,8 +47,8 @@ def test_on_progress_hook(cipher_signature, mocker):
 
     mocker.patch.object(request, 'get')
     request.get.side_effect = [
-        {'Content-Length': '16384'},
-        {'Content-Length': '16384'},
+        {'content-length': '16384'},
+        {'content-length': '16384'},
         iter([str(random.getrandbits(8 * 1024))]),
     ]
     with mock.patch('pytube.streams.open', mock.mock_open(), create=True):
@@ -67,8 +67,8 @@ def test_on_complete_hook(cipher_signature, mocker):
 
     mocker.patch.object(request, 'get')
     request.get.side_effect = [
-        {'Content-Length': '16384'},
-        {'Content-Length': '16384'},
+        {'content-length': '16384'},
+        {'content-length': '16384'},
         iter([str(random.getrandbits(8 * 1024))]),
     ]
     with mock.patch('pytube.streams.open', mock.mock_open(), create=True):

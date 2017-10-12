@@ -22,7 +22,8 @@ def get(
     if streaming:
         return stream_response(response, chunk_size)
     elif headers:
-        return dict(response.info().items())
+        # https://github.com/nficano/pytube/issues/160
+        return {k.lower(): v for k, v in response.info().items()}
     return (
         response
         .read()

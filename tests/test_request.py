@@ -27,10 +27,10 @@ def test_get_streaming(mock_urlopen):
 @mock.patch('pytube.request.urlopen')
 def test_get_headers(mock_urlopen):
     response = mock.Mock()
-    response.info.return_value = {'Content-Length': '16384'}
+    response.info.return_value = {'content-length': '16384'}
     mock_urlopen.return_value = response
     response = request.get('fakeassurl.gov', headers=True)
-    assert response == {'Content-Length': '16384'}
+    assert response == {'content-length': '16384'}
 
 
 @mock.patch('pytube.request.urlopen')
