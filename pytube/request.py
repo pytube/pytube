@@ -4,7 +4,7 @@ from pytube.compat import urlopen
 
 
 def get(
-    url=None, processes=2, headers=False,
+    url=None, headers=False,
     streaming=False, chunk_size=8 * 1024,
 ):
     """Send an http GET request.
@@ -13,8 +13,6 @@ def get(
         The URL to perform the GET request for.
     :param list urls:
         List of URLs to perform the GET request for concurrently.
-    :param int processes:
-        How many worker processes to start.
     :param bool headers:
         Only return the http headers.
     :param bool streaming:

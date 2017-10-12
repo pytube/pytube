@@ -15,11 +15,11 @@ def test_extract_watch_url():
     assert watch_url == 'https://youtube.com/watch?v=9bZkp7q19f0'
 
 
-def test_info_url(gangnam_style):
+def test_info_url(cipher_signature):
     video_info_url = extract.video_info_url(
-        video_id=gangnam_style.video_id,
-        watch_url=gangnam_style.watch_url,
-        watch_html=gangnam_style.watch_html,
+        video_id=cipher_signature.video_id,
+        watch_url=cipher_signature.watch_url,
+        watch_html=cipher_signature.watch_html,
     )
     expected = (
         'https://youtube.com/get_video_info?video_id=9bZkp7q19f0&el=%24el'
@@ -29,7 +29,15 @@ def test_info_url(gangnam_style):
     assert video_info_url == expected
 
 
-def test_js_url(gangnam_style):
+def test_js_url(cipher_signature):
     expected = 'https://youtube.com/yts/jsbin/player-vflOdyxa4/en_US/base.js'
-    result = extract.js_url(gangnam_style.watch_html)
+    result = extract.js_url(cipher_signature.watch_html)
     assert expected == result
+
+
+def test_age_restricted(age_restricted):
+    assert extract.is_age_restricted(age_restricted['watch_html'])
+
+
+def test_non_age_restricted(cipher_signature):
+    assert not extract.is_age_restricted(cipher_signature.watch_html)
