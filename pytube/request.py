@@ -11,8 +11,6 @@ def get(
 
     :param str url:
         The URL to perform the GET request for.
-    :param list urls:
-        List of URLs to perform the GET request for concurrently.
     :param bool headers:
         Only return the http headers.
     :param bool streaming:
