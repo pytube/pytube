@@ -135,6 +135,9 @@ class Stream(object):
     def filesize(self):
         """File size of the media stream in bytes."""
         headers = request.get(self.url, headers=True)
+        # https://github.com/nficano/pytube/issues/160
+        if 'content-length' in headers:
+            return int(headers['content-length'])
         return int(headers['Content-Length'])
 
     @property
