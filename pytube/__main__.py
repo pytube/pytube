@@ -163,6 +163,8 @@ class YouTube(object):
             self.fmt_streams.append(video)
 
     def initialize_caption_objects(self):
+        if 'captions' not in self.player_config['args']['player_response']:
+            return
         caption_tracks = (
             self.player_config['args']
             ['player_response']
