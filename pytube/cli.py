@@ -12,7 +12,6 @@ import os
 import sys
 
 from pytube import __version__
-from pytube import request
 from pytube import YouTube
 
 
@@ -78,9 +77,9 @@ def build_playback_report(url):
         'yt-video-{yt.video_id}-{ts}.json.tar.gz'.format(yt=yt, ts=ts),
     )
 
-    js = request.get(yt.js_url)
-    watch_html = request.get(yt.watch_html)
-    vid_info = request.get(yt.vid_info_url)
+    js = yt.js
+    watch_html = yt.watch_html
+    vid_info = yt.vid_info
 
     with gzip.open(fp, 'wb') as fh:
         fh.write(
