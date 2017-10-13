@@ -12,10 +12,10 @@ from __future__ import absolute_import
 import json
 import logging
 
+from pytube import Caption
 from pytube import extract
 from pytube import mixins
 from pytube import request
-from pytube import Caption
 from pytube import Stream
 from pytube import StreamQuery
 from pytube.compat import parse_qsl

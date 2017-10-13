@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class Caption:
     def __init__(self, caption_track):
         self.url = caption_track.get('baseUrl')
