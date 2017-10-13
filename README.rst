@@ -14,7 +14,7 @@ pytube
   :alt: Documentation Status
   :target: http://python-pytube.readthedocs.io/en/latest/?badge=latest
 
-.. image:: https://coveralls.io/repos/github/nficano/pytube/badge.svg?branch=master#23e6f7ac56dd3e
+.. image:: https://coveralls.io/repos/github/nficano/pytube/badge.svg?branch=master#23e6f7ac56dd3bde
   :alt: Code Coverage
   :target: https://coveralls.io/github/nficano/pytube?branch=master
 
