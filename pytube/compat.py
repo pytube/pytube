@@ -4,9 +4,12 @@
 """Python 2/3 compatibility support."""
 import sys
 
-python_version = sys.version_info[0]
+PY2 = sys.version_info[0] == 2
+PY3 = sys.version_info[0] == 3
+PY33 = sys.version_info[0:2] >= (3, 3)
 
-if python_version == 2:
+
+if PY2:
     from urllib import urlencode
     from urllib2 import URLError
     from urllib2 import quote
@@ -24,7 +27,15 @@ if python_version == 2:
         """Encode a string to utf-8."""
         return s.encode('utf-8')
 
-elif python_version == 3:
+elif PY33:
+    from html.parser import HTMLParser
+
+    def unescape(s):
+        """Strip HTML entries from a string."""
+        html_parser = HTMLParser()
+        return html_parser.unescape(s)
+
+elif PY3:
     from urllib.error import URLError
     from urllib.parse import parse_qsl
     from urllib.parse import quote
