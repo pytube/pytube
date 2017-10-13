@@ -27,14 +27,6 @@ if PY2:
         """Encode a string to utf-8."""
         return s.encode('utf-8')
 
-elif PY33:
-    from html.parser import HTMLParser
-
-    def unescape(s):
-        """Strip HTML entries from a string."""
-        html_parser = HTMLParser()
-        return html_parser.unescape(s)
-
 elif PY3:
     from urllib.error import URLError
     from urllib.parse import parse_qsl
@@ -42,8 +34,17 @@ elif PY3:
     from urllib.parse import unquote
     from urllib.parse import urlencode
     from urllib.request import urlopen
-    from html import unescape
 
     def unicode(s):
         """No-op."""
         return s
+
+    if PY33:
+        from html.parser import HTMLParser
+
+        def unescape(s):
+            """Strip HTML entries from a string."""
+            html_parser = HTMLParser()
+            return html_parser.unescape(s)
+    else:
+        from html import unescape
