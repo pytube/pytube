@@ -17,6 +17,7 @@ __copyright__ = 'Copyright 2017 Nick Ficano'
 from pytube.logging import create_logger
 from pytube.query import StreamQuery
 from pytube.streams import Stream
+from pytube.captions import Caption
 from pytube.__main__ import YouTube
 
 logger = create_logger()
