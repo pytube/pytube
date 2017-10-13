@@ -163,6 +163,16 @@ class YouTube(object):
         """Interface to query both adaptive (DASH) and progressive streams."""
         return StreamQuery([s for s in self.fmt_streams])
 
+    @property
+    def thumbnail_url(self):
+        """Get the thumbnail url image."""
+        return self.player_config['args']['thumbnail_url']
+
+    @property
+    def title(self):
+        """Get the video title."""
+        return self.player_config['args']['title']
+
     def register_on_progress_callback(self, func):
         """Register a download progess callback function post initialization.
 
