@@ -12,6 +12,8 @@ from __future__ import absolute_import
 import json
 import logging
 
+from pytube import Caption
+from pytube import CaptionQuery
 from pytube import extract
 from pytube import mixins
 from pytube import request
@@ -59,6 +61,7 @@ class YouTube(object):
         self.player_config = None  # inline js in the html containing streams
 
         self.fmt_streams = []  # list of :class:`Stream <Stream>` instances
+        self.caption_tracks = []
 
         # video_id part of /watch?v=<video_id>
         self.video_id = extract.video_id(url)
@@ -115,6 +118,8 @@ class YouTube(object):
         # build instances of :class:`Stream <Stream>`
         self.initialize_stream_objects(progressive_fmts)
         self.initialize_stream_objects(adaptive_fmts)
+
+        self.initialize_caption_objects()
         logger.info('init finished successfully')
 
     def prefetch(self):
@@ -157,6 +162,29 @@ class YouTube(object):
                 monostate=self.stream_monostate,
             )
             self.fmt_streams.append(video)
+
+    def initialize_caption_objects(self):
+        """Populate instances of :class:`Caption <Caption>`.
+
+        Take the unscrambled player response data, and use it to initialize
+        instances of :class:`Caption <Caption>`.
+        """
+        if 'captions' not in self.player_config['args']['player_response']:
+            return
+        caption_tracks = (
+            self.player_config['args']
+            ['player_response']
+            ['captions']
+            ['playerCaptionsTracklistRenderer']
+            ['captionTracks']
+        )
+        for caption_track in caption_tracks:
+            self.caption_tracks.append(Caption(caption_track))
+
+    @property
+    def captions(self):
+        """Interface to query caption tracks."""
+        return CaptionQuery([c for c in self.caption_tracks])
 
     @property
     def streams(self):
