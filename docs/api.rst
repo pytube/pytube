@@ -34,6 +34,13 @@ Caption Object
    :members:
    :inherited-members:
 
+CaptionQuery Object
+------------------
+
+.. autoclass:: pytube.query.CaptionQuery
+   :members:
+   :inherited-members:
+
 Extract
 -------
 
