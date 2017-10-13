@@ -15,6 +15,7 @@ if python_version == 2:
     from urlparse import parse_qsl
 
     def unicode(s):
+        """Encode a string to utf-8."""
         return s.encode('utf-8')
 
 elif python_version == 3:
@@ -26,4 +27,5 @@ elif python_version == 3:
     from urllib.request import urlopen
 
     def unicode(s):
-        return str(s)
+        """No-op."""
+        return s

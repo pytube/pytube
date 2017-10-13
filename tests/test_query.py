@@ -4,6 +4,7 @@ import pytest
 
 
 def test_count(cipher_signature):
+    """Ensure :meth:`~pytube.StreamQuery.count` returns an accurate amount."""
     assert cipher_signature.streams.count() == 22
 
 
@@ -28,28 +29,43 @@ def test_count(cipher_signature):
     ],
 )
 def test_filters(test_input, expected, cipher_signature):
-    result = [s.itag for s in cipher_signature.streams.filter(
-        **test_input
-    ).all()]
+    """Ensure filters produce the expected results."""
+    result = [
+        s.itag for s
+        in cipher_signature.streams.filter(**test_input).all()
+    ]
     assert result == expected
 
 
 @pytest.mark.parametrize('test_input', ['first', 'last'])
 def test_empty(test_input, cipher_signature):
+    """Ensure :meth:`~pytube.StreamQuery.last` and
+    :meth:`~pytube.StreamQuery.first` return ``None`` if the resultset is
+    empty.
+    """
     query = cipher_signature.streams.filter(video_codec='vp20')
     fn = getattr(query, test_input)
     assert fn() is None
 
 
 def test_get_last(cipher_signature):
+    """Ensure :meth:`~pytube.StreamQuery.last` returns the expected
+    :class:`Stream <Stream>`.
+    """
     assert cipher_signature.streams.last().itag == '251'
 
 
 def test_get_first(cipher_signature):
+    """Ensure :meth:`~pytube.StreamQuery.first` returns the expected
+    :class:`Stream <Stream>`.
+    """
     assert cipher_signature.streams.first().itag == '22'
 
 
 def test_order_by(cipher_signature):
+    """Ensure :meth:`~pytube.StreamQuery.order_by` sorts the list of
+    :class:`Stream <Stream>` instances in the expected order.
+    """
     itags = [
         s.itag for s in cipher_signature.streams
         .filter(progressive=True)
@@ -61,6 +77,9 @@ def test_order_by(cipher_signature):
 
 
 def test_order_by_descending(cipher_signature):
+    """Ensure :meth:`~pytube.StreamQuery.desc` sorts the list of
+    :class:`Stream <Stream>` instances in the reverse order.
+    """
     itags = [
         s.itag for s in cipher_signature.streams
         .filter(progressive=True)
@@ -73,6 +92,9 @@ def test_order_by_descending(cipher_signature):
 
 
 def test_order_by_ascending(cipher_signature):
+    """Ensure :meth:`~pytube.StreamQuery.desc` sorts the list of
+    :class:`Stream <Stream>` instances in ascending order.
+    """
     itags = [
         s.itag for s in cipher_signature.streams
         .filter(progressive=True)
@@ -85,6 +107,9 @@ def test_order_by_ascending(cipher_signature):
 
 
 def test_get_by_itag(cipher_signature):
+    """Ensure :meth:`~pytube.StreamQuery.get_by_itag` returns the expected
+    :class:`Stream <Stream>`.
+    """
     assert cipher_signature.streams.get_by_itag(22).itag == '22'
 
 

@@ -74,7 +74,7 @@ class YouTube(object):
             'on_complete': on_complete_callback,
         }
 
-        if url and not defer_prefetch_init:
+        if not defer_prefetch_init:
             self.prefetch_init()
 
     def prefetch_init(self):

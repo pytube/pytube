@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""This module contains setup instructions for pytube."""
 try:
     from setuptools import setup
 except ImportError:
@@ -34,7 +35,6 @@ setup(
         'Operating System :: Microsoft',
         'Operating System :: POSIX',
         'Operating System :: Unix',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
@@ -47,8 +47,7 @@ setup(
         'Topic :: Terminals',
         'Topic :: Utilities',
     ],
-    description=('A Python library for downloading YouTube videos.'),
+    description=('A pythonic library for downloading YouTube Videos.'),
     long_description=readme,
     zip_safe=True,
-
 )

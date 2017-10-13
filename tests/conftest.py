@@ -12,6 +12,7 @@ from pytube import YouTube
 
 
 def load_playback_file(filename):
+    """Load a gzip json playback file."""
     cur_fp = os.path.realpath(__file__)
     cur_dir = os.path.dirname(cur_fp)
     fp = os.path.join(cur_dir, 'mocks', filename)
@@ -21,6 +22,7 @@ def load_playback_file(filename):
 
 
 def load_and_init_from_playback_file(filename):
+    """Load a gzip json playback file and create YouTube instance."""
     pb = load_playback_file(filename)
     yt = YouTube(pb['url'], defer_prefetch_init=True)
     yt.watch_html = pb['watch_html']
