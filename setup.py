@@ -14,7 +14,7 @@ with open('LICENSE') as readme_file:
 
 setup(
     name='pytube',
-    version='7.0.8',
+    version='7.0.9',
     author='Nick Ficano',
     author_email='nficano@gmail.com',
     packages=['pytube'],
