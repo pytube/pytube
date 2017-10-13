@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
-"""This module provides a query interface for media streams."""
+"""This module provides a query interface for media streams and captions."""
 
 
 class StreamQuery:
     """Interface for querying the available media streams."""
 
     def __init__(self, fmt_streams):
-        """Construct a :class:`StreamQuery <StreamQuery>`."""
-        # list of :class:`Stream <Stream>` instances.
+        """Construct a :class:`StreamQuery <StreamQuery>`.
+
+        param list fmt_streams:
+            list of :class:`Stream <Stream>` instances.
+        """
         self.fmt_streams = fmt_streams
         self.itag_index = {int(s.itag): s for s in fmt_streams}
 
@@ -224,3 +227,33 @@ class StreamQuery:
     def all(self):
         """Get all the results represented by this query as a list."""
         return self.fmt_streams
+
+
+class CaptionQuery:
+    """Interface for querying the available captions."""
+
+    def __init__(self, captions):
+        """Construct a :class:`Caption <Caption>`.
+
+        param list captions:
+            list of :class:`Caption <Caption>` instances.
+
+        """
+        self.captions = captions
+        self.lang_code_index = {c.code: c for c in captions}
+
+    def get_by_language_code(self, lang_code):
+        """Get the :class:`Caption <Caption>` for a given ``lang_code``.
+
+        :param str lang_code:
+            The code that identifies the caption language.
+        :rtype: :class:`Caption <Caption>` or ``None``
+        :returns:
+            The :class:`Caption <Caption>` matching the given ``lang_code`` or
+            ``None`` if it does not exist.
+        """
+        return self.lang_code_index.get(lang_code)
+
+    def all(self):
+        """Get all the results represented by this query as a list."""
+        return self.captions

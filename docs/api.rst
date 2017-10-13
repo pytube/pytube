@@ -27,6 +27,13 @@ StreamQuery Object
    :members:
    :inherited-members:
 
+Caption Object
+-------------
+
+.. autoclass:: pytube.Caption
+   :members:
+   :inherited-members:
+
 Extract
 -------
 

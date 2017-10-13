@@ -13,6 +13,7 @@ import json
 import logging
 
 from pytube import Caption
+from pytube import CaptionQuery
 from pytube import extract
 from pytube import mixins
 from pytube import request
@@ -163,6 +164,11 @@ class YouTube(object):
             self.fmt_streams.append(video)
 
     def initialize_caption_objects(self):
+        """Populate instances of :class:`Caption <Caption>`.
+
+        Take the unscrambled player response data, and use it to initialize
+        instances of :class:`Caption <Caption>`.
+        """
         if 'captions' not in self.player_config['args']['player_response']:
             return
         caption_tracks = (
@@ -177,7 +183,8 @@ class YouTube(object):
 
     @property
     def captions(self):
-        return self.caption_tracks
+        """Interface to query caption tracks."""
+        return CaptionQuery([c for c in self.caption_tracks])
 
     @property
     def streams(self):

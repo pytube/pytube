@@ -15,6 +15,7 @@ __license__ = 'MIT License'
 __copyright__ = 'Copyright 2017 Nick Ficano'
 
 from pytube.logging import create_logger
+from pytube.query import CaptionQuery
 from pytube.query import StreamQuery
 from pytube.streams import Stream
 from pytube.captions import Caption

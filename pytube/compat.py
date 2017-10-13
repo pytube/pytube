@@ -13,6 +13,12 @@ if python_version == 2:
     from urllib2 import unquote
     from urllib2 import urlopen
     from urlparse import parse_qsl
+    from HTMLParser import HTMLParser
+
+    def unescape(s):
+        """Strip HTML entries from a string."""
+        html_parser = HTMLParser()
+        return html_parser.unescape(s)
 
     def unicode(s):
         """Encode a string to utf-8."""
@@ -25,6 +31,7 @@ elif python_version == 3:
     from urllib.parse import unquote
     from urllib.parse import urlencode
     from urllib.request import urlopen
+    from html import unescape
 
     def unicode(s):
         """No-op."""
