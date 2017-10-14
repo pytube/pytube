@@ -37,8 +37,20 @@ pytube
     ... .first()
     ... .download()
 
+Features
+--------
+
+- Support for Both Progressive & DASH Streams
+- Easily Register ``on_download_progress`` & ``on_download_complete`` callbacks
+- Command-line Interfaced Included
+- Caption Track Support
+- Outputs Caption Tracks to .srt format (SubRip Subtitle)
+- Ability to Capture Thumbnail URL.
+- Extensively Documented Source Code
+- No Third-Party Dependencies
+
 Installation
-============
+------------
 
 Download using pip via pypi.
 
@@ -47,7 +59,7 @@ Download using pip via pypi.
     pip install pytube
 
 Getting started
-===============
+---------------
 
 Let's begin with showing how easy it is to download a video with pytube:
 
