@@ -49,7 +49,7 @@ Features
 - Easily Register ``on_download_progress`` & ``on_download_complete`` callbacks
 - Command-line Interfaced Included
 - Caption Track Support
-- Outputs Caption Tracks to SRT format (SubRip Subtitle)
+- Outputs Caption Tracks to .srt format (SubRip Subtitle)
 - Ability to Capture Thumbnail URL.
 - Extensively Documented Source Code
 - No Third-Party Dependencies
