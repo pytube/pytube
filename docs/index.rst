@@ -62,6 +62,7 @@ This part of the documentation begins with some background information about the
    :maxdepth: 2
 
    user/install
+   user/quickstart
 
 The API Documentation / Guide
 -----------------------------
