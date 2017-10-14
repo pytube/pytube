@@ -42,9 +42,26 @@ Release v\ |version|. (:ref:`Installation <install>`)
     ... .first()
     ... .download()
 
+Features
+--------
+
+- Support for Both Progressive & DASH Streams
+- Easily Register ``on_download_progress`` & ``on_download_complete`` callbacks
+- Command-line Interfaced Included
+- Caption Track Support
+- Outputs Caption Tracks to SRT format (SubRip Subtitle)
+- Ability to Capture Thumbnail URL.
+- Extensively Documented Source Code
+- No Third-Party Dependencies
+
 The User Guide
 --------------
 This part of the documentation begins with some background information about the project, then focuses on step-by-step instructions for getting the most out of pytube.
+
+.. toctree::
+   :maxdepth: 2
+
+   user/install
 
 The API Documentation / Guide
 -----------------------------
