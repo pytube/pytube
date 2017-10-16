@@ -132,7 +132,7 @@ class Stream(object):
 
         Parse a variable length sized list of codecs and returns a
         consitant two element tuple, with the video codec as the first element
-        and audio as the second. Returns ``None`` if one is not available
+        and audio as the second. Returns None if one is not available
         (adaptive only).
 
         :rtype: tuple
@@ -180,7 +180,7 @@ class Stream(object):
             (optional) Output path for writing media file. If one is not
             specified, defaults to the current working directory.
         :type output_path: str or None
-        :rtype: ``None``
+        :rtype: None
 
         """
         # TODO(nficano): allow a filename to specified.
@@ -219,7 +219,7 @@ class Stream(object):
             The delta between the total file size in bytes and amount already
             downloaded.
 
-        :rtype: ``None``
+        :rtype: None
 
         """
         file_handler.write(chunk)
@@ -245,7 +245,7 @@ class Stream(object):
         :type file_handle:
             :py:class:`io.BufferedWriter`
 
-        :rtype: ``None``
+        :rtype: None
 
         """
         logger.debug('download finished')

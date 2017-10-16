@@ -70,7 +70,7 @@ def apply_mixin(dct, key, func, *args, **kwargs):
     :param \*\*kwargs:
         (optional) keyword arguments that ``func`` takes.
     :rtype:
-        ``None``
+        None
     """
     dct[key] = func(dct[key], *args, **kwargs)
 

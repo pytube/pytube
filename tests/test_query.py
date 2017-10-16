@@ -40,7 +40,7 @@ def test_filters(test_input, expected, cipher_signature):
 @pytest.mark.parametrize('test_input', ['first', 'last'])
 def test_empty(test_input, cipher_signature):
     """Ensure :meth:`~pytube.StreamQuery.last` and
-    :meth:`~pytube.StreamQuery.first` return ``None`` if the resultset is
+    :meth:`~pytube.StreamQuery.first` return None if the resultset is
     empty.
     """
     query = cipher_signature.streams.filter(video_codec='vp20')

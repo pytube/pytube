@@ -83,7 +83,7 @@ class YouTube(object):
     def prefetch_init(self):
         """Download data, descramble it, and build Stream instances.
 
-        :rtype: ``None``
+        :rtype: None
 
         """
         self.prefetch()
@@ -97,7 +97,7 @@ class YouTube(object):
         be applied in-place, instead of holding references to mutations at each
         interstitial step.
 
-        :rtype: ``None``
+        :rtype: None
 
         """
         logger.info('init started')
@@ -136,7 +136,7 @@ class YouTube(object):
         operations don't does need to make calls outside of the interpreter
         which blocks for long periods of time.
 
-        :rtype: ``None``
+        :rtype: None
 
         """
         self.watch_html = request.get(url=self.watch_url)
@@ -162,7 +162,7 @@ class YouTube(object):
             download or adaptive streams (e.g.: ``url_encoded_fmt_stream_map``
             or ``adaptive_fmts``).
 
-        :rtype: ``None``
+        :rtype: None
 
         """
         stream_manifest = self.player_config['args'][fmt]
@@ -180,7 +180,7 @@ class YouTube(object):
         Take the unscrambled player response data, and use it to initialize
         instances of :class:`Caption <Caption>`.
 
-        :rtype: ``None``
+        :rtype: None
 
         """
         if 'captions' not in self.player_config['args']['player_response']:
@@ -237,7 +237,7 @@ class YouTube(object):
             A callback function that takes ``stream``, ``chunk``,
             ``file_handle``, ``bytes_remaining`` as parameters.
 
-        :rtype: ``None``
+        :rtype: None
 
         """
         self.stream_monostate['on_progress'] = func
@@ -248,7 +248,7 @@ class YouTube(object):
         :param callable func:
             A callback function that takes ``stream`` and  ``file_handle``.
 
-        :rtype: ``None``
+        :rtype: None
 
         """
         self.stream_monostate['on_complete'] = func

@@ -27,59 +27,59 @@ class StreamQuery:
         :param fps:
             (optional) The frames per second.
         :type fps:
-            int or ``None``
+            int or None
 
         :param resolution:
             (optional) Alias to ``res``.
         :type res:
-            str or ``None``
+            str or None
 
         :param res:
             (optional) The video resolution.
         :type resolution:
-            str or ``None``
+            str or None
 
         :param mime_type:
             (optional) Two-part identifier for file formats and format contents
             composed of a "type", a "subtype".
         :type mime_type:
-            str or ``None``
+            str or None
 
         :param type:
             (optional) Type part of the ``mime_type`` (e.g.: audio, video).
         :type type:
-            str or ``None``
+            str or None
 
         :param subtype:
             (optional) Sub-type part of the ``mime_type`` (e.g.: mp4, mov).
         :type subtype:
-            str or ``None``
+            str or None
 
         :param file_extension:
             (optional) Alias to ``sub_type``.
         :type file_extension:
-            str or ``None``
+            str or None
 
         :param abr:
             (optional) Average bitrate (ABR) refers to the average amount of
             data transferred per unit of time (e.g.: 64kbps, 192kbps).
         :type abr:
-            str or ``None``
+            str or None
 
         :param bitrate:
             (optional) Alias to ``abr``.
         :type bitrate:
-            str or ``None``
+            str or None
 
         :param video_codec:
             (optional) Video compression format.
         :type video_codec:
-            str or ``None``
+            str or None
 
         :param audio_codec:
             (optional) Audio compression format.
         :type audio_codec:
-            str or ``None``
+            str or None
 
         :param bool progressive:
             Excludes adaptive streams (one file contains both audio and video
@@ -99,7 +99,7 @@ class StreamQuery:
             (optional) Interface for defining complex filters without
             subclassing.
         :type custom_filter_functions:
-            list or ``None``
+            list or None
 
         """
         filters = []
@@ -189,9 +189,9 @@ class StreamQuery:
 
         :param str itag:
             YouTube format identifier code.
-        :rtype: :class:`Stream <Stream>` or ``None``
+        :rtype: :class:`Stream <Stream>` or None
         :returns:
-            The :class:`Stream <Stream>` matching the given itag or ``None`` if
+            The :class:`Stream <Stream>` matching the given itag or None if
             not found.
 
         """
@@ -203,9 +203,9 @@ class StreamQuery:
     def first(self):
         """Get the first :class:`Stream <Stream>` in the results.
 
-        :rtype: :class:`Stream <Stream>` or ``None``
+        :rtype: :class:`Stream <Stream>` or None
         :returns:
-            the first result of this query or ``None`` if the result doesn't
+            the first result of this query or None if the result doesn't
             contain any streams.
 
         """
@@ -217,9 +217,9 @@ class StreamQuery:
     def last(self):
         """Get the last :class:`Stream <Stream>` in the results.
 
-        :rtype: :class:`Stream <Stream>` or ``None``
+        :rtype: :class:`Stream <Stream>` or None
         :returns:
-            Return the last result of this query or ``None`` if the result
+            Return the last result of this query or None if the result
             doesn't contain any streams.
 
         """
@@ -263,10 +263,10 @@ class CaptionQuery:
 
         :param str lang_code:
             The code that identifies the caption language.
-        :rtype: :class:`Caption <Caption>` or ``None``
+        :rtype: :class:`Caption <Caption>` or None
         :returns:
             The :class:`Caption <Caption>` matching the given ``lang_code`` or
-            ``None`` if it does not exist.
+            None if it does not exist.
         """
         return self.lang_code_index.get(lang_code)
 
