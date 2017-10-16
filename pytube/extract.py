@@ -30,7 +30,8 @@ def video_id(url):
 
     This function supports the following patterns:
 
-    - :samp:`https://www.youtube.com/watch?v={video_id}`
+    - :samp:`https://youtube.com/watch?v={video_id}`
+    - :samp:`https://youtube.com/embed/{video_id}`
     - :samp:`https://youtu.be/{video_id}`
 
     :param str url:
@@ -64,6 +65,10 @@ def video_info_url(video_id, watch_url, watch_html):
     :param str watch_html:
         The html contents of the watch page.
 
+    :rtype: str
+    :returns:
+        :samp:`https://youtube.com/get_video_info` with necessary GET
+        parameters.
     """
     # I'm not entirely sure what ``t`` represents. Looks to represent a
     # boolean.
