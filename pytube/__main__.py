@@ -81,7 +81,11 @@ class YouTube(object):
             self.prefetch_init()
 
     def prefetch_init(self):
-        """Download data, descramble it, and build Stream instances."""
+        """Download data, descramble it, and build Stream instances.
+
+        :rtype: ``None``
+
+        """
         self.prefetch()
         self.init()
 
@@ -92,6 +96,9 @@ class YouTube(object):
         "call-by-reference evaluation," which allows dictionary transforms to
         be applied in-place, instead of holding references to mutations at each
         interstitial step.
+
+        :rtype: ``None``
+
         """
         logger.info('init started')
 
@@ -129,6 +136,8 @@ class YouTube(object):
         operations don't does need to make calls outside of the interpreter
         which blocks for long periods of time.
 
+        :rtype: ``None``
+
         """
         self.watch_html = request.get(url=self.watch_url)
         if extract.is_age_restricted(self.watch_html):
@@ -149,9 +158,11 @@ class YouTube(object):
         instances of :class:`Stream <Stream>` for each media stream.
 
         :param str fmt:
-            Key in stream manifest ("player_config") containing progressive
-            download or adaptive streams (e.g.: "url_encoded_fmt_stream_map" or
-            "adaptive_fmts").
+            Key in stream manifest (``ytplayer_config``) containing progressive
+            download or adaptive streams (e.g.: ``url_encoded_fmt_stream_map``
+            or ``adaptive_fmts``).
+
+        :rtype: ``None``
 
         """
         stream_manifest = self.player_config['args'][fmt]
@@ -168,11 +179,15 @@ class YouTube(object):
 
         Take the unscrambled player response data, and use it to initialize
         instances of :class:`Caption <Caption>`.
+
+        :rtype: ``None``
+
         """
         if 'captions' not in self.player_config['args']['player_response']:
             return
         caption_tracks = (
-            self.player_config['args']
+            self.player_config
+            ['args']
             ['player_response']
             ['captions']
             ['playerCaptionsTracklistRenderer']
@@ -183,22 +198,36 @@ class YouTube(object):
 
     @property
     def captions(self):
-        """Interface to query caption tracks."""
+        """Interface to query caption tracks.
+
+        :rtype: :class:`CaptionQuery <CaptionQuery>`.
+        """
         return CaptionQuery([c for c in self.caption_tracks])
 
     @property
     def streams(self):
-        """Interface to query both adaptive (DASH) and progressive streams."""
+        """Interface to query both adaptive (DASH) and progressive streams.
+
+        :rtype: :class:`StreamQuery <StreamQuery>`.
+        """
         return StreamQuery([s for s in self.fmt_streams])
 
     @property
     def thumbnail_url(self):
-        """Get the thumbnail url image."""
+        """Get the thumbnail url image.
+
+        :rtype: str
+
+        """
         return self.player_config['args']['thumbnail_url']
 
     @property
     def title(self):
-        """Get the video title."""
+        """Get the video title.
+
+        :rtype: str
+
+        """
         return self.player_config['args']['title']
 
     def register_on_progress_callback(self, func):
@@ -207,6 +236,9 @@ class YouTube(object):
         :param callable func:
             A callback function that takes ``stream``, ``chunk``,
             ``file_handle``, ``bytes_remaining`` as parameters.
+
+        :rtype: ``None``
+
         """
         self.stream_monostate['on_progress'] = func
 
@@ -215,5 +247,8 @@ class YouTube(object):
 
         :param callable func:
             A callback function that takes ``stream`` and  ``file_handle``.
+
+        :rtype: ``None``
+
         """
         self.stream_monostate['on_complete'] = func
