@@ -19,9 +19,9 @@ def apply_signature(config_args, fmt, js):
     :param dict config_args:
         Details of the media streams available.
     :param str fmt:
-        Key in stream manifests ("player_config") containing progressive
-        download or adaptive streams (e.g.: "url_encoded_fmt_stream_map" or
-        "adaptive_fmts").
+        Key in stream manifests (``ytplayer_config``) containing progressive
+        download or adaptive streams (e.g.: ``url_encoded_fmt_stream_map`` or
+        ``adaptive_fmts``).
     :param str js:
         The contents of the base.js asset file.
 
