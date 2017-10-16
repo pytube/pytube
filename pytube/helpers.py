@@ -24,6 +24,12 @@ def regex_search(pattern, string, groups=False, group=None, flags=0):
         Should the return value be ``.groups()``.
     :param int group:
         Index of group to return.
+    :param int flags:
+        Expression behavior modifiers.
+    :rtype:
+        str or tuple
+    :returns:
+        Substring pattern matches.
     """
     regex = re.compile(pattern, flags)
     results = regex.search(string)
@@ -63,6 +69,8 @@ def apply_mixin(dct, key, func, *args, **kwargs):
         (optional) positional arguments that ``func`` takes.
     :param \*\*kwargs:
         (optional) keyword arguments that ``func`` takes.
+    :rtype:
+        ``None``
     """
     dct[key] = func(dct[key], *args, **kwargs)
 
@@ -73,10 +81,13 @@ def safe_filename(s, max_length=255):
     This function was based off the limitations outlined here:
     https://en.wikipedia.org/wiki/Filename.
 
-    :param str text:
+    :param str s:
         A string to make safe for use as a file name.
     :param int max_length:
         The maximum filename character length.
+    :rtype: str
+    :returns:
+        A sanitized string.
     """
     # Characters in range 0-31 (0x00-0x1F) are not allowed in NTFS filenames.
     ntfs_chrs = [chr(i) for i in range(0, 31)]
