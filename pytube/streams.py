@@ -82,32 +82,47 @@ class Stream(object):
         self.video_codec, self.audio_codec = self.parse_codecs()
 
     def set_attributes_from_dict(self, dct):
-        """Set class attributes from dictionary items."""
+        """Set class attributes from dictionary items.
+
+        :rtype: None
+        """
         for key, val in dct.items():
             setattr(self, key, val)
 
     @property
     def is_adaptive(self):
-        """Whether the stream is DASH."""
+        """Whether the stream is DASH.
+
+        :rtype: bool
+        """
         # if codecs has two elements (e.g.: ['vp8', 'vorbis']): 2 % 2 = 0
         # if codecs has one element (e.g.: ['vp8']) 1 % 2 = 1
         return len(self.codecs) % 2
 
     @property
     def is_progressive(self):
-        """Whether the stream is progressive."""
+        """Whether the stream is progressive.
+
+        :rtype: bool
+        """
         return not self.is_adaptive
 
     @property
     def includes_audio_track(self):
-        """Whether the stream only contains audio."""
+        """Whether the stream only contains audio.
+
+        :rtype: bool
+        """
         if self.is_progressive:
             return True
         return self.type == 'audio'
 
     @property
     def includes_video_track(self):
-        """Whether the stream only contains video."""
+        """Whether the stream only contains video.
+
+        :rtype: bool
+        """
         if self.is_progressive:
             return True
         return self.type == 'video'
@@ -119,6 +134,10 @@ class Stream(object):
         consitant two element tuple, with the video codec as the first element
         and audio as the second. Returns ``None`` if one is not available
         (adaptive only).
+
+        :rtype: tuple
+        :returns:
+            A two element tuple with audio and video codecs.
 
         """
         video = None
@@ -133,13 +152,23 @@ class Stream(object):
 
     @property
     def filesize(self):
-        """File size of the media stream in bytes."""
+        """File size of the media stream in bytes.
+
+        :rtype: int
+        :returns:
+            Filesize (in bytes) of the stream.
+        """
         headers = request.get(self.url, headers=True)
         return int(headers['content-length'])
 
     @property
     def default_filename(self):
-        """Generate filename based on the video title."""
+        """Generate filename based on the video title.
+
+        :rtype: str
+        :returns:
+            An os file system compatible filename.
+        """
         title = self.player_config['args']['title']
         filename = safe_filename(title)
         return '{filename}.{s.subtype}'.format(filename=filename, s=self)
@@ -151,6 +180,7 @@ class Stream(object):
             (optional) Output path for writing media file. If one is not
             specified, defaults to the current working directory.
         :type output_path: str or None
+        :rtype: ``None``
 
         """
         # TODO(nficano): allow a filename to specified.
@@ -189,6 +219,8 @@ class Stream(object):
             The delta between the total file size in bytes and amount already
             downloaded.
 
+        :rtype: ``None``
+
         """
         file_handler.write(chunk)
         logger.debug(
@@ -213,6 +245,8 @@ class Stream(object):
         :type file_handle:
             :py:class:`io.BufferedWriter`
 
+        :rtype: ``None``
+
         """
         logger.debug('download finished')
         on_complete = self._monostate['on_complete']
@@ -221,7 +255,12 @@ class Stream(object):
             on_complete(self, file_handle)
 
     def __repr__(self):
-        """Printable object representation."""
+        """Printable object representation.
+
+        :rtype: str
+        :returns:
+            A string representation of a :class:`Stream <Stream>` object.
+        """
         # TODO(nficano): this can probably be written better.
         parts = ['itag="{s.itag}"', 'mime_type="{s.mime_type}"']
         if self.includes_video_track:
