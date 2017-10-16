@@ -65,6 +65,12 @@ Mixins
 .. automodule:: pytube.mixins
     :members:
 
+Compat
+------
+
+.. automodule:: pytube.compat
+    :members:
+
 
 Helpers
 -------
