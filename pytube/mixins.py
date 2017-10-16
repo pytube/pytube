@@ -55,8 +55,8 @@ def apply_descrambler(stream_data, key):
     """Apply various in-place transforms to YouTube's media stream data.
 
     Creates a ``list`` of dictionaries by string splitting on commas, then
-    taking each list item, parsing the query string into a ``dict`` and
-    unquoting the value.
+    taking each list item, parsing it as a query string, converting it to a
+    ``dict`` and unquoting the value.
 
     :param dict dct:
         Dictionary containing query string encoded values.
