@@ -64,7 +64,7 @@ def apply_mixin(dct, key, func, *args, **kwargs):
     :param str key:
         Key within dictionary to apply mixin function to.
     :param callable func:
-        Transform function to apply to dct[key].
+        Transform function to apply to ``dct[key]``.
     :param \*args:
         (optional) positional arguments that ``func`` takes.
     :param \*\*kwargs:
@@ -89,7 +89,7 @@ def safe_filename(s, max_length=255):
     :returns:
         A sanitized string.
     """
-    # Characters in range 0-31 (0x00-0x1F) are not allowed in NTFS filenames.
+    # Characters in range 0-31 (0x00-0x1F) are not allowed in ntfs filenames.
     ntfs_chrs = [chr(i) for i in range(0, 31)]
     chrs = [
         '\"', '\#', '\$', '\%', '\'', '\*', '\,', '\.', '\/', '\:',

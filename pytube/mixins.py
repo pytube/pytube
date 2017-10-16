@@ -54,10 +54,21 @@ def apply_signature(config_args, fmt, js):
 def apply_descrambler(stream_data, key):
     """Apply various in-place transforms to YouTube's media stream data.
 
+    Creates a ``list`` of dictionaries by string splitting on commas, then
+    taking each list item, parsing the query string into a ``dict`` and
+    unquoting the value.
+
     :param dict dct:
         Dictionary containing query string encoded values.
     :param str key:
         Name of the key in dictionary.
+
+    **Example**:
+
+    >>> d = {'foo': 'bar=1&var=test,em=5&t=url%20encoded'}
+    >>> apply_descrambler(d, 'foo')
+    >>> print(d)
+    {'foo': [{'bar': '1', 'var': 'test'}, {'em': '5', 't': 'url encoded'}]}
 
     """
     stream_data[key] = [
