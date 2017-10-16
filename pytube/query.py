@@ -27,59 +27,59 @@ class StreamQuery:
         :param fps:
             (optional) The frames per second.
         :type fps:
-            int or None
+            int or ``None``
 
         :param resolution:
             (optional) Alias to ``res``.
         :type res:
-            str or None
+            str or ``None``
 
         :param res:
             (optional) The video resolution.
         :type resolution:
-            str or None
+            str or ``None``
 
         :param mime_type:
             (optional) Two-part identifier for file formats and format contents
             composed of a "type", a "subtype".
         :type mime_type:
-            str or None
+            str or ``None``
 
         :param type:
             (optional) Type part of the ``mime_type`` (e.g.: audio, video).
         :type type:
-            str or None
+            str or ``None``
 
         :param subtype:
             (optional) Sub-type part of the ``mime_type`` (e.g.: mp4, mov).
         :type subtype:
-            str or None
+            str or ``None``
 
         :param file_extension:
             (optional) Alias to ``sub_type``.
         :type file_extension:
-            str or None
+            str or ``None``
 
         :param abr:
             (optional) Average bitrate (ABR) refers to the average amount of
             data transferred per unit of time (e.g.: 64kbps, 192kbps).
         :type abr:
-            str or None
+            str or ``None``
 
         :param bitrate:
             (optional) Alias to ``abr``.
         :type bitrate:
-            str or None
+            str or ``None``
 
         :param video_codec:
             (optional) Video compression format.
         :type video_codec:
-            str or None
+            str or ``None``
 
         :param audio_codec:
             (optional) Audio compression format.
         :type audio_codec:
-            str or None
+            str or ``None``
 
         :param bool progressive:
             Excludes adaptive streams (one file contains both audio and video
@@ -99,7 +99,7 @@ class StreamQuery:
             (optional) Interface for defining complex filters without
             subclassing.
         :type custom_filter_functions:
-            list or None
+            list or ``None``
 
         """
         filters = []
@@ -169,11 +169,19 @@ class StreamQuery:
         return StreamQuery(fmt_streams)
 
     def desc(self):
-        """Sort streams in descending order."""
+        """Sort streams in descending order.
+
+        :rtype: :class:`StreamQuery <StreamQuery>`
+
+        """
         return StreamQuery(self.fmt_streams[::-1])
 
     def asc(self):
-        """Sort streams in ascending order."""
+        """Sort streams in ascending order.
+
+        :rtype: :class:`StreamQuery <StreamQuery>`
+
+        """
         return self
 
     def get_by_itag(self, itag):
@@ -221,11 +229,19 @@ class StreamQuery:
             pass
 
     def count(self):
-        """Get the count the query would return."""
+        """Get the count the query would return.
+
+        :rtype: int
+
+        """
         return len(self.fmt_streams)
 
     def all(self):
-        """Get all the results represented by this query as a list."""
+        """Get all the results represented by this query as a list.
+
+        :rtype: list
+
+        """
         return self.fmt_streams
 
 
@@ -255,5 +271,9 @@ class CaptionQuery:
         return self.lang_code_index.get(lang_code)
 
     def all(self):
-        """Get all the results represented by this query as a list."""
+        """Get all the results represented by this query as a list.
+
+        :rtype: list
+
+        """
         return self.captions
