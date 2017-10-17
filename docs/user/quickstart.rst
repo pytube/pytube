@@ -66,11 +66,17 @@ You can also specify a destination path::
     >>> stream.download('/tmp')
 
 
-Working with streams
---------------------
+Working with Streams
+====================
 
-Now let's explore the various options available for filtering streams. Begin by
-running the following again (*note these results can change over time*)::
+The next section will explore the various options available for working with media
+streams, but before we can dive in, we need to review a new-ish streaming technique
+adopted by YouTube.
+
+DASH vs Progressive Streams
+---------------------------
+
+Begin by running the following::
 
     >>> yt.streams.all()
     [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
