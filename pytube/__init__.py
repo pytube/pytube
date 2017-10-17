@@ -9,7 +9,7 @@ follows best practice patterns.
 
 """
 __title__ = 'pytube'
-__version__ = '7.0.10'
+__version__ = '7.0.11'
 __author__ = 'Nick Ficano'
 __license__ = 'MIT License'
 __copyright__ = 'Copyright 2017 Nick Ficano'
