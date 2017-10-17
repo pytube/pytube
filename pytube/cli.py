@@ -130,7 +130,7 @@ def display_progress_bar(bytes_received, filesize, ch='█', scale=0.55):
     sys.stdout.flush()
 
 
-def on_progress(stream, file_handle, bytes_remaining):
+def on_progress(stream, chunk, file_handle, bytes_remaining):
     """On download progress callback function.
 
     :param object stream:
@@ -160,7 +160,7 @@ def download(url, itag):
     # TODO(nficano): allow download target to be specified
     # TODO(nficano): allow dash itags to be selected
     yt = YouTube(url, on_progress_callback=on_progress)
-    stream = yt.streams.get(itag)
+    stream = yt.streams.get_by_itag(itag)
     print('\n{fn} | {fs} bytes'.format(
         fn=stream.default_filename,
         fs=stream.filesize,
