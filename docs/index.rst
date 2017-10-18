@@ -54,6 +54,13 @@ Features
 - Extensively Documented Source Code
 - No Third-Party Dependencies
 
+Roadmap
+-------
+
+- Playlist support
+- Allow downloading age restricted content
+- Complete ffmpeg integrationn
+
 The User Guide
 --------------
 This part of the documentation begins with some background information about the project, then focuses on step-by-step instructions for getting the most out of pytube.
