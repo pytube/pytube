@@ -133,7 +133,7 @@ Pytube allows you to filter on every property available (see
 :py:meth:`pytube.StreamQuery.filter` for a complete list of filter options),
 let's take a look at some common examples:
 
-Query audio only streams
+Query audio only Streams
 ------------------------
 
 To query the streams that contain only the audio track::
@@ -142,10 +142,10 @@ To query the streams that contain only the audio track::
     [<Stream: itag="140" mime_type="audio/mp4" abr="128kbps" acodec="mp4a.40.2">,
     <Stream: itag="171" mime_type="audio/webm" abr="128kbps" acodec="vorbis">]
 
-Query mp4 streams
------------------
+Query MPEG-4 Streams
+--------------------
 
-To query the streams that are encoded as mp4::
+To query only streams in the MPEG-4 format::
 
     >>> yt.streams.filter(file_extension='mp4').all()
     [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
@@ -157,3 +157,52 @@ To query the streams that are encoded as mp4::
     <Stream: itag="133" mime_type="video/mp4" res="240p" fps="30fps" vcodec="avc1.4d4015">,
     <Stream: itag="160" mime_type="video/mp4" res="144p" fps="30fps" vcodec="avc1.4d400c">,
     <Stream: itag="140" mime_type="audio/mp4" abr="128kbps" acodec="mp4a.40.2">]
+
+Get Streams by itag
+-------------------
+
+To get a stream by a specific itag::
+
+    >>> yt.streams.get_by_itag('22')
+    <Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">
+
+Subtitle/Caption Tracks
+=======================
+
+Pytube exposes the caption tracks in much the same way as querying the media
+streams. Let's begin by switching to a video that contains them::
+
+    >>> yt = YouTube('https://youtube.com/watch?v=XJGiS83eQLk')
+    >>> yt.captions.all()
+    [<Caption lang="Arabic" code="ar">,
+    <Caption lang="English (auto-generated)" code="en">,
+    <Caption lang="English" code="en">,
+    <Caption lang="English (United Kingdom)" code="en-GB">,
+    <Caption lang="German" code="de">,
+    <Caption lang="Greek" code="el">,
+    <Caption lang="Indonesian" code="id">,
+    <Caption lang="Sinhala" code="si">,
+    <Caption lang="Spanish" code="es">,
+    <Caption lang="Turkish" code="tr">]
+
+Now let's checkout the english captions::
+
+    >>> caption = yt.captions.get_by_language_code('en')
+
+Great, now let's see how YouTube formats them::
+
+    >>> caption.xml_captions
+    '<?xml version="1.0" encoding="utf-8" ?><transcript><text start="0" dur="5.541">well i&amp;#39...'
+
+Oh, this isn't very easy to work with, let's convert them to the srt format::
+
+    >>> print(caption.generate_srt_captions())
+    1
+    000:000:00,000 --> 000:000:05,541
+    well i'm just an editor and i dont know what to type
+
+    2
+    000:000:05,541 --> 000:000:12,321
+    not new to video. In fact, most films before 1930 were silent and used captions with video
+
+    ...
