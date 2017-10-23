@@ -185,13 +185,14 @@ class YouTube(object):
         """
         if 'captions' not in self.player_config['args']['player_response']:
             return
+        # https://github.com/nficano/pytube/issues/167
         caption_tracks = (
             self.player_config
-            ['args']
-            ['player_response']
-            ['captions']
-            ['playerCaptionsTracklistRenderer']
-            ['captionTracks']
+            .get('args', {})
+            .get('player_response', {})
+            .get('captions', {})
+            .get('playerCaptionsTracklistRenderer', {})
+            .get('captionTracks', [])
         )
         for caption_track in caption_tracks:
             self.caption_tracks.append(Caption(caption_track))
