@@ -105,26 +105,26 @@ class YouTube(object):
         self.vid_info = {k: v for k, v in parse_qsl(self.vid_info)}
         self.player_config = extract.get_ytplayer_config(self.watch_html)
 
-        progressive_fmts = 'url_encoded_fmt_stream_map'
-        adaptive_fmts = 'adaptive_fmts'
         config_args = self.player_config['args']
 
-        # unscramble the progressive and adaptive stream manifests.
-        mixins.apply_descrambler(self.vid_info, progressive_fmts)
-        mixins.apply_descrambler(self.vid_info, adaptive_fmts)
-        mixins.apply_descrambler(config_args, progressive_fmts)
-        mixins.apply_descrambler(config_args, adaptive_fmts)
+        # https://github.com/nficano/pytube/issues/165
+        stream_maps = ['url_encoded_fmt_stream_map']
+        if 'adaptive_fmts' in config_args:
+            stream_maps.append('adaptive_fmts')
 
-        # apply the signature to the download url.
-        mixins.apply_signature(config_args, progressive_fmts, self.js)
-        mixins.apply_signature(config_args, adaptive_fmts, self.js)
+        # unscramble the progressive and adaptive stream manifests.
+        for fmt in stream_maps:
+            mixins.apply_descrambler(self.vid_info, fmt)
+            mixins.apply_descrambler(config_args, fmt)
+
+            # apply the signature to the download url.
+            mixins.apply_signature(config_args, fmt, self.js)
+
+            # build instances of :class:`Stream <Stream>`
+            self.initialize_stream_objects(fmt)
 
         # load the player_response object (contains subtitle information)
         apply_mixin(config_args, 'player_response', json.loads)
-
-        # build instances of :class:`Stream <Stream>`
-        self.initialize_stream_objects(progressive_fmts)
-        self.initialize_stream_objects(adaptive_fmts)
 
         self.initialize_caption_objects()
         logger.info('init finished successfully')
