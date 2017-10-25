@@ -18,7 +18,8 @@ def create_logger(level=logging.ERROR):
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)
 
-    logger = logging.getLogger()
+    # https://github.com/nficano/pytube/issues/163
+    logger = logging.getLogger('pytube')
     logger.addHandler(handler)
     logger.setLevel(level)
     return logger
