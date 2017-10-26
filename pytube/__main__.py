@@ -32,7 +32,7 @@ class YouTube(object):
 
     def __init__(
         self, url=None, defer_prefetch_init=False, on_progress_callback=None,
-        on_complete_callback=None, stream_monostate=None,
+        on_complete_callback=None,
     ):
         """Construct a :class:`YouTube <YouTube>`.
 
@@ -46,11 +46,6 @@ class YouTube(object):
         :param func on_complete_callback:
             (Optional) User defined callback function for stream download
             complete events.
-        :param dict stream_monostate:
-            (Optional) A user defined stream monostate. This is necessary
-            for instances where instances of :class:`YouTube <YouTube>`
-            are created from a parent instance (necessary for playlist
-            support).
 
         """
         self.js = None      # js fetched by js_url
@@ -76,7 +71,7 @@ class YouTube(object):
 
         # A dictionary shared between all instances of :class:`Stream <Stream>`
         # (Borg pattern).
-        self.stream_monostate = stream_monostate or {
+        self.stream_monostate = {
             # user defined callback functions.
             'on_progress': on_progress_callback,
             'on_complete': on_complete_callback,
