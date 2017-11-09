@@ -5,7 +5,7 @@ This module countains all logic necessary to decipher the signature.
 YouTube's strategy to restrict downloading videos is to send a ciphered version
 of the signature to the client, along with the decryption algorithm obfuscated
 in JavaScript. For the clients to play the videos, JavaScript must take the
-ciphered version, pass it through a series of "transform functions," and then
+ciphered version, cycle it through a series of "transform functions," and then
 signs the media URL with the output.
 
 This module is responsible for (1) finding and extracting those "transform
