@@ -43,7 +43,7 @@ def get_initial_function_name(js):
 def get_transform_plan(js):
     """Extract the "transform plan".
 
-    The "transform plan" is the functions that the ciphered signature is 
+    The "transform plan" is the functions that the ciphered signature is
     cycled through to obtain the actual signature.
 
     :param str js:
