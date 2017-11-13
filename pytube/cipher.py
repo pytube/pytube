@@ -5,10 +5,8 @@ This module countains all logic necessary to decipher the signature.
 YouTube's strategy to restrict downloading videos is to send a ciphered version
 of the signature to the client, along with the decryption algorithm obfuscated
 in JavaScript. For the clients to play the videos, JavaScript must take the
-ciphered version, pass it through a series of "transform functions," and then
-signs the media URL with the output. On the backend, they verify that the
-signature sent in the GET parameters is valid, and then returns the content
-(video/audio stream) or 403 unauthorized accordingly.
+ciphered version, cycle it through a series of "transform functions," and then
+signs the media URL with the output.
 
 This module is responsible for (1) finding and extracting those "transform
 functions" (2) maps them to Python equivalents and (3) taking the ciphered
@@ -45,8 +43,8 @@ def get_initial_function_name(js):
 def get_transform_plan(js):
     """Extract the "transform plan".
 
-    The "transform plan" is the functions the ciphered signature is passed
-    through to obtain the actual signature.
+    The "transform plan" is the functions that the ciphered signature is 
+    cycled through to obtain the actual signature.
 
     :param str js:
         The contents of the base.js asset file.
