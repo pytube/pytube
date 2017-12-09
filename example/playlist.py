@@ -1,3 +1,5 @@
+"""script to download all videos in a playlist"""
+
 import urllib2
 from bs4 import BeautifulSoup as bs
 from pytube import YouTube
