@@ -11,22 +11,23 @@ def playlist(url):
 
     res = req.read()
 
-    soup = bs(res,'html.parser')
+    soup = bs(res, 'html.parser')
 
-    list = soup.find_all('a',{'class':'pl-video-title-link'})
+    list = soup.find_all('a', {'class': 'pl-video-title-link'})
     files_in_pl = []
     for link in list:
-        files_in_pl.append('https://www.youtube.com'+link.get('href').split('&')[0])
-        
+        vid_id = link.get('href').split('&')[0]
+        files_in_pl.append('https://www.youtube.com' + vid_id)
+
     for link in files_in_pl:
         print 'downloading ' + YouTube(link).title
         YouTube(link).streams.first().download()
-        
+
+
 if __name__ == '__main__':
-    inurl = raw_input()
-    print inurl
-    ret = re.search('com(.+?)\?',inurl)
-    if(ret != None):
+    inurl = raw_input('Enter playlist url : ')
+    ret = re.search('com(.+?)\?', inurl)
+    if(ret is not None):
         ret = ret.group(1)
     else:
         print 'wrong url'
@@ -35,4 +36,3 @@ if __name__ == '__main__':
         print 'no url'
         quit()
     playlist(inurl)
-    
