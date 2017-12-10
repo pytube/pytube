@@ -8,11 +8,8 @@ import re
 
 def playlist(url):
     req = urllib2.urlopen(url)
-
     res = req.read()
-
     soup = bs(res, 'html.parser')
-
     list = soup.find_all('a', {'class': 'pl-video-title-link'})
     files_in_pl = []
     for link in list:
@@ -20,7 +17,6 @@ def playlist(url):
         files_in_pl.append('https://www.youtube.com' + vid_id)
 
     for link in files_in_pl:
-        print 'downloading ' + YouTube(link).title
         YouTube(link).streams.first().download()
 
 
@@ -30,9 +26,7 @@ if __name__ == '__main__':
     if(ret is not None):
         ret = ret.group(1)
     else:
-        print 'wrong url'
         quit()
     if(ret != '/playlist'):
-        print 'no url'
         quit()
     playlist(inurl)
