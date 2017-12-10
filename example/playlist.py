@@ -9,9 +9,9 @@ import re
 def playlist(url):
     req = urllib2.urlopen(url)
 
-    res=req.read()
+    res = req.read()
 
-    soup=bs(res,'html.parser')
+    soup = bs(res,'html.parser')
 
     list = soup.find_all('a',{'class':'pl-video-title-link'})
     files_in_pl = []
@@ -19,7 +19,7 @@ def playlist(url):
         files_in_pl.append('https://www.youtube.com'+link.get('href').split('&')[0])
         
     for link in files_in_pl:
-        print 'downloading '+YouTube(link).title
+        print 'downloading ' + YouTube(link).title
         YouTube(link).streams.first().download()
         
 if __name__ == '__main__':
