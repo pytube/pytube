@@ -11,6 +11,8 @@ from __future__ import absolute_import
 
 import json
 import logging
+import re
+import urllib.parse
 
 from pytube import Caption
 from pytube import CaptionQuery
@@ -141,6 +143,24 @@ class YouTube(object):
         """
         self.watch_html = request.get(url=self.watch_url)
         if extract.is_age_restricted(self.watch_html):
+            embed_url = 'https://www.youtube.com/embed/{}'.format(
+                self.video_id)
+            embed_html = request.get(url=embed_url)
+            payload = {
+                'video_id': self.video_id,
+                'eurl': 'https://youtube.googleapis.com/v/{}'.format(
+                    self.video_id),
+                'sts': re.search(r'"sts"\s*:\s*(\d+)', embed_html).group(1)
+            }
+            data = urllib.parse.urlencode(payload)
+            video_info_url = 'https://www.youtube.com/get_video_info'
+            video_info_url = '{}?{}'.format(video_info_url, data)
+            video_info_url_page = request.get(url=video_info_url)
+            video_info = urllib.parse.parse_qs(video_info_url_page)
+            media_urls = urllib.parse.parse_qs(
+                video_info['adaptive_fmts'][0])['url']
+            print('first media_url: ', media_urls[0])
+            print('lenght of media urls: ', len(media_urls))
             raise AgeRestrictionError('Content is age restricted')
         self.vid_info_url = extract.video_info_url(
             video_id=self.video_id,
