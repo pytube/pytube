@@ -123,11 +123,6 @@ def js_url(watch_html):
     return 'https://youtube.com' + base_js
 
 
-def media_urls(video_info):
-    parsed = parse_qs(video_info)
-    return parse_qs(parsed['adaptive_fmts'][0])['url']
-
-
 def mime_type_codec(mime_type_codec):
     """Parse the type data.
 

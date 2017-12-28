@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 class Stream(object):
     """Container for stream manifest data."""
 
-    def __init__(self, stream, player_config, monostate):
+    def __init__(self, stream, player_config_args, monostate):
         """Construct a :class:`Stream <Stream>`.
 
         :param dict stream:
@@ -69,7 +69,7 @@ class Stream(object):
         # The player configuration which contains information like the video
         # title.
         # TODO(nficano): this should be moved to the momostate.
-        self.player_config = player_config
+        self.player_config_args = player_config_args
 
         # 'video/webm; codecs="vp8, vorbis"' -> 'video/webm', ['vp8', 'vorbis']
         self.mime_type, self.codecs = extract.mime_type_codec(self.type)
@@ -169,7 +169,7 @@ class Stream(object):
         :returns:
             An os file system compatible filename.
         """
-        title = self.player_config['args']['title']
+        title = self.player_config_args['title']
         filename = safe_filename(title)
         return '{filename}.{s.subtype}'.format(filename=filename, s=self)
 
