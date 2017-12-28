@@ -21,7 +21,7 @@ def test_info_url(cipher_signature):
         watch_url=cipher_signature.watch_url,
         watch_html=cipher_signature.watch_html,
         embed_html='',
-        age_restricted=False
+        age_restricted=False,
     )
     expected = (
         'https://youtube.com/get_video_info?video_id=9bZkp7q19f0&el=%24el'
