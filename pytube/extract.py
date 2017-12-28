@@ -47,7 +47,7 @@ def watch_url(video_id):
     """Construct a sanitized YouTube watch url, given a video id.
 
     :param str video_id:
-        A YouTube video identifer.
+        A YouTube video identifier.
     :rtype: str
     :returns:
         Sanitized YouTube watch url.

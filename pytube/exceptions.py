@@ -21,7 +21,7 @@ class ExtractError(PytubeError):
         :param str msg:
             User defined error message.
         :param str video_id:
-            A YouTube video identifer.
+            A YouTube video identifier.
         """
         if video_id is not None:
             msg = '{video_id}: {msg}'.format(video_id=video_id, msg=msg)

@@ -20,7 +20,6 @@ from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
 from pytube.compat import parse_qsl
-from pytube.exceptions import AgeRestrictionError
 from pytube.helpers import apply_mixin
 
 
@@ -58,7 +57,8 @@ class YouTube(object):
         self.vid_info_url = None  # the url to vid info, parsed from watch html
 
         self.watch_html = None     # the html of /watch?v=<video_id>
-        self.player_config_args = None  # inline js in the html containing streams
+        self.player_config_args = None  # inline js in the html containing
+        # streams
         self.age_restricted = None
 
         self.fmt_streams = []  # list of :class:`Stream <Stream>` instances
@@ -240,7 +240,7 @@ class YouTube(object):
         return self.player_config_args['title']
 
     def register_on_progress_callback(self, func):
-        """Register a download progess callback function post initialization.
+        """Register a download progress callback function post initialization.
 
         :param callable func:
             A callback function that takes ``stream``, ``chunk``,

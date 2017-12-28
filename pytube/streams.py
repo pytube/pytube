@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This module contrains a container for stream manifest data.
+This module contains a container for stream manifest data.
 
 A container object for the media stream (video only / audio only / video+audio
 combined). This was referred to as ``Video`` in the legacy pytube version, but
@@ -30,7 +30,7 @@ class Stream(object):
 
         :param dict stream:
             The unscrambled data extracted from YouTube.
-        :param dict player_config:
+        :param dict player_config_args:
             The data object containing video media data like title and
             keywords.
         :param dict monostate:
@@ -47,7 +47,7 @@ class Stream(object):
         self.res = None   # resolution (e.g.: 480p, 720p, 1080p)
         self.url = None   # signed download url
 
-        self.mime_type = None  # content identifer (e.g.: video/mp4)
+        self.mime_type = None  # content identifier (e.g.: video/mp4)
         self.type = None       # the part of the mime before the slash
         self.subtype = None    # the part of the mime after the slash
 
@@ -68,7 +68,7 @@ class Stream(object):
 
         # The player configuration which contains information like the video
         # title.
-        # TODO(nficano): this should be moved to the momostate.
+        # TODO(nficano): this should be moved to the monostate.
         self.player_config_args = player_config_args
 
         # 'video/webm; codecs="vp8, vorbis"' -> 'video/webm', ['vp8', 'vorbis']
@@ -131,7 +131,7 @@ class Stream(object):
         """Get the video/audio codecs from list of codecs.
 
         Parse a variable length sized list of codecs and returns a
-        consitant two element tuple, with the video codec as the first element
+        constant two element tuple, with the video codec as the first element
         and audio as the second. Returns None if one is not available
         (adaptive only).
 
@@ -219,9 +219,9 @@ class Stream(object):
 
         :param str chunk:
             Segment of media file binary data, not yet written to disk.
-        :param file_handle:
+        :param file_handler:
             The file handle where the media is being written to.
-        :type file_handle:
+        :type file_handler:
             :py:class:`io.BufferedWriter`
         :param int bytes_remaining:
             The delta between the total file size in bytes and amount already
