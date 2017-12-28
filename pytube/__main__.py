@@ -71,7 +71,6 @@ class YouTube(object):
         self.watch_url = extract.watch_url(self.video_id)
 
         self.embed_url = extract.embed_url(self.video_id)
-
         # A dictionary shared between all instances of :class:`Stream <Stream>`
         # (Borg pattern).
         self.stream_monostate = {
@@ -121,7 +120,6 @@ class YouTube(object):
         for fmt in stream_maps:
             if not self.age_restricted:
                 mixins.apply_descrambler(self.vid_info, fmt)
-
             mixins.apply_descrambler(self.player_config_args, fmt)
 
             # apply the signature to the download url.

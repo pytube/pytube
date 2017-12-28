@@ -3,7 +3,6 @@
 import json
 from collections import OrderedDict
 
-from pytube.compat import parse_qs
 from pytube.compat import quote
 from pytube.compat import urlencode
 from pytube.exceptions import RegexMatchError
