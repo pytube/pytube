@@ -11,8 +11,6 @@ from __future__ import absolute_import
 
 import json
 import logging
-import re
-import urllib.parse
 
 from pytube import Caption
 from pytube import CaptionQuery
@@ -21,12 +19,9 @@ from pytube import mixins
 from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
-from pytube.compat import parse_qs
 from pytube.compat import parse_qsl
-from pytube.compat import urlencode
 from pytube.exceptions import AgeRestrictionError
 from pytube.helpers import apply_mixin
-from pytube.helpers import regex_search
 
 
 logger = logging.getLogger(__name__)
@@ -73,6 +68,8 @@ class YouTube(object):
 
         # https://www.youtube.com/watch?v=<video_id>
         self.watch_url = extract.watch_url(self.video_id)
+
+        self.embed_url = extract.embed_url(self.video_id)
 
         # A dictionary shared between all instances of :class:`Stream <Stream>`
         # (Borg pattern).
@@ -145,33 +142,24 @@ class YouTube(object):
 
         """
         self.watch_html = request.get(url=self.watch_url)
-        if extract.is_age_restricted(self.watch_html):
-            embed_url = 'https://www.youtube.com/embed/{}'.format(
-                self.video_id)
-            embed_html = request.get(url=embed_url)
-            payload = {
-                'video_id': self.video_id,
-                'eurl': 'https://youtube.googleapis.com/v/{}'.format(
-                    self.video_id),
-                'sts': regex_search(r'"sts"\s*:\s*(\d+)', embed_html).group(1)
-            }
-            video_info_base_url = 'https://www.youtube.com/get_video_info'
-            video_info_url = '{}?{}'.format(
-                video_info_base_url, urlencode(payload))
-            video_info_url_page = request.get(url=video_info_url)
-            video_info = parse_qs(video_info_url_page)
-            media_urls = parse_qs(video_info['adaptive_fmts'][0])['url']
-            print('first media_url: ', media_urls[0])
-            print('lenght of media urls: ', len(media_urls))
-            raise AgeRestrictionError('Content is age restricted')
+        self.embed_html = request.get(url=self.embed_url)
+        age_restricted = extract.is_age_restricted(self.watch_html)
         self.vid_info_url = extract.video_info_url(
             video_id=self.video_id,
             watch_url=self.watch_url,
             watch_html=self.watch_html,
+            embed_html=self.embed_html,
+            age_restricted=age_restricted
         )
-        self.js_url = extract.js_url(self.watch_html)
-        self.js = request.get(self.js_url)
         self.vid_info = request.get(self.vid_info_url)
+        if age_restricted:
+            self.media_urls = extract.media_urls(self.vid_info)
+            print('first media_url: ', self.media_urls[0])
+            print('lenght of media urls: ', len(self.media_urls))
+            raise AgeRestrictionError('Content is age restricted')
+        else:
+            self.js_url = extract.js_url(self.watch_html)
+            self.js = request.get(self.js_url)
 
     def initialize_stream_objects(self, fmt):
         """Convert manifest data to instances of :class:`Stream <Stream>`.
