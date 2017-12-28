@@ -21,9 +21,12 @@ from pytube import mixins
 from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
+from pytube.compat import parse_qs
 from pytube.compat import parse_qsl
+from pytube.compat import urlencode
 from pytube.exceptions import AgeRestrictionError
 from pytube.helpers import apply_mixin
+from pytube.helpers import regex_search
 
 
 logger = logging.getLogger(__name__)
@@ -150,15 +153,14 @@ class YouTube(object):
                 'video_id': self.video_id,
                 'eurl': 'https://youtube.googleapis.com/v/{}'.format(
                     self.video_id),
-                'sts': re.search(r'"sts"\s*:\s*(\d+)', embed_html).group(1)
+                'sts': regex_search(r'"sts"\s*:\s*(\d+)', embed_html).group(1)
             }
-            data = urllib.parse.urlencode(payload)
-            video_info_url = 'https://www.youtube.com/get_video_info'
-            video_info_url = '{}?{}'.format(video_info_url, data)
+            video_info_base_url = 'https://www.youtube.com/get_video_info'
+            video_info_url = '{}?{}'.format(
+                video_info_base_url, urlencode(payload))
             video_info_url_page = request.get(url=video_info_url)
-            video_info = urllib.parse.parse_qs(video_info_url_page)
-            media_urls = urllib.parse.parse_qs(
-                video_info['adaptive_fmts'][0])['url']
+            video_info = parse_qs(video_info_url_page)
+            media_urls = parse_qs(video_info['adaptive_fmts'][0])['url']
             print('first media_url: ', media_urls[0])
             print('lenght of media urls: ', len(media_urls))
             raise AgeRestrictionError('Content is age restricted')
