@@ -173,30 +173,22 @@ class Stream(object):
         filename = safe_filename(title)
         return '{filename}.{s.subtype}'.format(filename=filename, s=self)
 
-    def download(self, output_path=None, filename=None):
+    def download(self, output_path=None):
         """Write the media stream to disk.
 
         :param output_path:
             (optional) Output path for writing media file. If one is not
             specified, defaults to the current working directory.
         :type output_path: str or None
-        :param filename:
-            (optional) Output filename (stem only) for writing media file.
-            If one is not specified, the default filename is used.
-        :type filename: str or None
-
         :rtype: None
 
         """
+        # TODO(nficano): allow a filename to specified.
         output_path = output_path or os.getcwd()
-        if filename:
-            safe = safe_filename(filename)
-            filename = '{filename}.{s.subtype}'.format(filename=safe, s=self)
-        filename = filename or self.default_filename
 
+        # remove " from output_path.
+        output_path=list(output_path)
         if(output_path!=None):
-            # remove " from output_path.
-            output_path=list(output_path)
             try:
                 while(1):
                     output_path.remove('"')
@@ -205,7 +197,7 @@ class Stream(object):
             output_path=''.join(output_path)
 
         # file path
-        fp = os.path.join(output_path, filename)
+        fp = os.path.join(output_path, self.default_filename)
         bytes_remaining = self.filesize
         logger.debug(
             'downloading (%s total bytes) file to %s',
