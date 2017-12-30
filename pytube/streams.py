@@ -189,6 +189,11 @@ class Stream(object):
 
         """
         output_path = output_path or os.getcwd()
+        if filename:
+            safe = safe_filename(filename)
+            filename = '{filename}.{s.subtype}'.format(filename=safe, s=self)
+        filename = filename or self.default_filename
+
         if(output_path!=None):
             # remove " from output_path.
             output_path=list(output_path)
@@ -198,11 +203,6 @@ class Stream(object):
             except ValueError:
                 pass
             output_path=''.join(output_path)
-        
-        if filename:
-            safe = safe_filename(filename)
-            filename = '{filename}.{s.subtype}'.format(filename=safe, s=self)
-        filename = filename or self.default_filename
 
         # file path
         fp = os.path.join(output_path, filename)
