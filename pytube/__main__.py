@@ -20,7 +20,6 @@ from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
 from pytube.compat import parse_qsl
-from pytube.exceptions import AgeRestrictionError
 from pytube.helpers import apply_mixin
 
 
@@ -58,7 +57,9 @@ class YouTube(object):
         self.vid_info_url = None  # the url to vid info, parsed from watch html
 
         self.watch_html = None     # the html of /watch?v=<video_id>
-        self.player_config = None  # inline js in the html containing streams
+        self.player_config_args = None  # inline js in the html containing
+        # streams
+        self.age_restricted = None
 
         self.fmt_streams = []  # list of :class:`Stream <Stream>` instances
         self.caption_tracks = []
@@ -69,6 +70,7 @@ class YouTube(object):
         # https://www.youtube.com/watch?v=<video_id>
         self.watch_url = extract.watch_url(self.video_id)
 
+        self.embed_url = extract.embed_url(self.video_id)
         # A dictionary shared between all instances of :class:`Stream <Stream>`
         # (Borg pattern).
         self.stream_monostate = {
@@ -103,28 +105,31 @@ class YouTube(object):
         logger.info('init started')
 
         self.vid_info = {k: v for k, v in parse_qsl(self.vid_info)}
-        self.player_config = extract.get_ytplayer_config(self.watch_html)
-
-        config_args = self.player_config['args']
+        if self.age_restricted:
+            self.player_config_args = self.vid_info
+        else:
+            self.player_config_args = extract.get_ytplayer_config(
+                self.watch_html)['args']
 
         # https://github.com/nficano/pytube/issues/165
         stream_maps = ['url_encoded_fmt_stream_map']
-        if 'adaptive_fmts' in config_args:
+        if 'adaptive_fmts' in self.player_config_args:
             stream_maps.append('adaptive_fmts')
 
         # unscramble the progressive and adaptive stream manifests.
         for fmt in stream_maps:
-            mixins.apply_descrambler(self.vid_info, fmt)
-            mixins.apply_descrambler(config_args, fmt)
+            if not self.age_restricted:
+                mixins.apply_descrambler(self.vid_info, fmt)
+            mixins.apply_descrambler(self.player_config_args, fmt)
 
             # apply the signature to the download url.
-            mixins.apply_signature(config_args, fmt, self.js)
+            mixins.apply_signature(self.player_config_args, fmt, self.js)
 
             # build instances of :class:`Stream <Stream>`
             self.initialize_stream_objects(fmt)
 
         # load the player_response object (contains subtitle information)
-        apply_mixin(config_args, 'player_response', json.loads)
+        apply_mixin(self.player_config_args, 'player_response', json.loads)
 
         self.initialize_caption_objects()
         logger.info('init finished successfully')
@@ -140,16 +145,19 @@ class YouTube(object):
 
         """
         self.watch_html = request.get(url=self.watch_url)
-        if extract.is_age_restricted(self.watch_html):
-            raise AgeRestrictionError('Content is age restricted')
+        self.embed_html = request.get(url=self.embed_url)
+        self.age_restricted = extract.is_age_restricted(self.watch_html)
         self.vid_info_url = extract.video_info_url(
             video_id=self.video_id,
             watch_url=self.watch_url,
             watch_html=self.watch_html,
+            embed_html=self.embed_html,
+            age_restricted=self.age_restricted
         )
-        self.js_url = extract.js_url(self.watch_html)
-        self.js = request.get(self.js_url)
         self.vid_info = request.get(self.vid_info_url)
+        if not self.age_restricted:
+            self.js_url = extract.js_url(self.watch_html)
+            self.js = request.get(self.js_url)
 
     def initialize_stream_objects(self, fmt):
         """Convert manifest data to instances of :class:`Stream <Stream>`.
@@ -165,11 +173,11 @@ class YouTube(object):
         :rtype: None
 
         """
-        stream_manifest = self.player_config['args'][fmt]
+        stream_manifest = self.player_config_args[fmt]
         for stream in stream_manifest:
             video = Stream(
                 stream=stream,
-                player_config=self.player_config,
+                player_config_args=self.player_config_args,
                 monostate=self.stream_monostate,
             )
             self.fmt_streams.append(video)
@@ -183,11 +191,11 @@ class YouTube(object):
         :rtype: None
 
         """
-        if 'captions' not in self.player_config['args']['player_response']:
+        if 'captions' not in self.player_config_args['player_response']:
             return
         # https://github.com/nficano/pytube/issues/167
         caption_tracks = (
-            self.player_config
+            self.player_config_args
             .get('args', {})
             .get('player_response', {})
             .get('captions', {})
@@ -220,7 +228,7 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config['args']['thumbnail_url']
+        return self.player_config_args['thumbnail_url']
 
     @property
     def title(self):
@@ -229,10 +237,10 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config['args']['title']
+        return self.player_config_args['title']
 
     def register_on_progress_callback(self, func):
-        """Register a download progess callback function post initialization.
+        """Register a download progress callback function post initialization.
 
         :param callable func:
             A callback function that takes ``stream``, ``chunk``,
