@@ -118,7 +118,7 @@ class YouTube(object):
 
         # unscramble the progressive and adaptive stream manifests.
         for fmt in stream_maps:
-            if not self.age_restricted:
+            if not self.age_restricted and fmt in self.vid_info:
                 mixins.apply_descrambler(self.vid_info, fmt)
             mixins.apply_descrambler(self.player_config_args, fmt)
 
