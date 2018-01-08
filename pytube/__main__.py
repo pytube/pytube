@@ -109,7 +109,8 @@ class YouTube(object):
             self.player_config_args = self.vid_info
         else:
             self.player_config_args = extract.get_ytplayer_config(
-                self.watch_html)['args']
+                self.watch_html,
+            )['args']
 
         # https://github.com/nficano/pytube/issues/165
         stream_maps = ['url_encoded_fmt_stream_map']
@@ -152,7 +153,7 @@ class YouTube(object):
             watch_url=self.watch_url,
             watch_html=self.watch_html,
             embed_html=self.embed_html,
-            age_restricted=self.age_restricted
+            age_restricted=self.age_restricted,
         )
         self.vid_info = request.get(self.vid_info_url)
         if not self.age_restricted:

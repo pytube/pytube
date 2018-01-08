@@ -63,8 +63,10 @@ def eurl(video_id):
     return 'https://youtube.googleapis.com/v/{}'.format(video_id)
 
 
-def video_info_url(video_id, watch_url, watch_html, embed_html,
-                   age_restricted):
+def video_info_url(
+    video_id, watch_url, watch_html, embed_html,
+    age_restricted,
+):
     """Construct the video_info url.
 
     :param str video_id:
@@ -94,8 +96,10 @@ def video_info_url(video_id, watch_url, watch_html, embed_html,
     else:
         # I'm not entirely sure what ``t`` represents. Looks to represent a
         # boolean.
-        t = regex_search(r'\W[\'"]?t[\'"]?: ?[\'"](.+?)[\'"]', watch_html,
-                         group=0)
+        t = regex_search(
+            r'\W[\'"]?t[\'"]?: ?[\'"](.+?)[\'"]', watch_html,
+            group=0,
+        )
         params = OrderedDict([
             ('video_id', video_id),
             ('el', '$el'),
