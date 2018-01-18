@@ -197,7 +197,6 @@ class YouTube(object):
         # https://github.com/nficano/pytube/issues/167
         caption_tracks = (
             self.player_config_args
-            .get('args', {})
             .get('player_response', {})
             .get('captions', {})
             .get('playerCaptionsTracklistRenderer', {})
