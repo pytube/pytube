@@ -77,7 +77,8 @@ class Playlist(object):
             except UnicodeEncodeError:
                 print("(title cannot be shown due to unicode error)")
 
-            yt.streams.filter(progressive=True, subtype="mp4").order_by("resolution"). \
-                desc().first().download()
+            yt.streams.filter(progressive=True,
+                              subtype="mp4").order_by(
+                "resolution").desc().first().download()
 
         print("Download complete")
