@@ -10,7 +10,8 @@ from pytube.__main__ import YouTube
 
 class Playlist(object):
     """
-    Handles all the task of manipulating and downloading a whole YouTube playlist
+    Handles all the task of manipulating and downloading
+    a whole YouTube playlist
     """
 
     def __init__(self, url):
@@ -19,8 +20,9 @@ class Playlist(object):
 
     def construct_playlist_url(self):
         """
-        There are two kinds of playlist urls in YouTube. One that contains watch?v= in URL,
-        another one contains the "playlist?list=" portion. It is preferable to work with the later one.
+        There are two kinds of playlist urls in YouTube. One that
+        contains watch?v= in URL, another one contains the "playlist?list="
+        portion. It is preferable to work with the later one.
         :return: playlist url -> string
         """
 
@@ -34,7 +36,8 @@ class Playlist(object):
 
     def populate_video_urls(self):
         """
-        Get the links of all the videos in playlist and populate video_urls list
+        Get the links of all the videos in playlist and populate video_urls
+        list
         :return: urls -> string
         """
 
@@ -53,9 +56,9 @@ class Playlist(object):
 
     def download_all(self):
         """
-        Download all the videos in the the playlist. Initially, download resolution is
-        720p (or highest available), later more option should be added to download
-        resolution of choice
+        Download all the videos in the the playlist. Initially, download
+        resolution is 720p (or highest available), later more option
+        should be added to download resolution of choice
         TODO: Add option to download resolution of user's choice
         :return: None
         """
