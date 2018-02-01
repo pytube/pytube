@@ -82,7 +82,8 @@ class Playlist(object):
         for link in self.video_urls:
             yt = YouTube(link)
 
-            # (ISSUE #206): the try/except is done to prevent the UnicodeEncodeError
+            # (ISSUE #206): the try/except is done to prevent
+            # the UnicodeEncodeError
             try:
                 print("Downloading:", yt.title)
             except UnicodeEncodeError:
