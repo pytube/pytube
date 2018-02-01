@@ -34,3 +34,10 @@ def test_populate():
 
     ob.populate_video_urls()
     assert ob.video_urls == expected
+
+
+def test_download():
+    ob = playlist.Playlist(
+        "https://www.youtube.com/watch?v=lByG_AgKS9k&list="
+        "PL525f8ds9RvuerPZ3bZygmNiYw2sP4BDk")
+    ob.download_all()
