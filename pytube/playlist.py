@@ -3,8 +3,7 @@
 Module to download a complete playlist from a youtube channel
 """
 from __future__ import print_function
-import requests
-from bs4 import BeautifulSoup as bs
+from pytube import request
 from pytube.__main__ import YouTube
 
 
@@ -34,22 +33,34 @@ class Playlist(object):
         # url is already in the desired format, so just return it
         return self.playlist_url
 
+    def parse_links(self):
+        """
+        Parse the video links from the page source, extracts and
+        returns the /watch?v= part from video link href
+        It's an alternative for BeautifulSoup
+        :return: list
+        """
+
+        url = self.construct_playlist_url()
+        req = request.get(url)
+
+        # split the page source by line and process each line
+        content = [x for x in req.split("\n") if "pl-video-title-link" in x]
+        link_list = [x.split('href="', 1)[1].split("&", 1)[0] for x in content]
+
+        return link_list
+
     def populate_video_urls(self):
         """
-        Get the links of all the videos in playlist and populate video_urls
-        list
+        Construct complete links of all the videos in playlist and
+        populate video_urls list
         :return: urls -> string
         """
 
         base_url = "https://www.youtube.com"
-        url = self.construct_playlist_url()
-        req = requests.get(url)
+        link_list = self.parse_links()
 
-        soup = bs(req.text, "html.parser")
-        link_list = soup.find_all(attrs={"class": "pl-video-title-link"})
-
-        for link in link_list:
-            video_id = link.get("href").split("&")[0]
+        for video_id in link_list:
             complete_url = base_url + video_id
             # print complete_url
             self.video_urls.append(complete_url)
@@ -71,7 +82,7 @@ class Playlist(object):
         for link in self.video_urls:
             yt = YouTube(link)
 
-            # the try/except is done to prevent the odd UnicodeEncodeError
+            # (ISSUE #206): the try/except is done to prevent the UnicodeEncodeError
             try:
                 print("Downloading:", yt.title)
             except UnicodeEncodeError:
