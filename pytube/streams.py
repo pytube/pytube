@@ -193,7 +193,17 @@ class Stream(object):
             safe = safe_filename(filename)
             filename = '{filename}.{s.subtype}'.format(filename=safe, s=self)
         filename = filename or self.default_filename
-
+        
+        # remove " from output_path.
+        output_path=list(output_path)
+        if(output_path!=None):
+            try:
+                while(1):
+                    output_path.remove('"')
+            except ValueError:
+                pass
+            output_path=''.join(output_path)
+            
         # file path
         fp = os.path.join(output_path, filename)
         bytes_remaining = self.filesize
