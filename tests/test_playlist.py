@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from pytube import playlist
+from pytube import Playlist
+
 
 
 def test_construct():
-    ob = playlist.Playlist(
+    ob = Playlist(
         'https://www.youtube.com/watch?v=m5q2GCsteQs&list='
         'PL525f8ds9RvsXDl44X6Wwh9t3fCzFNApw',
     )
@@ -15,7 +16,7 @@ def test_construct():
 
 
 def test_link_parse():
-    ob = playlist.Playlist(
+    ob = Playlist(
         'https://www.youtube.com/watch?v=m5q2GCsteQs&list='
         'PL525f8ds9RvsXDl44X6Wwh9t3fCzFNApw',
     )
@@ -29,7 +30,7 @@ def test_link_parse():
 
 
 def test_populate():
-    ob = playlist.Playlist(
+    ob = Playlist(
         'https://www.youtube.com/watch?v=m5q2GCsteQs&list='
         'PL525f8ds9RvsXDl44X6Wwh9t3fCzFNApw',
     )
@@ -44,7 +45,7 @@ def test_populate():
 
 
 def test_download():
-    ob = playlist.Playlist(
+    ob = Playlist(
         'https://www.youtube.com/watch?v=lByG_AgKS9k&list='
         'PL525f8ds9RvuerPZ3bZygmNiYw2sP4BDk',
     )
