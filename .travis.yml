@@ -18,7 +18,7 @@ before_install:
   - sudo apt-get install -y python-pip
   - sudo apt-get install -y libpython-dev
   - sudo apt-get install -y libyaml-dev
-  - sudo apt-get install python3.6-dev
+  - sudo apt-get install python-dev
 script: pipenv run pytest --cov-report term-missing --cov=pytube
 sudo: required
 after_success:
