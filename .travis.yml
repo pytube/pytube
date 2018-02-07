@@ -12,8 +12,8 @@ python:
   - "3.7-dev"
   - "nightly"
 install:
-  - pip install -r requirements.txt
-  - pip install -r tests/requirements.txt
+  - pip install --upgrade pipenv
+  - pipenv install --dev --ignore-pipfile
 before_script: flake8
 script: pytest --cov-report term-missing --cov=pytube
 sudo: required
