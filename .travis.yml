@@ -4,17 +4,18 @@ cache:
   - pip
 python:
   - "2.7"
-  - "3.3"
   - "3.4"
   - "3.5"
   - "3.6"
   - "3.6-dev"
   - "3.7-dev"
-  - "nightly"
 install:
   - pip install --upgrade pipenv
   - pipenv install --dev --ignore-pipfile
 before_script: flake8
+before_install:
+  - sudo apt-get install -y python-pip
+  - sudo apt-get install -y libpython-dev
 script: pipenv run pytest --cov-report term-missing --cov=pytube
 sudo: required
 after_success:
