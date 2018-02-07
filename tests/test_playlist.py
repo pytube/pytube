@@ -2,7 +2,6 @@
 from pytube import Playlist
 
 
-
 def test_construct():
     ob = Playlist(
         'https://www.youtube.com/watch?v=m5q2GCsteQs&list='
