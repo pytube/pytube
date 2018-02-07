@@ -50,6 +50,7 @@ Features
 --------
 
 - Support for Both Progressive & DASH Streams
+- Support for downloading complete playlist
 - Easily Register ``on_download_progress`` & ``on_download_complete`` callbacks
 - Command-line Interfaced Included
 - Caption Track Support
@@ -147,6 +148,18 @@ Conversely, if you only want to see the DASH streams (also referred to as "adapt
     <Stream: itag="249" mime_type="audio/webm" abr="50kbps" acodec="opus">,
     <Stream: itag="250" mime_type="audio/webm" abr="70kbps" acodec="opus">,
     <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus">]
+
+
+You can also download a complete Youtube playlist:
+
+.. code-block:: python
+
+   >>> from pytube import Playlist
+   >>> pl = Playlist("https://www.youtube.com/watch?v=Edpy1szoG80&list=PL153hDY-y1E00uQtCVCVC8xJ25TYX8yPU")
+   >>> pl.download_all()
+
+This will download the highest progressive stream available (generally 720p) from the given playlist. Later more option would be give users flexibility
+to choose video resolution. Playlist videos will be downloaded in the directory from where the command was run.
 
 
 Pytube allows you to filter on every property available (see the documentation for the complete list), let's take a look at some of the most useful ones.
