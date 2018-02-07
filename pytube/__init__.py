@@ -19,7 +19,7 @@ from pytube.query import CaptionQuery
 from pytube.query import StreamQuery
 from pytube.streams import Stream
 from pytube.captions import Caption
-from pytube.playlist import Playlist
+from pytube.contrib.playlist import Playlist
 from pytube.__main__ import YouTube
 
 logger = create_logger()
