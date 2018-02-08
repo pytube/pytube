@@ -190,9 +190,11 @@ def map_functions(js_func):
         ('{\w\.splice\(0,\w\)}', splice),
         # function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c}
         ('{var\s\w=\w\[0\];\w\[0\]=\w\[\w\%\w.length\];\w\[\w\]=\w}', swap),
-	# function(a,b){var c=a[0];a[0]=a[b%a.length];a[b%a.length]=c}
-        ('{var\s\w=\w\[0\];\w\[0\]=\w\[\w\%\w.length\];\w\[\w\%\w.length\]=\w}', swap),
-
+        # function(a,b){var c=a[0];a[0]=a[b%a.length];a[b%a.length]=c}
+        (
+            '{var\s\w=\w\[0\];\w\[0\]=\w\[\w\%\w.length\];'
+            '\w\[\w\%\w.length\]=\w}', swap,
+        ),
     )
 
     for pattern, fn in mapper:
