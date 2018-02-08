@@ -17,7 +17,7 @@ setup(
     version='9.0.5',
     author='Nick Ficano',
     author_email='nficano@gmail.com',
-    packages=['pytube'],
+    packages=['pytube', 'pytube.contrib'],
     url='https://github.com/nficano/pytube',
     license=license,
     entry_points={
