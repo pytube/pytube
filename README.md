@@ -15,7 +15,7 @@
 # pytube
 *pytube* is a lightweight, dependency-free Python library (and command-line utility) for downloading YouTube Videos.
 
-### Description
+## Description
 YouTube is the most popular video-sharing platform in the world and as a hacker you may encounter a situation where you want to script something to download videos.  For this I present to you *pytube*.
 
 *pytube* is a lightweight library written in Python. It has no third party dependencies and aims to be highly reliable.
@@ -24,7 +24,7 @@ YouTube is the most popular video-sharing platform in the world and as a hacker 
 
 Finally *pytube* also includes a command-line utility, allowing you to quickly download videos right from terminal.
 
-**Behold, a perfect balance of simplicity versus flexibility**:
+### Behold, a perfect balance of simplicity versus flexibility:
 
 ```python
  >>> YouTube('https://youtu.be/9bZkp7q19f0').streams.first().download()
@@ -37,7 +37,7 @@ Finally *pytube* also includes a command-line utility, allowing you to quickly d
   ... .download()
 ```
 
-#### Features
+### Features
 - Support for Both Progressive & DASH Streams
 - Support for downloading complete playlist
 - Easily Register ``on_download_progress`` & ``on_download_complete`` callbacks
