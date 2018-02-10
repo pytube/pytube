@@ -37,7 +37,7 @@ Finally *pytube* also includes a command-line utility, allowing you to quickly d
   ... .download()
 ```
 
-### Features
+## Features
 - Support for Both Progressive & DASH Streams
 - Support for downloading complete playlist
 - Easily Register ``on_download_progress`` & ``on_download_complete`` callbacks
@@ -48,7 +48,7 @@ Finally *pytube* also includes a command-line utility, allowing you to quickly d
 - Extensively Documented Source Code
 - No Third-Party Dependencies
 
-#### Installation
+## Installation
 
 Download using pip via pypi.
 
@@ -56,7 +56,7 @@ Download using pip via pypi.
 $ pip install pytube
 ```
 
-#### Getting started
+## Getting started
 
 Let's begin with showing how easy it is to download a video with pytube:
 
@@ -213,7 +213,7 @@ Similarly, if your application requires on-download progress logic, pytube expos
  >>> yt.register_on_progress_callback(show_progress_bar)
 ```
 
-#### Command-line interface
+## Command-line interface
 
 pytube also ships with a tiny cli interface for downloading and probing videos.
 
