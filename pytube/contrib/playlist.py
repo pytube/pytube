@@ -19,6 +19,11 @@ class Playlist(object):
         self.playlist_url = url
         self.video_urls = []
 
+        self.on_start_callback = None
+        self.on_progress_callback = None
+        self.on_complete_callback = None
+        self.on_complete_all_callback = None
+
     def construct_playlist_url(self):
         """There are two kinds of playlist urls in YouTube. One that
         contains watch?v= in URL, another one contains the "playlist?list="
@@ -66,7 +71,7 @@ class Playlist(object):
             complete_url = base_url + video_id
             self.video_urls.append(complete_url)
 
-    def download_all(self):
+    def download_all(self, location=None):
         """Download all the videos in the the playlist. Initially, download
         resolution is 720p (or highest available), later more option
         should be added to download resolution of choice
@@ -78,11 +83,60 @@ class Playlist(object):
         logger.debug('total videos found: ', len(self.video_urls))
         logger.debug('starting download')
 
+        if self.on_start_callback is not None:
+            self.on_start_callback(len(self.video_urls))
+
         for link in self.video_urls:
             yt = YouTube(link)
 
-            yt.streams.filter(
+            if self.on_progress_callback is not None:
+                yt.register_on_progress_callback(self.on_progress_callback)
+
+            if self.on_complete_callback is not None:
+                yt.register_on_complete_callback(self.on_complete_callback)
+
+            stream = yt.streams.filter(
                 progressive=True, subtype='mp4',
-            ).order_by('resolution').desc().first().download()
+            ).order_by('resolution').desc().first()
+
+            if location is not None:
+                stream.download(location)
+            else:
+                stream.download()
 
             logger.debug('download complete')
+
+    def register_on_start_callback(self, func):
+        """Register a download start callback function post initialization.
+
+                :param callable func:
+                    A callback function that takes ``count``.
+
+                :rtype: None
+
+                """
+        self.on_start_callback = func
+
+
+    def register_on_progress_callback(self, func):
+        """Register a download progress callback function post initialization.
+
+        :param callable func:
+            A callback function that takes ``stream``, ``chunk``,
+            ``file_handle``, ``bytes_remaining`` as parameters.
+
+        :rtype: None
+
+        """
+        self.on_progress_callback = func
+
+    def register_on_complete_callback(self, func):
+        """Register a download complete callback function post initialization.
+
+        :param callable func:
+            A callback function that takes ``stream`` and  ``file_handle``.
+
+        :rtype: None
+
+        """
+        self.on_complete_callback = func
