@@ -66,7 +66,7 @@ class Playlist(object):
             complete_url = base_url + video_id
             self.video_urls.append(complete_url)
 
-    def download_all(self):
+    def download_all(self, download_path=None):
         """Download all the videos in the the playlist. Initially, download
         resolution is 720p (or highest available), later more option
         should be added to download resolution of choice
@@ -81,8 +81,14 @@ class Playlist(object):
         for link in self.video_urls:
             yt = YouTube(link)
 
-            yt.streams.filter(
+            dl_stream = yt.streams.filter(
                 progressive=True, subtype='mp4',
-            ).order_by('resolution').desc().first().download()
+            ).order_by('resolution').desc().first()
+
+            if download_path is not None:
+                logger.debug("download path: " + download_path)
+                dl_stream.download(download_path)
+            else:
+                dl_stream.download()
 
             logger.debug('download complete')
