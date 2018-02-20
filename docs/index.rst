@@ -57,7 +57,6 @@ Features
 Roadmap
 -------
 
-- Playlist support
 - Allow downloading age restricted content
 - Complete ffmpeg integrationn
 

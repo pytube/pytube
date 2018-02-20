@@ -1,0 +1,28 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+
+
+[dev-packages]
+
+bumpversion = "*"
+coveralls = "*"
+"flake8" = "*"
+mock = "*"
+pre-commit = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-mock = "*"
+sphinx = "*"
+sphinx-rtd-theme = "*"
+
+
+[requires]
+
+python_version = "2.7"

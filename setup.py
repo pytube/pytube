@@ -14,10 +14,10 @@ with open('LICENSE') as readme_file:
 
 setup(
     name='pytube',
-    version='8.0.3',
+    version='9.0.7',
     author='Nick Ficano',
     author_email='nficano@gmail.com',
-    packages=['pytube'],
+    packages=['pytube', 'pytube.contrib'],
     url='https://github.com/nficano/pytube',
     license=license,
     entry_points={
@@ -36,7 +36,6 @@ setup(
         'Operating System :: POSIX',
         'Operating System :: Unix',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',

@@ -9,7 +9,7 @@ follows best practice patterns.
 
 """
 __title__ = 'pytube'
-__version__ = '8.0.3'
+__version__ = '9.0.7'
 __author__ = 'Nick Ficano'
 __license__ = 'MIT License'
 __copyright__ = 'Copyright 2017 Nick Ficano'
@@ -19,7 +19,7 @@ from pytube.query import CaptionQuery
 from pytube.query import StreamQuery
 from pytube.streams import Stream
 from pytube.captions import Caption
-from pytube.playlist import Playlist
+from pytube.contrib.playlist import Playlist
 from pytube.__main__ import YouTube
 
 logger = create_logger()
