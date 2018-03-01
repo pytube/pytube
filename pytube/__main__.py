@@ -109,7 +109,7 @@ class YouTube(object):
             self.player_config_args = self.vid_info
         else:
             self.player_config_args = extract.get_ytplayer_config(
-                self.watch_html, self.age_restricted
+                self.watch_html
             )['args']
 
         # https://github.com/nficano/pytube/issues/165

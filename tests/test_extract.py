@@ -33,7 +33,7 @@ def test_info_url(cipher_signature):
 
 def test_js_url(cipher_signature):
     expected = 'https://youtube.com/yts/jsbin/player-vflOdyxa4/en_US/base.js'
-    result = extract.js_url(cipher_signature.watch_html, False)
+    result = extract.js_url(cipher_signature.watch_html)
     assert expected == result
 
 
