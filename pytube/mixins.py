@@ -33,11 +33,16 @@ def apply_signature(config_args, fmt, js):
         if 'signature=' in url:
             # For certain videos, YouTube will just provide them pre-signed, in
             # which case there's no real magic to download them and we can skip
-            # the whole signature decrambling entirely.
+            # the whole signature descrambling entirely.
             logger.debug('signature found, skip decipher')
             continue
 
-        signature = cipher.get_signature(js, stream['s'])
+        if js is not None:
+            signature = cipher.get_signature(js, stream['s'])
+        else:
+            # signature not present in url (line 33), need js to descramble
+            # TypeError caught in __main__
+            raise TypeError('JS is None')
 
         logger.debug(
             'finished descrambling signature for itag=%s\n%s',

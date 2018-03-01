@@ -111,7 +111,7 @@ def video_info_url(
     return 'https://youtube.com/get_video_info?' + urlencode(params)
 
 
-def js_url(watch_html):
+def js_url(html, age_restricted):
     """Get the base JavaScript url.
 
     Construct the base JavaScript url, which contains the decipher
@@ -121,7 +121,7 @@ def js_url(watch_html):
         The html contents of the watch page.
 
     """
-    ytplayer_config = get_ytplayer_config(watch_html)
+    ytplayer_config = get_ytplayer_config(html, age_restricted)
     base_js = ytplayer_config['assets']['js']
     return 'https://youtube.com' + base_js
 
@@ -150,7 +150,7 @@ def mime_type_codec(mime_type_codec):
     return mime_type, [c.strip() for c in codecs.split(',')]
 
 
-def get_ytplayer_config(watch_html):
+def get_ytplayer_config(html, age_restricted):
     """Get the YouTube player configuration data from the watch html.
 
     Extract the ``ytplayer_config``, which is json data embedded within the
@@ -163,6 +163,9 @@ def get_ytplayer_config(watch_html):
     :returns:
         Substring of the html containing the encoded manifest data.
     """
-    pattern = r';ytplayer\.config\s*=\s*({.*?});'
-    yt_player_config = regex_search(pattern, watch_html, group=1)
+    if age_restricted:
+        pattern = r";yt\.setConfig\(\{'PLAYER_CONFIG':\s*({.*})(,'EXPERIMENT_FLAGS'|;)"
+    else:
+        pattern = r';ytplayer\.config\s*=\s*({.*?});'
+    yt_player_config = regex_search(pattern, html, group=1)
     return json.loads(yt_player_config)
