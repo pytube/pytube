@@ -126,7 +126,8 @@ class YouTube(object):
             try:
                 mixins.apply_signature(self.player_config_args, fmt, self.js)
             except TypeError:
-                self.js_url = extract.js_url(self.embed_html, self.age_restricted)
+                self.js_url = extract.js_url(
+                    self.embed_html, self.age_restricted)
                 self.js = request.get(self.js_url)
                 mixins.apply_signature(self.player_config_args, fmt, self.js)
 

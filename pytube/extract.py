@@ -164,7 +164,7 @@ def get_ytplayer_config(html, age_restricted):
         Substring of the html containing the encoded manifest data.
     """
     if age_restricted:
-        pattern = r";yt\.setConfig\(\{'PLAYER_CONFIG':\s*({.*})(,'EXPERIMENT_FLAGS'|;)"
+        pattern = r";yt\.setConfig\(\{'PLAYER_CONFIG':\s*({.*})(,'EXPERIMENT_FLAGS'|;)"  # noqa: E501
     else:
         pattern = r';ytplayer\.config\s*=\s*({.*?});'
     yt_player_config = regex_search(pattern, html, group=1)
