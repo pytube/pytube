@@ -2,7 +2,7 @@
 <div align="center">
   <p>
   <img src="./images/pytube.png" width="350" height="328" alt="pytube logo" />
-  </p> 
+  </p>
   <p align="center">
 	  <img src="https://img.shields.io/pypi/v/pytube.svg" alt="pypi">
 	  <a href="https://travis-ci.org/nficano/pytube"><img src="https://travis-ci.org/nficano/pytube.svg?branch=master" /></a>

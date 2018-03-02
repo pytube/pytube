@@ -109,7 +109,7 @@ class YouTube(object):
             self.player_config_args = self.vid_info
         else:
             self.player_config_args = extract.get_ytplayer_config(
-                self.watch_html
+                self.watch_html,
             )['args']
 
         # https://github.com/nficano/pytube/issues/165
@@ -127,7 +127,8 @@ class YouTube(object):
                 mixins.apply_signature(self.player_config_args, fmt, self.js)
             except TypeError:
                 self.js_url = extract.js_url(
-                    self.embed_html, self.age_restricted)
+                    self.embed_html, self.age_restricted,
+                )
                 self.js = request.get(self.js_url)
                 mixins.apply_signature(self.player_config_args, fmt, self.js)
 
