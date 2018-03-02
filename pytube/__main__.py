@@ -109,7 +109,7 @@ class YouTube(object):
             self.player_config_args = self.vid_info
         else:
             self.player_config_args = extract.get_ytplayer_config(
-                self.watch_html,
+                self.watch_html
             )['args']
 
         # https://github.com/nficano/pytube/issues/165
@@ -123,8 +123,13 @@ class YouTube(object):
                 mixins.apply_descrambler(self.vid_info, fmt)
             mixins.apply_descrambler(self.player_config_args, fmt)
 
-            # apply the signature to the download url.
-            mixins.apply_signature(self.player_config_args, fmt, self.js)
+            try:
+                mixins.apply_signature(self.player_config_args, fmt, self.js)
+            except TypeError:
+                self.js_url = extract.js_url(
+                    self.embed_html, self.age_restricted)
+                self.js = request.get(self.js_url)
+                mixins.apply_signature(self.player_config_args, fmt, self.js)
 
             # build instances of :class:`Stream <Stream>`
             self.initialize_stream_objects(fmt)
@@ -157,7 +162,7 @@ class YouTube(object):
         )
         self.vid_info = request.get(self.vid_info_url)
         if not self.age_restricted:
-            self.js_url = extract.js_url(self.watch_html)
+            self.js_url = extract.js_url(self.watch_html, self.age_restricted)
             self.js = request.get(self.js_url)
 
     def initialize_stream_objects(self, fmt):

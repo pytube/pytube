@@ -1,6 +1,8 @@
 
 <div align="center">
-  <img src="./images/pytube.png" width="400" height="375" alt="pytube logo" /><br>
+  <p>
+  <img src="./images/pytube.png" width="350" height="328" alt="pytube logo" />
+  </p> 
   <p align="center">
 	  <img src="https://img.shields.io/pypi/v/pytube.svg" alt="pypi">
 	  <a href="https://travis-ci.org/nficano/pytube"><img src="https://travis-ci.org/nficano/pytube.svg?branch=master" /></a>
@@ -10,13 +12,10 @@
   </p>
 </div>
 
-pytube
-======
+# pytube
 *pytube* is a lightweight, dependency-free Python library (and command-line utility) for downloading YouTube Videos.
 
-Description
-===========
-
+## Description
 YouTube is the most popular video-sharing platform in the world and as a hacker you may encounter a situation where you want to script something to download videos.  For this I present to you *pytube*.
 
 *pytube* is a lightweight library written in Python. It has no third party dependencies and aims to be highly reliable.
@@ -25,7 +24,7 @@ YouTube is the most popular video-sharing platform in the world and as a hacker 
 
 Finally *pytube* also includes a command-line utility, allowing you to quickly download videos right from terminal.
 
-**Behold, a perfect balance of simplicity versus flexibility**:
+### Behold, a perfect balance of simplicity versus flexibility:
 
 ```python
  >>> YouTube('https://youtu.be/9bZkp7q19f0').streams.first().download()
@@ -38,9 +37,7 @@ Finally *pytube* also includes a command-line utility, allowing you to quickly d
   ... .download()
 ```
 
-Features
---------
-
+## Features
 - Support for Both Progressive & DASH Streams
 - Support for downloading complete playlist
 - Easily Register ``on_download_progress`` & ``on_download_complete`` callbacks
@@ -51,17 +48,15 @@ Features
 - Extensively Documented Source Code
 - No Third-Party Dependencies
 
-Installation
-------------
+## Installation
 
 Download using pip via pypi.
 
 ```bash
-pip install pytube
+$ pip install pytube
 ```
 
-Getting started
----------------
+## Getting started
 
 Let's begin with showing how easy it is to download a video with pytube:
 
@@ -218,9 +213,7 @@ Similarly, if your application requires on-download progress logic, pytube expos
  >>> yt.register_on_progress_callback(show_progress_bar)
 ```
 
-
-Command-line interface
-======================
+## Command-line interface
 
 pytube also ships with a tiny cli interface for downloading and probing videos.
 
