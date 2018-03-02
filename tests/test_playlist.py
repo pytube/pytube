@@ -49,3 +49,4 @@ def test_download():
         'PL525f8ds9RvuerPZ3bZygmNiYw2sP4BDk',
     )
     ob.download_all()
+    ob.download_all('.')

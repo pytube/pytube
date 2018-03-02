@@ -57,6 +57,7 @@ class YouTube(object):
         self.vid_info_url = None  # the url to vid info, parsed from watch html
 
         self.watch_html = None     # the html of /watch?v=<video_id>
+        self.embed_html = None
         self.player_config_args = None  # inline js in the html containing
         # streams
         self.age_restricted = None
