@@ -19,6 +19,7 @@ from pytube import mixins
 from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
+from pytube.cache import get_js
 from pytube.compat import parse_qsl
 from pytube.helpers import apply_mixin
 
@@ -158,7 +159,7 @@ class YouTube(object):
         self.vid_info = request.get(self.vid_info_url)
         if not self.age_restricted:
             self.js_url = extract.js_url(self.watch_html)
-            self.js = request.get(self.js_url)
+            self.js = get_js(self.js_url)
 
     def initialize_stream_objects(self, fmt):
         """Convert manifest data to instances of :class:`Stream <Stream>`.
