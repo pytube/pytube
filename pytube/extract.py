@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """This module contains all non-cipher related data extraction logic."""
-from html.parser import HTMLParser
 import json
 from collections import OrderedDict
 
+from pytube.compat import HTMLParser
 from pytube.compat import quote
 from pytube.compat import urlencode
 from pytube.exceptions import RegexMatchError
