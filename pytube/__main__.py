@@ -256,6 +256,33 @@ class YouTube(object):
         """
         return self.vid_descr
 
+    @property
+    def rating(self):
+        """Get the video average rating.
+
+        :rtype: str
+
+        """
+        return self.player_config_args['avg_rating']
+
+    @property
+    def length(self):
+        """Get the video length in seconds.
+
+        :rtype: str
+
+        """
+        return self.player_config_args['length_seconds']
+
+    @property
+    def views(self):
+        """Get the number of the times the video has been viewed.
+
+        :rtype: str
+
+        """
+        return self.player_config_args['view_count']
+
     def register_on_progress_callback(self, func):
         """Register a download progress callback function post initialization.
 
