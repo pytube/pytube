@@ -113,6 +113,7 @@ class YouTube(object):
                 self.watch_html,
             )['args']
 
+        self.vid_descr = extract.get_vid_descr(self.watch_html)
         # https://github.com/nficano/pytube/issues/165
         stream_maps = ['url_encoded_fmt_stream_map']
         if 'adaptive_fmts' in self.player_config_args:
@@ -245,6 +246,15 @@ class YouTube(object):
 
         """
         return self.player_config_args['title']
+
+    @property
+    def description(self):
+        """Get the video description.
+
+        :rtype: str
+
+        """
+        return self.vid_descr
 
     def register_on_progress_callback(self, func):
         """Register a download progress callback function post initialization.
