@@ -86,7 +86,7 @@ class Playlist(object):
             ).order_by('resolution').desc().first()
 
             if download_path is not None:
-                logger.debug("download path: " + download_path)
+                logger.debug('download path: ' + download_path)
                 dl_stream.download(download_path)
             else:
                 dl_stream.download()
