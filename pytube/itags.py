@@ -69,6 +69,14 @@ ITAGS = {
     308: ('1440p', None),
     313: ('2160p', None),
     315: ('2160p', None),
+    330: ('144p', None),
+    331: ('240p', None),
+    332: ('360p', None),
+    333: ('480p', None),
+    334: ('720p', None),
+    335: ('1080p', None),
+    336: ('1440p', None),
+    337: ('2160p', None),
 
     # DASH Audio
     139: (None, '48kbps'),
@@ -85,7 +93,8 @@ ITAGS = {
     328: (None, None),
 }
 
-_60FPS = [298, 299, 302, 303, 308, 315]
+HDR = [330, 331, 332, 333, 334, 335, 336, 337]
+_60FPS = [298, 299, 302, 303, 308, 315] + HDR
 _3D = [82, 83, 84, 85, 100, 101, 102]
 LIVE = [91, 92, 93, 94, 95, 96, 132, 151]
 
@@ -106,5 +115,6 @@ def get_format_profile(itag):
         'abr': bitrate,
         'is_live': itag in LIVE,
         'is_3d': itag in _3D,
+        'is_hdr': itag in HDR,
         'fps': 60 if itag in _60FPS else 30,
     }
