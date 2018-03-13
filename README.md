@@ -140,10 +140,10 @@ You can also download a complete Youtube playlist:
 >>> from pytube import Playlist
 >>> pl = Playlist("https://www.youtube.com/watch?v=Edpy1szoG80&list=PL153hDY-y1E00uQtCVCVC8xJ25TYX8yPU")
 >>> pl.download_all()
->>> # of if you want to download in a specific path
->>> pl.download_all(download_path)
+>>> # or if you want to download in a specific directory
+>>> pl.download_all('/path/to/directory/')
 ```
-This will download the highest progressive stream available (generally 720p) from the given playlist. Later more option would be give users flexibility
+This will download the highest progressive stream available (generally 720p) from the given playlist. Later more options would be given for user's flexibility
 to choose video resolution.
 
 Pytube allows you to filter on every property available (see the documentation for the complete list), let's take a look at some of the most useful ones.
