@@ -23,6 +23,7 @@ pytest-cov = "*"
 pytest-mock = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
+configparser = "*"
 
 
 [requires]
