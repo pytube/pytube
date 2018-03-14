@@ -5,7 +5,8 @@ help:
 	@echo "install - install the package to the active Python's site-packages"
 
 ci:
-	pip install pipenv	
+	pip install requests urllib3 pyOpenSSL --force --upgrade
+	pip install pipenv
 	pipenv install --dev
 	pipenv run pytest --cov-report term-missing --cov=pytube
 
