@@ -5,8 +5,8 @@ help:
 	@echo "install - install the package to the active Python's site-packages"
 
 ci:
+	pip install pipenv	
 	pipenv install --dev
-	pip install pipenv
 	pipenv run pytest --cov-report term-missing --cov=pytube
 
 clean: clean-build clean-pyc
