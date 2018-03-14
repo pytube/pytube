@@ -8,9 +8,9 @@ python:
   - "3.5"
   - "3.6"
   - "3.6-dev"
-install:
-  - pip install --upgrade pipenv
-  - pipenv install --dev --ignore-pipfile
+install: "make"
+script:
+    - make test
 before_script: flake8
 before_install:
   - sudo apt-get install -y python-pip
