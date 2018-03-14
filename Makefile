@@ -22,10 +22,10 @@ clean-pyc:
 
 install: clean
 	python setup.py install
-	
+
 init:
     pip install pipenv
     pipenv install --dev
 
 test:
-    pipenv run py.test tests
+    pipenv run pytest --cov-report term-missing --cov=pytube
