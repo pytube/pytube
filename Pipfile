@@ -24,6 +24,7 @@ pytest-mock = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
 configparser = "*"
+"urllib3" = "*"
 
 
 [requires]
