@@ -8,15 +8,16 @@ python:
   - "3.5"
   - "3.6"
   - "3.6-dev"
-install: "make"
-script:
-    - make test
 before_script: flake8
 before_install:
+  - sudo apt-get install -y software-properties-common python-software-properties
+  - sudo add-apt-repository ppa:pypa/ppa
+  - sudo apt-get install -y pipenv
   - sudo apt-get install -y python-pip
   - sudo apt-get install -y libpython-dev
   - sudo apt-get install -y libyaml-dev
   - sudo apt-get install python-dev
+script: pipenv run pytest --cov-report term-missing --cov=pytube
 sudo: required
 after_success:
   coveralls
