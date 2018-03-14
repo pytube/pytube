@@ -25,8 +25,3 @@ sphinx = "*"
 sphinx-rtd-theme = "*"
 configparser = "*"
 "urllib3" = "*"
-
-
-[requires]
-
-python_version = "2.7"
