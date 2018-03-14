@@ -4,6 +4,13 @@ help:
 	@echo "clean-pyc - remove Python file artifacts"
 	@echo "install - install the package to the active Python's site-packages"
 
+init:
+	pip install pipenv
+	pipenv install --dev
+
+ci:
+	pipenv run pytest --cov-report term-missing --cov=pytube
+
 clean: clean-build clean-pyc
 
 clean-build:
