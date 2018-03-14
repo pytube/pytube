@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8c9810d2603da572abab096d586918b3d073a198b3d59a4c5d5c41d384f032b1"
+            "sha256": "e517b067af601141604f030b60fecfa67d34ff012465b87979a6baa106a56194"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -283,7 +283,7 @@
                 "sha256:330cc27ccbf7f1e992e69fef78261dc7c6569012cf397db8d3de0234e6c937ca",
                 "sha256:a7bb0f2cf3a3fd1ab2732cb49eba4252c2af4240442415b4abce3b87022a8f50"
             ],
-            "markers": "python_version < '3.0'",
+            "markers": "python_version < '3.3'",
             "version": "==1.0.2"
         },
         "identify": {
@@ -311,6 +311,7 @@
             "hashes": [
                 "sha256:200d8686011d470b5e4de207d803445deee427455cd0cb7c982b68cf82524f81"
             ],
+            "markers": "python_version < '3'",
             "version": "==1.0.19"
         },
         "jinja2": {
@@ -537,7 +538,6 @@
                 "sha256:06330f386d6e4b195fbfc736b297f58c5a892e4440e54d294d7004e3a9bbea1b",
                 "sha256:cc44da8e1145637334317feebd728bd869a35285b93cbb4cca2577da7e62db4f"
             ],
-            "markers": "python_version < '3'",
             "version": "==1.22"
         },
         "virtualenv": {

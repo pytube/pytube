@@ -11,7 +11,6 @@ python:
 install: "make"
 script:
   - make ci
-# before_script: flake8
 before_install:
   - sudo apt-get install -y libpython-dev
   - sudo apt-get install -y libyaml-dev
