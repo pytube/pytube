@@ -81,14 +81,11 @@ class Playlist(object):
         for link in self.video_urls:
             yt = YouTube(link)
 
+            # TODO: this should not be hardcoded to a single user's preference
             dl_stream = yt.streams.filter(
                 progressive=True, subtype='mp4',
             ).order_by('resolution').desc().first()
 
-            if download_path is not None:
-                logger.debug("download path: " + download_path)
-                dl_stream.download(download_path)
-            else:
-                dl_stream.download()
-
+            logger.debug('download path: %s', download_path)
+            dl_stream.download(download_path)
             logger.debug('download complete')

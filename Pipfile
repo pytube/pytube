@@ -23,8 +23,6 @@ pytest-cov = "*"
 pytest-mock = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
-
-
-[requires]
-
-python_version = "2.7"
+configparser = "*"
+"urllib3" = "*"
+pyopenssl = "*"
