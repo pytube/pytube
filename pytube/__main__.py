@@ -1,15 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-
- .===============.
- | .------------. |
- | |-.__.--.__.-| |
- | |-. pytube .-| |
- | |-.__.--.__.-| |  
- | '------------' |
- |   [#######]  o |
- '================'
-
 This module implements the core developer interface for pytube.
 
 The problem domain of the :class:`YouTube <YouTube> class focuses almost
