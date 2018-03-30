@@ -10,7 +10,7 @@ smaller peripheral modules and functions.
 from __future__ import absolute_import
 
 import json
-import logging†
+import logging
 
 from pytube import Caption
 from pytube import CaptionQuery
