@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
 """
+
+ .===============.
+ | .------------. |
+ | |-.__.--.__.-| |
+ | |-. pytube .-| |
+ | |-.__.--.__.-| |  
+ | '------------' |
+ |   [#######]  o |
+ '================'
+
 This module implements the core developer interface for pytube.
 
 The problem domain of the :class:`YouTube <YouTube> class focuses almost
@@ -10,7 +20,7 @@ smaller peripheral modules and functions.
 from __future__ import absolute_import
 
 import json
-import logging
+import logging†
 
 from pytube import Caption
 from pytube import CaptionQuery
