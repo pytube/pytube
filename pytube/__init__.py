@@ -3,16 +3,6 @@
 # noreorder
 """
 Pytube: a very serious Python library for downloading YouTube Videos.
-
- .===============.
- | .------------. |
- | |-.__.--.__.-| |
- | |-. pytube .-| |
- | |-.__.--.__.-| |  
- | '------------' |
- |   [#######]  o |
- '================'
-
 """
 __title__ = 'pytube'
 __version__ = '9.1.1'
