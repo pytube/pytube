@@ -2,10 +2,16 @@
 # flake8: noqa
 # noreorder
 """
-Pytube is a Python library for downloading YouTube Videos.
+Pytube: a very serious Python library for downloading YouTube Videos.
 
-Pytube aims to be lightweight, dependency-free, extensively documented and
-follows best practice patterns.
+ .===============.
+ | .------------. |
+ | |-.__.--.__.-| |
+ | |-. pytube .-| |
+ | |-.__.--.__.-| |  
+ | '------------' |
+ |   [#######]  o |
+ '================'
 
 """
 __title__ = 'pytube'
