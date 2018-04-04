@@ -215,7 +215,7 @@ class Stream(object):
         """Write the media stream to buffer
 
         :rtype: io.BytesIO buffer
-        """ 
+        """
         buffer = io.BytesIO()
         bytes_remaining = self.filesize
         logger.debug(
@@ -230,7 +230,6 @@ class Stream(object):
             self.on_progress(chunk, buffer, bytes_remaining)
         self.on_complete(buffer)
         return buffer
-
 
     def on_progress(self, chunk, file_handler, bytes_remaining):
         """On progress callback function.
