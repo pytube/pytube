@@ -212,17 +212,24 @@ class Stream(object):
             self.on_complete(fh)
 
     def stream_to_buffer(self):
-       """Write the media stream to buffer
-       :rtype: io.BytesIO buffer
-       """
-       bytes_remaining = self.filesize   
-       buffer = io.BytesIO()
+        """Write the media stream to buffer
 
-       for chunk in request.get(self.url, streaming=True):
-           bytes_remaining -= len(chunk)
-           buffer.write(chunk)
+        :rtype: io.BytesIO buffer
+        """ 
+        buffer = io.BytesIO()
+        bytes_remaining = self.filesize
+        logger.debug(
+            'downloading (%s total bytes) file to BytesIO buffer',
+            self.filesize,
+        )
 
-       return buffer
+        for chunk in request.get(self.url, streaming=True):
+            # reduce the (bytes) remainder by the length of the chunk.
+            bytes_remaining -= len(chunk)
+            # send to the on_progress callback.
+            self.on_progress(chunk, buffer, bytes_remaining)
+        self.on_complete(buffer)
+        return buffer
 
 
     def on_progress(self, chunk, file_handler, bytes_remaining):
