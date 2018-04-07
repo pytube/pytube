@@ -203,9 +203,9 @@ class Stream(object):
         filename = filename or self.default_filename
 
         if filename_prefix:
-            new_name = "{prefix}{filename}"\
-                .format(prefix=filename_prefix, filename=filename)
-            filename = safe_filename(new_name)
+            filename = "{prefix}{filename}"\
+                .format(prefix=safe_filename(filename_prefix),
+                        filename=filename)
 
         # file path
         fp = os.path.join(output_path, filename)
