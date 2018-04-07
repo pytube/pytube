@@ -111,7 +111,7 @@ class Playlist(object):
             ).order_by('resolution').desc().first()
 
             logger.debug('download path: %s', download_path)
-            if file_number_prefix:
+            if prefix_number:
                 prefix = next(prefix_gen)
                 logger.debug('file prefix is: %s', prefix)
                 dl_stream.download(download_path, filename_prefix=prefix)
