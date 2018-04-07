@@ -174,7 +174,7 @@ class Stream(object):
         filename = safe_filename(title)
         return '{filename}.{s.subtype}'.format(filename=filename, s=self)
 
-    def download(self, output_path=None, filename=None):
+    def download(self, output_path=None, filename=None, filename_prefix=None):
         """Write the media stream to disk.
 
         :param output_path:
@@ -185,6 +185,12 @@ class Stream(object):
             (optional) Output filename (stem only) for writing media file.
             If one is not specified, the default filename is used.
         :type filename: str or None
+        :param filename_prefix:
+            (optional) A string that will be prepended to the filename.
+            For example a number in a playlist or the name of a series.
+            If one is not specified, nothing will be prepended
+            Seperate from filename so you can use default and still add a prefix.
+        :type filename_prefix: str or None
 
         :rtype: None
 
@@ -194,6 +200,9 @@ class Stream(object):
             safe = safe_filename(filename)
             filename = '{filename}.{s.subtype}'.format(filename=safe, s=self)
         filename = filename or self.default_filename
+
+        if filename_prefix:
+            filename = safe_filename("{prefix}{filename}".format(prefix=filename_prefix, filename=filename))
 
         # file path
         fp = os.path.join(output_path, filename)

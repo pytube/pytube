@@ -66,7 +66,7 @@ class Playlist(object):
             complete_url = base_url + video_id
             self.video_urls.append(complete_url)
 
-    def download_all(self, download_path=None):
+    def download_all(self, download_path=None, file_number_prefix=True):
         """Download all the videos in the the playlist. Initially, download
         resolution is 720p (or highest available), later more option
         should be added to download resolution of choice
@@ -74,9 +74,30 @@ class Playlist(object):
         TODO(nficano): Add option to download resolution of user's choice
         """
 
+        def path_num_prefix_generator():
+            """
+            This generator function generates number prefixes for the items in the playlist.
+            If you have a playlist of 100 videos it will number them like this:
+            001, 002, 003 ect, up to 100.
+            It also adds a space after the number.
+            :return: prefix: string
+            """
+            digits = len(str(len(self.video_urls)))
+            i = 1
+            while True:
+                prefix = str(i)
+                if len(prefix) < digits:
+                    for f in range(digits - len(prefix)):
+                        prefix = "0" + prefix
+                prefix += " "
+                i += 1
+                yield prefix
+
         self.populate_video_urls()
         logger.debug('total videos found: ', len(self.video_urls))
         logger.debug('starting download')
+
+        prefix_gen = path_num_prefix_generator()
 
         for link in self.video_urls:
             yt = YouTube(link)
@@ -87,5 +108,10 @@ class Playlist(object):
             ).order_by('resolution').desc().first()
 
             logger.debug('download path: %s', download_path)
-            dl_stream.download(download_path)
+            if file_number_prefix:
+                prefix = next(prefix_gen)
+                logger.debug('file prefix is: %s', prefix)
+                dl_stream.download(download_path, filename_prefix=prefix)
+            else:
+                dl_stream.download(download_path)
             logger.debug('download complete')
