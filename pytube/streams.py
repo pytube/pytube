@@ -189,7 +189,8 @@ class Stream(object):
             (optional) A string that will be prepended to the filename.
             For example a number in a playlist or the name of a series.
             If one is not specified, nothing will be prepended
-            Seperate from filename so you can use default and still add a prefix.
+            This is seperate from filename so you can use the default
+            filename but still add a prefix.
         :type filename_prefix: str or None
 
         :rtype: None
@@ -202,7 +203,9 @@ class Stream(object):
         filename = filename or self.default_filename
 
         if filename_prefix:
-            filename = safe_filename("{prefix}{filename}".format(prefix=filename_prefix, filename=filename))
+            new_name = "{prefix}{filename}"\
+                .format(prefix=filename_prefix, filename=filename)
+            filename = safe_filename(new_name)
 
         # file path
         fp = os.path.join(output_path, filename)

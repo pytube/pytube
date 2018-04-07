@@ -76,8 +76,11 @@ class Playlist(object):
 
         def path_num_prefix_generator():
             """
-            This generator function generates number prefixes for the items in the playlist.
-            If you have a playlist of 100 videos it will number them like this:
+            This generator function generates number prefixes, for the items
+            in the playlist.
+            If the number of digits required to name a file,is less than is
+            required to name the last file,it prepends 0s.
+            So if you have a playlist of 100 videos it will number them like:
             001, 002, 003 ect, up to 100.
             It also adds a space after the number.
             :return: prefix: string
