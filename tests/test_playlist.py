@@ -50,3 +50,5 @@ def test_download():
     )
     ob.download_all()
     ob.download_all('.')
+    ob.download_all(prefix_number=False)
+    ob.download_all('.', prefix_number=False)
