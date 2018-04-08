@@ -79,7 +79,8 @@ class Playlist(object):
             This is passed along to the Stream objects.
         :type download_path: str or None
         :param prefix_number:
-            (optional) Automatically numbers
+            (optional) Automatically numbers playlists using the
+            path_num_prefix_generator function.
         :type prefix_number: bool
         :param reverse_numbering:
             (optional) Lets you number playlists in reverse, since some
