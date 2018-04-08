@@ -66,12 +66,25 @@ class Playlist(object):
             complete_url = base_url + video_id
             self.video_urls.append(complete_url)
 
-    def download_all(self, download_path=None, prefix_number=True):
+    def download_all(self, download_path=None, prefix_number=True, reverse_numbering=False):
         """Download all the videos in the the playlist. Initially, download
         resolution is 720p (or highest available), later more option
         should be added to download resolution of choice
 
         TODO(nficano): Add option to download resolution of user's choice
+
+        :param download_path:
+            (optional) Output path for the playlist If one is not
+            specified, defaults to the current working directory.
+            This is passed along to the Stream objects.
+        :type download_path: str or None
+        :param prefix_number:
+            (optional) Automatically numbers
+        :type prefix_number: bool
+        :param reverse_numbering:
+            (optional) Lets you number playlists in reverse, since some
+            playlists are ordered newest -> oldests.
+        :type reverse_numbering: bool
         """
 
         def path_num_prefix_generator():
@@ -86,14 +99,21 @@ class Playlist(object):
             :return: prefix: string
             """
             digits = len(str(len(self.video_urls)))
-            i = 1
+            reverse = reverse_numbering
+            if reverse:
+                i = len(self.video_urls)
+            else:
+                i = 1
             while True:
                 prefix = str(i)
                 if len(prefix) < digits:
                     for _ in range(digits - len(prefix)):
                         prefix = "0" + prefix
                 prefix += " "
-                i += 1
+                if reverse:
+                    i -= 1
+                else:
+                    i += 1
                 yield prefix
 
         self.populate_video_urls()
