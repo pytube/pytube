@@ -66,7 +66,8 @@ class Playlist(object):
             complete_url = base_url + video_id
             self.video_urls.append(complete_url)
 
-    def download_all(self, download_path=None, prefix_number=True, reverse_numbering=False):
+    def download_all(self, download_path=None, prefix_number=True,
+                     reverse_numbering=False):
         """Download all the videos in the the playlist. Initially, download
         resolution is 720p (or highest available), later more option
         should be added to download resolution of choice
