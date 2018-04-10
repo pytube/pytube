@@ -157,8 +157,6 @@ class YouTube(object):
 
         """
         self.watch_html = request.get(url=self.watch_url)
-        if 'id="player-unavailable"' in self.watch_html:
-            raise VideoUnavailable('This video is not available.')
         self.embed_html = request.get(url=self.embed_url)
         self.age_restricted = extract.is_age_restricted(self.watch_html)
         self.vid_info_url = extract.video_info_url(
