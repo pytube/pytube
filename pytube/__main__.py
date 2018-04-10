@@ -19,10 +19,10 @@ from pytube import mixins
 from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
+from pytube.compat import install_proxy
 from pytube.compat import parse_qsl
 from pytube.exceptions import VideoUnavailable
 from pytube.helpers import apply_mixin
-from pytube.compat import install_proxy
 
 logger = logging.getLogger(__name__)
 
