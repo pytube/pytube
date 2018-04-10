@@ -9,6 +9,7 @@ separately).
 """
 from __future__ import absolute_import
 
+import io
 import logging
 import os
 import pprint
@@ -209,6 +210,26 @@ class Stream(object):
                 # send to the on_progress callback.
                 self.on_progress(chunk, fh, bytes_remaining)
             self.on_complete(fh)
+
+    def stream_to_buffer(self):
+        """Write the media stream to buffer
+
+        :rtype: io.BytesIO buffer
+        """
+        buffer = io.BytesIO()
+        bytes_remaining = self.filesize
+        logger.debug(
+            'downloading (%s total bytes) file to BytesIO buffer',
+            self.filesize,
+        )
+
+        for chunk in request.get(self.url, streaming=True):
+            # reduce the (bytes) remainder by the length of the chunk.
+            bytes_remaining -= len(chunk)
+            # send to the on_progress callback.
+            self.on_progress(chunk, buffer, bytes_remaining)
+        self.on_complete(buffer)
+        return buffer
 
     def on_progress(self, chunk, file_handler, bytes_remaining):
         """On progress callback function.
