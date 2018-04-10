@@ -22,6 +22,7 @@ from pytube import StreamQuery
 from pytube.compat import parse_qsl
 from pytube.exceptions import VideoUnavailable
 from pytube.helpers import apply_mixin
+from pytube.compat import install_proxy
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +32,7 @@ class YouTube(object):
 
     def __init__(
         self, url=None, defer_prefetch_init=False, on_progress_callback=None,
-        on_complete_callback=None,
+        on_complete_callback=None, proxies=None,
     ):
         """Construct a :class:`YouTube <YouTube>`.
 
@@ -79,6 +80,9 @@ class YouTube(object):
             'on_progress': on_progress_callback,
             'on_complete': on_complete_callback,
         }
+
+        if proxies:
+            install_proxy(proxies)
 
         if not defer_prefetch_init:
             self.prefetch_init()
