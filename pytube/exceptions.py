@@ -37,4 +37,4 @@ class RegexMatchError(ExtractError):
 
 
 class VideoUnavailable(PytubeError):
-    """Video is not available."""
+    """Video is unavailable."""
