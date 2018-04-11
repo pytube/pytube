@@ -34,3 +34,4 @@ class ExtractError(PytubeError):
 
 class RegexMatchError(ExtractError):
     """Regex pattern did not return any matches."""
+
