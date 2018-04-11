@@ -66,6 +66,35 @@ class Playlist(object):
             complete_url = base_url + video_id
             self.video_urls.append(complete_url)
 
+    def _path_num_prefix_generator(self, reverse_numbering=False):
+        """
+        This generator function generates number prefixes, for the items
+        in the playlist.
+        If the number of digits required to name a file,is less than is
+        required to name the last file,it prepends 0s.
+        So if you have a playlist of 100 videos it will number them like:
+        001, 002, 003 ect, up to 100.
+        It also adds a space after the number.
+        :return: prefix: string
+        """
+        digits = len(str(len(self.video_urls)))
+        reverse = reverse_numbering
+        if reverse:
+            i = len(self.video_urls)
+        else:
+            i = 1
+        while True:
+            prefix = str(i)
+            if len(prefix) < digits:
+                for _ in range(digits - len(prefix)):
+                    prefix = "0" + prefix
+            prefix += " "
+            if reverse:
+                i -= 1
+            else:
+                i += 1
+            yield prefix
+
     def download_all(self, download_path=None, prefix_number=True,
                      reverse_numbering=False):
         """Download all the videos in the the playlist. Initially, download
@@ -81,7 +110,7 @@ class Playlist(object):
         :type download_path: str or None
         :param prefix_number:
             (optional) Automatically numbers playlists using the
-            path_num_prefix_generator function.
+            _path_num_prefix_generator function.
         :type prefix_number: bool
         :param reverse_numbering:
             (optional) Lets you number playlists in reverse, since some
@@ -89,40 +118,11 @@ class Playlist(object):
         :type reverse_numbering: bool
         """
 
-        def path_num_prefix_generator():
-            """
-            This generator function generates number prefixes, for the items
-            in the playlist.
-            If the number of digits required to name a file,is less than is
-            required to name the last file,it prepends 0s.
-            So if you have a playlist of 100 videos it will number them like:
-            001, 002, 003 ect, up to 100.
-            It also adds a space after the number.
-            :return: prefix: string
-            """
-            digits = len(str(len(self.video_urls)))
-            reverse = reverse_numbering
-            if reverse:
-                i = len(self.video_urls)
-            else:
-                i = 1
-            while True:
-                prefix = str(i)
-                if len(prefix) < digits:
-                    for _ in range(digits - len(prefix)):
-                        prefix = "0" + prefix
-                prefix += " "
-                if reverse:
-                    i -= 1
-                else:
-                    i += 1
-                yield prefix
-
         self.populate_video_urls()
         logger.debug('total videos found: ', len(self.video_urls))
         logger.debug('starting download')
 
-        prefix_gen = path_num_prefix_generator()
+        prefix_gen = self._path_num_prefix_generator(reverse_numbering)
 
         for link in self.video_urls:
             yt = YouTube(link)
