@@ -186,7 +186,7 @@ class Stream(object):
             If one is not specified, the default filename is used.
         :type filename: str or None
 
-        :rtype: None
+        :rtype: str
 
         """
         output_path = output_path or os.getcwd()
@@ -210,6 +210,7 @@ class Stream(object):
                 # send to the on_progress callback.
                 self.on_progress(chunk, fh, bytes_remaining)
             self.on_complete(fh)
+        return fp
 
     def stream_to_buffer(self):
         """Write the media stream to buffer
