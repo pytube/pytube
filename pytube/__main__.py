@@ -114,11 +114,13 @@ class YouTube(object):
                 self.watch_html,
             )['args']
 
-        player_response = json.loads(
-            self.player_config_args['player_response'])
+        # load the player_response object (contains subtitle information)
+        apply_mixin(self.player_config_args, 'player_response', json.loads)
+
+        player_response = self.player_config_args['player_response']
         if ('playabilityStatus' in player_response and
-                player_response['playabilityStatus']['status'] != 'OK'):
-            raise LiveStreamError('Content is a live stream')
+            player_response['playabilityStatus']['status'] != 'OK'):
+                raise LiveStreamError('Content is a live stream')
 
         # https://github.com/nficano/pytube/issues/165
         stream_maps = ['url_encoded_fmt_stream_map']
@@ -142,9 +144,6 @@ class YouTube(object):
 
             # build instances of :class:`Stream <Stream>`
             self.initialize_stream_objects(fmt)
-
-        # load the player_response object (contains subtitle information)
-        apply_mixin(self.player_config_args, 'player_response', json.loads)
 
         self.initialize_caption_objects()
         logger.info('init finished successfully')
