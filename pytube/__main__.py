@@ -119,7 +119,7 @@ class YouTube(object):
 
         player_response = self.player_config_args['player_response']
         if ('playabilityStatus' in player_response and
-            player_response['playabilityStatus']['status'] != 'OK'):
+                player_response['playabilityStatus']['status'] != 'OK'):
                 raise LiveStreamError('Content is a live stream')
 
         # https://github.com/nficano/pytube/issues/165
