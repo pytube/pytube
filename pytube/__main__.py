@@ -20,6 +20,7 @@ from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
 from pytube.compat import parse_qsl
+from pytube.exceptions import LiveStreamError
 from pytube.helpers import apply_mixin
 
 
@@ -112,6 +113,12 @@ class YouTube(object):
             self.player_config_args = extract.get_ytplayer_config(
                 self.watch_html,
             )['args']
+
+        player_response = json.loads(
+            self.player_config_args['player_response'])
+        if ('playabilityStatus' in player_response and
+                player_response['playabilityStatus']['status'] != 'OK'):
+            raise LiveStreamError('Content is a live stream')
 
         # https://github.com/nficano/pytube/issues/165
         stream_maps = ['url_encoded_fmt_stream_map']

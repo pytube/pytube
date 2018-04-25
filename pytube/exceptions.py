@@ -34,3 +34,7 @@ class ExtractError(PytubeError):
 
 class RegexMatchError(ExtractError):
     """Regex pattern did not return any matches."""
+
+
+class LiveStreamError(ExtractError):
+    """Video is a live stream."""
