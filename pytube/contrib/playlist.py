@@ -66,7 +66,7 @@ class Playlist(object):
             complete_url = base_url + video_id
             self.video_urls.append(complete_url)
 
-    def _path_num_prefix_generator(self, reverse_numbering=False):
+    def _path_num_prefix_generator(self, reverse=False):
         """
         This generator function generates number prefixes, for the items
         in the playlist.
@@ -75,25 +75,15 @@ class Playlist(object):
         So if you have a playlist of 100 videos it will number them like:
         001, 002, 003 ect, up to 100.
         It also adds a space after the number.
-        :return: prefix: string
+        :return: prefix string generator : generator
         """
         digits = len(str(len(self.video_urls)))
-        reverse = reverse_numbering
         if reverse:
-            i = len(self.video_urls)
+            start, stop, step = (len(self.video_urls), 0, -1)
         else:
-            i = 1
-        while True:
-            prefix = str(i)
-            if len(prefix) < digits:
-                for _ in range(digits - len(prefix)):
-                    prefix = "0" + prefix
-            prefix += " "
-            if reverse:
-                i -= 1
-            else:
-                i += 1
-            yield prefix
+            start, stop, step = (1, len(self.video_urls) + 1, 1)
+        return (str(i).zfill(digits) for i in range(start, stop, step))
+
 
     def download_all(self, download_path=None, prefix_number=True,
                      reverse_numbering=False):
