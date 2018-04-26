@@ -84,7 +84,6 @@ class Playlist(object):
             start, stop, step = (1, len(self.video_urls) + 1, 1)
         return (str(i).zfill(digits) for i in range(start, stop, step))
 
-
     def download_all(self, download_path=None, prefix_number=True,
                      reverse_numbering=False):
         """Download all the videos in the the playlist. Initially, download
