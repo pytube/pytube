@@ -115,7 +115,6 @@ class Playlist(object):
 
         for link in self.video_urls:
             yt = YouTube(link)
-
             # TODO: this should not be hardcoded to a single user's preference
             dl_stream = yt.streams.filter(
                 progressive=True, subtype='mp4',
