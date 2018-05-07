@@ -85,12 +85,10 @@ class Playlist(object):
         return (str(i).zfill(digits) for i in range(start, stop, step))
 
     def download_all(self, download_path=None, prefix_number=True,
-                     reverse_numbering=False):
+                     reverse_numbering=False, resolution="720p"):
         """Download all the videos in the the playlist. Initially, download
         resolution is 720p (or highest available), later more option
         should be added to download resolution of choice
-
-        TODO(nficano): Add option to download resolution of user's choice
 
         :param download_path:
             (optional) Output path for the playlist If one is not
@@ -105,7 +103,25 @@ class Playlist(object):
             (optional) Lets you number playlists in reverse, since some
             playlists are ordered newest -> oldests.
         :type reverse_numbering: bool
+        :param resolution:
+            (optional) Let's you change the resolution at which the
+            playlist will be downloaded. The input must be a string
+            that's in the resolutions array.
+        :type resolution:str
+
+        :rtype: None
         """
+
+        class Resolution_Exception(Exception):
+            pass
+
+        resolutions = ["720p", "480p", "360p", "240p", "144p"]
+        if resolution not in resolutions:
+            raise Resolution_Exception("Resolution argument, needs to be one"
+                                       " of these: {} \n Higher than 720p is "
+                                       "not yet supported since no progressive"
+                                       " stream is available. "
+                                       .format(resolutions))
 
         self.populate_video_urls()
         logger.debug('total videos found: ', len(self.video_urls))
@@ -114,11 +130,27 @@ class Playlist(object):
         prefix_gen = self._path_num_prefix_generator(reverse_numbering)
 
         for link in self.video_urls:
+
+            def get_stream(_resolution):
+                stream = yt.streams.filter(
+                    progressive=True, subtype='mp4', resolution=resolution
+                ).first()
+                if stream is not None:
+                    return stream
+                else:
+                    res_idx = resolutions.index(_resolution)
+                    if res_idx > 0:
+                        return get_stream(resolutions[res_idx - 1])
+                    else:
+                        print("Pytube could not find resolution equal or "
+                              "smaller than {0} for link: {}")
+                        print("Downloading at lowest available quality.")
+                        return yt.streams.filter(
+                            progressive=True, subtype='mp4',
+                        ).order_by('resolution').desc().last()
+
             yt = YouTube(link)
-            # TODO: this should not be hardcoded to a single user's preference
-            dl_stream = yt.streams.filter(
-                progressive=True, subtype='mp4',
-            ).order_by('resolution').desc().first()
+            dl_stream = get_stream(resolution)
 
             logger.debug('download path: %s', download_path)
             if prefix_number:

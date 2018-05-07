@@ -203,7 +203,7 @@ class Stream(object):
         filename = filename or self.default_filename
 
         if filename_prefix:
-            filename = "{prefix}{filename}"\
+            filename = "{prefix} {filename}"\
                 .format(prefix=safe_filename(filename_prefix),
                         filename=filename)
 
