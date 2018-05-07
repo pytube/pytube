@@ -6,6 +6,7 @@ import logging
 
 from pytube import request
 from pytube.__main__ import YouTube
+from pytube.exceptions import Resolution_Exception
 
 logger = logging.getLogger(__name__)
 
@@ -111,9 +112,6 @@ class Playlist(object):
 
         :rtype: None
         """
-
-        class Resolution_Exception(Exception):
-            pass
 
         resolutions = ["720p", "480p", "360p", "240p", "144p"]
         if resolution not in resolutions:

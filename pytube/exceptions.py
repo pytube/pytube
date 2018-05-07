@@ -34,3 +34,8 @@ class ExtractError(PytubeError):
 
 class RegexMatchError(ExtractError):
     """Regex pattern did not return any matches."""
+
+
+class Resolution_Exception(PytubeError):
+    """When an attempt is made to download a playlist, in a resolution
+    that isn't available"""

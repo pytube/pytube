@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pytube import Playlist
+from pytube import Playlist, exceptions
 
 short_test_pl = 'https://www.youtube.com/watch?v=' \
           'm5q2GCsteQs&list=PL525f8ds9RvsXDl44X6Wwh9t3fCzFNApw'
@@ -75,3 +75,13 @@ def test_numbering():
     gen = ob._path_num_prefix_generator(reverse=True)
     assert str(len(ob.video_urls)) in next(gen)
     assert str(len(ob.video_urls) - 1) in next(gen)
+
+
+def test_resoluton_picker_failure():
+    passed = False
+    try:
+        test = Playlist(short_test_pl)
+        test.download_all(resolution="1080p")
+    except exceptions.Resolution_Exception:
+        passed = True
+    assert passed is True
