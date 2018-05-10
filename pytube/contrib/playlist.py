@@ -110,7 +110,7 @@ class Playlist(object):
         """
 
         self.populate_video_urls()
-        logger.debug('total videos found: ', len(self.video_urls))
+        logger.debug('total videos found: %d', len(self.video_urls))
         logger.debug('starting download')
 
         prefix_gen = self._path_num_prefix_generator(reverse_numbering)
