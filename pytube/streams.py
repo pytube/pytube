@@ -174,7 +174,8 @@ class Stream(object):
         filename = safe_filename(title)
         return '{filename}.{s.subtype}'.format(filename=filename, s=self)
 
-    def download(self, output_path=None, filename=None, filename_prefix=None):
+    def download(self, output_path=None, filename=None, filename_prefix=None,
+                 skip_existing=False):
         """Write the media stream to disk.
 
         :param output_path:
@@ -192,6 +193,11 @@ class Stream(object):
             This is seperate from filename so you can use the default
             filename but still add a prefix.
         :type filename_prefix: str or None
+        :param skip_existing:
+            (optional) If True, skip and do not overwrite the local file
+            that has already been downloaded with the same filename
+            and size.
+        :type skip_existing: bool
 
         :rtype: str
 
@@ -209,19 +215,25 @@ class Stream(object):
 
         # file path
         fp = os.path.join(output_path, filename)
-        bytes_remaining = self.filesize
-        logger.debug(
-            'downloading (%s total bytes) file to %s',
-            self.filesize, fp,
-        )
+        if (skip_existing and 
+            os.path.isfile(fp) and
+            os.path.getsize(fp) == self.filesize):
+            # likely the same file, so skip it
+            logger.debug('file %s already exists, skipping', fp)
+        else:
+            bytes_remaining = self.filesize
+            logger.debug(
+                'downloading (%s total bytes) file to %s',
+                self.filesize,fp,
+            )
 
-        with open(fp, 'wb') as fh:
-            for chunk in request.get(self.url, streaming=True):
-                # reduce the (bytes) remainder by the length of the chunk.
-                bytes_remaining -= len(chunk)
-                # send to the on_progress callback.
-                self.on_progress(chunk, fh, bytes_remaining)
-            self.on_complete(fh)
+            with open(fp, 'wb') as fh:
+                for chunk in request.get(self.url, streaming=True):
+                    # reduce the (bytes) remainder by the length of the chunk.
+                    bytes_remaining -= len(chunk)
+                    # send to the on_progress callback.
+                    self.on_progress(chunk, fh, bytes_remaining)
+                self.on_complete(fh)
         return fp
 
     def stream_to_buffer(self):
