@@ -13,6 +13,7 @@ import io
 import logging
 import os
 import pprint
+import string
 
 from pytube import extract
 from pytube import request
@@ -175,6 +176,7 @@ class Stream(object):
         return '{filename}.{s.subtype}'.format(filename=filename, s=self)
 
     def download(self, output_path=None, filename=None, filename_prefix=None):
+
         """Write the media stream to disk.
 
         :param output_path:
@@ -184,6 +186,9 @@ class Stream(object):
         :param filename:
             (optional) Output filename (stem only) for writing media file.
             If one is not specified, the default filename is used.
+            The string may contain keywords that are substituted with that
+            video's meta-data.  For example, '{author}-{title}' would use
+            the video's author and title with a bash between them.
         :type filename: str or None
         :param filename_prefix:
             (optional) A string that will be prepended to the filename.
@@ -198,6 +203,10 @@ class Stream(object):
         """
         output_path = output_path or os.getcwd()
         if filename:
+            kwargs = {'title': self.player_config_args['title'],
+                      'author': self.player_config_args['author']}
+            fmt = BlankFormatter()
+            filename = fmt.format(filename, **kwargs)
             safe = safe_filename(filename)
             filename = '{filename}.{s.subtype}'.format(filename=safe, s=self)
         filename = filename or self.default_filename
@@ -318,3 +327,17 @@ class Stream(object):
             parts.extend(['abr="{s.abr}"', 'acodec="{s.audio_codec}"'])
         parts = ' '.join(parts).format(s=self)
         return '<Stream: {parts}>'.format(parts=parts)
+
+
+class BlankFormatter(string.Formatter):
+    """ Format a string with dict of substitution values if they're passed
+        and leave them blank otherwise.
+    """
+    def __init__(self, default=''):
+        self.default=default
+
+    def get_value(self, key, args, kwds):
+        if isinstance(key, str):
+            return kwds.get(key, self.default)
+        else:
+            return string.Formatter.get_value(key, args, kwds)

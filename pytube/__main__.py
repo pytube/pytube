@@ -249,6 +249,15 @@ class YouTube(object):
         """
         return self.player_config_args['title']
 
+    @property
+    def author(self):
+        """Get the video author.
+
+        :rtype: str
+
+        """
+        return self.player_config_args['author']
+
     def register_on_progress_callback(self, func):
         """Register a download progress callback function post initialization.
 
