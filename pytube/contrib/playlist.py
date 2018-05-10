@@ -84,8 +84,8 @@ class Playlist(object):
             start, stop, step = (1, len(self.video_urls) + 1, 1)
         return (str(i).zfill(digits) for i in range(start, stop, step))
 
-    def download_all(self, download_path=None, prefix_number=True,
-                     reverse_numbering=False):
+    def download_all(self, download_path=None, filename=None,
+                     prefix_number=True, reverse_numbering=False):
         """Download all the videos in the the playlist. Initially, download
         resolution is 720p (or highest available), later more option
         should be added to download resolution of choice
@@ -97,6 +97,11 @@ class Playlist(object):
             specified, defaults to the current working directory.
             This is passed along to the Stream objects.
         :type download_path: str or None
+        :param filename:
+            (optional) Output filename (stem only) for writing media file.
+            If one is not specified, the default filename is used.
+            This is passed along to the Stream objects.
+        :type filename: str or None
         :param prefix_number:
             (optional) Automatically numbers playlists using the
             _path_num_prefix_generator function.
@@ -124,7 +129,7 @@ class Playlist(object):
             if prefix_number:
                 prefix = next(prefix_gen)
                 logger.debug('file prefix is: %s', prefix)
-                dl_stream.download(download_path, filename_prefix=prefix)
+                dl_stream.download(download_path, filename, filename_prefix=prefix)
             else:
-                dl_stream.download(download_path)
+                dl_stream.download(download_path, filename)
             logger.debug('download complete')
