@@ -13,10 +13,10 @@ import io
 import logging
 import os
 import pprint
-import string
 
 from pytube import extract
 from pytube import request
+from pytube.helpers import KeywordFormatter
 from pytube.helpers import safe_filename
 from pytube.itags import get_format_profile
 
@@ -205,7 +205,7 @@ class Stream(object):
         if filename:
             kwargs = {'title': self.player_config_args['title'],
                       'author': self.player_config_args['author']}
-            fmt = BlankFormatter()
+            fmt = KeywordFormatter()
             filename = fmt.format(filename, **kwargs)
             safe = safe_filename(filename)
             filename = '{filename}.{s.subtype}'.format(filename=safe, s=self)
@@ -328,16 +328,3 @@ class Stream(object):
         parts = ' '.join(parts).format(s=self)
         return '<Stream: {parts}>'.format(parts=parts)
 
-
-class BlankFormatter(string.Formatter):
-    """ Format a string with dict of substitution values if they're passed
-        and leave them blank otherwise.
-    """
-    def __init__(self, default=''):
-        self.default=default
-
-    def get_value(self, key, args, kwds):
-        if isinstance(key, str):
-            return kwds.get(key, self.default)
-        else:
-            return string.Formatter.get_value(key, args, kwds)

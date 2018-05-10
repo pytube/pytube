@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Various helper functions implemented by pytube."""
+"""Various helper functions and classes implemented by pytube."""
 from __future__ import absolute_import
 
 import logging
 import pprint
 import re
+import string
 
 from pytube.compat import unicode
 from pytube.exceptions import RegexMatchError
@@ -99,3 +100,29 @@ def safe_filename(s, max_length=255):
     regex = re.compile(pattern, re.UNICODE)
     filename = regex.sub('', s)
     return unicode(filename[:max_length].rsplit(' ', 0)[0])
+
+class KeywordFormatter(string.Formatter):
+    """Create a string and format it with the values if they're passed.
+
+    This class is based on the BlankFormatter detailed here:
+    https://stackoverflow.com/questions/19799609/
+        leaving-values-blank-if-not-passed-in-str-format
+    Instead of setting values blank for undefined keys, just
+    leave the key in the string unaltered.
+    """
+
+    def get_value(self, key, args, kwds):
+        """Override Formatter get_value()
+
+        This function is called indirectly as a result of
+        calling string.format().  For an explanation of
+        the params this function uses, see:
+        https://docs.python.org/3.1/library/string.html
+        """ 
+        
+        if isinstance(key, str):
+            return kwds.get(key, '{'+key+'}')
+        else:
+            return string.Formatter.get_value(key, args, kwds)
+
+
