@@ -193,7 +193,7 @@ class Stream(object):
             filename but still add a prefix.
         :type filename_prefix: str or None
 
-        :rtype: None
+        :rtype: str
 
         """
         output_path = output_path or os.getcwd()
@@ -203,9 +203,11 @@ class Stream(object):
         filename = filename or self.default_filename
 
         if filename_prefix:
-            filename = "{prefix} {filename}"\
-                .format(prefix=safe_filename(filename_prefix),
-                        filename=filename)
+            filename = '{prefix} {filename}'\
+                .format(
+                    prefix=safe_filename(filename_prefix),
+                    filename=filename,
+                )
 
         # file path
         fp = os.path.join(output_path, filename)
@@ -222,6 +224,7 @@ class Stream(object):
                 # send to the on_progress callback.
                 self.on_progress(chunk, fh, bytes_remaining)
             self.on_complete(fh)
+        return fp
 
     def stream_to_buffer(self):
         """Write the media stream to buffer

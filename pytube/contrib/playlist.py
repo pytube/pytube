@@ -85,8 +85,10 @@ class Playlist(object):
             start, stop, step = (1, len(self.video_urls) + 1, 1)
         return (str(i).zfill(digits) for i in range(start, stop, step))
 
-    def download_all(self, download_path=None, prefix_number=True,
-                     reverse_numbering=False, resolution="720p"):
+    def download_all(
+      self, download_path=None, prefix_number=True,
+      reverse_numbering=False, resolution="720p"
+    ):
         """Download all the videos in the the playlist. Initially, download
         resolution is 720p (or highest available), later more option
         should be added to download resolution of choice
@@ -122,7 +124,7 @@ class Playlist(object):
                                        .format(resolutions))
 
         self.populate_video_urls()
-        logger.debug('total videos found: ', len(self.video_urls))
+        logger.debug('total videos found: %d', len(self.video_urls))
         logger.debug('starting download')
 
         prefix_gen = self._path_num_prefix_generator(reverse_numbering)

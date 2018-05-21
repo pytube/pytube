@@ -10,6 +10,7 @@ PY33 = sys.version_info[0:2] >= (3, 3)
 
 
 if PY2:
+    import urllib2
     from urllib import urlencode
     from urllib2 import URLError
     from urllib2 import quote
@@ -17,6 +18,17 @@ if PY2:
     from urllib2 import urlopen
     from urlparse import parse_qsl
     from HTMLParser import HTMLParser
+
+    def install_proxy(proxy_handler):
+        """
+        install global proxy.
+        :param proxy_handler:
+            :samp:`{"http":"http://my.proxy.com:1234", "https":"https://my.proxy.com:1234"}`
+        :return:
+        """
+        proxy_support = urllib2.ProxyHandler(proxy_handler)
+        opener = urllib2.build_opener(proxy_support)
+        urllib2.install_opener(opener)
 
     def unescape(s):
         """Strip HTML entries from a string."""
@@ -34,6 +46,12 @@ elif PY3:
     from urllib.parse import unquote
     from urllib.parse import urlencode
     from urllib.request import urlopen
+    from urllib import request
+
+    def install_proxy(proxy_handler):
+        proxy_support = request.ProxyHandler(proxy_handler)
+        opener = request.build_opener(proxy_support)
+        request.install_opener(opener)
 
     def unicode(s):
         """No-op."""

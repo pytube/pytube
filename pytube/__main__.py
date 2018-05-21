@@ -19,9 +19,10 @@ from pytube import mixins
 from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
+from pytube.compat import install_proxy
 from pytube.compat import parse_qsl
+from pytube.exceptions import VideoUnavailable
 from pytube.helpers import apply_mixin
-
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +32,7 @@ class YouTube(object):
 
     def __init__(
         self, url=None, defer_prefetch_init=False, on_progress_callback=None,
-        on_complete_callback=None,
+        on_complete_callback=None, proxies=None,
     ):
         """Construct a :class:`YouTube <YouTube>`.
 
@@ -79,6 +80,9 @@ class YouTube(object):
             'on_progress': on_progress_callback,
             'on_complete': on_complete_callback,
         }
+
+        if proxies:
+            install_proxy(proxies)
 
         if not defer_prefetch_init:
             self.prefetch_init()
@@ -153,6 +157,8 @@ class YouTube(object):
 
         """
         self.watch_html = request.get(url=self.watch_url)
+        if '<img class="icon meh" src="/yts/img' not in self.watch_html:
+            raise VideoUnavailable('This video is unavailable.')
         self.embed_html = request.get(url=self.embed_url)
         self.age_restricted = extract.is_age_restricted(self.watch_html)
         self.vid_info_url = extract.video_info_url(
