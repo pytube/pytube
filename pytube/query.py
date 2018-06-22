@@ -163,14 +163,17 @@ class StreamQuery:
             The name of the attribute to sort by.
         """
 
-        numerical_attr_repr = {}
+        integer_attr_repr = {}
         for stream in self.fmt_streams:
             attr = getattr(stream, attribute_name)
+            if attr is None:
+                break
             num = [char for char in attr if char.isdigit()]
-            numerical_attr_repr[attr] = int(''.join(num)) if num else None
+            integer_attr_repr[attr] = int(''.join(num)) if num else None
 
-        if all(numerical_attr_repr.values()):
-            key = lambda s: numerical_attr_repr[getattr(s, attribute_name)]
+        # if every attribute has an integer representation
+        if all(integer_attr_repr.values()) and integer_attr_repr:
+            key = lambda s: integer_attr_repr[getattr(s, attribute_name)]
         else:
             key=lambda s: getattr(s, attribute_name)
 
