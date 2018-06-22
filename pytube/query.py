@@ -130,14 +130,14 @@ class StreamQuery:
         if only_audio:
             filters.append(
                 lambda s: (
-                    s.includes_audio_track and not s.includes_video_track
+                        s.includes_audio_track and not s.includes_video_track
                 ),
             )
 
         if only_video:
             filters.append(
                 lambda s: (
-                    s.includes_video_track and not s.includes_audio_track
+                        s.includes_video_track and not s.includes_audio_track
                 ),
             )
 
@@ -157,14 +157,29 @@ class StreamQuery:
         return StreamQuery(fmt_streams)
 
     def order_by(self, attribute_name):
-        """Apply a sort order to a resultset.
+        """Apply a sort order to a result set.
 
         :param str attribute_name:
             The name of the attribute to sort by.
         """
+
+        integer_attr_repr = {}
+        for stream in self.fmt_streams:
+            attr = getattr(stream, attribute_name)
+            if attr is None:
+                break
+            num = [char for char in attr if char.isdigit()]
+            integer_attr_repr[attr] = int(''.join(num)) if num else None
+
+        # if every attribute has an integer representation
+        if all(integer_attr_repr.values()) and integer_attr_repr:
+            key = lambda s: integer_attr_repr[getattr(s, attribute_name)]
+        else:
+            key=lambda s: getattr(s, attribute_name)
+
         fmt_streams = sorted(
             self.fmt_streams,
-            key=lambda s: getattr(s, attribute_name),
+            key=key
         )
         return StreamQuery(fmt_streams)
 
