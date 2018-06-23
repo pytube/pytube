@@ -12,7 +12,7 @@ class StreamQuery:
             list of :class:`Stream <Stream>` instances.
         """
         self.fmt_streams = fmt_streams
-        self.itag_index = {int(s.itag): s for s in fmt_streams}
+        self.itag_index = {s.itag: s for s in fmt_streams}
 
     def filter(
             self, fps=None, res=None, resolution=None, mime_type=None,
