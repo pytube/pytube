@@ -174,7 +174,7 @@ class StreamQuery:
         if all(integer_attr_repr.values()) and integer_attr_repr:
             key = lambda s: integer_attr_repr[getattr(s, attribute_name)]
         else:
-            key=lambda s: getattr(s, attribute_name)
+            key = lambda s: getattr(s, attribute_name)
 
         fmt_streams = sorted(
             self.fmt_streams,
