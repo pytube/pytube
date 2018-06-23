@@ -111,6 +111,7 @@ def test_get_by_itag(cipher_signature):
     :class:`Stream <Stream>`.
     """
     assert cipher_signature.streams.get_by_itag(22).itag == '22'
+    assert cipher_signature.streams.get_by_itag('22').itag == '22'
 
 
 def test_get_by_non_existent_itag(cipher_signature):
