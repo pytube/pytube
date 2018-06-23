@@ -172,9 +172,9 @@ class StreamQuery:
 
         # if every attribute has an integer representation
         if all(integer_attr_repr.values()) and integer_attr_repr:
-            key = lambda s: integer_attr_repr[getattr(s, attribute_name)]
+            def key(s): return integer_attr_repr[getattr(s, attribute_name)]
         else:
-            key = lambda s: getattr(s, attribute_name)
+            def key(s): return getattr(s, attribute_name)
 
         fmt_streams = sorted(
             self.fmt_streams,
