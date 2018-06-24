@@ -120,7 +120,7 @@ def test_order_by_ascending(cipher_signature):
         s.mime_type for s in cipher_signature.streams
             .filter(progressive=True)
             .order_by('mime_type')
-            .desc()
+            .asc()
             .all()
     ]
     assert mime_types == ['video/3gpp', 'video/3gpp', 'video/mp4', 'video/mp4', 'video/webm']
