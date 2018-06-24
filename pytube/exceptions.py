@@ -38,3 +38,7 @@ class RegexMatchError(ExtractError):
 
 class LiveStreamError(ExtractError):
     """Video is a live stream."""
+
+
+class VideoUnavailable(PytubeError):
+    """Video is unavailable."""

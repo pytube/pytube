@@ -187,7 +187,7 @@ class StreamQuery:
     def get_by_itag(self, itag):
         """Get the corresponding :class:`Stream <Stream>` for a given itag.
 
-        :param str itag:
+        :param str int itag:
             YouTube format identifier code.
         :rtype: :class:`Stream <Stream>` or None
         :returns:
@@ -196,7 +196,7 @@ class StreamQuery:
 
         """
         try:
-            return self.itag_index[itag]
+            return self.itag_index[int(itag)]
         except KeyError:
             pass
 

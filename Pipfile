@@ -1,18 +1,11 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
 
-"flake8" = "*"
-"enum34" = "*"
-
-
 [dev-packages]
-
 bumpversion = "*"
 coveralls = "*"
 "flake8" = "*"
@@ -26,3 +19,4 @@ sphinx-rtd-theme = "*"
 configparser = "*"
 "urllib3" = "*"
 pyopenssl = "*"
+"enum34" = "*"
