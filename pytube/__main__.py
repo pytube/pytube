@@ -21,7 +21,6 @@ from pytube import Stream
 from pytube import StreamQuery
 from pytube.compat import install_proxy
 from pytube.compat import parse_qsl
-from pytube.exceptions import LiveStreamError
 from pytube.exceptions import VideoUnavailable
 from pytube.helpers import apply_mixin
 
@@ -63,6 +62,7 @@ class YouTube(object):
         self.player_config_args = None  # inline js in the html containing
         # streams
         self.age_restricted = None
+        self.live_stream = None
 
         self.fmt_streams = []  # list of :class:`Stream <Stream>` instances
         self.caption_tracks = []
@@ -122,9 +122,8 @@ class YouTube(object):
         apply_mixin(self.player_config_args, 'player_response', json.loads)
 
         player_response = self.player_config_args['player_response']
-        if ('playabilityStatus' in player_response and
-                player_response['playabilityStatus']['status'] != 'OK'):
-                raise LiveStreamError('Content is a live stream')
+        self.live_stream = ('liveStreamability' in
+                            player_response['playabilityStatus'])
 
         # https://github.com/nficano/pytube/issues/165
         stream_maps = ['url_encoded_fmt_stream_map']
@@ -138,13 +137,15 @@ class YouTube(object):
             mixins.apply_descrambler(self.player_config_args, fmt)
 
             try:
-                mixins.apply_signature(self.player_config_args, fmt, self.js)
+                mixins.apply_signature(
+                    self.player_config_args, fmt, self.js, self.live_stream)
             except TypeError:
                 self.js_url = extract.js_url(
                     self.embed_html, self.age_restricted,
                 )
                 self.js = request.get(self.js_url)
-                mixins.apply_signature(self.player_config_args, fmt, self.js)
+                mixins.apply_signature(
+                    self.player_config_args, fmt, self.js, self.live_stream)
 
             # build instances of :class:`Stream <Stream>`
             self.initialize_stream_objects(fmt)

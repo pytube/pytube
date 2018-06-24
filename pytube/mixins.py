@@ -8,12 +8,13 @@ import pprint
 from pytube import cipher
 from pytube.compat import parse_qsl
 from pytube.compat import unquote
+from pytube.exceptions import LiveStreamError
 
 
 logger = logging.getLogger(__name__)
 
 
-def apply_signature(config_args, fmt, js):
+def apply_signature(config_args, fmt, js, live_stream):
     """Apply the decrypted signature to the stream manifest.
 
     :param dict config_args:
@@ -24,11 +25,16 @@ def apply_signature(config_args, fmt, js):
         ``adaptive_fmts``).
     :param str js:
         The contents of the base.js asset file.
+    :param bool live_stream:
+        If the video was at any point in time a live stream.
 
     """
     stream_manifest = config_args[fmt]
     for i, stream in enumerate(stream_manifest):
-        url = stream['url']
+        if 'url' in stream:
+            url = stream['url']
+        elif live_stream:
+            raise LiveStreamError('Video is currently being streamed live')
 
         if 'signature=' in url:
             # For certain videos, YouTube will just provide them pre-signed, in
