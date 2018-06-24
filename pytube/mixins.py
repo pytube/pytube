@@ -2,6 +2,7 @@
 """Applies in-place data mutations."""
 from __future__ import absolute_import
 
+import json
 import logging
 import pprint
 
@@ -28,7 +29,7 @@ def apply_signature(config_args, fmt, js):
 
     """
     stream_manifest = config_args[fmt]
-    live_stream = config_args['player_response'].get(
+    live_stream = json.loads(config_args['player_response']).get(
         'playabilityStatus', {}).get('liveStreamability')
     for i, stream in enumerate(stream_manifest):
         if 'url' in stream:
