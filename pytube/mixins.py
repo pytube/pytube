@@ -14,7 +14,7 @@ from pytube.exceptions import LiveStreamError
 logger = logging.getLogger(__name__)
 
 
-def apply_signature(config_args, fmt, js, live_stream):
+def apply_signature(config_args, fmt, js):
     """Apply the decrypted signature to the stream manifest.
 
     :param dict config_args:
@@ -25,11 +25,11 @@ def apply_signature(config_args, fmt, js, live_stream):
         ``adaptive_fmts``).
     :param str js:
         The contents of the base.js asset file.
-    :param bool live_stream:
-        If the video was at any point in time a live stream.
 
     """
     stream_manifest = config_args[fmt]
+    live_stream = config_args['player_response'].get(
+        'playabilityStatus', {}).get('liveStreamability')
     for i, stream in enumerate(stream_manifest):
         if 'url' in stream:
             url = stream['url']
