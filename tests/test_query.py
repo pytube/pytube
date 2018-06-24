@@ -68,9 +68,9 @@ def test_order_by(cipher_signature):
     """
     itags = [
         s.itag for s in cipher_signature.streams
-            .filter(progressive=True)
-            .order_by('itag')
-            .all()
+        .filter(progressive=True)
+        .order_by('itag')
+        .all()
     ]
 
     assert itags == ['17', '18', '22', '36', '43']
@@ -83,22 +83,24 @@ def test_order_by_descending(cipher_signature):
     # numerical values
     itags = [
         s.itag for s in cipher_signature.streams
-            .filter(progressive=True)
-            .order_by('itag')
-            .desc()
-            .all()
+        .filter(progressive=True)
+        .order_by('itag')
+        .desc()
+        .all()
     ]
     assert itags == ['43', '36', '22', '18', '17']
 
     # non numerical values
     mime_types = [
         s.mime_type for s in cipher_signature.streams
-            .filter(progressive=True)
-            .order_by('mime_type')
-            .desc()
-            .all()
+        .filter(progressive=True)
+        .order_by('mime_type')
+        .desc()
+        .all()
     ]
-    assert mime_types == ['video/webm', 'video/mp4', 'video/mp4', 'video/3gpp', 'video/3gpp']
+    assert mime_types == ['video/webm', 'video/mp4',
+                          'video/mp4', 'video/3gpp', 'video/3gpp']
+
 
 def test_order_by_ascending(cipher_signature):
     """Ensure :meth:`~pytube.StreamQuery.desc` sorts the list of
@@ -107,10 +109,10 @@ def test_order_by_ascending(cipher_signature):
     # numerical values
     itags = [
         s.itag for s in cipher_signature.streams
-            .filter(progressive=True)
-            .order_by('itag')
-            .asc()
-            .all()
+        .filter(progressive=True)
+        .order_by('itag')
+        .asc()
+        .all()
     ]
 
     assert itags == ['17', '18', '22', '36', '43']
@@ -118,12 +120,13 @@ def test_order_by_ascending(cipher_signature):
     # non numerical values
     mime_types = [
         s.mime_type for s in cipher_signature.streams
-            .filter(progressive=True)
-            .order_by('mime_type')
-            .asc()
-            .all()
+        .filter(progressive=True)
+        .order_by('mime_type')
+        .asc()
+        .all()
     ]
-    assert mime_types == ['video/3gpp', 'video/3gpp', 'video/mp4', 'video/mp4', 'video/webm']
+    assert mime_types == ['video/3gpp', 'video/3gpp',
+                          'video/mp4', 'video/mp4', 'video/webm']
 
 
 def test_get_by_itag(cipher_signature):
