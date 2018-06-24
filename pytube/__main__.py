@@ -62,7 +62,6 @@ class YouTube(object):
         self.player_config_args = None  # inline js in the html containing
         # streams
         self.age_restricted = None
-        self.live_stream = None
 
         self.fmt_streams = []  # list of :class:`Stream <Stream>` instances
         self.caption_tracks = []
@@ -118,9 +117,6 @@ class YouTube(object):
                 self.watch_html,
             )['args']
 
-        # load the player_response object (contains subtitle information)
-        apply_mixin(self.player_config_args, 'player_response', json.loads)
-
         # https://github.com/nficano/pytube/issues/165
         stream_maps = ['url_encoded_fmt_stream_map']
         if 'adaptive_fmts' in self.player_config_args:
@@ -133,18 +129,19 @@ class YouTube(object):
             mixins.apply_descrambler(self.player_config_args, fmt)
 
             try:
-                mixins.apply_signature(
-                    self.player_config_args, fmt, self.js)
+                mixins.apply_signature(self.player_config_args, fmt, self.js)
             except TypeError:
                 self.js_url = extract.js_url(
                     self.embed_html, self.age_restricted,
                 )
                 self.js = request.get(self.js_url)
-                mixins.apply_signature(
-                    self.player_config_args, fmt, self.js)
+                mixins.apply_signature(self.player_config_args, fmt, self.js)
 
             # build instances of :class:`Stream <Stream>`
             self.initialize_stream_objects(fmt)
+
+        # load the player_response object (contains subtitle information)
+        apply_mixin(self.player_config_args, 'player_response', json.loads)
 
         self.initialize_caption_objects()
         logger.info('init finished successfully')
