@@ -43,3 +43,8 @@ def test_age_restricted(age_restricted):
 
 def test_non_age_restricted(cipher_signature):
     assert not extract.is_age_restricted(cipher_signature.watch_html)
+
+
+def test_get_vid_desc(cipher_signature):
+    expected = "PSY - DADDY(feat. CL of 2NE1) M/V @ https://youtu.be/FrG4TEcSuRgPSY - 나팔바지(NAPAL BAJI) M/V @ https://youtu.be/tF27TNC_4pcPSY - 7TH ALBUM '칠집싸이다' on iTunes @ http://smarturl.it/PSY_7THALBUMPSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam#PSY #싸이 #GANGNAMSTYLE #강남스타일More about PSY@http://www.psypark.com/http://www.youtube.com/officialpsyhttp://www.facebook.com/officialpsyhttp://twitter.com/psy_oppahttps://www.instagram.com/42psy42http://iTunes.com/PSYhttp://sptfy.com/PSYhttp://weibo.com/psyoppahttp://twitter.com/ygent_official"  # noqa
+    assert extract.get_vid_descr(cipher_signature.watch_html) == expected

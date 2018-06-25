@@ -3,10 +3,30 @@
 import json
 from collections import OrderedDict
 
+from pytube.compat import HTMLParser
 from pytube.compat import quote
 from pytube.compat import urlencode
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search
+
+
+class PytubeHTMLParser(HTMLParser):
+    in_vid_descr = False
+    vid_descr = ''
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'p':
+            for attr in attrs:
+                if attr[0] == 'id' and attr[1] == 'eow-description':
+                    self.in_vid_descr = True
+
+    def handle_endtag(self, tag):
+        if tag == 'p' and self.in_vid_descr:
+            self.in_vid_descr = False
+
+    def handle_data(self, data):
+        if self.in_vid_descr:
+            self.vid_descr += data
 
 
 def is_age_restricted(watch_html):
@@ -173,3 +193,9 @@ def get_ytplayer_config(html, age_restricted=False):
         pattern = r';ytplayer\.config\s*=\s*({.*?});'
     yt_player_config = regex_search(pattern, html, group=1)
     return json.loads(yt_player_config)
+
+
+def get_vid_descr(html):
+    html_parser = PytubeHTMLParser()
+    html_parser.feed(html)
+    return html_parser.vid_descr

@@ -4,12 +4,14 @@
 """Python 2/3 compatibility support."""
 import sys
 
+
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
 PY33 = sys.version_info[0:2] >= (3, 3)
 
-
 if PY2:
+    reload(sys)
+    sys.setdefaultencoding('utf8')
     import urllib2
     from urllib import urlencode
     from urllib2 import URLError
