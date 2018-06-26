@@ -48,6 +48,7 @@ class Stream(object):
         self.res = None   # resolution (e.g.: 480p, 720p, 1080p)
         self.url = None   # signed download url
 
+        self._filesize = None  # filesize in bytes
         self.mime_type = None  # content identifier (e.g.: video/mp4)
         self.type = None       # the part of the mime before the slash
         self.subtype = None    # the part of the mime after the slash
@@ -159,8 +160,10 @@ class Stream(object):
         :returns:
             Filesize (in bytes) of the stream.
         """
-        headers = request.get(self.url, headers=True)
-        return int(headers['content-length'])
+        if self._filesize is None:
+            headers = request.get(self.url, headers=True)
+            self._filesize = int(headers['content-length'])
+        return self._filesize
 
     @property
     def default_filename(self):
