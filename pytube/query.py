@@ -171,7 +171,7 @@ class StreamQuery:
             integer_attr_repr[attr] = int(''.join(num)) if num else None
 
         # if every attribute has an integer representation
-        if all(integer_attr_repr.values()) and integer_attr_repr:
+        if integer_attr_repr and all(integer_attr_repr.values()):
             def key(s): return integer_attr_repr[getattr(s, attribute_name)]
         else:
             def key(s): return getattr(s, attribute_name)
