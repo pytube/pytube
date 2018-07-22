@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
-import random
-
-import mock
-
 from pytube import Playlist
-from pytube import request
 from pytube import streams
 
 short_test_pl = 'https://www.youtube.com/watch?v=' \
@@ -14,10 +9,6 @@ long_test_pl = 'https://www.youtube.com/watch?v=' \
 
 
 def test_construct():
-    print('*' * 50)
-    print('*' * 50)
-    print('*' * 50)
-    print('*' * 50)
     ob = Playlist(short_test_pl)
     expected = 'https://www.youtube.com/' \
                'playlist?list=' \
