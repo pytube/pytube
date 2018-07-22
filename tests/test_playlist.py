@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
+import random
+
+import mock
+
 from pytube import Playlist
+from pytube import request
+from pytube import streams
 
 short_test_pl = 'https://www.youtube.com/watch?v=' \
     'm5q2GCsteQs&list=PL525f8ds9RvsXDl44X6Wwh9t3fCzFNApw'
@@ -8,10 +14,16 @@ long_test_pl = 'https://www.youtube.com/watch?v=' \
 
 
 def test_construct():
+    print('*' * 50)
+    print('*' * 50)
+    print('*' * 50)
+    print('*' * 50)
     ob = Playlist(short_test_pl)
     expected = 'https://www.youtube.com/' \
                'playlist?list=' \
                'PL525f8ds9RvsXDl44X6Wwh9t3fCzFNApw'
+
+    # assert 1 == 2
 
     assert ob.construct_playlist_url() == expected
 
@@ -39,11 +51,20 @@ def test_link_parse():
     assert ob.parse_links() == expected
 
 
-def test_download():
+def blank_fn(*args, **kwargs):
+    pass
+
+
+def test_download(mocker):
+    mocker.patch.object(streams.Stream, 'download')
+    streams.Stream.download.side_effect = blank_fn
     ob = Playlist(short_test_pl)
     ob.download_all()
+    del ob.video_urls[:]
     ob.download_all('.')
+    del ob.video_urls[:]
     ob.download_all(prefix_number=False)
+    del ob.video_urls[:]
     ob.download_all('.', prefix_number=False)
 
 
