@@ -14,8 +14,6 @@ def test_construct():
                'playlist?list=' \
                'PL525f8ds9RvsXDl44X6Wwh9t3fCzFNApw'
 
-    # assert 1 == 2
-
     assert ob.construct_playlist_url() == expected
 
 
