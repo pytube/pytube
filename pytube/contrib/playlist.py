@@ -5,6 +5,7 @@ Module to download a complete playlist from a youtube channel
 import logging
 
 from pytube import request
+from pytube.compat import install_proxy
 from pytube.__main__ import YouTube
 
 logger = logging.getLogger(__name__)
@@ -15,9 +16,12 @@ class Playlist(object):
     playlist
     """
 
-    def __init__(self, url):
+    def __init__(self, url, proxies=None):
         self.playlist_url = url
         self.video_urls = []
+        
+        if proxies:
+            install_proxy(proxies)
 
     def construct_playlist_url(self):
         """There are two kinds of playlist urls in YouTube. One that
