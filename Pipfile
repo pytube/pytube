@@ -1,22 +1,12 @@
 [[source]]
-url = "https://pypi.python.org/simple"
+url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
 [packages]
 
 [dev-packages]
-bumpversion = "*"
-coveralls = "*"
-"flake8" = "*"
-mock = "*"
-pre-commit = "*"
-pytest = "*"
-pytest-cov = "*"
-pytest-mock = "*"
-sphinx = "*"
-sphinx-rtd-theme = "*"
-configparser = "*"
-"urllib3" = "*"
-pyopenssl = "*"
-"enum34" = "*"
+ipython = "*"
+
+[requires]
+python_version = "3.7"
