@@ -66,7 +66,7 @@ class Playlist(object):
             complete_url = base_url + video_id
             self.video_urls.append(complete_url)
 
-    def _path_num_prefix_generator(self, reverse=False):
+    def _path_num_prefix_generator(self, reverse=False, start_video_number=1):
         """
         This generator function generates number prefixes, for the items
         in the playlist.
@@ -81,12 +81,13 @@ class Playlist(object):
         if reverse:
             start, stop, step = (len(self.video_urls), 0, -1)
         else:
-            start, stop, step = (1, len(self.video_urls) + 1, 1)
+            start, stop, step = (start_video_number, len(self.video_urls) + 1, 1)
         return (str(i).zfill(digits) for i in range(start, stop, step))
 
     def download_all(
         self, download_path=None, prefix_number=True,
         reverse_numbering=False,
+        start_video_number=1
     ):
         """Download all the videos in the the playlist. Initially, download
         resolution is 720p (or highest available), later more option
@@ -107,16 +108,20 @@ class Playlist(object):
             (optional) Lets you number playlists in reverse, since some
             playlists are ordered newest -> oldests.
         :type reverse_numbering: bool
+        :param start_video_number:
+            (optional) Lets you start downloading playlist videos from
+            a specific video by entering it's number
+        :type start_video_number: int
         """
-
+        start_index = start_video_number - 1
         self.populate_video_urls()
         logger.debug('total videos found: %d', len(self.video_urls))
         logger.debug('starting download')
 
-        prefix_gen = self._path_num_prefix_generator(reverse_numbering)
+        prefix_gen = self._path_num_prefix_generator(reverse=reverse_numbering, start_video_number=start_video_number)
 
-        for link in self.video_urls:
-            yt = YouTube(link)
+        for i in range(start_index, len(self.video_urls)):
+            yt = YouTube(self.video_urls[i])
             # TODO: this should not be hardcoded to a single user's preference
             dl_stream = yt.streams.filter(
                 progressive=True, subtype='mp4',
