@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 
 [dev-packages]
-ipython = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.6"
