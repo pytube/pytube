@@ -8,6 +8,7 @@ name = "pypi"
 [dev-packages]
 "flake8" = "*"
 pytest = "*"
+coveralls = "*"
 
 [requires]
 python_version = "3.6"
