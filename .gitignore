@@ -39,3 +39,7 @@ _build
 _static
 _templates
 _autosummary
+
+
+#Pycharm stuff
+.idea/*
