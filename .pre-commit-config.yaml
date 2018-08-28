@@ -16,7 +16,7 @@
     sha: v0.3.5
     hooks:
     -   id: reorder-python-imports
-        language_version: python3.6
+        language_version: python3.7
 -   repo: https://github.com/Lucas-C/pre-commit-hooks-safety
     sha: v1.1.0
     hooks:

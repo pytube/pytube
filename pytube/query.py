@@ -178,7 +178,7 @@ class StreamQuery:
 
         fmt_streams = sorted(
             self.fmt_streams,
-            key=key
+            key=key,
         )
         return StreamQuery(fmt_streams)
 
