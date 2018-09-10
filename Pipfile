@@ -14,8 +14,7 @@ pre-commit = "*"
 "enum34" = "*"
 pytest-cov = "*"
 "pathlib2" = "*"
-setuptools = "*"
-pip = "*"
+"scandir" = "*"
 
 [requires]
 python_version = "3.6"
