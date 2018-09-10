@@ -8,6 +8,7 @@ python:
   - "3.5"
   - "3.6"
   - "3.6-dev"
+  - "3.7"  
 install: "make"
 script:
   - make ci
