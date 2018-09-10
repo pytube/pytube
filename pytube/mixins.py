@@ -30,7 +30,8 @@ def apply_signature(config_args, fmt, js):
     """
     stream_manifest = config_args[fmt]
     live_stream = json.loads(config_args['player_response']).get(
-        'playabilityStatus', {}).get('liveStreamability')
+        'playabilityStatus', {},
+    ).get('liveStreamability')
     for i, stream in enumerate(stream_manifest):
         if 'url' in stream:
             url = stream['url']
