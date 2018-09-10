@@ -12,6 +12,7 @@ coveralls = "*"
 mock = "*"
 pytest-mock = "*"
 pre-commit = "*"
+"enum34" = "*"
 
 [requires]
 python_version = "3.6"
