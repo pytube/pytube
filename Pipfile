@@ -8,11 +8,12 @@ name = "pypi"
 [dev-packages]
 "flake8" = "*"
 pytest = "*"
-coveralls = "*"
 mock = "*"
 pytest-mock = "*"
 pre-commit = "*"
 "enum34" = "*"
+pytest-cov = "*"
+"pathlib2" = "*"
 
 [requires]
 python_version = "3.6"
