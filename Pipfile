@@ -11,6 +11,7 @@ pytest = "*"
 coveralls = "*"
 mock = "*"
 pytest-mock = "*"
+pre-commit = "*"
 
 [requires]
 python_version = "3.6"
