@@ -12,12 +12,7 @@ install: "make"
 script:
   - make ci
 before_install:
-  - sudo apt-get install -y libpython-dev
-  - sudo apt-get install -y libyaml-dev
-  - sudo apt-get install -y python-dev
-  - sudo apt-get install -y python-pip
-  - sudo apt-get install -y python-software-properties
-  - sudo apt-get install -y software-properties-common
+  - pip install pipenv flake8 --upgrade
 sudo: false
 after_success:
   coveralls
