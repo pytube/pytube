@@ -2,6 +2,7 @@
 import random
 
 import mock
+from pytest_mock import mocker
 
 from pytube import request
 from pytube import Stream

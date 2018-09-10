@@ -9,6 +9,8 @@ name = "pypi"
 "flake8" = "*"
 pytest = "*"
 coveralls = "*"
+mock = "*"
+pytest-mock = "*"
 
 [requires]
 python_version = "3.6"
