@@ -38,7 +38,7 @@ def regex_search(pattern, string, groups=False, group=None, flags=0):
             if not results:
                 raise RegexMatchError(
                     'regex pattern ({pattern}) had zero matches'
-                        .format(pattern=p),
+                    .format(pattern=p),
                 )
             else:
                 logger.debug(
@@ -62,7 +62,7 @@ def regex_search(pattern, string, groups=False, group=None, flags=0):
         if not results:
             raise RegexMatchError(
                 'regex pattern ({pattern}) had zero matches'
-                    .format(pattern=pattern),
+                .format(pattern=pattern),
             )
         else:
             logger.debug(
