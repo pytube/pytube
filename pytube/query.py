@@ -162,9 +162,23 @@ class StreamQuery:
         :param str attribute_name:
             The name of the attribute to sort by.
         """
+        integer_attr_repr = {}
+        for stream in self.fmt_streams:
+            attr = getattr(stream, attribute_name)
+            if attr is None:
+                break
+            num = [char for char in attr if char.isdigit()]
+            integer_attr_repr[attr] = int(''.join(num)) if num else None
+
+        # if every attribute has an integer representation
+        if integer_attr_repr and all(integer_attr_repr.values()):
+            def key(s): return integer_attr_repr[getattr(s, attribute_name)]
+        else:
+            def key(s): return getattr(s, attribute_name)
+
         fmt_streams = sorted(
             self.fmt_streams,
-            key=lambda s: getattr(s, attribute_name),
+            key=key,
         )
         return StreamQuery(fmt_streams)
 
@@ -187,7 +201,7 @@ class StreamQuery:
     def get_by_itag(self, itag):
         """Get the corresponding :class:`Stream <Stream>` for a given itag.
 
-        :param str itag:
+        :param str int itag:
             YouTube format identifier code.
         :rtype: :class:`Stream <Stream>` or None
         :returns:
@@ -196,7 +210,7 @@ class StreamQuery:
 
         """
         try:
-            return self.itag_index[itag]
+            return self.itag_index[int(itag)]
         except KeyError:
             pass
 

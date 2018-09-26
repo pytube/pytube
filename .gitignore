@@ -17,6 +17,9 @@ pkg
 *.egg
 *.egg-info
 
+# Test files
+.pytest_cache/
+
 # Debian Files
 debian/files
 debian/python-beaver*
@@ -36,3 +39,5 @@ _build
 _static
 _templates
 _autosummary
+
+.pytest_cache*

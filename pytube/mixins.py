@@ -2,12 +2,14 @@
 """Applies in-place data mutations."""
 from __future__ import absolute_import
 
+import json
 import logging
 import pprint
 
 from pytube import cipher
 from pytube.compat import parse_qsl
 from pytube.compat import unquote
+from pytube.exceptions import LiveStreamError
 
 
 logger = logging.getLogger(__name__)
@@ -27,8 +29,14 @@ def apply_signature(config_args, fmt, js):
 
     """
     stream_manifest = config_args[fmt]
+    live_stream = json.loads(config_args['player_response']).get(
+        'playabilityStatus', {},
+    ).get('liveStreamability')
     for i, stream in enumerate(stream_manifest):
-        url = stream['url']
+        if 'url' in stream:
+            url = stream['url']
+        elif live_stream:
+            raise LiveStreamError('Video is currently being streamed live')
 
         if 'signature=' in url:
             # For certain videos, YouTube will just provide them pre-signed, in
