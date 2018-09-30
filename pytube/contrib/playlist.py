@@ -15,9 +15,10 @@ class Playlist(object):
     playlist
     """
 
-    def __init__(self, url):
+    def __init__(self, url, suppress_exception=False):
         self.playlist_url = url
         self.video_urls = []
+        self.suppress_exception = suppress_exception
 
     def construct_playlist_url(self):
         """There are two kinds of playlist urls in YouTube. One that
@@ -116,17 +117,25 @@ class Playlist(object):
         prefix_gen = self._path_num_prefix_generator(reverse_numbering)
 
         for link in self.video_urls:
-            yt = YouTube(link)
-            # TODO: this should not be hardcoded to a single user's preference
-            dl_stream = yt.streams.filter(
-                progressive=True, subtype='mp4',
-            ).order_by('resolution').desc().first()
-
-            logger.debug('download path: %s', download_path)
-            if prefix_number:
-                prefix = next(prefix_gen)
-                logger.debug('file prefix is: %s', prefix)
-                dl_stream.download(download_path, filename_prefix=prefix)
+            try:
+                yt = YouTube(link)
+            except Exception as e:
+                logger.debug(e)
+                if not self.suppress_exception:
+                    raise e
+                else:
+                    logger.debug('Exception suppressed')
             else:
-                dl_stream.download(download_path)
-            logger.debug('download complete')
+                # TODO: this should not be hardcoded to a single user's preference
+                dl_stream = yt.streams.filter(
+                    progressive=True, subtype='mp4',
+                ).order_by('resolution').desc().first()
+
+                logger.debug('download path: %s', download_path)
+                if prefix_number:
+                    prefix = next(prefix_gen)
+                    logger.debug('file prefix is: %s', prefix)
+                    dl_stream.download(download_path, filename_prefix=prefix)
+                else:
+                    dl_stream.download(download_path)
+                logger.debug('download complete')
