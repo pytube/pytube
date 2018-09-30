@@ -98,8 +98,10 @@ def test_order_by_descending(cipher_signature):
         .desc()
         .all()
     ]
-    assert mime_types == ['video/webm', 'video/mp4',
-                          'video/mp4', 'video/3gpp', 'video/3gpp']
+    assert mime_types == [
+        'video/webm', 'video/mp4',
+        'video/mp4', 'video/3gpp', 'video/3gpp',
+    ]
 
 
 def test_order_by_ascending(cipher_signature):
@@ -125,8 +127,10 @@ def test_order_by_ascending(cipher_signature):
         .asc()
         .all()
     ]
-    assert mime_types == ['video/3gpp', 'video/3gpp',
-                          'video/mp4', 'video/mp4', 'video/webm']
+    assert mime_types == [
+        'video/3gpp', 'video/3gpp',
+        'video/mp4', 'video/mp4', 'video/webm',
+    ]
 
 
 def test_get_by_itag(cipher_signature):

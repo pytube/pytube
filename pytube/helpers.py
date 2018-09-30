@@ -31,29 +31,55 @@ def regex_search(pattern, string, groups=False, group=None, flags=0):
     :returns:
         Substring pattern matches.
     """
-    regex = re.compile(pattern, flags)
-    results = regex.search(string)
-    if not results:
-        raise RegexMatchError(
-            'regex pattern ({pattern}) had zero matches'
-            .format(pattern=pattern),
-        )
+    if type(pattern) == list:
+        for p in pattern:
+            regex = re.compile(p, flags)
+            results = regex.search(string)
+            if not results:
+                raise RegexMatchError(
+                    'regex pattern ({pattern}) had zero matches'
+                    .format(pattern=p),
+                )
+            else:
+                logger.debug(
+                    'finished regex search: %s',
+                    pprint.pformat(
+                        {
+                            'pattern': p,
+                            'results': results.group(0),
+                        }, indent=2,
+                    ),
+                )
+                if groups:
+                    return results.groups()
+                elif group is not None:
+                    return results.group(group)
+                else:
+                    return results
     else:
-        logger.debug(
-            'finished regex search: %s',
-            pprint.pformat(
-                {
-                    'pattern': pattern,
-                    'results': results.group(0),
-                }, indent=2,
-            ),
-        )
-        if groups:
-            return results.groups()
-        elif group is not None:
-            return results.group(group)
+        regex = re.compile(pattern, flags)
+        results = regex.search(string)
+        if not results:
+            raise RegexMatchError(
+                'regex pattern ({pattern}) had zero matches'
+                .format(pattern=pattern),
+            )
         else:
-            return results
+            logger.debug(
+                'finished regex search: %s',
+                pprint.pformat(
+                    {
+                        'pattern': pattern,
+                        'results': results.group(0),
+                    }, indent=2,
+                ),
+            )
+            if groups:
+                return results.groups()
+            elif group is not None:
+                return results.group(group)
+            else:
+                return results
 
 
 def apply_mixin(dct, key, func, *args, **kwargs):

@@ -6,19 +6,16 @@ python:
   - "2.7"
   - "3.4"
   - "3.5"
+  - "3.5-dev"  # 3.5 development branch
   - "3.6"
-  - "3.6-dev"
+  - "3.6-dev"  # 3.6 development branch
+  - "3.7-dev"  # 3.7 development branch
 install: "make"
 script:
   - make ci
 before_install:
-  - sudo apt-get install -y libpython-dev
-  - sudo apt-get install -y libyaml-dev
-  - sudo apt-get install -y python-dev
-  - sudo apt-get install -y python-pip
-  - sudo apt-get install -y python-software-properties
-  - sudo apt-get install -y software-properties-common
-sudo: required
+  - pip install pipenv flake8 --upgrade
+sudo: false
 after_success:
   coveralls
 notifications:
