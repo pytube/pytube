@@ -2,7 +2,10 @@
 """
 Module to download a complete playlist from a youtube channel
 """
+import json
 import logging
+import re
+from collections import OrderedDict
 
 from pytube import request
 from pytube.__main__ import YouTube
@@ -35,6 +38,20 @@ class Playlist(object):
         # url is already in the desired format, so just return it
         return self.playlist_url
 
+    def _load_more_url(self, req):
+        """Given an html page or a fragment thereof, looks for
+        and returns the "load more" url if found.
+
+        :return: string
+        """
+        try:
+            load_more_url = 'https://www.youtube.com' + re.search(
+                r'data-uix-load-more-href=\"(/browse_ajax\?'
+                'action_continuation=.*?)\"', req).group(1)
+        except AttributeError:
+            load_more_url = ''
+        return load_more_url
+
     def parse_links(self):
         """Parse the video links from the page source, extracts and
         returns the /watch?v= part from video link href
@@ -49,6 +66,20 @@ class Playlist(object):
         # split the page source by line and process each line
         content = [x for x in req.split('\n') if 'pl-video-title-link' in x]
         link_list = [x.split('href="', 1)[1].split('&', 1)[0] for x in content]
+
+        # The above only returns 100 or fewer links
+        # Simulating a browser request for the load more link
+        load_more_url = self._load_more_url(req)
+        while len(load_more_url):   # there is an url found
+            logger.debug('load more url: %s' % load_more_url)
+            req = request.get(load_more_url)
+            load_more = json.loads(req)
+            videos = re.findall(r'href=\"(/watch\?v=[\w-]*)',
+                                load_more['content_html'])
+            # remove duplicates
+            link_list.extend(list(OrderedDict.fromkeys(videos)))
+            load_more_url = self._load_more_url(
+                            load_more['load_more_widget_html'])
 
         return link_list
 
