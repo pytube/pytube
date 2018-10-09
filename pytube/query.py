@@ -130,14 +130,14 @@ class StreamQuery:
         if only_audio:
             filters.append(
                 lambda s: (
-                    s.includes_audio_track and not s.includes_video_track
+                        s.includes_audio_track and not s.includes_video_track
                 ),
             )
 
         if only_video:
             filters.append(
                 lambda s: (
-                    s.includes_video_track and not s.includes_audio_track
+                        s.includes_video_track and not s.includes_audio_track
                 ),
             )
 
@@ -167,14 +167,16 @@ class StreamQuery:
             attr = getattr(stream, attribute_name)
             if attr is None:
                 break
-            num = [char for char in attr if char.isdigit()]
+            num = ''.join(x for x in attr if x.isdigit())
             integer_attr_repr[attr] = int(''.join(num)) if num else None
 
         # if every attribute has an integer representation
         if integer_attr_repr and all(integer_attr_repr.values()):
-            def key(s): return integer_attr_repr[getattr(s, attribute_name)]
+            def key(s):
+                return integer_attr_repr[getattr(s, attribute_name)]
         else:
-            def key(s): return getattr(s, attribute_name)
+            def key(s):
+                return getattr(s, attribute_name)
 
         fmt_streams = sorted(
             self.fmt_streams,

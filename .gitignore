@@ -39,5 +39,7 @@ _build
 _static
 _templates
 _autosummary
-
 .pytest_cache*
+
+#Pycharm stuff
+.idea/*
