@@ -16,6 +16,7 @@ pytest-cov = "*"
 "pathlib2" = "*"
 "scandir" = "*"
 bumpversion = "*"
+coveralls = "*"
 
 [requires]
 python_version = "3.6"
