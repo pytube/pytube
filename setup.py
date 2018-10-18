@@ -1,16 +1,48 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """This module contains setup instructions for pytube."""
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+import codecs
+import os
+import sys
+from shutil import rmtree
 
-with open('README.md') as readme_file:
-    readme = readme_file.read()
+from setuptools import Command
+from setuptools import setup
 
-with open('LICENSE') as readme_file:
-    license = readme_file.read()
+here = os.path.abspath(os.path.dirname(__file__))
+
+with codecs.open(os.path.join(here, 'README.md'), encoding='utf-8') as fh:
+    long_description = '\n' + fh.read()
+
+
+class UploadCommand(Command):
+    """Support setup.py publish."""
+
+    description = 'Build and publish the package.'
+    user_options = []
+
+    @staticmethod
+    def status(s):
+        """Prints things in bold."""
+        print('\033[1m{0}\033[0m'.format(s))
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        try:
+            self.status('Removing previous builds ...')
+            rmtree(os.path.join(here, 'dist'))
+        except Exception:
+            pass
+        self.status('Building Source distribution ...')
+        os.system('{0} setup.py sdist bdist_wheel'.format(sys.executable))
+        self.status('Uploading the package to PyPI via Twine ...')
+        os.system('twine upload dist/*')
+        sys.exit()
 
 setup(
     name='pytube',
@@ -18,8 +50,11 @@ setup(
     author='Nick Ficano',
     author_email='nficano@gmail.com',
     packages=['pytube', 'pytube.contrib'],
+    package_data={
+        '': ['LICENSE'],
+    },    
     url='https://github.com/nficano/pytube',
-    license=license,
+    license='MIT',
     entry_points={
         'console_scripts': [
             'pytube = pytube.cli:main',
@@ -48,6 +83,9 @@ setup(
         'Topic :: Utilities',
     ],
     description=('A pythonic library for downloading YouTube Videos.'),
-    long_description=readme,
+    include_package_data=True,
+    long_description_content_type='text/markdown',
+    long_description=long_description,
     zip_safe=True,
+    cmdclass={'upload': UploadCommand},
 )
