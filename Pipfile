@@ -17,6 +17,7 @@ pytest-cov = "*"
 "scandir" = "*"
 bumpversion = "*"
 coveralls = "*"
+twine = "*"
 
 [requires]
 python_version = "3.6"
