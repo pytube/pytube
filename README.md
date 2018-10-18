@@ -1,7 +1,7 @@
 
 <div align="center">
   <p>
-  <img src="./images/pytube.png" width="350" height="328" alt="pytube logo" />
+  <img src="https://github.com/nficano/pytube/blob/master/images/pytube.png?raw=true" width="350" height="328" alt="pytube logo" />
   </p>
   <p align="center">
 	  <img src="https://img.shields.io/pypi/v/pytube.svg" alt="pypi">
