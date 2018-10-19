@@ -44,6 +44,7 @@ class UploadCommand(Command):
         os.system('twine upload dist/*')
         sys.exit()
 
+
 setup(
     name='pytube',
     version='9.3.4',
@@ -52,7 +53,7 @@ setup(
     packages=['pytube', 'pytube.contrib'],
     package_data={
         '': ['LICENSE'],
-    },    
+    },
     url='https://github.com/nficano/pytube',
     license='MIT',
     entry_points={

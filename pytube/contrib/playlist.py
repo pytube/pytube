@@ -47,7 +47,8 @@ class Playlist(object):
         try:
             load_more_url = 'https://www.youtube.com' + re.search(
                 r'data-uix-load-more-href=\"(/browse_ajax\?'
-                'action_continuation=.*?)\"', req).group(1)
+                'action_continuation=.*?)\"', req,
+            ).group(1)
         except AttributeError:
             load_more_url = ''
         return load_more_url
@@ -74,12 +75,15 @@ class Playlist(object):
             logger.debug('load more url: %s' % load_more_url)
             req = request.get(load_more_url)
             load_more = json.loads(req)
-            videos = re.findall(r'href=\"(/watch\?v=[\w-]*)',
-                                load_more['content_html'])
+            videos = re.findall(
+                r'href=\"(/watch\?v=[\w-]*)',
+                load_more['content_html'],
+            )
             # remove duplicates
             link_list.extend(list(OrderedDict.fromkeys(videos)))
             load_more_url = self._load_more_url(
-                            load_more['load_more_widget_html'])
+                load_more['load_more_widget_html'],
+            )
 
         return link_list
 

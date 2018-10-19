@@ -130,14 +130,14 @@ class StreamQuery:
         if only_audio:
             filters.append(
                 lambda s: (
-                        s.includes_audio_track and not s.includes_video_track
+                    s.includes_audio_track and not s.includes_video_track
                 ),
             )
 
         if only_video:
             filters.append(
                 lambda s: (
-                        s.includes_video_track and not s.includes_audio_track
+                    s.includes_video_track and not s.includes_audio_track
                 ),
             )
 
