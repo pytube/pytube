@@ -24,11 +24,11 @@ class Playlist(object):
         self.suppress_exception = suppress_exception
 
     def construct_playlist_url(self):
-        """There are two kinds of playlist urls in YouTube. One that
-        contains watch?v= in URL, another one contains the "playlist?list="
-        portion. It is preferable to work with the later one.
+        """There are two kinds of playlist urls in YouTube. One that contains
+        watch?v= in URL, another one contains the "playlist?list=" portion. It
+        is preferable to work with the later one.
 
-        :return: playlist url -> string
+        :return: playlist url
         """
 
         if 'watch?v=' in self.playlist_url:
@@ -42,8 +42,6 @@ class Playlist(object):
     def _load_more_url(self, req):
         """Given an html page or a fragment thereof, looks for
         and returns the "load more" url if found.
-
-        :return: string
         """
         try:
             load_more_url = 'https://www.youtube.com' + re.search(
@@ -58,8 +56,6 @@ class Playlist(object):
         """Parse the video links from the page source, extracts and
         returns the /watch?v= part from video link href
         It's an alternative for BeautifulSoup
-
-        :return: list
         """
 
         url = self.construct_playlist_url()
@@ -121,7 +117,9 @@ class Playlist(object):
         return (str(i).zfill(digits) for i in range(start, stop, step))
 
     def download_all(
-        self, download_path=None, prefix_number=True,
+        self,
+        download_path=None,
+        prefix_number=True,
         reverse_numbering=False,
     ):
         """Download all the videos in the the playlist. Initially, download
@@ -161,7 +159,8 @@ class Playlist(object):
                 else:
                     logger.debug('Exception suppressed')
             else:
-                # TODO: this should not be hardcoded to a single user's preference
+                # TODO: this should not be hardcoded to a single user's
+                # preference
                 dl_stream = yt.streams.filter(
                     progressive=True, subtype='mp4',
                 ).order_by('resolution').desc().first()
