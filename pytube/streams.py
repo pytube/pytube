@@ -226,7 +226,7 @@ class Stream(object):
                 bytes_remaining -= len(chunk)
                 # send to the on_progress callback.
                 self.on_progress(chunk, fh, bytes_remaining)
-            self.on_complete(fh)
+        self.on_complete(fh)
         return fp
 
     def stream_to_buffer(self):

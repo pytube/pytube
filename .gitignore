@@ -41,5 +41,7 @@ _templates
 _autosummary
 .pytest_cache*
 
+# IDE Files
+.idea/
 #Pycharm stuff
 .idea/*
