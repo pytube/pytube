@@ -45,7 +45,7 @@ class Caption:
         '00:00:03,890'
         """
         frac, whole = math.modf(d)
-        time_fmt = time.strftime('0%H:0%M:%S,', time.gmtime(whole))
+        time_fmt = time.strftime('%H:%M:%S,', time.gmtime(whole))
         ms = '{:.3f}'.format(frac).replace('0.', '')
         return time_fmt + ms
 
