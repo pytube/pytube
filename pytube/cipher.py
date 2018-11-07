@@ -35,12 +35,7 @@ def get_initial_function_name(js):
 
     """
     # c&&d.set("signature", EE(c));
-    pattern = [
-        r'yt\.akamaized\.net/\)\s*\|\|\s*'
-        r'.*?\s*c\s*&&\s*d\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(',
-        r'\.sig\|\|(?P<sig>[a-zA-Z0-9$]+)\(',
-        r'\bc\s*&&\s*d\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(',
-    ]
+    pattern = r'\bc\s*&&\s*d\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\('
     logger.debug('finding initial function name')
     return regex_search(pattern, js, group=1)
 
