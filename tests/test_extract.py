@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for the :module:`extract <extract>` module."""
 from pytube import extract
-import datetime as dt
+
 
 def test_extract_video_id():
     url = 'https://www.youtube.com/watch?v=9bZkp7q19f0'
@@ -48,7 +48,3 @@ def test_non_age_restricted(cipher_signature):
 def test_get_vid_desc(cipher_signature):
     expected = "PSY - DADDY(feat. CL of 2NE1) M/V @ https://youtu.be/FrG4TEcSuRgPSY - 나팔바지(NAPAL BAJI) M/V @ https://youtu.be/tF27TNC_4pcPSY - 7TH ALBUM '칠집싸이다' on iTunes @ http://smarturl.it/PSY_7THALBUMPSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam#PSY #싸이 #GANGNAMSTYLE #강남스타일More about PSY@http://www.psypark.com/http://www.youtube.com/officialpsyhttp://www.facebook.com/officialpsyhttp://twitter.com/psy_oppahttps://www.instagram.com/42psy42http://iTunes.com/PSYhttp://sptfy.com/PSYhttp://weibo.com/psyoppahttp://twitter.com/ygent_official"  # noqa
     assert extract.get_vid_descr(cipher_signature.watch_html) == expected
-
-def test_get_vid_published_date(cipher_signature):
-    expected = dt.datetime(2012, 7, 15).date()
-    assert extract.get_vid_published_date(cipher_signature.watch_html) == expected
