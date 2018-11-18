@@ -118,6 +118,7 @@ class YouTube(object):
             )['args']
 
         self.vid_descr = extract.get_vid_descr(self.watch_html)
+        self.vid_published_date = extract.get_vid_published_date(self.watch_html)
         # https://github.com/nficano/pytube/issues/165
         stream_maps = ['url_encoded_fmt_stream_map']
         if 'adaptive_fmts' in self.player_config_args:
@@ -261,6 +262,15 @@ class YouTube(object):
 
         """
         return self.vid_descr
+
+    @property
+    def published_date(self):
+        """Get the published date.
+
+        :rtype: :class:`datetime.date`
+
+        """
+        return self.vid_published_date
 
     @property
     def rating(self):

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """This module contains all non-cipher related data extraction logic."""
 import json
+import datetime as dt
 from collections import OrderedDict
 
 from pytube.compat import HTMLParser
@@ -13,12 +14,16 @@ from pytube.helpers import regex_search
 class PytubeHTMLParser(HTMLParser):
     in_vid_descr = False
     vid_descr = ''
+    vid_published_date = None
 
     def handle_starttag(self, tag, attrs):
         if tag == 'p':
             for attr in attrs:
                 if attr[0] == 'id' and attr[1] == 'eow-description':
                     self.in_vid_descr = True
+        if tag == 'meta':
+            if attrs[0] == ('itemprop', 'datePublished'):
+                self.vid_published_date = dt.datetime.strptime(attrs[1][1], '%Y-%m-%d').date()
 
     def handle_endtag(self, tag):
         if tag == 'p' and self.in_vid_descr:
@@ -199,3 +204,8 @@ def get_vid_descr(html):
     html_parser = PytubeHTMLParser()
     html_parser.feed(html)
     return html_parser.vid_descr
+	
+def get_vid_published_date(html):
+    html_parser = PytubeHTMLParser()
+    html_parser.feed(html)
+    return html_parser.vid_published_date
