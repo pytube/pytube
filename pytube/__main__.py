@@ -159,7 +159,7 @@ class YouTube(object):
 
         """
         self.watch_html = request.get(url=self.watch_url)
-        if '<img class="icon meh" src="/yts/img' not in self.watch_html:
+        if '<img class="icon meh" src="/yts/img' not in self.watch_html and '<div class="icon meh"></div>' not in self.watch_html:
             raise VideoUnavailable('This video is unavailable.')
         self.embed_html = request.get(url=self.embed_url)
         self.age_restricted = extract.is_age_restricted(self.watch_html)
