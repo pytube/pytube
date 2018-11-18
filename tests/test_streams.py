@@ -98,8 +98,8 @@ def test_repr_for_video_streams(cipher_signature):
 def test_repr_for_progressive_streams(cipher_signature):
     stream = str(cipher_signature.streams.filter(progressive=True).first())
     expected = (
-        '<Stream: itag="22" mime_type="video/mp4" res="720p" '
-        'fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">'
+        '<Stream: itag="18" mime_type="video/mp4" res="360p" '
+        'fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">'
     )
     assert stream == expected
 
