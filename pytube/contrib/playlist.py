@@ -165,11 +165,14 @@ class Playlist(object):
                     progressive=True, subtype='mp4',
                 ).order_by('resolution').desc().first()
 
-                logger.debug('download path: %s', download_path)
-                if prefix_number:
-                    prefix = next(prefix_gen)
-                    logger.debug('file prefix is: %s', prefix)
-                    dl_stream.download(download_path, filename_prefix=prefix)
+                if dl_stream == None:
+                	break
                 else:
-                    dl_stream.download(download_path)
-                logger.debug('download complete')
+                    logger.debug('download path: %s', download_path)
+                    if prefix_number:
+                        prefix = next(prefix_gen)
+                        logger.debug('file prefix is: %s', prefix)
+                        dl_stream.download(download_path, filename_prefix=prefix)
+                    else:
+                        dl_stream.download(download_path)
+                        logger.debug('download complete')
