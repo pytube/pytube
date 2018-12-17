@@ -35,7 +35,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'pytube'
-copyright = '2017, Nick Ficano'
+copyright = '2018, Nick Ficano'
 author = 'Nick Ficano'
 
 # The version info for the project you're documenting, acts as replacement for

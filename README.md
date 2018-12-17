@@ -1,13 +1,14 @@
 
 <div align="center">
   <p>
-  <img src="./images/pytube.png" width="350" height="328" alt="pytube logo" />
+  <img src="https://github.com/nficano/pytube/blob/master/images/pytube.png?raw=true" width="350" height="328" alt="pytube logo" />
   </p>
   <p align="center">
 	  <img src="https://img.shields.io/pypi/v/pytube.svg" alt="pypi">
 	  <a href="https://travis-ci.org/nficano/pytube"><img src="https://travis-ci.org/nficano/pytube.svg?branch=master" /></a>
 	  <a href="http://python-pytube.readthedocs.io/en/latest/?badge=latest"><img src="https://readthedocs.org/projects/python-pytube/badge/?version=latest" /></a>
 	  <a href="https://coveralls.io/github/nficano/pytube?branch=master"><img src="https://coveralls.io/repos/github/nficano/pytube/badge.svg?branch=master#23e6f7ac56dd3bde" /></a>
+      <a href="https://pypi.org/project/pytube/"><img src="https://img.shields.io/pypi/dm/pytube.svg" alt="pypi"></a>
 	  <a href="https://pypi.python.org/pypi/pytube/"><img src="https://img.shields.io/pypi/pyversions/pytube.svg" /></a>
   </p>
 </div>
