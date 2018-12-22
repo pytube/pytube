@@ -38,7 +38,7 @@ class YouTube(object):
 
         :param str url:
             A valid YouTube watch URL.
-        :param bool defer_init:
+        :param bool defer_prefetch_init:
             Defers executing any network requests.
         :param func on_progress_callback:
             (Optional) User defined callback function for stream download
