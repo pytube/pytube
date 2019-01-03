@@ -8,7 +8,7 @@ __title__ = 'pytube'
 __version__ = '9.3.6'
 __author__ = 'Nick Ficano'
 __license__ = 'MIT License'
-__copyright__ = 'Copyright 2018 Nick Ficano'
+__copyright__ = 'Copyright 2019 Nick Ficano'
 
 from pytube.logging import create_logger
 from pytube.query import CaptionQuery
