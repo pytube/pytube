@@ -150,7 +150,7 @@ class YouTube(object):
     def do_get(self, url, result, index):
         result[index] = request.get(url=url)
 
-    def prefetch(self, multithread = False):
+    def prefetch(self, multithread=False):
         """Eagerly download all necessary data.
 
         Eagerly executes all necessary network requests so all other
@@ -183,14 +183,16 @@ class YouTube(object):
         )
         if multithread:
             threads, results = [None] * 2, [None] * 2
-            threads[0] = Thread(target=self.do_get, args=(self.vid_info_url, results, 0))
+            args = (self.vid_info_url, results, 0)
+            threads[0] = Thread(target=self.do_get, args=args)
             threads[0].start()
         else:
             self.vid_info = request.get(self.vid_info_url)
         if not self.age_restricted:
             self.js_url = extract.js_url(self.watch_html, self.age_restricted)
             if multithread:
-                threads[1] = Thread(target=self.do_get, args=(self.js_url, results, 1))
+                args = (self.js_url, results, 1)
+                threads[1] = Thread(target=self.do_get, args=args)
                 threads[1].start()
                 threads[0].join()
                 threads[1].join()
@@ -200,7 +202,6 @@ class YouTube(object):
             threads[0].join()
         if multithread:
             self.vid_info, self.js = results
-
 
     def initialize_stream_objects(self, fmt):
         """Convert manifest data to instances of :class:`Stream <Stream>`.
