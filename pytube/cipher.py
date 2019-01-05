@@ -28,14 +28,18 @@ logger = logging.getLogger(__name__)
 
 
 def get_initial_function_name(js):
-    """Extract the name of the function responsible for computing the signature.
+    """Extract the name of the function responsible for computing the
+    signature.
 
     :param str js:
         The contents of the base.js asset file.
 
     """
     # c&&d.set("signature", EE(c));
-    pattern = r'\bc\s*&&\s*d\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\('
+    pattern = (
+        r'\bc\s*&&\s*d\.set\([^,]+\s*,'
+        r'\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\('
+    )
     logger.debug('finding initial function name')
     return regex_search(pattern, js, group=1)
 
