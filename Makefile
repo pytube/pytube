@@ -8,7 +8,7 @@ ci:
 	pip install pipenv
 	pipenv install --dev
 	pipenv run flake8
-	pipenv run pytest --cov-report term-missing --cov=pytube
+	pipenv run pytest --cov-report term-missing --cov=pytube --ignore=W605
 
 clean: clean-build clean-pyc
 
