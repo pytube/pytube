@@ -5,7 +5,7 @@
 Pytube: a very serious Python library for downloading YouTube Videos.
 """
 __title__ = 'pytube'
-__version__ = '9.3.6'
+__version__ = '9.4.0'
 __author__ = 'Nick Ficano'
 __license__ = 'MIT License'
 __copyright__ = 'Copyright 2019 Nick Ficano'
