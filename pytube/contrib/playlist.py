@@ -173,3 +173,17 @@ class Playlist(object):
                 else:
                     dl_stream.download(download_path)
                 logger.debug('download complete')
+
+    def title(self):
+        """return playlist title (name)
+        """        
+        try:
+            url = self.construct_playlist_url()
+            req = request.get(url)           
+            open_tag = "<title>"
+            end_tag = "</title>"
+            matchresult = re.compile(open_tag + "(.+?)" + end_tag).search(req).group().replace(open_tag,"").replace(end_tag,"").replace("- YouTube","").strip()
+            return matchresult
+        except Exception as e:
+            logger.debug(e)
+            return None
