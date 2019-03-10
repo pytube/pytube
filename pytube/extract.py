@@ -22,11 +22,11 @@ class PytubeHTMLParser(HTMLParser):
                     self.in_vid_descr = True
 
     def handle_endtag(self, tag):
-        if tag == 'p' and self.in_vid_descr:
+        if self.in_vid_descr and tag == 'p':
             self.in_vid_descr = False
 
     def handle_startendtag(self, tag, attrs):
-        if tag == 'br':
+        if self.in_vid_descr and tag == 'br':
             self.in_br = True
 
     def handle_data(self, data):
