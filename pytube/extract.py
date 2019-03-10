@@ -12,6 +12,7 @@ from pytube.helpers import regex_search
 
 class PytubeHTMLParser(HTMLParser):
     in_vid_descr = False
+    in_br = False
     vid_descr = ''
 
     def handle_starttag(self, tag, attrs):
@@ -24,9 +25,17 @@ class PytubeHTMLParser(HTMLParser):
         if tag == 'p' and self.in_vid_descr:
             self.in_vid_descr = False
 
+    def handle_startendtag(self, tag, attrs):
+        if tag == 'br':
+            self.in_br = True
+
     def handle_data(self, data):
         if self.in_vid_descr:
-            self.vid_descr += data
+            if self.in_br:
+                self.vid_descr += '\n{}'.format(data)
+                self.in_br = False
+            else:
+                self.vid_descr += data
 
 
 def is_age_restricted(watch_html):
