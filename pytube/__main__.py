@@ -21,7 +21,6 @@ from pytube import Stream
 from pytube import StreamQuery
 from pytube.compat import install_proxy
 from pytube.compat import parse_qsl
-from pytube.exceptions import VideoUnavailable
 from pytube.helpers import apply_mixin
 
 logger = logging.getLogger(__name__)
@@ -158,8 +157,6 @@ class YouTube(object):
 
         """
         self.watch_html = request.get(url=self.watch_url)
-        if '<img class="icon meh" src="/yts/img' not in self.watch_html:
-            raise VideoUnavailable('This video is unavailable.')
         self.embed_html = request.get(url=self.embed_url)
         self.age_restricted = extract.is_age_restricted(self.watch_html)
         self.vid_info_url = extract.video_info_url(
