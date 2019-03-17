@@ -47,7 +47,7 @@ def is_age_restricted(watch_html):
         Whether or not the content is age restricted.
     """
     try:
-        regex_search(r'og:restrictions:age', watch_html, group=0)
+        regex_search(r'player-age-gate-content">', watch_html, group=0)
     except RegexMatchError:
         return False
     return True
