@@ -52,7 +52,7 @@ class Playlist(object):
             load_more_url = ''
         return load_more_url
 
-    def parse_links(self):
+    def parse_links(self, amount=0):
         """Parse the video links from the page source, extracts and
         returns the /watch?v= part from video link href
         It's an alternative for BeautifulSoup
@@ -68,7 +68,8 @@ class Playlist(object):
         # The above only returns 100 or fewer links
         # Simulating a browser request for the load more link
         load_more_url = self._load_more_url(req)
-        while len(load_more_url):   # there is an url found
+        # there is an url found and needs more videos
+        while len(load_more_url) and (amount == 0 or len(link_list) < amount):
             logger.debug('load more url: %s' % load_more_url)
             req = request.get(load_more_url)
             load_more = json.loads(req)
@@ -82,7 +83,10 @@ class Playlist(object):
                 load_more['load_more_widget_html'],
             )
 
-        return link_list
+        if amount == 0:
+            return link_list
+        else:
+            return link_list[0:amount]
 
     def populate_video_urls(self):
         """Construct complete links of all the videos in playlist and
