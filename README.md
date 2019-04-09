@@ -225,10 +225,17 @@ Let's start with downloading:
 ```bash
 $ pytube http://youtube.com/watch?v=9bZkp7q19f0 --itag=22
 ```
+Note that you must specify the itag in order to be able to download a Youtube video.
+
 To view available streams:
 
 ```bash
 $ pytube http://youtube.com/watch?v=9bZkp7q19f0 --list
+```
+
+Now to download a full playlist
+```bash
+$ pytube -p http://youtube.com/playlist?list=deadbeefAZE --itag=140
 ```
 
 Finally, if you're filing a bug report, the cli contains a switch called ``--build-playback-report``, which bundles up the state, allowing others to easily replay your issue.

@@ -12,7 +12,7 @@ import os
 import sys
 
 from pytube import __version__
-from pytube import YouTube
+from pytube import YouTube, Playlist
 
 
 logger = logging.getLogger(__name__)
@@ -46,11 +46,20 @@ def main():
             'Save the html and js to disk'
         ),
     )
+    parser.add_argument(
+        '-p', '--playlist', type=str, help='Download a playlist'
+    )
 
     args = parser.parse_args()
     logging.getLogger().setLevel(max(3 - args.verbosity, 0) * 10)
 
-    if not args.url:
+    if not args.url and not args.playlist:
+        parser.print_help()
+        sys.exit(1)
+
+    if not args.itag:
+        sys.stdout.write("ERROR: Please specify an itag\n")
+        sys.stdout.flush()
         parser.print_help()
         sys.exit(1)
 
@@ -60,8 +69,13 @@ def main():
     elif args.build_playback_report:
         build_playback_report(args.url)
 
-    elif args.itag:
-        download(args.url, args.itag)
+    elif args.playlist:
+        download_playlist(args.playlist, args.itag)
+
+    # As we know that the url and the itag exists, this is the default
+    # behaviour
+    download(args.url, args.itag)
+
 
 
 def build_playback_report(url):
@@ -182,6 +196,21 @@ def display_streams(url):
     yt = YouTube(url)
     for stream in yt.streams.all():
         print(stream)
+
+def download_playlist(playlist_url, itag):
+    """Start downloading a YouTube playlist.
+
+    :param str url:
+        A valid YouTube playlist URL.
+    :param str itag:
+        YouTube format identifier code.
+
+    """
+    pl = Playlist(playlist_url)
+    links = pl.parse_links()
+
+    for l in links:
+        download("https://www.youtube.com" + l, itag)
 
 
 if __name__ == '__main__':
