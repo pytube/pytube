@@ -77,7 +77,6 @@ def main():
     download(args.url, args.itag)
 
 
-
 def build_playback_report(url):
     """Serialize the request data to json for offline debugging.
 
@@ -196,6 +195,7 @@ def display_streams(url):
     yt = YouTube(url)
     for stream in yt.streams.all():
         print(stream)
+
 
 def download_playlist(playlist_url, itag):
     """Start downloading a YouTube playlist.
