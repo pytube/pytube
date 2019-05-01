@@ -10,6 +10,10 @@ import json
 import logging
 import os
 import sys
+import subprocess
+
+from platform import system
+from struct import unpack
 
 from pytube import __version__
 from pytube import YouTube
@@ -46,13 +50,35 @@ def main():
             'Save the html and js to disk'
         ),
     )
+    parser.add_argument(
+        '-t', '--target', help=(
+            'The output directory for the downloaded stream. '
+            'Default is current working directory'
+        ),
+    )
+    parser.add_argument(
+        '-n', '--name', help=(
+            'The desired filename for the downloaded stream. '
+            'Name should be the stem only and should NOT include '
+            'a file extension (e.g. "example", NOT "example.mp4"). '
+            'Default is data from YouTube(url).title'
+        ),
+    )
 
     args = parser.parse_args()
     logging.getLogger().setLevel(max(3 - args.verbosity, 0) * 10)
+    target = None
+    name = None
 
     if not args.url:
         parser.print_help()
         sys.exit(1)
+
+    if args.target:
+        target = args.target
+
+    if args.name:
+        name = args.name
 
     if args.list:
         display_streams(args.url)
@@ -61,8 +87,7 @@ def main():
         build_playback_report(args.url)
 
     elif args.itag:
-        download(args.url, args.itag)
-
+        download(args.url, args.itag, target, name)
 
 def build_playback_report(url):
     """Serialize the request data to json for offline debugging.
@@ -95,9 +120,50 @@ def build_playback_report(url):
 
 def get_terminal_size():
     """Return the terminal size in rows and columns."""
-    rows, columns = os.popen('stty size', 'r').read().split()
-    return int(rows), int(columns)
+    default = (80, 24)
+    tuple_rc = None
+    current_os = system()
 
+    def _get_size_windows():
+        """Fetch terminal geometry for Windows systems
+        (because Microsoft wants to be sooo~ special)."""
+        from ctypes import windll, create_string_buffer
+        # adapted from http://code.activestate.com/recipes/440694-determine-size-of-console-window-on-windows/
+        # stdin, stdout, stderr = (-10, -11, -12)
+        try:
+            h = windll.kernel32.GetStdHandle(-12)
+            csbi = create_string_buffer(22)
+            res = windll.kernel32.GetConsoleScreenBufferInfo(h, csbi)
+
+            if res:
+                dataList = unpack("hhhhHhhhhhh", csbi.raw)[5:9]
+                left, top, right, bottom = dataList
+                sizex = right - left + 1
+                sizey = bottom - top + 1
+                return (sizex, sizey)
+        except:
+            return None
+
+    def _get_size():
+        """Fetch terminal geometry for Linux and OSX systems."""
+        try:
+            size = subprocess.check_output('stty size', shell=True)
+            rows, columns = size.split()
+            return (rows, columns)
+        except subprocess.CalledProcessError:
+            return None
+
+    if current_os == "Windows":
+        tuple_rc = _get_size_windows()
+    else:
+        tuple_rc = _get_size()
+
+    if tuple_rc == None:
+        rows, columns = default
+    else:
+        rows, columns = tuple_rc
+
+    return int(rows), int(columns)
 
 def display_progress_bar(bytes_received, filesize, ch='█', scale=0.55):
     """Display a simple, pretty progress bar.
@@ -148,7 +214,7 @@ def on_progress(stream, chunk, file_handle, bytes_remaining):
     display_progress_bar(bytes_received, filesize)
 
 
-def download(url, itag):
+def download(url, itag, target, name):
     """Start downloading a YouTube video.
 
     :param str url:
@@ -157,7 +223,6 @@ def download(url, itag):
         YouTube format identifier code.
 
     """
-    # TODO(nficano): allow download target to be specified
     # TODO(nficano): allow dash itags to be selected
     yt = YouTube(url, on_progress_callback=on_progress)
     stream = yt.streams.get_by_itag(itag)
@@ -166,7 +231,7 @@ def download(url, itag):
         fs=stream.filesize,
     ))
     try:
-        stream.download()
+        stream.download(output_path=target, filename=name)
         sys.stdout.write('\n')
     except KeyboardInterrupt:
         sys.exit()
