@@ -269,7 +269,7 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args['avg_rating']
+        return self.player_config_args['player_response']['videoDetails']['averageRating']
 
     @property
     def length(self):
@@ -287,7 +287,7 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args['view_count']
+        return self.player_config_args['player_response']['videoDetails']['viewCount']
 
     def register_on_progress_callback(self, func):
         """Register a download progress callback function post initialization.

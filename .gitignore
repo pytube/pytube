@@ -45,3 +45,5 @@ _autosummary
 .idea/
 #Pycharm stuff
 .idea/*
+
+.vscode/

@@ -122,19 +122,12 @@ def video_info_url(
             ('sts', sts),
         ])
     else:
-        # I'm not entirely sure what ``t`` represents. Looks to represent a
-        # boolean.
-        t = regex_search(
-            r'\W[\'"]?t[\'"]?: ?[\'"](.+?)[\'"]', watch_html,
-            group=0,
-        )
         params = OrderedDict([
             ('video_id', video_id),
             ('el', '$el'),
             ('ps', 'default'),
             ('eurl', quote(watch_url)),
             ('hl', 'en_US'),
-            ('t', quote(t)),
         ])
     return 'https://youtube.com/get_video_info?' + urlencode(params)
 
