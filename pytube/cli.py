@@ -121,7 +121,6 @@ def build_playback_report(url):
 def get_terminal_size():
     """Return the terminal size in rows and columns."""
     default = (80, 24)
-    tuple_rc = None
     current_os = system()
 
     def _get_size_windows():
@@ -142,7 +141,7 @@ def get_terminal_size():
                 sizey = bottom - top + 1
                 return (sizex, sizey)
         except:
-            return None
+            return default
 
     def _get_size():
         """Fetch terminal geometry for Linux and OSX systems."""
@@ -151,17 +150,12 @@ def get_terminal_size():
             rows, columns = size.split()
             return (rows, columns)
         except subprocess.CalledProcessError:
-            return None
+            return default
 
     if current_os == "Windows":
-        tuple_rc = _get_size_windows()
+        rows, columns = _get_size_windows()
     else:
-        tuple_rc = _get_size()
-
-    if tuple_rc == None:
-        rows, columns = default
-    else:
-        rows, columns = tuple_rc
+        rows, columns = _get_size()
 
     return int(rows), int(columns)
 
