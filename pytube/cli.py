@@ -89,6 +89,7 @@ def main():
     elif args.itag:
         download(args.url, args.itag, target, name)
 
+
 def build_playback_report(url):
     """Serialize the request data to json for offline debugging.
 
@@ -125,9 +126,10 @@ def get_terminal_size():
 
     def _get_size_windows():
         """Fetch terminal geometry for Windows systems
-        (because Microsoft wants to be sooo~ special)."""
+        (because Microsoft wants to be sooo~ special).
+        Adapted from http://code.activestate.com/recipes/
+        440694-determine-size-of-console-window-on-windows/"""
         from ctypes import windll, create_string_buffer
-        # adapted from http://code.activestate.com/recipes/440694-determine-size-of-console-window-on-windows/
         # stdin, stdout, stderr = (-10, -11, -12)
         try:
             h = windll.kernel32.GetStdHandle(-12)
@@ -140,7 +142,7 @@ def get_terminal_size():
                 sizex = right - left + 1
                 sizey = bottom - top + 1
                 return (sizex, sizey)
-        except:
+        except ImportError:
             return default
 
     def _get_size():
@@ -158,6 +160,7 @@ def get_terminal_size():
         rows, columns = _get_size()
 
     return int(rows), int(columns)
+
 
 def display_progress_bar(bytes_received, filesize, ch='█', scale=0.55):
     """Display a simple, pretty progress bar.
