@@ -26,7 +26,7 @@ def test_info_url(cipher_signature):
     expected = (
         'https://youtube.com/get_video_info?video_id=9bZkp7q19f0&el=%24el'
         '&ps=default&eurl=https%253A%2F%2Fyoutube.com%2Fwatch%253Fv%'
-        '253D9bZkp7q19f0&hl=en_US&t=%252C%2522t%2522%253A%25221%2522'
+        '253D9bZkp7q19f0&hl=en_US'
     )
     assert video_info_url == expected
 
