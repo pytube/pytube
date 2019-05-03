@@ -12,6 +12,7 @@ from pytube.helpers import regex_search
 
 class PytubeHTMLParser(HTMLParser):
     in_vid_descr = False
+    in_vid_descr_br = False
     vid_descr = ''
 
     def handle_starttag(self, tag, attrs):
@@ -21,11 +22,18 @@ class PytubeHTMLParser(HTMLParser):
                     self.in_vid_descr = True
 
     def handle_endtag(self, tag):
-        if tag == 'p' and self.in_vid_descr:
+        if self.in_vid_descr and tag == 'p':
             self.in_vid_descr = False
 
+    def handle_startendtag(self, tag, attrs):
+        if self.in_vid_descr and tag == 'br':
+            self.in_vid_descr_br = True
+
     def handle_data(self, data):
-        if self.in_vid_descr:
+        if self.in_vid_descr_br:
+            self.vid_descr += '\n{}'.format(data)
+            self.in_vid_descr_br = False
+        elif self.in_vid_descr:
             self.vid_descr += data
 
 

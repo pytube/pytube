@@ -26,7 +26,7 @@ def test_info_url(cipher_signature):
     expected = (
         'https://youtube.com/get_video_info?video_id=9bZkp7q19f0&el=%24el'
         '&ps=default&eurl=https%253A%2F%2Fyoutube.com%2Fwatch%253Fv%'
-        '253D9bZkp7q19f0&hl=en_US&t=%252C%2522t%2522%253A%25221%2522'
+        '253D9bZkp7q19f0&hl=en_US'
     )
     assert video_info_url == expected
 
@@ -46,5 +46,5 @@ def test_non_age_restricted(cipher_signature):
 
 
 def test_get_vid_desc(cipher_signature):
-    expected = "PSY - DADDY(feat. CL of 2NE1) M/V @ https://youtu.be/FrG4TEcSuRgPSY - 나팔바지(NAPAL BAJI) M/V @ https://youtu.be/tF27TNC_4pcPSY - 7TH ALBUM '칠집싸이다' on iTunes @ http://smarturl.it/PSY_7THALBUMPSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam#PSY #싸이 #GANGNAMSTYLE #강남스타일More about PSY@http://www.psypark.com/http://www.youtube.com/officialpsyhttp://www.facebook.com/officialpsyhttp://twitter.com/psy_oppahttps://www.instagram.com/42psy42http://iTunes.com/PSYhttp://sptfy.com/PSYhttp://weibo.com/psyoppahttp://twitter.com/ygent_official"  # noqa
+    expected = "PSY - DADDY(feat. CL of 2NE1) M/V @ https://youtu.be/FrG4TEcSuRg\nPSY - 나팔바지(NAPAL BAJI) M/V @ https://youtu.be/tF27TNC_4pc\nPSY - 7TH ALBUM '칠집싸이다' on iTunes @ http://smarturl.it/PSY_7THALBUM\nPSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n#PSY #싸이 #GANGNAMSTYLE #강남스타일\nMore about PSY@\nhttp://www.psypark.com/\nhttp://www.youtube.com/officialpsy\nhttp://www.facebook.com/officialpsy\nhttp://twitter.com/psy_oppa\nhttps://www.instagram.com/42psy42\nhttp://iTunes.com/PSY\nhttp://sptfy.com/PSY\nhttp://weibo.com/psyoppa\nhttp://twitter.com/ygent_official"  # noqa
     assert extract.get_vid_descr(cipher_signature.watch_html) == expected
