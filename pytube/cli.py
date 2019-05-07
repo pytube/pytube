@@ -119,19 +119,18 @@ def build_playback_report(url):
         )
 
 
-def get_terminal_size():
+def get_terminal_size(current_os):
     """Return the terminal size in rows and columns."""
     default = (80, 24)
-    current_os = system()
 
     def _get_size_windows():
         """Fetch terminal geometry for Windows systems
         (because Microsoft wants to be sooo~ special).
         Adapted from http://code.activestate.com/recipes/
         440694-determine-size-of-console-window-on-windows/"""
-        from ctypes import windll, create_string_buffer
         # stdin, stdout, stderr = (-10, -11, -12)
         try:
+            from ctypes import windll, create_string_buffer
             h = windll.kernel32.GetStdHandle(-12)
             csbi = create_string_buffer(22)
             res = windll.kernel32.GetConsoleScreenBufferInfo(h, csbi)
@@ -181,7 +180,8 @@ def display_progress_bar(bytes_received, filesize, ch='█', scale=0.55):
         Scale multipler to reduce progress bar size.
 
     """
-    _, columns = get_terminal_size()
+    current_os = system()
+    _, columns = get_terminal_size(current_os)
     max_width = int(columns * scale)
 
     filled = int(round(max_width * bytes_received / float(filesize)))
