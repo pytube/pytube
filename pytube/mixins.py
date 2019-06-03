@@ -38,7 +38,7 @@ def apply_signature(config_args, fmt, js):
         elif live_stream:
             raise LiveStreamError('Video is currently being streamed live')
 
-        if 'signature=' in url:
+        if ('signature=' in url) or ('&sig=' in url) or ('&lsig=' in url):
             # For certain videos, YouTube will just provide them pre-signed, in
             # which case there's no real magic to download them and we can skip
             # the whole signature descrambling entirely.
