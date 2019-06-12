@@ -45,6 +45,13 @@ def apply_signature(config_args, fmt, js):
             logger.debug('signature found, skip decipher')
             continue
 
+        if 'sig=' in url:
+            # For certain videos, YouTube will just provide them pre-signed, in
+            # which case there's no real magic to download them and we can skip
+            # the whole signature descrambling entirely.
+            logger.debug('signature found, skip decipher')
+            continue
+
         if js is not None:
             signature = cipher.get_signature(js, stream['s'])
         else:
