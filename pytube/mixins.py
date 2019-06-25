@@ -46,7 +46,12 @@ def apply_signature(config_args, fmt, js):
             continue
 
         if js is not None:
-            signature = cipher.get_signature(js, stream['s'])
+            if 's' not in stream:
+                logger.error('Ciphered signature not found in stream!')
+                # Can be changed to another exception typem or simply ignored.
+                raise TypeError('Ciphered signature is None')
+            ciphered_signature = stream['s']
+            signature = cipher.get_signature(js, ciphered_signature)
         else:
             # signature not present in url (line 33), need js to descramble
             # TypeError caught in __main__
