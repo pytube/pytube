@@ -74,7 +74,7 @@ def build_playback_report(url):
     ts = int(dt.datetime.utcnow().timestamp())
     fp = os.path.join(
         os.getcwd(),
-        'yt-video-{yt.video_id}-{ts}.json.tar.gz'.format(yt=yt, ts=ts),
+        'yt-video-{yt.video_id}-{ts}.json.gz'.format(yt=yt, ts=ts),
     )
 
     js = yt.js
