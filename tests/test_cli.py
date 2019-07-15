@@ -10,7 +10,7 @@ def test_download(MockYouTube, mock_sys):
     instance = MockYouTube.return_value
     instance.prefetch_init.return_value = None
     instance.streams = mock.Mock()
-    cli.download('asdf', 'asdf', None, None)
+    cli.download('asdf', 'asdf')
 
 
 def test_terminal_geometry():

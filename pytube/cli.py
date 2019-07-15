@@ -50,35 +50,13 @@ def main():
             'Save the html and js to disk'
         ),
     )
-    parser.add_argument(
-        '-t', '--target', help=(
-            'The output directory for the downloaded stream. '
-            'Default is current working directory'
-        ),
-    )
-    parser.add_argument(
-        '-n', '--name', help=(
-            'The desired filename for the downloaded stream. '
-            'Name should be the stem only and should NOT include '
-            'a file extension (e.g. "example", NOT "example.mp4"). '
-            'Default is data from YouTube(url).title'
-        ),
-    )
 
     args = parser.parse_args()
     logging.getLogger().setLevel(max(3 - args.verbosity, 0) * 10)
-    target = None
-    name = None
 
     if not args.url:
         parser.print_help()
         sys.exit(1)
-
-    if args.target:
-        target = args.target
-
-    if args.name:
-        name = args.name
 
     if args.list:
         display_streams(args.url)
@@ -87,7 +65,7 @@ def main():
         build_playback_report(args.url)
 
     elif args.itag:
-        download(args.url, args.itag, target, name)
+        download(args.url, args.itag)
 
 
 def build_playback_report(url):
@@ -211,7 +189,7 @@ def on_progress(stream, chunk, file_handle, bytes_remaining):
     display_progress_bar(bytes_received, filesize)
 
 
-def download(url, itag, target, name):
+def download(url, itag):
     """Start downloading a YouTube video.
 
     :param str url:
@@ -220,6 +198,7 @@ def download(url, itag, target, name):
         YouTube format identifier code.
 
     """
+    # TODO(nficano): allow download target to be specified
     # TODO(nficano): allow dash itags to be selected
     yt = YouTube(url, on_progress_callback=on_progress)
     stream = yt.streams.get_by_itag(itag)
@@ -228,7 +207,7 @@ def download(url, itag, target, name):
         fs=stream.filesize,
     ))
     try:
-        stream.download(output_path=target, filename=name)
+        stream.download()
         sys.stdout.write('\n')
     except KeyboardInterrupt:
         sys.exit()
