@@ -61,7 +61,7 @@ def apply_signature(config_args, fmt, js):
                 }, indent=2,
             ),
         )
-        stream_manifest[i]['url'] = url + '&signature=' + signature
+        stream_manifest[i]['url'] = url + '&sig=' + signature
 
 
 def apply_descrambler(stream_data, key):
