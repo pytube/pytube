@@ -19,7 +19,10 @@ def create_logger(level=logging.ERROR):
     handler.setFormatter(formatter)
 
     # https://github.com/nficano/pytube/issues/163
-    logger = logging.getLogger('pytube')
-    logger.addHandler(handler)
-    logger.setLevel(level)
-    return logger
+    try:
+        logger = logging.getLogger('pytube')
+        logger.addHandler(handler)
+        logger.setLevel(level)
+        return logger
+    except Exception as l:
+        logging.exception('Exception on Handler: {0}'.format(l))
