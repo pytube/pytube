@@ -242,7 +242,14 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args['thumbnail_url']
+        return (
+            self.player_config_args
+            .get('player_response', {})
+            .get('videoDetails', {})
+            .get('thumbnail', {})
+            .get('thumbnails', [])[0]
+            .get('url')
+        )
 
     @property
     def title(self):
@@ -251,7 +258,12 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args['title']
+        return (
+            self.player_config_args
+            .get('player_response', {})
+            .get('videoDetails', {})
+            .get('title')
+        )
 
     @property
     def description(self):
@@ -283,7 +295,12 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args['length_seconds']
+        return (
+            self.player_config_args
+            .get('player_response', {})
+            .get('videoDetails', {})
+            .get('lengthSeconds')
+        )
 
     @property
     def views(self):
