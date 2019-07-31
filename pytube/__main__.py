@@ -251,7 +251,8 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args['player_response']['videoDetails']['title']
+        details = self.player_config_args['player_response']['videoDetails']
+        return details['title']
 
     @property
     def description(self):
