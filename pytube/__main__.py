@@ -251,7 +251,8 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args['player_response']['videoDetails']['title']
+        details = self.player_config_args['player_response']['videoDetails']
+        return details['title']
 
     @property
     def description(self):
@@ -260,7 +261,8 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args['player_response']['videoDetails']['shortDescription']
+        details = self.player_config_args['player_response']['videoDetails']
+        return details['shortDescription']
 
     @property
     def rating(self):
@@ -283,7 +285,8 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args['player_response']['videoDetails']['lengthSeconds']
+        details = self.player_config_args['player_response']['videoDetails']
+        return details['lengthSeconds']
 
     @property
     def views(self):
