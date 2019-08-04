@@ -242,7 +242,18 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args['thumbnail_url']
+        player_response = self.player_config_args.get('player_response', {})
+        thumbnail_details = (
+            player_response
+            .get('videoDetails', {})
+            .get('thumbnail', {})
+            .get('thumbnails')
+        )
+        if thumbnail_details:
+            thumbnail_details = thumbnail_details[-1]  # last item has max size
+            return thumbnail_details['url']
+
+        return f"https://img.youtube.com/vi/{self.video_id}/maxresdefault.jpg"
 
     @property
     def title(self):
