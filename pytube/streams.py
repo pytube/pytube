@@ -279,10 +279,10 @@ class Stream(object):
                 }, indent=2,
             ),
         )
-        on_progress = self._monostate['on_progress']
+        on_progress, args, kwargs = self._monostate['on_progress']
         if on_progress:
             logger.debug('calling on_progress callback %s', on_progress)
-            on_progress(self, chunk, file_handler, bytes_remaining)
+            on_progress(self, chunk, file_handler, bytes_remaining, *args, **kwargs)
 
     def on_complete(self, file_handle):
         """On download complete handler function.
@@ -296,10 +296,10 @@ class Stream(object):
 
         """
         logger.debug('download finished')
-        on_complete = self._monostate['on_complete']
+        on_complete, args, kwargs = self._monostate['on_complete']
         if on_complete:
             logger.debug('calling on_complete callback %s', on_complete)
-            on_complete(self, file_handle)
+            on_complete(self, file_handle, *args, **kwargs)
 
     def __repr__(self):
         """Printable object representation.

@@ -77,8 +77,8 @@ class YouTube(object):
         # (Borg pattern).
         self.stream_monostate = {
             # user defined callback functions.
-            'on_progress': on_progress_callback,
-            'on_complete': on_complete_callback,
+            'on_progress': [on_progress_callback, None, None],
+            'on_complete': [on_complete_callback, None, None],
         }
 
         if proxies:
@@ -299,25 +299,27 @@ class YouTube(object):
             .get('viewCount')
         )
 
-    def register_on_progress_callback(self, func):
+    def register_on_progress_callback(self, func, *args, **kwargs):
         """Register a download progress callback function post initialization.
 
         :param callable func:
             A callback function that takes ``stream``, ``chunk``,
             ``file_handle``, ``bytes_remaining`` as parameters.
+            Additionally, passes user-defined args and kwargs
 
         :rtype: None
 
         """
-        self.stream_monostate['on_progress'] = func
+        self.stream_monostate['on_progress'] = [func, args, kwargs]
 
-    def register_on_complete_callback(self, func):
+    def register_on_complete_callback(self, func, *args, **kwargs):
         """Register a download complete callback function post initialization.
 
         :param callable func:
             A callback function that takes ``stream`` and  ``file_handle``.
+            Additionally, passes user-defined args and kwargs
 
         :rtype: None
 
         """
-        self.stream_monostate['on_complete'] = func
+        self.stream_monostate['on_complete'] = [func, args, kwargs]
