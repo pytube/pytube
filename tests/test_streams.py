@@ -20,7 +20,7 @@ def test_default_filename(cipher_signature):
 
 
 def test_title(cipher_signature):
-    expected = 'PSY - GANGNAM STYLE(강남스타일) MV'
+    expected = 'PSY - GANGNAM STYLE(강남스타일) M/V'
     stream = cipher_signature.streams.first()
     assert stream.title == expected
 
