@@ -26,7 +26,7 @@ def test_title(cipher_signature):
 
     expected = 'PSY - GANGNAM STYLE(강남스타일)'
     stream.player_config_args = {
-        'player_response': {'videoDetails': expected}}
+        'player_response': {'videoDetails': {'title': expected}}}
     assert stream.title == expected
 
     expected = 'Unknown YouTube Video Title'
