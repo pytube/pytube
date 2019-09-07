@@ -176,7 +176,7 @@ class Stream(object):
         player_config_args = self.player_config_args or {}
 
         if 'title' in player_config_args:
-            return player_config_args['player_config_args']
+            return player_config_args['title']
 
         details = self.player_config_args.get(
             'player_response', {}).get('videoDetails', {})
