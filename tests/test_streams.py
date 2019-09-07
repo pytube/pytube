@@ -19,6 +19,12 @@ def test_default_filename(cipher_signature):
     assert stream.default_filename == expected
 
 
+def test_title(cipher_signature):
+    expected = 'PSY - GANGNAM STYLE(강남스타일) MV'
+    stream = cipher_signature.streams.first()
+    assert stream.title == expected
+
+
 def test_download(cipher_signature, mocker):
     mocker.patch.object(request, 'get')
     request.get.side_effect = [
