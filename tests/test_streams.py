@@ -24,6 +24,15 @@ def test_title(cipher_signature):
     stream = cipher_signature.streams.first()
     assert stream.title == expected
 
+    expected = 'PSY - GANGNAM STYLE(강남스타일)'
+    stream.player_config_args = {
+        'player_response': {'videoDetails': expected}}
+    assert stream.title == expected
+
+    expected = 'Unknown YouTube Video Title'
+    stream.player_config_args = {}
+    assert stream.title == expected
+
 
 def test_download(cipher_signature, mocker):
     mocker.patch.object(request, 'get')
