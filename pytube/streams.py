@@ -166,6 +166,27 @@ class Stream(object):
         return self._filesize
 
     @property
+    def title(self):
+        """Get title of video
+
+        :rtype: str
+        :returns:
+            Youtube video title
+        """
+        player_config_args = self.player_config_args or {}
+
+        if 'title' in player_config_args:
+            return player_config_args['title']
+
+        details = self.player_config_args.get(
+            'player_response', {}).get('videoDetails', {})
+
+        if 'title' in details:
+            return details['title']
+
+        return 'Unknown YouTube Video Title'
+
+    @property
     def default_filename(self):
         """Generate filename based on the video title.
 
@@ -173,8 +194,8 @@ class Stream(object):
         :returns:
             An os file system compatible filename.
         """
-        title = self.player_config_args['title']
-        filename = safe_filename(title)
+
+        filename = safe_filename(self.title)
         return '{filename}.{s.subtype}'.format(filename=filename, s=self)
 
     def download(self, output_path=None, filename=None, filename_prefix=None):
