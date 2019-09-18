@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Implements a simple wrapper around urlopen."""
-from pytube.compat import urlopen
+from pytube.compat import urlopen, Request
 
 
 def get(
@@ -18,7 +18,11 @@ def get(
     :param int chunk_size:
         The size in bytes of each chunk.
     """
-    response = urlopen(url)
+
+    req = Request(url)
+    req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36')
+
+    response = urlopen(req)
     if streaming:
         return stream_response(response, chunk_size)
     elif headers:
