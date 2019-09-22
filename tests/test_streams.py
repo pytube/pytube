@@ -34,6 +34,18 @@ def test_title(cipher_signature):
     assert stream.title == expected
 
 
+def test_author(cipher_signature):
+    expected = 'Test author'
+    cipher_signature.player_config_args = {
+        'player_response': {'videoDetails': {'author': expected}}
+    }
+    assert cipher_signature.author == expected
+
+    expected = 'unknown'
+    cipher_signature.player_config_args = {}
+    assert cipher_signature.author == expected
+
+
 def test_download(cipher_signature, mocker):
     mocker.patch.object(request, 'get')
     request.get.side_effect = [

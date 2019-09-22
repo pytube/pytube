@@ -277,6 +277,20 @@ class YouTube(object):
         )
 
     @property
+    def author(self):
+        """Get the video author.
+
+        :rtype: str
+
+        """
+        return (
+            self.player_config_args
+            .get('player_response', {})
+            .get('videoDetails', {})
+            .get('author', 'unknown')
+        )
+
+    @property
     def length(self):
         """Get the video length in seconds.
 
