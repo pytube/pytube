@@ -232,3 +232,11 @@ $ pytube http://youtube.com/watch?v=9bZkp7q19f0 --list
 ```
 
 Finally, if you're filing a bug report, the cli contains a switch called ``--build-playback-report``, which bundles up the state, allowing others to easily replay your issue.
+
+## Notes
+
+If you are having problems downloading on version 9.5.1, please update to 9.5.2:
+
+```bash
+$ pip install pytube --upgrade
+```
