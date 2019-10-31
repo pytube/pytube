@@ -180,13 +180,13 @@ class Playlist(object):
         try:
             url = self.construct_playlist_url()
             req = request.get(url)
-            open_tag = "<title>"
-            end_tag = "</title>"
-            matchresult = re.compile(open_tag + "(.+?)" + end_tag)
+            open_tag = '<title>'
+            end_tag = '</title>'
+            matchresult = re.compile(open_tag + '(.+?)' + end_tag)
             matchresult = matchresult.search(req).group()
-            matchresult = matchresult.replace(open_tag, "")
-            matchresult = matchresult.replace(end_tag, "")
-            matchresult = matchresult.replace("- YouTube", "")
+            matchresult = matchresult.replace(open_tag, '')
+            matchresult = matchresult.replace(end_tag, '')
+            matchresult = matchresult.replace('- YouTube', '')
             matchresult = matchresult.strip()
 
             return matchresult

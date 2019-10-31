@@ -119,17 +119,16 @@ class YouTube(object):
 
             # Fix for KeyError: 'title' issue #434
             if 'title' not in self.player_config_args:
-            	try:
-            		from bs4 import BeautifulSoup
-            		soup = BeautifulSoup(self.watch_html, 'lxml')
-            		title = soup.title.get_text().strip()
-            	except ModuleNotFoundError:
-            		i_start = self.watch_html.lower().index('<title>') + len('<title>')
-            		i_end = self.watch_html.lower().index('</title>')
-            		title = self.watch_html[i_start:i_end].strip()
-            	index = title.lower().rfind(' - youtube')
-            	title = title[:index] if index > 0 else title
-            	self.player_config_args['title'] = title
+                i_start = (
+                    self.watch_html
+                    .lower()
+                    .index('<title>') + len('<title>')
+                )
+                i_end = self.watch_html.lower().index('</title>')
+                title = self.watch_html[i_start:i_end].strip()
+                index = title.lower().rfind(' - youtube')
+                title = title[:index] if index > 0 else title
+                self.player_config_args['title'] = title
 
         self.vid_descr = extract.get_vid_descr(self.watch_html)
         # https://github.com/nficano/pytube/issues/165
