@@ -2,6 +2,8 @@
 """Implements a simple wrapper around urlopen."""
 from pytube.compat import urlopen
 
+#403 forbidden fix
+import urllib.request
 
 def get(
     url=None, headers=False,
@@ -18,7 +20,12 @@ def get(
     :param int chunk_size:
         The size in bytes of each chunk.
     """
-    response = urlopen(url)
+
+    #403 forbidden fix
+    req = urllib.request.Request(url, headers = {"User-Agent": "Mozilla/5.0"})
+    #response = urlopen(url)
+    response = urlopen(req)
+    
     if streaming:
         return stream_response(response, chunk_size)
     elif headers:
