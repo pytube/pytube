@@ -47,7 +47,7 @@ class UploadCommand(Command):
 
 setup(
     name='pytube',
-    version='9.5.2',
+    version='9.5.3',
     author='Nick Ficano',
     author_email='nficano@gmail.com',
     packages=['pytube', 'pytube.contrib'],
