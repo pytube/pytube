@@ -11,6 +11,7 @@ from __future__ import absolute_import
 
 import json
 import logging
+import html
 
 from pytube import Caption
 from pytube import CaptionQuery
@@ -128,7 +129,7 @@ class YouTube(object):
                 title = self.watch_html[i_start:i_end].strip()
                 index = title.lower().rfind(' - youtube')
                 title = title[:index] if index > 0 else title
-                self.player_config_args['title'] = title
+                self.player_config_args['title'] = html.unescape(title)
 
         self.vid_descr = extract.get_vid_descr(self.watch_html)
         # https://github.com/nficano/pytube/issues/165
