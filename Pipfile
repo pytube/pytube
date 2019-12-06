@@ -18,7 +18,7 @@ pytest-cov = "*"
 bumpversion = "*"
 coveralls = "*"
 twine = "*"
-more-itertools = "==5.0.0"
+more-itertools = "==8.0.1"
 
 [requires]
 python_version = "3.6"
