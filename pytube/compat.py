@@ -19,6 +19,7 @@ if PY2:
     from urllib2 import unquote
     from urllib2 import urlopen
     from urlparse import parse_qsl
+    from urlparse import parse_qs
     from HTMLParser import HTMLParser
 
     def install_proxy(proxy_handler):
@@ -44,6 +45,7 @@ if PY2:
 elif PY3:
     from urllib.error import URLError
     from urllib.parse import parse_qsl
+    from urllib.parse import parse_qs
     from urllib.parse import quote
     from urllib.parse import unquote
     from urllib.parse import urlencode
