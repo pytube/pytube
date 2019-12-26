@@ -8,7 +8,7 @@ import pprint
 
 from pytube import cipher
 from pytube.compat import parse_qsl
-From pytube.compat import parse_qs
+from pytube.compat import parse_qs
 from pytube.compat import unquote
 from pytube.exceptions import LiveStreamError
 
