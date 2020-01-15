@@ -10,9 +10,12 @@ here = os.path.abspath(os.path.dirname(__file__))
 with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
     long_description = "\n" + fh.read()
 
+with open(os.path.join(here, "pytube", "version.py")) as fp:
+    exec(fp.read())
+
 setup(
     name="pytube3",
-    version="9.5.5",
+    version=__version__,
     author="Nick Ficano, Harold Martin",
     author_email="nficano@gmail.com, harold.martin@gmail.com",
     packages=["pytube", "pytube.contrib"],
@@ -45,4 +48,5 @@ setup(
     long_description_content_type="text/markdown",
     long_description=long_description,
     zip_safe=True,
+    python_requires='>=3.5',
 )
