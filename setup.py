@@ -54,7 +54,7 @@ setup(
     package_data={
         '': ['LICENSE'],
     },
-    url='https://github.com/hbmartin/pytube',
+    url='https://github.com/hbmartin/pytube3',
     license='MIT',
     entry_points={
         'console_scripts': [
@@ -86,5 +86,4 @@ setup(
     long_description_content_type='text/markdown',
     long_description=long_description,
     zip_safe=True,
-    cmdclass={'upload': UploadCommand},
 )

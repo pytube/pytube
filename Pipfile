@@ -16,7 +16,7 @@ pytest-cov = "*"
 "scandir" = "*"
 bumpversion = "*"
 coveralls = "*"
-more-itertools = "==5.0.0"
+sphinx_rtd_theme = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.5"
