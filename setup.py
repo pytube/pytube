@@ -49,4 +49,13 @@ setup(
     long_description=long_description,
     zip_safe=True,
     python_requires='>=3.5',
+    project_urls={
+        "Bug Reports": "https://github.com/hbmartin/pytube3/issues",
+    },
+    keywords=[
+        "youtube",
+        "download",
+        "video",
+        "stream",
+    ],
 )
