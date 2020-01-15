@@ -5,8 +5,7 @@ import time
 import xml.etree.ElementTree as ElementTree
 
 from pytube import request
-from pytube.compat import unescape
-
+from html import unescape
 
 class Caption:
     """Container for caption tracks."""

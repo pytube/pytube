@@ -6,7 +6,6 @@ import logging
 import pprint
 import re
 
-from pytube.compat import unicode
 from pytube.exceptions import RegexMatchError
 
 
@@ -124,4 +123,4 @@ def safe_filename(s, max_length=255):
     pattern = '|'.join(ntfs_chrs + chrs)
     regex = re.compile(pattern, re.UNICODE)
     filename = regex.sub('', s)
-    return unicode(filename[:max_length].rsplit(' ', 0)[0])
+    return filename[:max_length].rsplit(' ', 0)[0]

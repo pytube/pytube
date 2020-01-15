@@ -7,9 +7,10 @@ import logging
 import pprint
 
 from pytube import cipher
-from pytube.compat import parse_qsl
-from pytube.compat import parse_qs
-from pytube.compat import unquote
+from urllib import request
+from urllib.parse import parse_qsl
+from urllib.parse import parse_qs
+from urllib.parse import unquote
 from pytube.exceptions import LiveStreamError
 
 
@@ -117,3 +118,8 @@ def apply_descrambler(stream_data, key):
         'applying descrambler\n%s',
         pprint.pformat(stream_data[key], indent=2),
     )
+
+def install_proxy(proxy_handler):
+    proxy_support = request.ProxyHandler(proxy_handler)
+    opener = request.build_opener(proxy_support)
+    request.install_opener(opener)

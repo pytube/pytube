@@ -54,7 +54,7 @@ setup(
     package_data={
         '': ['LICENSE'],
     },
-    url='https://github.com/nficano/pytube',
+    url='https://github.com/hbmartin/pytube',
     license='MIT',
     entry_points={
         'console_scripts': [
@@ -71,8 +71,6 @@ setup(
         'Operating System :: Microsoft',
         'Operating System :: POSIX',
         'Operating System :: Unix',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',

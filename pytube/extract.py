@@ -3,9 +3,9 @@
 import json
 from collections import OrderedDict
 
-from pytube.compat import HTMLParser
-from pytube.compat import quote
-from pytube.compat import urlencode
+from html.parser import HTMLParser
+from urllib.parse import quote
+from urllib.parse import urlencode
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search
 
