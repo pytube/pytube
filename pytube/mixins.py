@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Applies in-place data mutations."""
-from __future__ import absolute_import
 
 import json
 import logging

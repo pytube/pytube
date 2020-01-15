@@ -13,7 +13,6 @@ functions" (2) maps them to Python equivalents and (3) taking the ciphered
 signature and decoding it.
 
 """
-from __future__ import absolute_import
 
 import logging
 import pprint

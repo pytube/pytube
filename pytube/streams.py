@@ -7,7 +7,6 @@ combined). This was referred to as ``Video`` in the legacy pytube version, but
 has been renamed to accommodate DASH (which serves the audio and video
 separately).
 """
-from __future__ import absolute_import
 
 import io
 import logging

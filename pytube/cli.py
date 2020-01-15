@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """A simple command line application to download youtube videos."""
-from __future__ import absolute_import
-from __future__ import print_function
 
 import argparse
 import datetime as dt

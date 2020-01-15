@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Various helper functions implemented by pytube."""
-from __future__ import absolute_import
 
 import logging
 import pprint

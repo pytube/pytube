@@ -19,7 +19,7 @@ setup(
     package_data={"": ["LICENSE"],},
     url="https://github.com/hbmartin/pytube3",
     license="MIT",
-    entry_points={"console_scripts": ["pytube = pytube.cli:main",],},
+    entry_points={"console_scripts": ["pytube3 = pytube.cli:main",],},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",

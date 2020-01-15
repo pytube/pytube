@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Reusable dependency injected testing components."""
-from __future__ import unicode_literals
 
 import gzip
 import json
