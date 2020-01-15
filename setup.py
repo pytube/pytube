@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""This module contains setup instructions for pytube."""
+"""This module contains setup instructions for pytube3."""
 import codecs
 import os
 from setuptools import setup
