@@ -37,7 +37,7 @@ class PytubeHTMLParser(HTMLParser):
             self.vid_descr += data
 
 
-def is_age_restricted(watch_html):
+def is_age_restricted(watch_html: str) -> bool:
     """Check if content is age restricted.
 
     :param str watch_html:
@@ -53,7 +53,7 @@ def is_age_restricted(watch_html):
     return True
 
 
-def video_id(url):
+def video_id(url: str) -> str:
     """Extract the ``video_id`` from a YouTube url.
 
     This function supports the following patterns:
@@ -71,7 +71,7 @@ def video_id(url):
     return regex_search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url, group=1)
 
 
-def watch_url(video_id):
+def watch_url(video_id: str) -> str:
     """Construct a sanitized YouTube watch url, given a video id.
 
     :param str video_id:
@@ -83,17 +83,21 @@ def watch_url(video_id):
     return "https://youtube.com/watch?v=" + video_id
 
 
-def embed_url(video_id):
+def embed_url(video_id: str) -> str:
     return "https://www.youtube.com/embed/{}".format(video_id)
 
 
-def eurl(video_id):
+def eurl(video_id: str) -> str:
     return "https://youtube.googleapis.com/v/{}".format(video_id)
 
 
 def video_info_url(
-    video_id, watch_url, watch_html, embed_html, age_restricted,
-):
+    video_id: str,
+    watch_url: str,
+    watch_html: str,
+    embed_html: str,
+    age_restricted: bool,
+) -> str:
     """Construct the video_info url.
 
     :param str video_id:
@@ -102,6 +106,7 @@ def video_info_url(
         A YouTube watch url.
     :param str watch_html:
         The html contents of the watch page.
+        TODO: unused
     :param str embed_html:
         The html contents of the embed page (for age restricted videos).
     :param bool age_restricted:
@@ -131,7 +136,7 @@ def video_info_url(
     return "https://youtube.com/get_video_info?" + urlencode(params)
 
 
-def js_url(html, age_restricted=False):
+def js_url(html: str, age_restricted: bool = False) -> str:
     """Get the base JavaScript url.
 
     Construct the base JavaScript url, which contains the decipher

@@ -98,7 +98,7 @@ LIVE = [91, 92, 93, 94, 95, 96, 132, 151]
 
 
 def get_format_profile(itag):
-    """Get dditional format information for a given itag.
+    """Get additional format information for a given itag.
 
     :param str itag:
         YouTube format identifier code.

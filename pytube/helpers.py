@@ -91,7 +91,7 @@ def apply_mixin(dct, key, func, *args, **kwargs):
     dct[key] = func(dct[key], *args, **kwargs)
 
 
-def safe_filename(s, max_length=255):
+def safe_filename(s: str, max_length: int = 255) -> str:
     """Sanitize a string making it safe to use as a filename.
 
     This function was based off the limitations outlined here:

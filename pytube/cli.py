@@ -66,7 +66,7 @@ def main():
         download(args.url, args.itag)
 
 
-def build_playback_report(url):
+def build_playback_report(url: str):
     """Serialize the request data to json for offline debugging.
 
     :param str url:
@@ -150,7 +150,7 @@ def on_progress(stream, chunk, file_handle, bytes_remaining):
     display_progress_bar(bytes_received, filesize)
 
 
-def download(url, itag):
+def download(url: str, itag: str):
     """Start downloading a YouTube video.
 
     :param str url:
@@ -171,7 +171,7 @@ def download(url, itag):
         sys.exit()
 
 
-def display_streams(url):
+def display_streams(url: str):
     """Probe YouTube video and lists its available formats.
 
     :param str url:

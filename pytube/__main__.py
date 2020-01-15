@@ -32,7 +32,7 @@ class YouTube(object):
 
     def __init__(
         self,
-        url=None,
+        url,
         defer_prefetch_init=False,
         on_progress_callback=None,
         on_complete_callback=None,
@@ -185,7 +185,7 @@ class YouTube(object):
             self.js_url = extract.js_url(self.watch_html, self.age_restricted)
             self.js = request.get(self.js_url)
 
-    def initialize_stream_objects(self, fmt):
+    def initialize_stream_objects(self, fmt: str):
         """Convert manifest data to instances of :class:`Stream <Stream>`.
 
         Take the unscrambled stream data and uses it to initialize

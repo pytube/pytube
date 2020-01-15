@@ -15,7 +15,7 @@ class PytubeError(Exception):
 class ExtractError(PytubeError):
     """Data extraction based exception."""
 
-    def __init__(self, msg, video_id=None):
+    def __init__(self, msg: str, video_id: str = None):
         """Construct an instance of a :class:`ExtractError <ExtractError>`.
 
         :param str msg:

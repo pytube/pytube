@@ -240,7 +240,7 @@ def parse_function(js_func):
     return regex_search(r"\w+\.(\w+)\(\w,(\d+)\)", js_func, groups=True)
 
 
-def get_signature(js, ciphered_signature):
+def get_signature(js: str, ciphered_signature: str) -> str:
     """Decipher the signature.
 
     Taking the ciphered signature, applies the transform functions.

@@ -4,6 +4,7 @@
 import json
 import logging
 import pprint
+from typing import Dict
 
 from pytube import cipher
 from urllib import request
@@ -16,7 +17,7 @@ from pytube.exceptions import LiveStreamError
 logger = logging.getLogger(__name__)
 
 
-def apply_signature(config_args, fmt, js):
+def apply_signature(config_args: Dict, fmt: str, js: str):
     """Apply the decrypted signature to the stream manifest.
 
     :param dict config_args:
@@ -66,14 +67,14 @@ def apply_signature(config_args, fmt, js):
         stream_manifest[i]["url"] = url + "&sig=" + signature
 
 
-def apply_descrambler(stream_data, key):
+def apply_descrambler(stream_data: Dict, key: str):
     """Apply various in-place transforms to YouTube's media stream data.
 
     Creates a ``list`` of dictionaries by string splitting on commas, then
     taking each list item, parsing it as a query string, converting it to a
     ``dict`` and unquoting the value.
 
-    :param dict dct:
+    :param dict stream_data:
         Dictionary containing query string encoded values.
     :param str key:
         Name of the key in dictionary.
