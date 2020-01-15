@@ -1,15 +1,15 @@
 
 <div align="center">
   <p>
-  <img src="https://github.com/nficano/pytube/blob/master/images/pytube.png?raw=true" width="350" height="328" alt="pytube logo" />
+  <img src="https://github.com/hbmartin/pytube3/blob/master/images/pytube.png?raw=true" width="350" height="328" alt="pytube logo" />
   </p>
   <p align="center">
-	  <img src="https://img.shields.io/pypi/v/pytube.svg" alt="pypi">
-	  <a href="https://travis-ci.org/nficano/pytube"><img src="https://travis-ci.org/nficano/pytube.svg?branch=master" /></a>
+	  <img src="https://img.shields.io/pypi/v/pytube3.svg" alt="pypi">
+	  <a href="https://travis-ci.org/hbmartin/pytube3"><img src="https://travis-ci.org/hbmartin/pytube3.svg?branch=master" /></a>
 	  <a href="http://python-pytube.readthedocs.io/en/latest/?badge=latest"><img src="https://readthedocs.org/projects/python-pytube/badge/?version=latest" /></a>
-	  <a href="https://coveralls.io/github/nficano/pytube?branch=master"><img src="https://coveralls.io/repos/github/nficano/pytube/badge.svg?branch=master#23e6f7ac56dd3bde" /></a>
-      <a href="https://pypi.org/project/pytube/"><img src="https://img.shields.io/pypi/dm/pytube.svg" alt="pypi"></a>
-	  <a href="https://pypi.python.org/pypi/pytube/"><img src="https://img.shields.io/pypi/pyversions/pytube.svg" /></a>
+	  <a href="https://coveralls.io/github/hbmartin/pytube3?branch=master"><img src="https://coveralls.io/repos/github/hbmartin/pytube3/badge.svg?branch=master" /></a>
+	  <a href="https://pypi.python.org/pypi/pytube3/"><img src="https://img.shields.io/pypi/pyversions/pytube3.svg" /></a>
+	  <a href="https://github.com/ambv/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a>
   </p>
 </div>
 
@@ -54,8 +54,9 @@ Finally *pytube* also includes a command-line utility, allowing you to quickly d
 Download using pip via pypi.
 
 ```bash
-$ pip install pytube
+$ pip install pytube3 --upgrade
 ```
+Mac/homebrew users may need to use ``pip3``
 
 ## Getting started
 
@@ -232,3 +233,11 @@ $ pytube http://youtube.com/watch?v=9bZkp7q19f0 --list
 ```
 
 Finally, if you're filing a bug report, the cli contains a switch called ``--build-playback-report``, which bundles up the state, allowing others to easily replay your issue.
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+### Code Formatting
+
+This project is linted with [pyflakes](https://github.com/PyCQA/pyflakes) and makes strict use of [Black](https://github.com/ambv/black) for code formatting.
