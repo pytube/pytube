@@ -8,7 +8,6 @@ name = "pypi"
 [dev-packages]
 "flake8" = "*"
 pytest = "*"
-mock = "*"
 pytest-mock = "*"
 pre-commit = "*"
 pytest-cov = "*"
