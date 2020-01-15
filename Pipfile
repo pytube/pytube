@@ -11,13 +11,11 @@ pytest = "*"
 mock = "*"
 pytest-mock = "*"
 pre-commit = "*"
-"enum34" = "*"
 pytest-cov = "*"
 "pathlib2" = "*"
 "scandir" = "*"
 bumpversion = "*"
 coveralls = "*"
-twine = "*"
 more-itertools = "==5.0.0"
 
 [requires]

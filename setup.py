@@ -46,10 +46,10 @@ class UploadCommand(Command):
 
 
 setup(
-    name='pytube',
-    version='9.5.3',
-    author='Nick Ficano',
-    author_email='nficano@gmail.com',
+    name='pytube3',
+    version='9.5.4',
+    author='Nick Ficano, Harold Martin',
+    author_email='nficano@gmail.com, harold.martin@gmail.com',
     packages=['pytube', 'pytube.contrib'],
     package_data={
         '': ['LICENSE'],
