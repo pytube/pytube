@@ -29,3 +29,9 @@ clean-pyc:
 
 install: clean
 	python setup.py install
+
+package:
+	pipenv run python setup.py sdist bdist_wheel
+
+upload:
+	twine upload dist/*
