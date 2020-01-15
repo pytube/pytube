@@ -22,6 +22,7 @@ Finally *pytube* also includes a command-line utility, allowing you to quickly d
 ### Behold, a perfect balance of simplicity versus flexibility:
 
 ```python
+ >>> from pytube import YouTube
  >>> YouTube('https://youtu.be/9bZkp7q19f0').streams.first().download()
  >>> yt = YouTube('http://youtube.com/watch?v=9bZkp7q19f0')
  >>> yt.streams
@@ -218,12 +219,12 @@ pytube also ships with a tiny cli interface for downloading and probing videos.
 Let's start with downloading:
 
 ```bash
-$ pytube http://youtube.com/watch?v=9bZkp7q19f0 --itag=22
+$ pytube3 http://youtube.com/watch?v=9bZkp7q19f0 --itag=22
 ```
 To view available streams:
 
 ```bash
-$ pytube http://youtube.com/watch?v=9bZkp7q19f0 --list
+$ pytube3 http://youtube.com/watch?v=9bZkp7q19f0 --list
 ```
 
 Finally, if you're filing a bug report, the cli contains a switch called ``--build-playback-report``, which bundles up the state, allowing others to easily replay your issue.

@@ -18,6 +18,7 @@ bumpversion = "*"
 coveralls = "*"
 sphinx_rtd_theme = "*"
 mypy = "*"
+black = "==19.10b0"
 
 [requires]
 python_version = "3.5"
