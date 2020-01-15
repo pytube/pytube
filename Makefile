@@ -10,7 +10,7 @@ ci:
 	pipenv run flake8
 	pipenv run black pytube --diff
 	pipenv run mypy pytube
-	pipenv run pytest --cov-report term-missing --cov=pytube --ignore=W605
+	pipenv run pytest --cov-report term-missing --cov=pytube
 
 clean: clean-build clean-pyc
 

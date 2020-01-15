@@ -15,7 +15,7 @@ with open(os.path.join(here, "pytube", "version.py")) as fp:
 
 setup(
     name="pytube3",
-    version=__version__,
+    version=__version__,  # noqa: F821
     author="Nick Ficano, Harold Martin",
     author_email="nficano@gmail.com, harold.martin@gmail.com",
     packages=["pytube", "pytube.contrib"],
@@ -48,14 +48,7 @@ setup(
     long_description_content_type="text/markdown",
     long_description=long_description,
     zip_safe=True,
-    python_requires='>=3.5',
-    project_urls={
-        "Bug Reports": "https://github.com/hbmartin/pytube3/issues",
-    },
-    keywords=[
-        "youtube",
-        "download",
-        "video",
-        "stream",
-    ],
+    python_requires=">=3.5",
+    project_urls={"Bug Reports": "https://github.com/hbmartin/pytube3/issues",},
+    keywords=["youtube", "download", "video", "stream",],
 )
