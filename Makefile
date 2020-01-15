@@ -35,3 +35,9 @@ package: clean-build
 
 upload:
 	twine upload dist/*
+
+tag:
+	git tag "v`pipenv run python pytube/version.py`"
+	git push --tags
+
+release: tag package upload

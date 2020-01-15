@@ -133,3 +133,23 @@ def safe_filename(s, max_length=255):
     regex = re.compile(pattern, re.UNICODE)
     filename = regex.sub("", s)
     return filename[:max_length].rsplit(" ", 0)[0]
+
+
+def create_logger(level=logging.ERROR):
+    """Create a configured instance of logger.
+
+    :param int level:
+        Describe the severity level of the logs to handle.
+    """
+    fmt = "[%(asctime)s] %(levelname)s in %(module)s: %(message)s"
+    date_fmt = "%H:%M:%S"
+    formatter = logging.Formatter(fmt, datefmt=date_fmt)
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+
+    # https://github.com/nficano/pytube/issues/163
+    logger = logging.getLogger("pytube")
+    logger.addHandler(handler)
+    logger.setLevel(level)
+    return logger
