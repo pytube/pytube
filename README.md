@@ -1,8 +1,5 @@
 
 <div align="center">
-  <p>
-  <img src="https://github.com/hbmartin/pytube3/blob/master/images/pytube.png?raw=true" width="350" height="328" alt="pytube logo" />
-  </p>
   <p align="center">
 	  <img src="https://img.shields.io/pypi/v/pytube3.svg" alt="pypi">
 	  <a href="https://travis-ci.org/hbmartin/pytube3"><img src="https://travis-ci.org/hbmartin/pytube3.svg?branch=master" /></a>
@@ -10,6 +7,7 @@
 	  <a href="https://coveralls.io/github/hbmartin/pytube3?branch=master"><img src="https://coveralls.io/repos/github/hbmartin/pytube3/badge.svg?branch=master" /></a>
 	  <a href="https://pypi.python.org/pypi/pytube3/"><img src="https://img.shields.io/pypi/pyversions/pytube3.svg" /></a>
 	  <a href="https://github.com/ambv/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a>
+	  <a href="https://twitter.com/hmartin"><img src="https://img.shields.io/badge/twitter-@hmartin-blue.svg?style=flat" /></a>
   </p>
 </div>
 
@@ -238,6 +236,18 @@ Finally, if you're filing a bug report, the cli contains a switch called ``--bui
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-### Code Formatting
+#### Virtual environment
+
+Virtual environment is setup with [pipenv](https://pipenv-fork.readthedocs.io/en/latest/) and can be automatically activated with [direnv](https://direnv.net/docs/installation.html)
+
+#### Code Formatting
 
 This project is linted with [pyflakes](https://github.com/PyCQA/pyflakes) and makes strict use of [Black](https://github.com/ambv/black) for code formatting.
+
+#### Testing
+
+This project is tested with [pytest](https://docs.pytest.org/en/latest/) and coverage is evaluated with [coveralls](https://coveralls-python.readthedocs.io/en/latest/index.html)
+
+#### Code of Conduct
+
+Treat other people with helpfulness, gratitude, and consideration! See the [Python Community Code of Conduct](https://www.python.org/psf/codeofconduct/).

@@ -30,7 +30,7 @@ clean-pyc:
 install: clean
 	python setup.py install
 
-package:
+package: clean-build
 	pipenv run python setup.py sdist bdist_wheel
 
 upload:
