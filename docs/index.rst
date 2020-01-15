@@ -1,7 +1,4 @@
-.. pytube3 documentation master file, created by
-   sphinx-quickstart on Mon Oct  9 02:11:41 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. pytube3 documentation master file, created by sphinx-quickstart on Mon Oct  9 02:11:41 2017.
 
 pytube3
 ======
@@ -29,6 +26,7 @@ Release v\ |version|. (:ref:`Installation <install>`)
 
 **Behold, a perfect balance of simplicity versus flexibility**::
 
+    >>> from pytube import YouTube
     >>> YouTube('https://youtu.be/9bZkp7q19f0').streams.first().download()
     >>> yt = YouTube('http://youtube.com/watch?v=9bZkp7q19f0')
     >>> yt.streams

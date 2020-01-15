@@ -27,7 +27,7 @@ def load_and_init_from_playback_file(filename):
     yt.watch_html = pb['watch_html']
     yt.js = pb['js']
     yt.vid_info = pb['video_info']
-    yt.init()
+    yt.descramble()
     return yt
 
 

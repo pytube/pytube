@@ -42,7 +42,7 @@ class YouTube(object):
 
         :param str url:
             A valid YouTube watch URL.
-        :param bool defer_init:
+        :param bool defer_prefetch_init:
             Defers executing any network requests.
         :param func on_progress_callback:
             (Optional) User defined callback function for stream download
@@ -89,18 +89,18 @@ class YouTube(object):
             install_proxy(proxies)
 
         if not defer_prefetch_init:
-            self.prefetch_init()
+            self.prefetch_descramble()
 
-    def prefetch_init(self):
+    def prefetch_descramble(self):
         """Download data, descramble it, and build Stream instances.
 
         :rtype: None
 
         """
         self.prefetch()
-        self.init()
+        self.descramble()
 
-    def init(self):
+    def descramble(self):
         """Descramble the stream data and build Stream instances.
 
         The initialization process takes advantage of Python's
