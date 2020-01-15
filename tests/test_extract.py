@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Unit tests for the :module:`extract <extract>` module."""
-import pytest
 from pytube import extract
 
 
@@ -16,7 +15,6 @@ def test_extract_watch_url():
     assert watch_url == 'https://youtube.com/watch?v=9bZkp7q19f0'
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_info_url(cipher_signature):
     video_info_url = extract.video_info_url(
         video_id=cipher_signature.video_id,
@@ -33,7 +31,6 @@ def test_info_url(cipher_signature):
     assert video_info_url == expected
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_js_url(cipher_signature):
     expected = 'https://youtube.com/yts/jsbin/player-vflOdyxa4/en_US/base.js'
     result = extract.js_url(cipher_signature.watch_html)
@@ -44,12 +41,10 @@ def test_age_restricted(age_restricted):
     assert extract.is_age_restricted(age_restricted['watch_html'])
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_non_age_restricted(cipher_signature):
     assert not extract.is_age_restricted(cipher_signature.watch_html)
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_get_vid_desc(cipher_signature):
-    expected = "PSY - DADDY(feat. CL of 2NE1) M/V @ https://youtu.be/FrG4TEcSuRg\nPSY - 나팔바지(NAPAL BAJI) M/V @ https://youtu.be/tF27TNC_4pc\nPSY - 7TH ALBUM '칠집싸이다' on iTunes @ http://smarturl.it/PSY_7THALBUM\nPSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n#PSY #싸이 #GANGNAMSTYLE #강남스타일\nMore about PSY@\nhttp://www.psypark.com/\nhttp://www.youtube.com/officialpsy\nhttp://www.facebook.com/officialpsy\nhttp://twitter.com/psy_oppa\nhttps://www.instagram.com/42psy42\nhttp://iTunes.com/PSY\nhttp://sptfy.com/PSY\nhttp://weibo.com/psyoppa\nhttp://twitter.com/ygent_official"  # noqa
+    expected = "PSY - ‘I LUV IT’ M/V @ https://youtu.be/Xvjnoagk6GU\nPSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\nPSY - 8TH ALBUM '4X2=8' on iTunes @\nhttps://smarturl.it/PSY_8thAlbum\nPSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n#PSY #싸이 #GANGNAMSTYLE #강남스타일\nMore about PSY@\nhttp://www.youtube.com/officialpsy\nhttp://www.facebook.com/officialpsy\nhttp://twitter.com/psy_oppa\nhttps://www.instagram.com/42psy42\nhttp://iTunes.com/PSY\nhttp://sptfy.com/PSY\nhttp://weibo.com/psyoppa"  # noqa
     assert extract.get_vid_descr(cipher_signature.watch_html) == expected

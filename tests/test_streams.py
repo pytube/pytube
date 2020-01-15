@@ -2,27 +2,23 @@
 import random
 
 from unittest import mock
-import pytest
 
 from pytube import request
 from pytube import Stream
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_filesize(cipher_signature, mocker):
     mocker.patch.object(request, 'get')
     request.get.return_value = {'content-length': '6796391'}
     assert cipher_signature.streams.first().filesize == 6796391
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_default_filename(cipher_signature):
     expected = 'PSY - GANGNAM STYLE(강남스타일) MV.mp4'
     stream = cipher_signature.streams.first()
     assert stream.default_filename == expected
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_title(cipher_signature):
     expected = 'PSY - GANGNAM STYLE(강남스타일) M/V'
     stream = cipher_signature.streams.first()
@@ -39,7 +35,6 @@ def test_title(cipher_signature):
     assert stream.title == expected
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_download(cipher_signature, mocker):
     mocker.patch.object(request, 'get')
     request.get.side_effect = [
@@ -52,19 +47,16 @@ def test_download(cipher_signature, mocker):
         stream.download()
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_progressive_streams_return_includes_audio_track(cipher_signature):
     stream = cipher_signature.streams.filter(progressive=True).first()
     assert stream.includes_audio_track
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_progressive_streams_return_includes_video_track(cipher_signature):
     stream = cipher_signature.streams.filter(progressive=True).first()
     assert stream.includes_video_track
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_on_progress_hook(cipher_signature, mocker):
     callback_fn = mock.MagicMock()
     cipher_signature.register_on_progress_callback(callback_fn)
@@ -85,7 +77,6 @@ def test_on_progress_hook(cipher_signature, mocker):
     assert isinstance(stream, Stream)
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_on_complete_hook(cipher_signature, mocker):
     callback_fn = mock.MagicMock()
     cipher_signature.register_on_complete_callback(callback_fn)
@@ -102,7 +93,6 @@ def test_on_complete_hook(cipher_signature, mocker):
     assert callback_fn.called
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_repr_for_audio_streams(cipher_signature):
     stream = str(cipher_signature.streams.filter(only_audio=True).first())
     expected = (
@@ -112,7 +102,6 @@ def test_repr_for_audio_streams(cipher_signature):
     assert stream == expected
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_repr_for_video_streams(cipher_signature):
     stream = str(cipher_signature.streams.filter(only_video=True).first())
     expected = (
@@ -122,17 +111,15 @@ def test_repr_for_video_streams(cipher_signature):
     assert stream == expected
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_repr_for_progressive_streams(cipher_signature):
     stream = str(cipher_signature.streams.filter(progressive=True).first())
     expected = (
-        '<Stream: itag="22" mime_type="video/mp4" res="720p" '
-        'fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">'
+        '<Stream: itag="18" mime_type="video/mp4" res="360p" '
+        'fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">'
     )
     assert stream == expected
 
 
-@pytest.mark.skip(reason="Regex error")
 def test_repr_for_adaptive_streams(cipher_signature):
     stream = str(cipher_signature.streams.filter(adaptive=True).first())
     expected = (

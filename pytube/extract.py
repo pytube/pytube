@@ -142,7 +142,7 @@ def js_url(html: str, age_restricted: bool = False) -> str:
     Construct the base JavaScript url, which contains the decipher
     "transforms".
 
-    :param str watch_html:
+    :param str html:
         The html contents of the watch page.
     :param bool age_restricted:
         Is video age restricted.

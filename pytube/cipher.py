@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This module countains all logic necessary to decipher the signature.
+This module contains all logic necessary to decipher the signature.
 
 YouTube's strategy to restrict downloading videos is to send a ciphered version
 of the signature to the client, along with the decryption algorithm obfuscated
