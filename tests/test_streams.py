@@ -8,41 +8,41 @@ from pytube import Stream
 
 
 def test_filesize(cipher_signature, mocker):
-    mocker.patch.object(request, 'get')
-    request.get.return_value = {'content-length': '6796391'}
+    mocker.patch.object(request, "get")
+    request.get.return_value = {"content-length": "6796391"}
     assert cipher_signature.streams.first().filesize == 6796391
 
 
 def test_default_filename(cipher_signature):
-    expected = 'PSY - GANGNAM STYLE(강남스타일) MV.mp4'
+    expected = "PSY - GANGNAM STYLE(강남스타일) MV.mp4"
     stream = cipher_signature.streams.first()
     assert stream.default_filename == expected
 
 
 def test_title(cipher_signature):
-    expected = 'PSY - GANGNAM STYLE(강남스타일) M/V'
+    expected = "PSY - GANGNAM STYLE(강남스타일) M/V"
     stream = cipher_signature.streams.first()
     assert stream.title == expected
 
-    expected = 'PSY - GANGNAM STYLE(강남스타일)'
+    expected = "PSY - GANGNAM STYLE(강남스타일)"
     stream.player_config_args = {
-        'player_response': {'videoDetails': {'title': expected}},
+        "player_response": {"videoDetails": {"title": expected}},
     }
     assert stream.title == expected
 
-    expected = 'Unknown YouTube Video Title'
+    expected = "Unknown YouTube Video Title"
     stream.player_config_args = {}
     assert stream.title == expected
 
 
 def test_download(cipher_signature, mocker):
-    mocker.patch.object(request, 'get')
+    mocker.patch.object(request, "get")
     request.get.side_effect = [
-        {'content-length': '16384'},
-        {'content-length': '16384'},
+        {"content-length": "16384"},
+        {"content-length": "16384"},
         iter([str(random.getrandbits(8 * 1024))]),
     ]
-    with mock.patch('pytube.streams.open', mock.mock_open(), create=True):
+    with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
         stream = cipher_signature.streams.first()
         stream.download()
 
@@ -61,13 +61,13 @@ def test_on_progress_hook(cipher_signature, mocker):
     callback_fn = mock.MagicMock()
     cipher_signature.register_on_progress_callback(callback_fn)
 
-    mocker.patch.object(request, 'get')
+    mocker.patch.object(request, "get")
     request.get.side_effect = [
-        {'content-length': '16384'},
-        {'content-length': '16384'},
+        {"content-length": "16384"},
+        {"content-length": "16384"},
         iter([str(random.getrandbits(8 * 1024))]),
     ]
-    with mock.patch('pytube.streams.open', mock.mock_open(), create=True):
+    with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
         stream = cipher_signature.streams.first()
         stream.download()
     assert callback_fn.called
@@ -81,13 +81,13 @@ def test_on_complete_hook(cipher_signature, mocker):
     callback_fn = mock.MagicMock()
     cipher_signature.register_on_complete_callback(callback_fn)
 
-    mocker.patch.object(request, 'get')
+    mocker.patch.object(request, "get")
     request.get.side_effect = [
-        {'content-length': '16384'},
-        {'content-length': '16384'},
+        {"content-length": "16384"},
+        {"content-length": "16384"},
         iter([str(random.getrandbits(8 * 1024))]),
     ]
-    with mock.patch('pytube.streams.open', mock.mock_open(), create=True):
+    with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
         stream = cipher_signature.streams.first()
         stream.download()
     assert callback_fn.called
@@ -96,8 +96,7 @@ def test_on_complete_hook(cipher_signature, mocker):
 def test_repr_for_audio_streams(cipher_signature):
     stream = str(cipher_signature.streams.filter(only_audio=True).first())
     expected = (
-        '<Stream: itag="140" mime_type="audio/mp4" abr="128kbps" '
-        'acodec="mp4a.40.2">'
+        '<Stream: itag="140" mime_type="audio/mp4" abr="128kbps" ' 'acodec="mp4a.40.2">'
     )
     assert stream == expected
 

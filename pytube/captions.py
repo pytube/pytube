@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""This module contrains a container for caption tracks."""
+"""This module contains a container for caption tracks."""
 import math
 import time
 import xml.etree.ElementTree as ElementTree
