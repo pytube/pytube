@@ -34,19 +34,19 @@ def load_and_init_from_playback_file(filename):
 @pytest.fixture
 def cipher_signature():
     """Youtube instance initialized with video id 9bZkp7q19f0."""
-    filename = 'yt-video-9bZkp7q19f0-1507588332.json.tar.gz'
+    filename = 'yt-video-9bZkp7q19f0-1507588332.json.gz'
     return load_and_init_from_playback_file(filename)
 
 
 @pytest.fixture
 def presigned_video():
     """Youtube instance initialized with video id QRS8MkLhQmM."""
-    filename = 'yt-video-QRS8MkLhQmM-1507588031.json.tar.gz'
+    filename = 'yt-video-QRS8MkLhQmM-1507588031.json.gz'
     return load_and_init_from_playback_file(filename)
 
 
 @pytest.fixture
 def age_restricted():
     """Youtube instance initialized with video id zRbsm3e2ltw."""
-    filename = 'yt-video-zRbsm3e2ltw-1507777044.json.tar.gz'
+    filename = 'yt-video-zRbsm3e2ltw-1507777044.json.gz'
     return load_playback_file(filename)
