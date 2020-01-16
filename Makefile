@@ -4,13 +4,18 @@ help:
 	@echo "clean-pyc - remove Python file artifacts"
 	@echo "install - install the package to the active Python's site-packages"
 
-ci:
+pipenv:
 	pip install pipenv
 	pipenv install --dev
+
+test:
 	pipenv run flake8
 	pipenv run black pytube --diff
+	pipenv run black tests --diff
 	pipenv run mypy pytube
 	pipenv run pytest --cov-report term-missing --cov=pytube
+
+ci: pipenv test
 
 clean: clean-build clean-pyc
 
@@ -28,6 +33,7 @@ clean-pyc:
 	find . -name '*~' -exec rm -f {} +
 	find . -name '__pycache__' -exec rm -fr {} +
 	find . -name '.pytest_cache' -exec rm -fr {} +
+	find . -name '.mypy_cache' -exec rm -fr {} +
 
 install: clean
 	python setup.py install
@@ -39,7 +45,8 @@ upload:
 	twine upload dist/*
 
 tag:
+	git diff-index --quiet HEAD --  # checks for unstaged/uncomitted files
 	git tag "v`pipenv run python pytube/version.py`"
 	git push --tags
 
-release: tag package upload
+release: clean test tag clean-pyc package upload
