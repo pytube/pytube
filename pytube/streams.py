@@ -336,4 +336,5 @@ class Stream(object):
                 parts.extend(['vcodec="{s.video_codec}"'])
         else:
             parts.extend(['abr="{s.abr}"', 'acodec="{s.audio_codec}"'])
+        parts.extend(['progressive="{s.is_progressive}"', 'type="{s.type}"'])
         return "<Stream: {parts}>".format(parts=" ".join(parts).format(s=self))

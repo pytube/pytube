@@ -177,6 +177,7 @@ class StreamQuery:
             attr = getattr(stream, attribute_name)
             if attr is None:
                 break
+            # TODO: improve this so tests can work
             num = "".join(x for x in attr if x.isdigit())
             integer_attr_repr[attr] = int("".join(num)) if num else None
 

@@ -11,10 +11,10 @@ __copyright__ = "Copyright 2019 Nick Ficano"
 
 from pytube.version import __version__
 from pytube.helpers import create_logger
-from pytube.query import CaptionQuery
-from pytube.query import StreamQuery
 from pytube.streams import Stream
 from pytube.captions import Caption
+from pytube.query import CaptionQuery
+from pytube.query import StreamQuery
 from pytube.contrib.playlist import Playlist
 from pytube.__main__ import YouTube
 

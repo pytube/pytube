@@ -229,7 +229,7 @@ $ pytube3 http://youtube.com/watch?v=9bZkp7q19f0 --list
 
 Finally, if you're filing a bug report, the cli contains a switch called ``--build-playback-report``, which bundles up the state, allowing others to easily replay your issue.
 
-## Contributing
+## Development
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
@@ -239,7 +239,7 @@ Virtual environment is setup with [pipenv](https://pipenv-fork.readthedocs.io/en
 
 #### Code Formatting
 
-This project is linted with [pyflakes](https://github.com/PyCQA/pyflakes), formatted with [Black](https://github.com/ambv/black), and typed with [mypy](https://mypy.readthedocs.io/en/latest/introduction.html)
+This project is linted with [pyflakes](https://github.com/PyCQA/pyflakes), formatted with [black](https://github.com/ambv/black), and typed with [mypy](https://mypy.readthedocs.io/en/latest/introduction.html)
 
 #### Testing
 
@@ -248,3 +248,9 @@ This project is tested with [pytest](https://docs.pytest.org/en/latest/) and cov
 #### Code of Conduct
 
 Treat other people with helpfulness, gratitude, and consideration! See the [Python Community Code of Conduct](https://www.python.org/psf/codeofconduct/).
+
+#### See also
+* [youtube-python](https://github.com/rohitkhatri/youtube-python) - client for the YouTube data API
+* [youtube-dl](https://github.com/ytdl-org/youtube-dl) - command line downloader with sophisticated options
+* [youtube-dl-gui](https://github.com/MrS0m30n3/youtube-dl-gui) - wxPython GUI frontend for youtube-dl
+* [youtube-dl-server](https://github.com/manbearwiz/youtube-dl-server) - web frontend for youtube-dl
