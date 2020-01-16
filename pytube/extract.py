@@ -4,7 +4,7 @@ import json
 from collections import OrderedDict
 
 from html.parser import HTMLParser
-from typing import Any
+from typing import Any, Optional
 from urllib.parse import quote
 from urllib.parse import urlencode
 from pytube.exceptions import RegexMatchError
@@ -95,7 +95,7 @@ def eurl(video_id: str) -> str:
 def video_info_url(
     video_id: str,
     watch_url: str,
-    watch_html: str,
+    watch_html: Optional[str],
     embed_html: str,
     age_restricted: bool,
 ) -> str:

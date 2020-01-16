@@ -229,6 +229,8 @@ Finally, if you're filing a bug report, the cli contains a switch called ``--bui
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
+To run code checking before a PR use ``make test``
+
 #### Virtual environment
 
 Virtual environment is setup with [pipenv](https://pipenv-fork.readthedocs.io/en/latest/) and can be automatically activated with [direnv](https://direnv.net/docs/installation.html)

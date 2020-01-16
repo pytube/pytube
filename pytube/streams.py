@@ -83,7 +83,7 @@ class Stream(object):
         # streams return NoneType for audio/video depending.
         self.video_codec, self.audio_codec = self.parse_codecs()
 
-    def set_attributes_from_dict(self, dct: Dict):
+    def set_attributes_from_dict(self, dct: Dict) -> None:
         """Set class attributes from dictionary items.
 
         :rtype: None
@@ -199,7 +199,12 @@ class Stream(object):
         filename = safe_filename(self.title)
         return "{filename}.{s.subtype}".format(filename=filename, s=self)
 
-    def download(self, output_path=None, filename=None, filename_prefix=None):
+    def download(
+        self,
+        output_path: Optional[str] = None,
+        filename: Optional[str] = None,
+        filename_prefix: Optional[str] = None,
+    ) -> str:
         """Write the media stream to disk.
 
         :param output_path:
@@ -248,7 +253,7 @@ class Stream(object):
         self.on_complete(fh)
         return fp
 
-    def stream_to_buffer(self):
+    def stream_to_buffer(self) -> io.BytesIO:
         """Write the media stream to buffer
 
         :rtype: io.BytesIO buffer

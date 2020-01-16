@@ -2,6 +2,7 @@
 import math
 import time
 import xml.etree.ElementTree as ElementTree
+from typing import Dict
 
 from pytube import request
 from html import unescape
@@ -10,7 +11,7 @@ from html import unescape
 class Caption:
     """Container for caption tracks."""
 
-    def __init__(self, caption_track):
+    def __init__(self, caption_track: Dict):
         """Construct a :class:`Caption <Caption>`.
 
         :param dict caption_track:
@@ -33,7 +34,7 @@ class Caption:
         """
         return self.xml_caption_to_srt(self.xml_captions)
 
-    def float_to_srt_time_format(self, d):
+    def float_to_srt_time_format(self, d: float) -> str:
         """Convert decimal durations into proper srt format.
 
         :rtype: str

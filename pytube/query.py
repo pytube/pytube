@@ -206,7 +206,7 @@ class StreamQuery:
                 sorted(has_attribute, key=lambda s: getattr(s, attribute_name))
             )
 
-    def desc(self):
+    def desc(self) -> "StreamQuery":
         """Sort streams in descending order.
 
         :rtype: :class:`StreamQuery <StreamQuery>`
@@ -214,7 +214,7 @@ class StreamQuery:
         """
         return StreamQuery(self.fmt_streams[::-1])
 
-    def asc(self):
+    def asc(self) -> "StreamQuery":
         """Sort streams in ascending order.
 
         :rtype: :class:`StreamQuery <StreamQuery>`
@@ -222,7 +222,7 @@ class StreamQuery:
         """
         return self
 
-    def get_by_itag(self, itag):
+    def get_by_itag(self, itag) -> Optional[Stream]:
         """Get the corresponding :class:`Stream <Stream>` for a given itag.
 
         :param int itag:
@@ -233,12 +233,9 @@ class StreamQuery:
             not found.
 
         """
-        try:
-            return self.itag_index[int(itag)]
-        except KeyError:
-            pass
+        return self.itag_index.get(int(itag))
 
-    def first(self):
+    def first(self) -> Optional[Stream]:
         """Get the first :class:`Stream <Stream>` in the results.
 
         :rtype: :class:`Stream <Stream>` or None
@@ -250,7 +247,7 @@ class StreamQuery:
         try:
             return self.fmt_streams[0]
         except IndexError:
-            pass
+            return None
 
     def last(self):
         """Get the last :class:`Stream <Stream>` in the results.

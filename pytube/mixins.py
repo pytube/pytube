@@ -17,7 +17,7 @@ from pytube.exceptions import LiveStreamError
 logger = logging.getLogger(__name__)
 
 
-def apply_signature(config_args: Dict, fmt: str, js: str):
+def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
     """Apply the decrypted signature to the stream manifest.
 
     :param dict config_args:
@@ -67,7 +67,7 @@ def apply_signature(config_args: Dict, fmt: str, js: str):
         stream_manifest[i]["url"] = url + "&sig=" + signature
 
 
-def apply_descrambler(stream_data: Dict, key: str):
+def apply_descrambler(stream_data: Dict, key: str) -> None:
     """Apply various in-place transforms to YouTube's media stream data.
 
     Creates a ``list`` of dictionaries by string splitting on commas, then

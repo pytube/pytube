@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import sys
+from typing import Tuple
 
 from pytube import __version__
 from pytube import YouTube
@@ -66,7 +67,7 @@ def main():
         download(args.url, args.itag)
 
 
-def build_playback_report(url: str):
+def build_playback_report(url: str) -> None:
     """Serialize the request data to json for offline debugging.
 
     :param str url:
@@ -95,13 +96,15 @@ def build_playback_report(url: str):
         )
 
 
-def get_terminal_size():
+def get_terminal_size() -> Tuple[int, int]:
     """Return the terminal size in rows and columns."""
     rows, columns = os.popen("stty size", "r").read().split()
     return int(rows), int(columns)
 
 
-def display_progress_bar(bytes_received, filesize, ch="█", scale=0.55):
+def display_progress_bar(
+    bytes_received: int, filesize: int, ch: str = "█", scale: float = 0.55
+) -> None:
     """Display a simple, pretty progress bar.
 
     Example:
@@ -150,7 +153,7 @@ def on_progress(stream, chunk, file_handle, bytes_remaining):
     display_progress_bar(bytes_received, filesize)
 
 
-def download(url: str, itag: str):
+def download(url: str, itag: str) -> None:
     """Start downloading a YouTube video.
 
     :param str url:
@@ -162,7 +165,10 @@ def download(url: str, itag: str):
     # TODO(nficano): allow download target to be specified
     # TODO(nficano): allow dash itags to be selected
     yt = YouTube(url, on_progress_callback=on_progress)
-    stream = yt.streams.get_by_itag(itag)
+    stream = yt.streams.get_by_itag(int(itag))
+    if stream is None:
+        print("Could not find a stream with itag: " + itag)
+        sys.exit()
     print("\n{fn} | {fs} bytes".format(fn=stream.default_filename, fs=stream.filesize,))
     try:
         stream.download()
@@ -171,7 +177,7 @@ def download(url: str, itag: str):
         sys.exit()
 
 
-def display_streams(url: str):
+def display_streams(url: str) -> None:
     """Probe YouTube video and lists its available formats.
 
     :param str url:

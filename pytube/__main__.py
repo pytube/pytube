@@ -91,7 +91,7 @@ class YouTube(object):
         if not defer_prefetch_init:
             self.prefetch_descramble()
 
-    def prefetch_descramble(self):
+    def prefetch_descramble(self) -> None:
         """Download data, descramble it, and build Stream instances.
 
         :rtype: None
@@ -100,7 +100,7 @@ class YouTube(object):
         self.prefetch()
         self.descramble()
 
-    def descramble(self):
+    def descramble(self) -> None:
         """Descramble the stream data and build Stream instances.
 
         The initialization process takes advantage of Python's
@@ -158,7 +158,7 @@ class YouTube(object):
         self.initialize_caption_objects()
         logger.info("init finished successfully")
 
-    def prefetch(self):
+    def prefetch(self) -> None:
         """Eagerly download all necessary data.
 
         Eagerly executes all necessary network requests so all other
@@ -185,7 +185,7 @@ class YouTube(object):
             self.js_url = extract.js_url(self.watch_html, self.age_restricted)
             self.js = request.get(self.js_url)
 
-    def initialize_stream_objects(self, fmt: str):
+    def initialize_stream_objects(self, fmt: str) -> None:
         """Convert manifest data to instances of :class:`Stream <Stream>`.
 
         Take the unscrambled stream data and uses it to initialize
@@ -208,7 +208,7 @@ class YouTube(object):
             )
             self.fmt_streams.append(video)
 
-    def initialize_caption_objects(self):
+    def initialize_caption_objects(self) -> None:
         """Populate instances of :class:`Caption <Caption>`.
 
         Take the unscrambled player response data, and use it to initialize
@@ -230,7 +230,7 @@ class YouTube(object):
             self.caption_tracks.append(Caption(caption_track))
 
     @property
-    def captions(self):
+    def captions(self) -> CaptionQuery:
         """Interface to query caption tracks.
 
         :rtype: :class:`CaptionQuery <CaptionQuery>`.
@@ -238,7 +238,7 @@ class YouTube(object):
         return CaptionQuery([c for c in self.caption_tracks])
 
     @property
-    def streams(self):
+    def streams(self) -> StreamQuery:
         """Interface to query both adaptive (DASH) and progressive streams.
 
         :rtype: :class:`StreamQuery <StreamQuery>`.
@@ -246,7 +246,7 @@ class YouTube(object):
         return StreamQuery([s for s in self.fmt_streams])
 
     @property
-    def thumbnail_url(self):
+    def thumbnail_url(self) -> str:
         """Get the thumbnail url image.
 
         :rtype: str
@@ -255,7 +255,7 @@ class YouTube(object):
         return self.player_config_args["thumbnail_url"]
 
     @property
-    def title(self):
+    def title(self) -> str:
         """Get the video title.
 
         :rtype: str
@@ -264,7 +264,7 @@ class YouTube(object):
         return self.player_config_args["title"]
 
     @property
-    def description(self):
+    def description(self) -> str:
         """Get the video description.
 
         :rtype: str
