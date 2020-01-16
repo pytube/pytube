@@ -2,7 +2,7 @@
 <div align="center">
   <p align="center">
 	  <img src="https://img.shields.io/pypi/v/pytube3.svg" alt="pypi">
-	  <a href="https://travis-ci.org/hbmartin/pytube3"><img src="https://travis-ci.org/hbmartin/pytube3.svg?branch=master" /></a>
+	  <a href="https://travis-ci.com/hbmartin/pytube3/"><img src="https://travis-ci.org/hbmartin/pytube3.svg?branch=master" /></a>
 	  <a href='https://pytube3.readthedocs.io/en/latest/?badge=latest'><img src='https://readthedocs.org/projects/pytube3/badge/?version=latest' alt='Documentation Status' /></a>
 	  <a href="https://coveralls.io/github/hbmartin/pytube3?branch=master"><img src="https://coveralls.io/repos/github/hbmartin/pytube3/badge.svg?branch=master" /></a>
 	  <a href="https://pypi.python.org/pypi/pytube3/"><img src="https://img.shields.io/pypi/pyversions/pytube3.svg" /></a>
@@ -239,11 +239,11 @@ Virtual environment is setup with [pipenv](https://pipenv-fork.readthedocs.io/en
 
 #### Code Formatting
 
-This project is linted with [pyflakes](https://github.com/PyCQA/pyflakes) and makes strict use of [Black](https://github.com/ambv/black) for code formatting.
+This project is linted with [pyflakes](https://github.com/PyCQA/pyflakes), formatted with [Black](https://github.com/ambv/black), and typed with [mypy](https://mypy.readthedocs.io/en/latest/introduction.html)
 
 #### Testing
 
-This project is tested with [pytest](https://docs.pytest.org/en/latest/) and coverage is evaluated with [coveralls](https://coveralls-python.readthedocs.io/en/latest/index.html)
+This project is tested with [pytest](https://docs.pytest.org/en/latest/) and coverage is evaluated with [coveralls](https://coveralls-python.readthedocs.io/en/latest/index.html).
 
 #### Code of Conduct
 

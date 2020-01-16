@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """This module provides a query interface for media streams and captions."""
+from typing import List, Optional
+
+from pytube import Stream, Caption
 
 
 class StreamQuery:
@@ -210,7 +213,7 @@ class StreamQuery:
     def get_by_itag(self, itag):
         """Get the corresponding :class:`Stream <Stream>` for a given itag.
 
-        :param str int itag:
+        :param int itag:
             YouTube format identifier code.
         :rtype: :class:`Stream <Stream>` or None
         :returns:
@@ -251,7 +254,7 @@ class StreamQuery:
         except IndexError:
             pass
 
-    def count(self):
+    def count(self) -> int:
         """Get the count the query would return.
 
         :rtype: int
@@ -259,7 +262,7 @@ class StreamQuery:
         """
         return len(self.fmt_streams)
 
-    def all(self):
+    def all(self) -> List[Stream]:
         """Get all the results represented by this query as a list.
 
         :rtype: list
@@ -271,7 +274,7 @@ class StreamQuery:
 class CaptionQuery:
     """Interface for querying the available captions."""
 
-    def __init__(self, captions):
+    def __init__(self, captions: List[Caption]):
         """Construct a :class:`Caption <Caption>`.
 
         param list captions:
@@ -281,7 +284,7 @@ class CaptionQuery:
         self.captions = captions
         self.lang_code_index = {c.code: c for c in captions}
 
-    def get_by_language_code(self, lang_code):
+    def get_by_language_code(self, lang_code: str) -> Optional[Caption]:
         """Get the :class:`Caption <Caption>` for a given ``lang_code``.
 
         :param str lang_code:
@@ -293,7 +296,7 @@ class CaptionQuery:
         """
         return self.lang_code_index.get(lang_code)
 
-    def all(self):
+    def all(self) -> List[Caption]:
         """Get all the results represented by this query as a list.
 
         :rtype: list

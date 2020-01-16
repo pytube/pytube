@@ -12,6 +12,7 @@ import io
 import logging
 import os
 import pprint
+from typing import Dict, Tuple, Optional
 
 from pytube import extract
 from pytube import request
@@ -25,7 +26,7 @@ logger = logging.getLogger(__name__)
 class Stream(object):
     """Container for stream manifest data."""
 
-    def __init__(self, stream, player_config_args, monostate):
+    def __init__(self, stream: Dict, player_config_args: Dict, monostate: Dict):
         """Construct a :class:`Stream <Stream>`.
 
         :param dict stream:
@@ -47,7 +48,7 @@ class Stream(object):
         self.res = None  # resolution (e.g.: 480p, 720p, 1080p)
         self.url = None  # signed download url
 
-        self._filesize = None  # filesize in bytes
+        self._filesize: Optional[int] = None  # filesize in bytes
         self.mime_type = None  # content identifier (e.g.: video/mp4)
         self.type = None  # the part of the mime before the slash
         self.subtype = None  # the part of the mime after the slash
@@ -82,7 +83,7 @@ class Stream(object):
         # streams return NoneType for audio/video depending.
         self.video_codec, self.audio_codec = self.parse_codecs()
 
-    def set_attributes_from_dict(self, dct):
+    def set_attributes_from_dict(self, dct: Dict):
         """Set class attributes from dictionary items.
 
         :rtype: None
@@ -91,17 +92,17 @@ class Stream(object):
             setattr(self, key, val)
 
     @property
-    def is_adaptive(self):
+    def is_adaptive(self) -> bool:
         """Whether the stream is DASH.
 
         :rtype: bool
         """
         # if codecs has two elements (e.g.: ['vp8', 'vorbis']): 2 % 2 = 0
         # if codecs has one element (e.g.: ['vp8']) 1 % 2 = 1
-        return len(self.codecs) % 2
+        return bool(len(self.codecs) % 2)
 
     @property
-    def is_progressive(self):
+    def is_progressive(self) -> bool:
         """Whether the stream is progressive.
 
         :rtype: bool
@@ -109,7 +110,7 @@ class Stream(object):
         return not self.is_adaptive
 
     @property
-    def includes_audio_track(self):
+    def includes_audio_track(self) -> bool:
         """Whether the stream only contains audio.
 
         :rtype: bool
@@ -119,7 +120,7 @@ class Stream(object):
         return self.type == "audio"
 
     @property
-    def includes_video_track(self):
+    def includes_video_track(self) -> bool:
         """Whether the stream only contains video.
 
         :rtype: bool
@@ -128,7 +129,7 @@ class Stream(object):
             return True
         return self.type == "video"
 
-    def parse_codecs(self):
+    def parse_codecs(self) -> Tuple:
         """Get the video/audio codecs from list of codecs.
 
         Parse a variable length sized list of codecs and returns a
@@ -152,7 +153,7 @@ class Stream(object):
         return video, audio
 
     @property
-    def filesize(self):
+    def filesize(self) -> int:
         """File size of the media stream in bytes.
 
         :rtype: int
@@ -165,7 +166,7 @@ class Stream(object):
         return self._filesize
 
     @property
-    def title(self):
+    def title(self) -> str:
         """Get title of video
 
         :rtype: str
@@ -187,7 +188,7 @@ class Stream(object):
         return "Unknown YouTube Video Title"
 
     @property
-    def default_filename(self):
+    def default_filename(self) -> str:
         """Generate filename based on the video title.
 
         :rtype: str
@@ -316,7 +317,7 @@ class Stream(object):
             logger.debug("calling on_complete callback %s", on_complete)
             on_complete(self, file_handle)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Printable object representation.
 
         :rtype: str
@@ -335,5 +336,4 @@ class Stream(object):
                 parts.extend(['vcodec="{s.video_codec}"'])
         else:
             parts.extend(['abr="{s.abr}"', 'acodec="{s.audio_codec}"'])
-        parts = " ".join(parts).format(s=self)
-        return "<Stream: {parts}>".format(parts=parts)
+        return "<Stream: {parts}>".format(parts=" ".join(parts).format(s=self))

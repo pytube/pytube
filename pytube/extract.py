@@ -4,6 +4,7 @@ import json
 from collections import OrderedDict
 
 from html.parser import HTMLParser
+from typing import Any
 from urllib.parse import quote
 from urllib.parse import urlencode
 from pytube.exceptions import RegexMatchError
@@ -177,14 +178,14 @@ def mime_type_codec(mime_type_codec):
     return mime_type, [c.strip() for c in codecs.split(",")]
 
 
-def get_ytplayer_config(html, age_restricted=False):
+def get_ytplayer_config(html: str, age_restricted: bool = False) -> Any:
     """Get the YouTube player configuration data from the watch html.
 
     Extract the ``ytplayer_config``, which is json data embedded within the
     watch html and serves as the primary source of obtaining the stream
     manifest data.
 
-    :param str watch_html:
+    :param str html:
         The html contents of the watch page.
     :param bool age_restricted:
         Is video age restricted.
@@ -200,7 +201,7 @@ def get_ytplayer_config(html, age_restricted=False):
     return json.loads(yt_player_config)
 
 
-def get_vid_descr(html):
+def get_vid_descr(html: str) -> str:
     html_parser = PytubeHTMLParser()
     html_parser.feed(html)
     return html_parser.vid_descr
