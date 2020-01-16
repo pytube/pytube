@@ -167,7 +167,7 @@ class StreamQuery:
         return StreamQuery(fmt_streams)
 
     def order_by(self, attribute_name: str) -> "StreamQuery":
-        """Apply a sort order to a resultset. Implicitly Filters out stream the do not have the attribute.
+        """Apply a sort order to a resultset. Filters out stream the do not have the attribute.
 
         :param str attribute_name:
             The name of the attribute to sort by.
@@ -195,10 +195,10 @@ class StreamQuery:
 
         # lookup integer values if we have them
         if integer_attr_repr is not None:
-            return StreamQuery(  # mypy: ignore
+            return StreamQuery(
                 sorted(
                     has_attribute,
-                    key=lambda s: integer_attr_repr[getattr(s, attribute_name)],  # type: ignore
+                    key=lambda s: integer_attr_repr[getattr(s, attribute_name)],  # type: ignore  # noqa: E501
                 )
             )
         else:

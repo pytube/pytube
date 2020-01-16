@@ -12,7 +12,7 @@ import io
 import logging
 import os
 import pprint
-from typing import Dict, Tuple, Optional
+from typing import Dict, Tuple, Optional, List
 
 from pytube import extract
 from pytube import request
@@ -42,18 +42,21 @@ class Stream(object):
         # (Borg pattern).
         self._monostate = monostate
 
+        self.url = stream["url"]  # signed download url
+        self.itag = int(stream["itag"])  # stream format id (youtube nomenclature)
+        self.type = stream[
+            "type"
+        ]  # the part of the mime before the slash, overwritten later
+
         self.abr = None  # average bitrate (audio streams only)
         self.fps = None  # frames per second (video streams only)
-        self.itag = None  # stream format id (youtube nomenclature)
         self.res = None  # resolution (e.g.: 480p, 720p, 1080p)
-        self.url = None  # signed download url
 
         self._filesize: Optional[int] = None  # filesize in bytes
         self.mime_type = None  # content identifier (e.g.: video/mp4)
-        self.type = None  # the part of the mime before the slash
         self.subtype = None  # the part of the mime after the slash
 
-        self.codecs = []  # audio/video encoders (e.g.: vp8, mp4a)
+        self.codecs: List[str] = []  # audio/video encoders (e.g.: vp8, mp4a)
         self.audio_codec = None  # audio codec of the stream (e.g.: vorbis)
         self.video_codec = None  # video codec of the stream (e.g.: vp8)
 
@@ -63,7 +66,7 @@ class Stream(object):
 
         # Additional information about the stream format, such as resolution,
         # frame rate, and whether the stream is live (HLS) or 3D.
-        self.fmt_profile = get_format_profile(self.itag)
+        self.fmt_profile: Dict = get_format_profile(self.itag)
 
         # Same as above, except for the format profile attributes.
         self.set_attributes_from_dict(self.fmt_profile)

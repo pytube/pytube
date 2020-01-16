@@ -252,7 +252,17 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args["thumbnail_url"]
+        player_response = self.player_config_args.get("player_response", {})
+        thumbnail_details = (
+            player_response.get("videoDetails", {})
+            .get("thumbnail", {})
+            .get("thumbnails")
+        )
+        if thumbnail_details:
+            thumbnail_details = thumbnail_details[-1]  # last item has max size
+            return thumbnail_details["url"]
+
+        return "https://img.youtube.com/vi/" + self.video_id + "/maxresdefault.jpg"
 
     @property
     def title(self) -> str:
@@ -273,10 +283,10 @@ class YouTube(object):
         return self.vid_descr
 
     @property
-    def rating(self):
+    def rating(self) -> float:
         """Get the video average rating.
 
-        :rtype: str
+        :rtype: float
 
         """
         return (
@@ -286,16 +296,18 @@ class YouTube(object):
         )
 
     @property
-    def length(self):
+    def length(self) -> str:
         """Get the video length in seconds.
 
         :rtype: str
 
         """
-        return self.player_config_args["length_seconds"]
+        return self.player_config_args["player_response"]["videoDetails"][
+            "lengthSeconds"
+        ]
 
     @property
-    def views(self):
+    def views(self) -> str:
         """Get the number of the times the video has been viewed.
 
         :rtype: str
