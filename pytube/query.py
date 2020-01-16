@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """This module provides a query interface for media streams and captions."""
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from pytube import Stream, Caption
 
@@ -166,34 +166,45 @@ class StreamQuery:
             fmt_streams = list(filter(fn, fmt_streams))
         return StreamQuery(fmt_streams)
 
-    def order_by(self, attribute_name):
-        """Apply a sort order to a resultset.
+    def order_by(self, attribute_name: str) -> "StreamQuery":
+        """Apply a sort order to a resultset. Implicitly Filters out stream the do not have the attribute.
 
         :param str attribute_name:
             The name of the attribute to sort by.
         """
-        integer_attr_repr = {}
-        for stream in self.fmt_streams:
-            attr = getattr(stream, attribute_name)
-            if attr is None:
-                break
-            # TODO: improve this so tests can work
-            num = "".join(x for x in attr if x.isdigit())
-            integer_attr_repr[attr] = int("".join(num)) if num else None
+        has_attribute = [
+            s for s in self.fmt_streams if getattr(s, attribute_name) is not None
+        ]
+        integer_attr_repr: Optional[Dict[str, int]] = None
 
-        # if every attribute has an integer representation
-        if integer_attr_repr and all(integer_attr_repr.values()):
+        # check that the attribute value is a string
+        if len(has_attribute) > 0 and isinstance(
+            getattr(has_attribute[0], attribute_name), str
+        ):
+            # attempt to extract numerical values from string
+            try:
+                integer_attr_repr = {
+                    getattr(s, attribute_name): int(
+                        "".join(list(filter(str.isdigit, getattr(s, attribute_name))))
+                    )
+                    for s in has_attribute
+                }
+            except ValueError:
+                integer_attr_repr = None
+                pass
 
-            def key(s):
-                return integer_attr_repr[getattr(s, attribute_name)]
-
+        # lookup integer values if we have them
+        if integer_attr_repr is not None:
+            return StreamQuery(  # mypy: ignore
+                sorted(
+                    has_attribute,
+                    key=lambda s: integer_attr_repr[getattr(s, attribute_name)],  # type: ignore
+                )
+            )
         else:
-
-            def key(s):
-                return getattr(s, attribute_name)
-
-        fmt_streams = sorted(self.fmt_streams, key=key,)
-        return StreamQuery(fmt_streams)
+            return StreamQuery(
+                sorted(has_attribute, key=lambda s: getattr(s, attribute_name))
+            )
 
     def desc(self):
         """Sort streams in descending order.

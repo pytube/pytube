@@ -5,8 +5,10 @@
       <w>descrambler</w>
       <w>ficano</w>
       <w>itag</w>
+      <w>mypy</w>
       <w>noqa</w>
       <w>pytube</w>
+      <w>webm</w>
     </words>
   </dictionary>
 </component>
