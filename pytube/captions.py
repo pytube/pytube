@@ -26,7 +26,7 @@ class Caption:
         """Download the xml caption tracks."""
         return request.get(self.url)
 
-    def generate_srt_captions(self):
+    def generate_srt_captions(self) -> str:
         """Generate "SubRip Subtitle" captions.
 
         Takes the xml captions from :meth:`~pytube.Caption.xml_captions` and
@@ -49,7 +49,7 @@ class Caption:
         ms = "{:.3f}".format(frac).replace("0.", "")
         return time_fmt + ms
 
-    def xml_caption_to_srt(self, xml_captions):
+    def xml_caption_to_srt(self, xml_captions: str) -> str:
         """Convert xml caption tracks to "SubRip Subtitle (srt)".
 
         :param str xml_captions:

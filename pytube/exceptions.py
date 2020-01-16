@@ -42,3 +42,7 @@ class LiveStreamError(ExtractError):
 
 class VideoUnavailable(PytubeError):
     """Video is unavailable."""
+
+
+class HTMLParseError(PytubeError):
+    """HTML could not be parsed"""

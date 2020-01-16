@@ -130,7 +130,7 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
     )
 
 
-def install_proxy(proxy_handler):
+def install_proxy(proxy_handler: Dict[str, str]) -> None:
     proxy_support = request.ProxyHandler(proxy_handler)
     opener = request.build_opener(proxy_support)
     request.install_opener(opener)

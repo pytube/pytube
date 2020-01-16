@@ -100,7 +100,7 @@ DASH_MP4_VIDEO = [133, 134, 135, 136, 137, 138, 160, 212, 264, 266, 298, 299]
 DASH_MP4_AUDIO = [139, 140, 141, 256, 258, 325, 328]
 
 
-def get_format_profile(itag):
+def get_format_profile(itag: int) -> Dict:
     """Get additional format information for a given itag.
 
     :param str itag:

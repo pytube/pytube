@@ -4,10 +4,10 @@ import json
 from collections import OrderedDict
 
 from html.parser import HTMLParser
-from typing import Any, Optional
+from typing import Any, Optional, Tuple, List
 from urllib.parse import quote
 from urllib.parse import urlencode
-from pytube.exceptions import RegexMatchError
+from pytube.exceptions import RegexMatchError, HTMLParseError
 from pytube.helpers import regex_search
 
 
@@ -36,6 +36,9 @@ class PytubeHTMLParser(HTMLParser):
             self.in_vid_descr_br = False
         elif self.in_vid_descr:
             self.vid_descr += data
+
+    def error(self, message):
+        raise HTMLParseError(message)
 
 
 def is_age_restricted(watch_html: str) -> bool:
@@ -106,8 +109,7 @@ def video_info_url(
     :param str watch_url:
         A YouTube watch url.
     :param str watch_html:
-        The html contents of the watch page.
-        TODO: unused
+        (Unused) The html contents of the watch page.
     :param str embed_html:
         The html contents of the embed page (for age restricted videos).
     :param bool age_restricted:
@@ -154,7 +156,7 @@ def js_url(html: str, age_restricted: bool = False) -> str:
     return "https://youtube.com" + base_js
 
 
-def mime_type_codec(mime_type_codec):
+def mime_type_codec(mime_type_codec: str) -> Tuple[str, List[str]]:
     """Parse the type data.
 
     Breaks up the data in the ``type`` key of the manifest, which contains the
