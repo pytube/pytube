@@ -32,7 +32,7 @@ def test_info_url(cipher_signature):
 
 
 def test_js_url(cipher_signature):
-    expected = "https://youtube.com/yts/jsbin/player-vflOdyxa4/en_US/base.js"
+    expected = "https://youtube.com/yts/jsbin/player_ias-vflWQEEag/en_US/base.js"
     result = extract.js_url(cipher_signature.watch_html)
     assert expected == result
 
@@ -46,5 +46,19 @@ def test_non_age_restricted(cipher_signature):
 
 
 def test_get_vid_desc(cipher_signature):
-    expected = "PSY - ‘I LUV IT’ M/V @ https://youtu.be/Xvjnoagk6GU\nPSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\nPSY - 8TH ALBUM '4X2=8' on iTunes @\nhttps://smarturl.it/PSY_8thAlbum\nPSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n#PSY #싸이 #GANGNAMSTYLE #강남스타일\nMore about PSY@\nhttp://www.youtube.com/officialpsy\nhttp://www.facebook.com/officialpsy\nhttp://twitter.com/psy_oppa\nhttps://www.instagram.com/42psy42\nhttp://iTunes.com/PSY\nhttp://sptfy.com/PSY\nhttp://weibo.com/psyoppa"  # noqa
+    expected = (
+        "PSY - ‘I LUV IT’ M/V @ https://youtu.be/Xvjnoagk6GU\n"
+        "PSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\n"
+        "PSY - 8TH ALBUM '4X2=8' on iTunes @\n"
+        "https://smarturl.it/PSY_8thAlbum\n"
+        "PSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n"
+        "#PSY #싸이 #GANGNAMSTYLE #강남스타일\n"
+        "More about PSY@\nhttp://www.youtube.com/officialpsy\n"
+        "http://www.facebook.com/officialpsy\n"
+        "http://twitter.com/psy_oppa\n"
+        "https://www.instagram.com/42psy42\n"
+        "http://iTunes.com/PSY\n"
+        "http://sptfy.com/PSY\n"
+        "http://weibo.com/psyoppa"
+    )
     assert extract.get_vid_descr(cipher_signature.watch_html) == expected
