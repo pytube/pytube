@@ -13,17 +13,21 @@
 
 # pytube3
 
-*pytube* is a lightweight library written in Python. It has no third party dependencies and aims to be highly reliable.
+## Installation
 
-*pytube* also makes pipelining easy, allowing you to specify callback functions for different download events, such as  ``on progress`` or ``on complete``.
+Download using pip via pypi.
 
-Finally *pytube* also includes a command-line utility, allowing you to quickly download videos right from terminal.
+```bash
+$ pip install pytube3 --upgrade
+```
+(Mac/homebrew users may need to use ``pip3``)
 
-### Behold, a perfect balance of simplicity versus flexibility:
 
+## Quick start
 ```python
  >>> from pytube import YouTube
  >>> YouTube('https://youtu.be/9bZkp7q19f0').streams.first().download()
+ >>>
  >>> yt = YouTube('http://youtube.com/watch?v=9bZkp7q19f0')
  >>> yt.streams
   ... .filter(progressive=True, file_extension='mp4')
@@ -44,16 +48,8 @@ Finally *pytube* also includes a command-line utility, allowing you to quickly d
 - Extensively Documented Source Code
 - No Third-Party Dependencies
 
-## Installation
 
-Download using pip via pypi.
-
-```bash
-$ pip install pytube3 --upgrade
-```
-Mac/homebrew users may need to use ``pip3``
-
-## Getting started
+## Usage
 
 Let's begin with showing how easy it is to download a video with pytube:
 
