@@ -95,6 +95,18 @@ def test_on_complete_hook(cipher_signature, mocker):
     assert callback_fn.called
 
 
+def test_author(cipher_signature):
+    expected = "Test author"
+    cipher_signature.player_config_args = {
+        "player_response": {"videoDetails": {"author": expected}}
+    }
+    assert cipher_signature.author == expected
+
+    expected = "unknown"
+    cipher_signature.player_config_args = {}
+    assert cipher_signature.author == expected
+
+
 @pytest.mark.skip
 def test_repr_for_audio_streams(cipher_signature):
     stream = str(cipher_signature.streams.filter(only_audio=True).first())
