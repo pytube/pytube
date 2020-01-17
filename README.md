@@ -87,6 +87,9 @@ Next, let's explore how we would view what video streams are available:
  <Stream: itag="250" mime_type="audio/webm" abr="70kbps" acodec="opus">,
  <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus">]
 ```
+
+### Selecting an itag
+
 You may notice that some streams listed have both a video codec and audio codec, while others have just video or just audio, this is a result of YouTube supporting a streaming technique called Dynamic Adaptive Streaming over HTTP (DASH).
 
 In the context of pytube, the implications are for the highest quality streams; you now need to download both the audio and video tracks and then post-process them with software like FFmpeg to merge them.
@@ -139,6 +142,8 @@ You can also download a complete Youtube playlist:
 This will download the highest progressive stream available (generally 720p) from the given playlist. Later more options would be given for user's flexibility
 to choose video resolution.
 
+### Filtering
+
 Pytube allows you to filter on every property available (see the documentation for the complete list), let's take a look at some of the most useful ones.
 
 To list the audio only streams:
@@ -190,10 +195,12 @@ If you need to optimize for a specific feature, such as the "highest resolution"
 ```
 Note that ``order_by`` cannot be used if your attribute is undefined in any of the Stream instances, so be sure to apply a filter to remove those before calling it.
 
+### Callbacks
+
 If your application requires post-processing logic, pytube allows you to specify an "on download complete" callback function:
 
 ```python
- >>> def convert_to_aac(stream, file_handle):
+ >>> def convert_to_aac(stream, file_handler):
          return  # do work
 
  >>> yt.register_on_complete_callback(convert_to_aac)
@@ -202,7 +209,7 @@ If your application requires post-processing logic, pytube allows you to specify
 Similarly, if your application requires on-download progress logic, pytube exposes a callback for this as well:
 
 ```python
- >>> def show_progress_bar(stream, chunk, file_handle, bytes_remaining):
+ >>> def show_progress_bar(stream, chunk, file_handler, bytes_remaining):
          return  # do work
 
  >>> yt.register_on_progress_callback(show_progress_bar)
