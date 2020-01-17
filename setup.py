@@ -23,6 +23,7 @@ setup(
     url="https://github.com/hbmartin/pytube3",
     license="MIT",
     entry_points={"console_scripts": ["pytube3 = pytube.cli:main",],},
+    install_requires=["typing_extensions"],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
