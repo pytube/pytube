@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+typing_extensions = "*"
 
 [dev-packages]
 "flake8" = "*"
