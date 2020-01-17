@@ -13,6 +13,7 @@ before_install:
   - pip install pipenv --upgrade
 sudo: false
 after_success:
+  codecov
   coveralls
 notifications:
 #  slack: watchcloud:rNoT5kJJakPqwLSKuev6oa4C
