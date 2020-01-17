@@ -222,7 +222,7 @@ class Stream(object):
             (optional) A string that will be prepended to the filename.
             For example a number in a playlist or the name of a series.
             If one is not specified, nothing will be prepended
-            This is seperate from filename so you can use the default
+            This is separate from filename so you can use the default
             filename but still add a prefix.
         :type filename_prefix: str or None
 

@@ -106,8 +106,8 @@ def safe_filename(s: str, max_length: int = 255) -> str:
         A sanitized string.
     """
     # Characters in range 0-31 (0x00-0x1F) are not allowed in ntfs filenames.
-    ntfs_chrs = [chr(i) for i in range(0, 31)]
-    chrs = [
+    ntfs_characters = [chr(i) for i in range(0, 31)]
+    characters = [
         '"',
         "\#",
         "\$",
@@ -129,7 +129,7 @@ def safe_filename(s: str, max_length: int = 255) -> str:
         "\~",
         "\\\\",
     ]
-    pattern = "|".join(ntfs_chrs + chrs)
+    pattern = "|".join(ntfs_characters + characters)
     regex = re.compile(pattern, re.UNICODE)
     filename = regex.sub("", s)
     return filename[:max_length].rsplit(" ", 0)[0]

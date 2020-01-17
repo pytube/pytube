@@ -25,7 +25,7 @@ def main():
         "--version", action="version", version="%(prog)s " + __version__,
     )
     parser.add_argument(
-        "--itag", type=int, help=("The itag for the desired stream"),
+        "--itag", type=int, help="The itag for the desired stream",
     )
     parser.add_argument(
         "-l",
@@ -47,7 +47,7 @@ def main():
     parser.add_argument(
         "--build-playback-report",
         action="store_true",
-        help=("Save the html and js to disk"),
+        help="Save the html and js to disk",
     )
 
     args = parser.parse_args()
@@ -117,10 +117,10 @@ def display_progress_bar(
         written to disk.
     :param int filesize:
         File size of the media stream in bytes.
-    :param ch str:
+    :param str ch:
         Character to use for presenting progress segment.
     :param float scale:
-        Scale multipler to reduce progress bar size.
+        Scale multiplier to reduce progress bar size.
 
     """
     _, columns = get_terminal_size()

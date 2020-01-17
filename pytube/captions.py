@@ -41,12 +41,11 @@ class Caption:
         :returns:
             SubRip Subtitle (str) formatted time duration.
 
-        >>> float_to_srt_time_format(3.89)
-        '00:00:03,890'
+        float_to_srt_time_format(3.89) -> '00:00:03,890'
         """
-        frac, whole = math.modf(d)
+        fraction, whole = math.modf(d)
         time_fmt = time.strftime("%H:%M:%S,", time.gmtime(whole))
-        ms = "{:.3f}".format(frac).replace("0.", "")
+        ms = "{:.3f}".format(fraction).replace("0.", "")
         return time_fmt + ms
 
     def xml_caption_to_srt(self, xml_captions: str) -> str:

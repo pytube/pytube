@@ -254,15 +254,15 @@ def get_signature(js: str, ciphered_signature: str) -> str:
        Decrypted signature required to download the media content.
 
     """
-    tplan = get_transform_plan(js)
+    transform_plan = get_transform_plan(js)
     # DE.AJ(a,15) => DE, AJ(a,15)
-    var, _ = tplan[0].split(".")
-    tmap = get_transform_map(js, var)
+    var, _ = transform_plan[0].split(".")
+    transform_map = get_transform_map(js, var)
     signature = [s for s in ciphered_signature]
 
-    for js_func in tplan:
+    for js_func in transform_plan:
         name, argument = parse_function(js_func)
-        signature = tmap[name](signature, int(argument))
+        signature = transform_map[name](signature, int(argument))
         logger.debug(
             "applied transform function\n%s",
             pprint.pformat(
@@ -270,7 +270,7 @@ def get_signature(js: str, ciphered_signature: str) -> str:
                     "output": "".join(signature),
                     "js_function": name,
                     "argument": int(argument),
-                    "function": tmap[name],
+                    "function": transform_map[name],
                 },
                 indent=2,
             ),

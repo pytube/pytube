@@ -134,7 +134,7 @@ class Playlist(object):
         :type prefix_number: bool
         :param reverse_numbering:
             (optional) Lets you number playlists in reverse, since some
-            playlists are ordered newest -> oldests.
+            playlists are ordered newest -> oldest.
         :type reverse_numbering: bool
         """
 
@@ -180,14 +180,14 @@ class Playlist(object):
             req = request.get(url)
             open_tag = "<title>"
             end_tag = "</title>"
-            matchresult = re.compile(open_tag + "(.+?)" + end_tag)
-            matchresult = matchresult.search(req).group()
-            matchresult = matchresult.replace(open_tag, "")
-            matchresult = matchresult.replace(end_tag, "")
-            matchresult = matchresult.replace("- YouTube", "")
-            matchresult = matchresult.strip()
+            match_result = re.compile(open_tag + "(.+?)" + end_tag)
+            match_result = match_result.search(req).group()
+            match_result = match_result.replace(open_tag, "")
+            match_result = match_result.replace(end_tag, "")
+            match_result = match_result.replace("- YouTube", "")
+            match_result = match_result.strip()
 
-            return matchresult
+            return match_result
         except Exception as e:
             logger.debug(e)
             return None

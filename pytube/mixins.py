@@ -37,10 +37,11 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
         .get("liveStreamability")
     )
     for i, stream in enumerate(stream_manifest):
-        if "url" in stream:
+        try:
             url = stream["url"]
-        elif live_stream:
-            raise LiveStreamError("Video is currently being streamed live")
+        except KeyError:
+            if live_stream:
+                raise LiveStreamError("Video is currently being streamed live")
         # 403 Forbidden fix.
         if "signature" in url or (
             "s" not in stream and ("&sig=" in url or "&lsig=" in url)

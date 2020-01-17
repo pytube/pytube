@@ -165,8 +165,7 @@ def mime_type_codec(mime_type_codec: str) -> Tuple[str, List[str]]:
 
     **Example**:
 
-    >>> mime_type_codec('audio/webm; codecs="opus"')
-    ('audio/webm', ['opus'])
+    mime_type_codec('audio/webm; codecs="opus"') -> ('audio/webm', ['opus'])
 
     :param str mime_type_codec:
         String containing mime type and codecs.
