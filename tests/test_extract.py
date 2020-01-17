@@ -19,7 +19,6 @@ def test_info_url(cipher_signature):
     video_info_url = extract.video_info_url(
         video_id=cipher_signature.video_id,
         watch_url=cipher_signature.watch_url,
-        watch_html=cipher_signature.watch_html,
         embed_html="",
         age_restricted=False,
     )

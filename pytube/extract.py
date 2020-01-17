@@ -96,11 +96,7 @@ def eurl(video_id: str) -> str:
 
 
 def video_info_url(
-    video_id: str,
-    watch_url: str,
-    watch_html: Optional[str],
-    embed_html: str,
-    age_restricted: bool,
+    video_id: str, watch_url: str, embed_html: Optional[str], age_restricted: bool,
 ) -> str:
     """Construct the video_info url.
 
@@ -108,8 +104,6 @@ def video_info_url(
         A YouTube video identifier.
     :param str watch_url:
         A YouTube watch url.
-    :param str watch_html:
-        (Unused) The html contents of the watch page.
     :param str embed_html:
         The html contents of the embed page (for age restricted videos).
     :param bool age_restricted:
@@ -139,7 +133,7 @@ def video_info_url(
     return "https://youtube.com/get_video_info?" + urlencode(params)
 
 
-def js_url(html: str, age_restricted: bool = False) -> str:
+def js_url(html: str, age_restricted: Optional[bool] = False) -> str:
     """Get the base JavaScript url.
 
     Construct the base JavaScript url, which contains the decipher
@@ -151,7 +145,7 @@ def js_url(html: str, age_restricted: bool = False) -> str:
         Is video age restricted.
 
     """
-    ytplayer_config = get_ytplayer_config(html, age_restricted)
+    ytplayer_config = get_ytplayer_config(html, age_restricted or False)
     base_js = ytplayer_config["assets"]["js"]
     return "https://youtube.com" + base_js
 

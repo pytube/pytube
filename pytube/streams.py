@@ -18,7 +18,7 @@ from pytube import extract
 from pytube import request
 from pytube.helpers import safe_filename
 from pytube.itags import get_format_profile
-
+from pytube.monostate import Monostate
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 class Stream(object):
     """Container for stream manifest data."""
 
-    def __init__(self, stream: Dict, player_config_args: Dict, monostate: Dict):
+    def __init__(self, stream: Dict, player_config_args: Dict, monostate: Monostate):
         """Construct a :class:`Stream <Stream>`.
 
         :param dict stream:
@@ -303,7 +303,7 @@ class Stream(object):
                 indent=2,
             ),
         )
-        on_progress = self._monostate["on_progress"]
+        on_progress = self._monostate.on_progress
         if on_progress:
             logger.debug("calling on_progress callback %s", on_progress)
             on_progress(self, chunk, file_handler, bytes_remaining)
@@ -320,7 +320,7 @@ class Stream(object):
 
         """
         logger.debug("download finished")
-        on_complete = self._monostate["on_complete"]
+        on_complete = self._monostate.on_complete
         if on_complete:
             logger.debug("calling on_complete callback %s", on_complete)
             on_complete(self, file_handle)

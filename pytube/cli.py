@@ -136,18 +136,6 @@ def display_progress_bar(
 
 
 def on_progress(stream, chunk, file_handle, bytes_remaining):
-    """On download progress callback function.
-
-    :param object stream:
-        An instance of :class:`Stream <Stream>` being downloaded.
-    :param file_handle:
-        The file handle where the media is being written to.
-    :type file_handle:
-        :py:class:`io.BufferedWriter`
-    :param int bytes_remaining:
-        How many bytes have been downloaded.
-
-    """
     filesize = stream.filesize
     bytes_received = filesize - bytes_remaining
     display_progress_bar(bytes_received, filesize)

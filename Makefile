@@ -10,8 +10,8 @@ pipenv:
 
 test:
 	pipenv run flake8
-	pipenv run black pytube --diff
-	pipenv run black tests --diff
+	pipenv run black pytube --check
+	pipenv run black tests --check
 	pipenv run mypy pytube
 	pipenv run pytest --cov-report term-missing --cov=pytube
 

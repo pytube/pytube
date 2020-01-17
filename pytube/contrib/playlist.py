@@ -6,6 +6,7 @@ import json
 import logging
 import re
 from collections import OrderedDict
+from typing import List, Optional
 
 from pytube import request
 from pytube.__main__ import YouTube
@@ -18,12 +19,12 @@ class Playlist(object):
     playlist
     """
 
-    def __init__(self, url, suppress_exception=False):
+    def __init__(self, url: str, suppress_exception: bool = False):
         self.playlist_url = url
-        self.video_urls = []
+        self.video_urls: List[str] = []
         self.suppress_exception = suppress_exception
 
-    def construct_playlist_url(self):
+    def construct_playlist_url(self) -> str:
         """There are two kinds of playlist urls in YouTube. One that contains
         watch?v= in URL, another one contains the "playlist?list=" portion. It
         is preferable to work with the later one.
@@ -53,7 +54,7 @@ class Playlist(object):
             load_more_url = ""
         return load_more_url
 
-    def parse_links(self):
+    def parse_links(self) -> List[str]:
         """Parse the video links from the page source, extracts and
         returns the /watch?v= part from video link href
         It's an alternative for BeautifulSoup
@@ -115,8 +116,11 @@ class Playlist(object):
         return (str(i).zfill(digits) for i in range(start, stop, step))
 
     def download_all(
-        self, download_path=None, prefix_number=True, reverse_numbering=False,
-    ):
+        self,
+        download_path: Optional[str] = None,
+        prefix_number: bool = True,
+        reverse_numbering: bool = False,
+    ) -> None:
         """Download all the videos in the the playlist. Initially, download
         resolution is 720p (or highest available), later more option
         should be added to download resolution of choice
@@ -172,7 +176,7 @@ class Playlist(object):
                     dl_stream.download(download_path)
                 logger.debug("download complete")
 
-    def title(self):
+    def title(self) -> Optional[str]:
         """return playlist title (name)
         """
         try:
@@ -180,14 +184,19 @@ class Playlist(object):
             req = request.get(url)
             open_tag = "<title>"
             end_tag = "</title>"
-            match_result = re.compile(open_tag + "(.+?)" + end_tag)
-            match_result = match_result.search(req).group()
-            match_result = match_result.replace(open_tag, "")
-            match_result = match_result.replace(end_tag, "")
-            match_result = match_result.replace("- YouTube", "")
-            match_result = match_result.strip()
+            pattern = re.compile(open_tag + "(.+?)" + end_tag)
+            match = pattern.search(req)
 
-            return match_result
+            if match is None:
+                return None
+
+            return (
+                match.group()
+                .replace(open_tag, "")
+                .replace(end_tag, "")
+                .replace("- YouTube", "")
+                .strip()
+            )
         except Exception as e:
             logger.debug(e)
             return None
