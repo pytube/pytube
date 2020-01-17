@@ -1,14 +1,39 @@
 <component name="ProjectDictionaryState">
   <dictionary name="haroldmartin">
     <words>
+      <w>acodec</w>
+      <w>akamaized</w>
+      <w>bitrate</w>
+      <w>descr</w>
       <w>descramble</w>
       <w>descrambler</w>
+      <w>descrambles</w>
+      <w>descrambling</w>
+      <w>eurl</w>
       <w>ficano</w>
+      <w>filesize</w>
       <w>itag</w>
+      <w>itags</w>
+      <w>lsig</w>
+      <w>maxresdefault</w>
+      <w>meth</w>
+      <w>monostate</w>
       <w>mypy</w>
+      <w>nficano</w>
       <w>noqa</w>
+      <w>noreorder</w>
+      <w>ntfs</w>
+      <w>prog</w>
       <w>pytube</w>
+      <w>recompiles</w>
+      <w>samp</w>
+      <w>streamability</w>
+      <w>stty</w>
+      <w>tracklist</w>
+      <w>vcodec</w>
+      <w>vorbis</w>
       <w>webm</w>
+      <w>ytplayer</w>
     </words>
   </dictionary>
 </component>
