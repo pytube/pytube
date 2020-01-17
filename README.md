@@ -1,7 +1,7 @@
 
 <div align="center">
   <p align="center">
-	  <img src="https://img.shields.io/pypi/v/pytube3.svg" alt="pypi">
+	  <a href="https://pypi.org/project/pytube3/"><img src="https://img.shields.io/pypi/v/pytube3.svg" alt="pypi"></a>
 	  <a href="https://travis-ci.com/hbmartin/pytube3/"><img src="https://travis-ci.org/hbmartin/pytube3.svg?branch=master" /></a>
 	  <a href='https://pytube3.readthedocs.io/en/latest/?badge=latest'><img src='https://readthedocs.org/projects/pytube3/badge/?version=latest' alt='Documentation Status' /></a>
 	  <a href="https://coveralls.io/github/hbmartin/pytube3?branch=master"><img src="https://coveralls.io/repos/github/hbmartin/pytube3/badge.svg?branch=master" /></a>
