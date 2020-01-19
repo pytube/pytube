@@ -179,10 +179,9 @@ class StreamQuery:
             def key(s):
                 return getattr(s, attribute_name)
 
-        fmt_streams = sorted(
-            fmt_streams,
-            key=key,
-        )
+        # We can sort in place instead of calling sorted()
+        fmt_streams.sort(key=key)
+
         return StreamQuery(fmt_streams)
 
     def desc(self):
