@@ -166,7 +166,7 @@ class StreamQuery:
         integer_attr_repr = {}
         for stream in self.fmt_streams:
             attr = getattr(stream, attribute_name)
-            if attr is not None:
+            if attr:
                 fmt_streams.append(stream)
                 num = ''.join(x for x in attr if x.isdigit())
                 integer_attr_repr[attr] = int(''.join(num)) if num else None
