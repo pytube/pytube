@@ -162,14 +162,13 @@ class StreamQuery:
         :param str attribute_name:
             The name of the attribute to sort by.
         """
-        fmt_streams = []
         integer_attr_repr = {}
         for stream in self.fmt_streams:
             attr = getattr(stream, attribute_name)
-            if attr:
-                fmt_streams.append(stream)
-                num = ''.join(x for x in attr if x.isdigit())
-                integer_attr_repr[attr] = int(''.join(num)) if num else None
+            if attr is None:
+                break
+            num = ''.join(x for x in attr if x.isdigit())
+            integer_attr_repr[attr] = int(''.join(num)) if num else None
 
         # if every attribute has an integer representation
         if integer_attr_repr and all(integer_attr_repr.values()):
@@ -179,8 +178,10 @@ class StreamQuery:
             def key(s):
                 return getattr(s, attribute_name)
 
-        # We can sort in place instead of calling sorted()
-        fmt_streams.sort(key=key)
+        fmt_streams = sorted(
+            self.fmt_streams,
+            key=key,
+        )
 
         return StreamQuery(fmt_streams)
 
