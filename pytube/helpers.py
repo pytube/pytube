@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def regex_search(
-    pattern: str, string: str, groups: bool = False, group: Optional[int] = None,
+    pattern: str, string: str, group: Optional[int] = None,
 ):
     """Shortcut method to search a string for a given pattern.
 
@@ -21,8 +21,6 @@ def regex_search(
         A regular expression pattern.
     :param str string:
         A target string to search.
-    :param bool groups:
-        Should the return value be ``.groups()``.
     :param int group:
         Index of group to return.
     :rtype:
@@ -43,9 +41,7 @@ def regex_search(
                 {"pattern": pattern, "results": results.group(0),}, indent=2,
             ),
         )
-        if groups:
-            return results.groups()
-        elif group is not None:
+        if group is not None:
             return results.group(group)
         else:
             return results

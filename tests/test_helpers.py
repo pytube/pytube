@@ -7,7 +7,7 @@ from pytube.exceptions import RegexMatchError
 
 def test_regex_search_no_match():
     with pytest.raises(RegexMatchError):
-        helpers.regex_search("^a$", "", groups=True)
+        helpers.regex_search("^a$", "")
 
 
 def test_regex_search():

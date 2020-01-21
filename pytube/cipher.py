@@ -245,7 +245,14 @@ def parse_function(js_func: str):
 
     """
     logger.debug("parsing transform function")
-    return regex_search(r"\w+\.(\w+)\(\w,(\d+)\)", js_func, groups=True)
+    pattern = r"\w+\.(\w+)\(\w,(\d+)\)"
+    regex = re.compile(pattern)
+    results = regex.search(js_func)
+    if not results:
+        raise RegexMatchError(
+            "regex pattern ({pattern}) had zero matches".format(pattern=pattern),
+        )
+    return results.groups()
 
 
 def get_signature(js: str, ciphered_signature: str) -> str:
