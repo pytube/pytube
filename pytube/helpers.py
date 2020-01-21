@@ -13,11 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def regex_search(
-    pattern: str,
-    string: str,
-    groups: bool = False,
-    group: Optional[int] = None,
-    flags: int = 0,
+    pattern: str, string: str, groups: bool = False, group: Optional[int] = None,
 ):
     """Shortcut method to search a string for a given pattern.
 
@@ -29,14 +25,12 @@ def regex_search(
         Should the return value be ``.groups()``.
     :param int group:
         Index of group to return.
-    :param int flags:
-        Expression behavior modifiers.
     :rtype:
         str or tuple
     :returns:
         Substring pattern matches.
     """
-    regex = re.compile(pattern, flags)
+    regex = re.compile(pattern)
     results = regex.search(string)
     if not results:
         raise RegexMatchError(

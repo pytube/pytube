@@ -109,11 +109,14 @@ def get_transform_object(js: str, var: str):
     """
     pattern = r"var %s={(.*?)};" % re.escape(var)
     logger.debug("getting transform object")
-    return (
-        regex_search(pattern, js, group=1, flags=re.DOTALL)
-        .replace("\n", " ")
-        .split(", ")
-    )
+    regex = re.compile(pattern, flags=re.DOTALL)
+    results = regex.search(js)
+    if not results:
+        raise RegexMatchError(
+            "regex pattern ({pattern}) had zero matches".format(pattern=pattern),
+        )
+
+    return results.group(1).replace("\n", " ").split(", ")
 
 
 def get_transform_map(js, var):
