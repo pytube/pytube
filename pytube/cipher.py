@@ -274,7 +274,11 @@ def get_signature(js: str, ciphered_signature: str) -> str:
         name, argument = parse_function(js_func)
         signature = transform_map[name](signature, argument)
         logger.debug(
-            "applied transform function\noutput: %s\njs_function: %s\nargument: %d\nfunction: %s",
+            "applied transform function\n"
+            "output: %s\n"
+            "js_function: %s\n"
+            "argument: %d\n"
+            "function: %s",
             "".join(signature),
             name,
             argument,
