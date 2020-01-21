@@ -16,7 +16,7 @@ signature and decoding it.
 
 import re
 from itertools import chain
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Callable
 
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search, create_logger
@@ -86,7 +86,7 @@ def get_transform_plan(js: str) -> List[str]:
     return regex_search(pattern, js, group=1).split(";")
 
 
-def get_transform_object(js: str, var: str):
+def get_transform_object(js: str, var: str) -> List[str]:
     """Extract the "transform object".
 
     The "transform object" contains the function definitions referenced in the
@@ -120,7 +120,7 @@ def get_transform_object(js: str, var: str):
     return results.group(1).replace("\n", " ").split(", ")
 
 
-def get_transform_map(js, var):
+def get_transform_map(js: str, var: str) -> Dict:
     """Build a transform function lookup.
 
     Build a lookup table of obfuscated JavaScript function names to the
@@ -198,7 +198,7 @@ def swap(arr, b):
     return list(chain([arr[r]], arr[1:r], [arr[0]], arr[r + 1 :]))
 
 
-def map_functions(js_func):
+def map_functions(js_func: str) -> Callable:
     """For a given JavaScript transform function, return the Python equivalent.
 
     :param str js_func:
