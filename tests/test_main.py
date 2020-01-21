@@ -14,6 +14,10 @@ def test_prefetch_deferred(MockYouTube):
 
 @mock.patch("urllib.request.install_opener")
 def test_install_proxy(opener):
-    proxies = {'http': 'http://www.example.com:3128/'}
-    YouTube("https://www.youtube.com/watch?v=9bZkp7q19f0", defer_prefetch_init=True, proxies=proxies)
+    proxies = {"http": "http://www.example.com:3128/"}
+    YouTube(
+        "https://www.youtube.com/watch?v=9bZkp7q19f0",
+        defer_prefetch_init=True,
+        proxies=proxies,
+    )
     opener.assert_called()
