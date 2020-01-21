@@ -17,15 +17,16 @@ def get(url, headers=False, streaming=False, chunk_size=8192):
         The size in bytes of each chunk. Defaults to 8*1024
     """
 
-    # https://github.com/nficano/pytube/pull/465
     req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
     response = urlopen(req)
 
     if streaming:
         return stream_response(response, chunk_size)
-    elif headers:
+
+    if headers:
         # https://github.com/nficano/pytube/issues/160
         return {k.lower(): v for k, v in response.info().items()}
+
     return response.read().decode("utf-8")
 
 

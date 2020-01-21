@@ -34,7 +34,8 @@ class Caption:
         """
         return self.xml_caption_to_srt(self.xml_captions)
 
-    def float_to_srt_time_format(self, d: float) -> str:
+    @staticmethod
+    def float_to_srt_time_format(d: float) -> str:
         """Convert decimal durations into proper srt format.
 
         :rtype: str
@@ -56,7 +57,7 @@ class Caption:
         """
         segments = []
         root = ElementTree.fromstring(xml_captions)
-        for i, child in enumerate(root.getchildren()):
+        for i, child in enumerate(list(root)):
             text = child.text or ""
             caption = unescape(text.replace("\n", " ").replace("  ", " "),)
             duration = float(child.attrib["dur"])

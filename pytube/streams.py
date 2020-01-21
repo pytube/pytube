@@ -23,7 +23,7 @@ from pytube.monostate import Monostate
 logger = logging.getLogger(__name__)
 
 
-class Stream(object):
+class Stream:
     """Container for stream manifest data."""
 
     def __init__(self, stream: Dict, player_config_args: Dict, monostate: Monostate):
@@ -176,19 +176,15 @@ class Stream(object):
         :returns:
             Youtube video title
         """
-        player_config_args = self.player_config_args or {}
-
-        if "title" in player_config_args:
-            return player_config_args["title"]
-
-        details = self.player_config_args.get("player_response", {},).get(
-            "videoDetails", {}
+        return (
+            self.player_config_args.get("title")
+            or (
+                self.player_config_args.get("player_response", {})
+                .get("videoDetails", {})
+                .get("title")
+            )
+            or "Unknown YouTube Video Title"
         )
-
-        if "title" in details:
-            return details["title"]
-
-        return "Unknown YouTube Video Title"
 
     @property
     def default_filename(self) -> str:

@@ -23,13 +23,12 @@ from pytube import Stream
 from pytube import StreamQuery
 from pytube.mixins import install_proxy
 from pytube.exceptions import VideoUnavailable
-from pytube.helpers import apply_mixin
 from pytube.monostate import OnProgress, OnComplete, Monostate
 
 logger = logging.getLogger(__name__)
 
 
-class YouTube(object):
+class YouTube:
     """Core developer interface for pytube."""
 
     def __init__(
@@ -91,16 +90,8 @@ class YouTube(object):
             install_proxy(proxies)
 
         if not defer_prefetch_init:
-            self.prefetch_descramble()
-
-    def prefetch_descramble(self) -> None:
-        """Download data, descramble it, and build Stream instances.
-
-        :rtype: None
-
-        """
-        self.prefetch()
-        self.descramble()
+            self.prefetch()
+            self.descramble()
 
     def descramble(self) -> None:
         """Descramble the stream data and build Stream instances.
@@ -161,7 +152,9 @@ class YouTube(object):
             self.initialize_stream_objects(fmt)
 
         # load the player_response object (contains subtitle information)
-        apply_mixin(self.player_config_args, "player_response", json.loads)
+        self.player_config_args["player_response"] = json.loads(
+            self.player_config_args["player_response"]
+        )
 
         self.initialize_caption_objects()
         logger.info("init finished successfully")
@@ -283,7 +276,11 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args["title"]
+        return self.player_config_args.get("title") or (
+            self.player_config_args.get("player_response", {})
+            .get("videoDetails", {})
+            .get("title")
+        )
 
     @property
     def description(self) -> str:
@@ -292,7 +289,11 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.vid_descr
+        return self.vid_descr or (
+            self.player_config_args.get("player_response", {})
+            .get("videoDetails", {})
+            .get("shortDescription")
+        )
 
     @property
     def rating(self) -> float:
@@ -314,7 +315,7 @@ class YouTube(object):
         :rtype: str
 
         """
-        return (
+        return self.player_config_args.get("length_seconds") or (
             self.player_config_args.get("player_response", {})
             .get("videoDetails", {})
             .get("lengthSeconds")

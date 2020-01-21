@@ -205,14 +205,14 @@ def map_functions(js_func: str) -> Callable:
     """
     mapper = (
         # function(a){a.reverse()}
-        ("{\w\.reverse\(\)}", reverse),
+        (r"{\w\.reverse\(\)}", reverse),
         # function(a,b){a.splice(0,b)}
-        ("{\w\.splice\(0,\w\)}", splice),
+        (r"{\w\.splice\(0,\w\)}", splice),
         # function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c}
-        ("{var\s\w=\w\[0\];\w\[0\]=\w\[\w\%\w.length\];\w\[\w\]=\w}", swap),
+        (r"{var\s\w=\w\[0\];\w\[0\]=\w\[\w\%\w.length\];\w\[\w\]=\w}", swap),
         # function(a,b){var c=a[0];a[0]=a[b%a.length];a[b%a.length]=c}
         (
-            "{var\s\w=\w\[0\];\w\[0\]=\w\[\w\%\w.length\];" "\w\[\w\%\w.length\]=\w}",
+            r"{var\s\w=\w\[0\];\w\[0\]=\w\[\w\%\w.length\];\w\[\w\%\w.length\]=\w}",
             swap,
         ),
     )

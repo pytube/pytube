@@ -18,9 +18,8 @@ def test_get_streaming(mock_urlopen):
     response.read.side_effect = fake_stream_binary
     mock_urlopen.return_value = response
     response = request.get("http://fakeassurl.gov", streaming=True)
-    call_count = 0
-    for i in response:
-        call_count += 1
+    call_count = len(list(response))
+
     assert call_count == 3
 
 

@@ -8,7 +8,8 @@ import json
 import logging
 import os
 import sys
-from typing import Tuple
+from io import BufferedWriter
+from typing import Tuple, Any
 
 from pytube import __version__
 from pytube import YouTube
@@ -19,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 def main():
     """Command line application to download youtube videos."""
+    # noinspection PyTypeChecker
     parser = argparse.ArgumentParser(description=main.__doc__)
     parser.add_argument("url", help="The YouTube /watch url", nargs="?")
     parser.add_argument(
@@ -128,14 +130,18 @@ def display_progress_bar(
 
     filled = int(round(max_width * bytes_received / float(filesize)))
     remaining = max_width - filled
-    bar = ch * filled + " " * remaining
+    progress_bar = ch * filled + " " * remaining
     percent = round(100.0 * bytes_received / float(filesize), 1)
-    text = " ↳ |{bar}| {percent}%\r".format(bar=bar, percent=percent)
+    text = " ↳ |{progress_bar}| {percent}%\r".format(
+        progress_bar=progress_bar, percent=percent
+    )
     sys.stdout.write(text)
     sys.stdout.flush()
 
 
-def on_progress(stream, chunk, file_handle, bytes_remaining):
+def on_progress(
+    stream: Any, chunk: Any, file_handler: BufferedWriter, bytes_remaining: int
+) -> None:
     filesize = stream.filesize
     bytes_received = filesize - bytes_remaining
     display_progress_bar(bytes_received, filesize)
