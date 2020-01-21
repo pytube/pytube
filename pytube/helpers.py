@@ -4,10 +4,8 @@
 import logging
 import pprint
 import re
-from typing import Optional
 
 from pytube.exceptions import RegexMatchError
-
 
 logger = logging.getLogger(__name__)
 
