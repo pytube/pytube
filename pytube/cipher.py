@@ -14,26 +14,24 @@ signature and decoding it.
 
 """
 
-import logging
-import pprint
 import re
 from itertools import chain
 
 from pytube.exceptions import RegexMatchError
-from pytube.helpers import regex_search
+from pytube.helpers import regex_search, create_logger
+
+logger = create_logger()
 
 
-logger = logging.getLogger(__name__)
-
-
-def get_initial_function_name(js):
+def get_initial_function_name(js: str) -> str:
     """Extract the name of the function responsible for computing the signature.
 
     :param str js:
         The contents of the base.js asset file.
-
+    :rtype: str
+    :returns:
+       Function name from regex match
     """
-    # c&&d.set("signature", EE(c));
 
     pattern = [
         r"\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
@@ -50,10 +48,17 @@ def get_initial_function_name(js):
     ]
 
     logger.debug("finding initial function name")
-    return regex_search(pattern, js, group=1)
+    for p in pattern:
+        regex = re.compile(p)
+        results = regex.search(js)
+        if results:
+            logger.debug("finished regex search, matched: {pattern}".format(pattern=p))
+            return results.group(1)
+
+    raise RegexMatchError("get_initial_function_name not found")
 
 
-def get_transform_plan(js):
+def get_transform_plan(js: str):
     """Extract the "transform plan".
 
     The "transform plan" is the functions that the ciphered signature is
@@ -80,7 +85,7 @@ def get_transform_plan(js):
     return regex_search(pattern, js, group=1).split(";")
 
 
-def get_transform_object(js, var):
+def get_transform_object(js: str, var: str):
     """Extract the "transform object".
 
     The "transform object" contains the function definitions referenced in the
@@ -218,7 +223,7 @@ def map_functions(js_func):
     )
 
 
-def parse_function(js_func):
+def parse_function(js_func: str):
     """Parse the Javascript transform function.
 
     Break a JavaScript transform function down into a two element ``tuple``
@@ -263,16 +268,15 @@ def get_signature(js: str, ciphered_signature: str) -> str:
     for js_func in transform_plan:
         name, argument = parse_function(js_func)
         signature = transform_map[name](signature, int(argument))
-        logger.debug(
-            "applied transform function\n%s",
-            pprint.pformat(
-                {
-                    "output": "".join(signature),
-                    "js_function": name,
-                    "argument": int(argument),
-                    "function": transform_map[name],
-                },
-                indent=2,
-            ),
-        )
+        logger.debug("applied transform function\n")
+        # pprint.pformat(
+        #     {
+        #         "output": "".join(signature),
+        #         "js_function": name,
+        #         "argument": int(argument),
+        #         "function": transform_map[name],
+        #     },
+        #     indent=2,
+        # ),
+
     return "".join(signature)

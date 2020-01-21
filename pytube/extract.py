@@ -114,6 +114,7 @@ def video_info_url(
         parameters.
     """
     if age_restricted:
+        assert embed_html is not None
         sts = regex_search(r'"sts"\s*:\s*(\d+)', embed_html, group=1)
         # Here we use ``OrderedDict`` so that the output is consistent between
         # Python 2.7+.
