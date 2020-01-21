@@ -27,9 +27,7 @@ def regex_search(pattern: str, string: str, group: int) -> str:
     regex = re.compile(pattern)
     results = regex.search(string)
     if not results:
-        raise RegexMatchError(
-            "regex pattern ({pattern}) had zero matches".format(pattern=pattern),
-        )
+        raise RegexMatchError(caller="regex_search", pattern=pattern)
 
     logger.debug(
         "finished regex search: %s",

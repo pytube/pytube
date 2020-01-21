@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Library specific exception definitions."""
 import sys
+from typing import Union, Pattern
 
 
 class PytubeError(Exception):
@@ -15,25 +16,24 @@ class PytubeError(Exception):
 class ExtractError(PytubeError):
     """Data extraction based exception."""
 
-    def __init__(self, msg: str, video_id: str = "unknown id"):
-        """Construct an instance of a :class:`ExtractError <ExtractError>`.
-
-        :param str msg:
-            User defined error message.
-        :param str video_id:
-            A YouTube video identifier.
-        """
-        if video_id is not None:
-            msg = "{video_id}: {msg}".format(video_id=video_id, msg=msg)
-
-        super(ExtractError, self).__init__(msg)
-
-        self.exc_info = sys.exc_info()
-        self.video_id = video_id
-
 
 class RegexMatchError(ExtractError):
     """Regex pattern did not return any matches."""
+
+    def __init__(self, caller: str, pattern: Union[str, Pattern]):
+        """
+        :param str caller:
+            Calling function
+        :param str pattern:
+            Pattern that failed to match
+        """
+        super(ExtractError, self).__init__(
+            "{caller}: could not find match for {pattern}".format(
+                caller=caller, pattern=pattern
+            )
+        )
+        self.caller = caller
+        self.pattern = pattern
 
 
 class LiveStreamError(ExtractError):
@@ -42,6 +42,18 @@ class LiveStreamError(ExtractError):
 
 class VideoUnavailable(PytubeError):
     """Video is unavailable."""
+
+    def __init__(self, video_id: str):
+        """
+        :param str video_id:
+            A YouTube video identifier.
+        """
+        super(PytubeError, self).__init__(
+            "{video_id} is unavailable".format(video_id=video_id)
+        )
+
+        self.exc_info = sys.exc_info()
+        self.video_id = video_id
 
 
 class HTMLParseError(PytubeError):

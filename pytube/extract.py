@@ -174,9 +174,7 @@ def mime_type_codec(mime_type_codec: str) -> Tuple[str, List[str]]:
     regex = re.compile(pattern)
     results = regex.search(mime_type_codec)
     if not results:
-        raise RegexMatchError(
-            "regex pattern ({pattern}) had zero matches".format(pattern=pattern),
-        )
+        raise RegexMatchError(caller="mime_type_codec", pattern=pattern)
     mime_type, codecs = results.groups()
     return mime_type, [c.strip() for c in codecs.split(",")]
 

@@ -56,7 +56,7 @@ def get_initial_function_name(js: str) -> str:
             logger.debug("finished regex search, matched: {pattern}".format(pattern=p))
             return results.group(1)
 
-    raise RegexMatchError("get_initial_function_name not found")
+    raise RegexMatchError(caller="get_initial_function_name", pattern="multiple")
 
 
 def get_transform_plan(js: str) -> List[str]:
@@ -113,9 +113,7 @@ def get_transform_object(js: str, var: str) -> List[str]:
     regex = re.compile(pattern, flags=re.DOTALL)
     results = regex.search(js)
     if not results:
-        raise RegexMatchError(
-            "regex pattern ({pattern}) had zero matches".format(pattern=pattern),
-        )
+        raise RegexMatchError(caller="get_transform_object", pattern=pattern)
 
     return results.group(1).replace("\n", " ").split(", ")
 
@@ -222,9 +220,7 @@ def map_functions(js_func: str) -> Callable:
     for pattern, fn in mapper:
         if re.search(pattern, js_func):
             return fn
-    raise RegexMatchError(
-        "could not find python equivalent function for: ", js_func,
-    )
+    raise RegexMatchError(caller="map_functions", pattern="multiple")
 
 
 def parse_function(js_func: str) -> Tuple[str, int]:
@@ -250,9 +246,7 @@ def parse_function(js_func: str) -> Tuple[str, int]:
     regex = re.compile(pattern)
     results = regex.search(js_func)
     if not results:
-        raise RegexMatchError(
-            "regex pattern ({pattern}) had zero matches".format(pattern=pattern),
-        )
+        raise RegexMatchError(caller="parse_function", pattern=pattern)
     fn_name, fn_arg = results.groups()
     return fn_name, int(fn_arg)
 
