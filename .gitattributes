@@ -1,1 +1,4 @@
 tests/mock_data/* linguist-vendored
+/docs export-ignore
+.travis.yml export-ignore
+*.sh text eol=lf
