@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 """Unit tests for the :module:`extract <extract>` module."""
+import pytest
+
+from pytube.exceptions import RegexMatchError
+
 from pytube import extract
 
 
@@ -61,3 +65,19 @@ def test_get_vid_desc(cipher_signature):
         "http://weibo.com/psyoppa"
     )
     assert extract.get_vid_descr(cipher_signature.watch_html) == expected
+
+
+def test_eurl():
+    url = extract.eurl("videoid")
+    assert url == "https://youtube.googleapis.com/v/videoid"
+
+
+def test_mime_type_codec():
+    mime_type, mime_subtype = extract.mime_type_codec('audio/webm; codecs="opus"')
+    assert mime_type == "audio/webm"
+    assert mime_subtype == ["opus"]
+
+
+def test_mime_type_codec_with_no_match_should_error():
+    with pytest.raises(RegexMatchError):
+        mime_type, mime_subtype = extract.mime_type_codec("audio/webm")

@@ -16,7 +16,7 @@ signature and decoding it.
 
 import re
 from itertools import chain
-from typing import List
+from typing import List, Tuple
 
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search, create_logger
@@ -227,7 +227,7 @@ def map_functions(js_func):
     )
 
 
-def parse_function(js_func: str):
+def parse_function(js_func: str) -> Tuple[str, int]:
     """Parse the Javascript transform function.
 
     Break a JavaScript transform function down into a two element ``tuple``
@@ -253,7 +253,8 @@ def parse_function(js_func: str):
         raise RegexMatchError(
             "regex pattern ({pattern}) had zero matches".format(pattern=pattern),
         )
-    return results.groups()
+    fn_name, fn_arg = results.groups()
+    return fn_name, int(fn_arg)
 
 
 def get_signature(js: str, ciphered_signature: str) -> str:
@@ -278,7 +279,7 @@ def get_signature(js: str, ciphered_signature: str) -> str:
 
     for js_func in transform_plan:
         name, argument = parse_function(js_func)
-        signature = transform_map[name](signature, int(argument))
+        signature = transform_map[name](signature, argument)
         logger.debug("applied transform function\n")
         # pprint.pformat(
         #     {
