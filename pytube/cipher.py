@@ -58,7 +58,7 @@ def get_initial_function_name(js: str) -> str:
     raise RegexMatchError("get_initial_function_name not found")
 
 
-def get_transform_plan(js: str):
+def get_transform_plan(js: str) -> str:
     """Extract the "transform plan".
 
     The "transform plan" is the functions that the ciphered signature is
