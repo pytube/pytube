@@ -191,7 +191,6 @@ class StreamQuery:
                 }
             except ValueError:
                 integer_attr_repr = None
-                pass
 
         # lookup integer values if we have them
         if integer_attr_repr is not None:
@@ -201,10 +200,10 @@ class StreamQuery:
                     key=lambda s: integer_attr_repr[getattr(s, attribute_name)],  # type: ignore  # noqa: E501
                 )
             )
-        else:
-            return StreamQuery(
-                sorted(has_attribute, key=lambda s: getattr(s, attribute_name))
-            )
+
+        return StreamQuery(
+            sorted(has_attribute, key=lambda s: getattr(s, attribute_name))
+        )
 
     def desc(self) -> "StreamQuery":
         """Sort streams in descending order.
