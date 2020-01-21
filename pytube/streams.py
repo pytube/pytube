@@ -176,10 +176,14 @@ class Stream(object):
         :returns:
             Youtube video title
         """
-        return self.player_config_args.get("title") or (
-            self.player_config_args.get("player_response", {})
-            .get("videoDetails", {})
-            .get("title")
+        return (
+            self.player_config_args.get("title")
+            or (
+                self.player_config_args.get("player_response", {})
+                .get("videoDetails", {})
+                .get("title")
+            )
+            or "Unknown YouTube Video Title"
         )
 
     @property
