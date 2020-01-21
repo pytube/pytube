@@ -16,6 +16,7 @@ signature and decoding it.
 
 import re
 from itertools import chain
+from typing import List
 
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search, create_logger
@@ -58,7 +59,7 @@ def get_initial_function_name(js: str) -> str:
     raise RegexMatchError("get_initial_function_name not found")
 
 
-def get_transform_plan(js: str) -> str:
+def get_transform_plan(js: str) -> List[str]:
     """Extract the "transform plan".
 
     The "transform plan" is the functions that the ciphered signature is

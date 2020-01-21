@@ -12,9 +12,7 @@ from pytube.exceptions import RegexMatchError
 logger = logging.getLogger(__name__)
 
 
-def regex_search(
-    pattern: str, string: str, group: Optional[int] = None,
-):
+def regex_search(pattern: str, string: str, group: int) -> str:
     """Shortcut method to search a string for a given pattern.
 
     :param str pattern:
@@ -34,17 +32,13 @@ def regex_search(
         raise RegexMatchError(
             "regex pattern ({pattern}) had zero matches".format(pattern=pattern),
         )
-    else:
-        logger.debug(
-            "finished regex search: %s",
-            pprint.pformat(
-                {"pattern": pattern, "results": results.group(0),}, indent=2,
-            ),
-        )
-        if group is not None:
-            return results.group(group)
-        else:
-            return results
+
+    logger.debug(
+        "finished regex search: %s",
+        pprint.pformat({"pattern": pattern, "results": results.group(0),}, indent=2,),
+    )
+
+    return results.group(group)
 
 
 def apply_mixin(dct, key, func, *args, **kwargs):
