@@ -1,7 +1,7 @@
 version = 1
 
 test_patterns = [
-  "*/test/**"
+  "*/tests/**"
 ]
 
 exclude_patterns = [

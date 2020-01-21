@@ -28,7 +28,7 @@ from pytube.monostate import OnProgress, OnComplete, Monostate
 logger = logging.getLogger(__name__)
 
 
-class YouTube(object):
+class YouTube:
     """Core developer interface for pytube."""
 
     def __init__(

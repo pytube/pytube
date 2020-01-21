@@ -167,7 +167,7 @@ class StreamQuery:
         return StreamQuery(fmt_streams)
 
     def order_by(self, attribute_name: str) -> "StreamQuery":
-        """Apply a sort order to a resultset. Filters out stream the do not have the attribute.
+        """Apply a sort order. Filters out stream the do not have the attribute.
 
         :param str attribute_name:
             The name of the attribute to sort by.

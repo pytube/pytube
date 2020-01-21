@@ -23,7 +23,7 @@ from pytube.monostate import Monostate
 logger = logging.getLogger(__name__)
 
 
-class Stream(object):
+class Stream:
     """Container for stream manifest data."""
 
     def __init__(self, stream: Dict, player_config_args: Dict, monostate: Monostate):

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-Module to download a complete playlist from a youtube channel
-"""
+"""Module to download a complete playlist from a youtube channel"""
+
 import json
 import logging
 import re
@@ -14,7 +13,7 @@ from pytube.__main__ import YouTube
 logger = logging.getLogger(__name__)
 
 
-class Playlist(object):
+class Playlist:
     """Handles all the task of manipulating and downloading a whole YouTube
     playlist
     """
@@ -40,7 +39,8 @@ class Playlist(object):
         # url is already in the desired format, so just return it
         return self.playlist_url
 
-    def _load_more_url(self, req):
+    @staticmethod
+    def _load_more_url(req):
         """Given an html page or a fragment thereof, looks for
         and returns the "load more" url if found.
         """
@@ -71,7 +71,7 @@ class Playlist(object):
         # Simulating a browser request for the load more link
         load_more_url = self._load_more_url(req)
         while len(load_more_url):  # there is an url found
-            logger.debug("load more url: %s" % load_more_url)
+            logger.debug("load more url: %s", load_more_url)
             req = request.get(load_more_url)
             load_more = json.loads(req)
             videos = re.findall(
@@ -155,8 +155,6 @@ class Playlist(object):
                 logger.debug(e)
                 if not self.suppress_exception:
                     raise e
-                else:
-                    logger.debug("Exception suppressed")
             else:
                 # TODO: this should not be hardcoded to a single user's
                 # preference
@@ -177,26 +175,21 @@ class Playlist(object):
                 logger.debug("download complete")
 
     def title(self) -> Optional[str]:
-        """return playlist title (name)
-        """
-        try:
-            url = self.construct_playlist_url()
-            req = request.get(url)
-            open_tag = "<title>"
-            end_tag = "</title>"
-            pattern = re.compile(open_tag + "(.+?)" + end_tag)
-            match = pattern.search(req)
+        """return playlist title (name)"""
+        url = self.construct_playlist_url()
+        req = request.get(url)
+        open_tag = "<title>"
+        end_tag = "</title>"
+        pattern = re.compile(open_tag + "(.+?)" + end_tag)
+        match = pattern.search(req)
 
-            if match is None:
-                return None
-
-            return (
-                match.group()
-                .replace(open_tag, "")
-                .replace(end_tag, "")
-                .replace("- YouTube", "")
-                .strip()
-            )
-        except Exception as e:
-            logger.debug(e)
+        if match is None:
             return None
+
+        return (
+            match.group()
+            .replace(open_tag, "")
+            .replace(end_tag, "")
+            .replace("- YouTube", "")
+            .strip()
+        )

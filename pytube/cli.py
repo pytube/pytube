@@ -130,9 +130,11 @@ def display_progress_bar(
 
     filled = int(round(max_width * bytes_received / float(filesize)))
     remaining = max_width - filled
-    bar = ch * filled + " " * remaining
+    progress_bar = ch * filled + " " * remaining
     percent = round(100.0 * bytes_received / float(filesize), 1)
-    text = " ↳ |{bar}| {percent}%\r".format(bar=bar, percent=percent)
+    text = " ↳ |{progress_bar}| {percent}%\r".format(
+        progress_bar=progress_bar, percent=percent
+    )
     sys.stdout.write(text)
     sys.stdout.flush()
 

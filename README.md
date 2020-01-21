@@ -244,6 +244,8 @@ Finally, if you're filing a bug report, the cli contains a switch called ``--bui
 
 ## Development
 
+<a href="https://deepsource.io/gh/hbmartin/pytube3/?ref=repository-badge" target="_blank"><img alt="DeepSource" title="DeepSource" src="https://static.deepsource.io/deepsource-badge-light-mini.svg"></a>
+
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 To run code checking before a PR use ``make test``
