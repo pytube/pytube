@@ -107,40 +107,41 @@ def test_author(cipher_signature):
     assert cipher_signature.author == expected
 
 
-@pytest.mark.skip
+def test_thumbnail_when_in_details(cipher_signature):
+    expected = "some url"
+    cipher_signature.player_config_args = {
+        "player_response": {
+            "videoDetails": {"thumbnail": {"thumbnails": [{"url": expected}]}}
+        }
+    }
+    assert cipher_signature.thumbnail_url == expected
+
+
+def test_thumbnail_when_not_in_details(cipher_signature):
+    expected = "https://img.youtube.com/vi/9bZkp7q19f0/maxresdefault.jpg"
+    cipher_signature.player_config_args = {}
+    assert cipher_signature.thumbnail_url == expected
+
+
 def test_repr_for_audio_streams(cipher_signature):
     stream = str(cipher_signature.streams.filter(only_audio=True).first())
-    expected = (
-        '<Stream: itag="140" mime_type="audio/mp4" abr="128kbps" ' 'acodec="mp4a.40.2">'
-    )
+    expected = '<Stream: itag="140" mime_type="audio/mp4" abr="128kbps" acodec="mp4a.40.2" progressive="False" type="audio">'
     assert stream == expected
 
 
-@pytest.mark.skip
 def test_repr_for_video_streams(cipher_signature):
     stream = str(cipher_signature.streams.filter(only_video=True).first())
-    expected = (
-        '<Stream: itag="137" mime_type="video/mp4" res="1080p" '
-        'fps="30fps" vcodec="avc1.640028">'
-    )
+    expected = '<Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028" progressive="False" type="video">'
     assert stream == expected
 
 
-@pytest.mark.skip
 def test_repr_for_progressive_streams(cipher_signature):
     stream = str(cipher_signature.streams.filter(progressive=True).first())
-    expected = (
-        '<Stream: itag="18" mime_type="video/mp4" res="360p" '
-        'fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">'
-    )
+    expected = '<Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2" progressive="True" type="video">'
     assert stream == expected
 
 
-@pytest.mark.skip
 def test_repr_for_adaptive_streams(cipher_signature):
     stream = str(cipher_signature.streams.filter(adaptive=True).first())
-    expected = (
-        '<Stream: itag="137" mime_type="video/mp4" res="1080p" '
-        'fps="30fps" vcodec="avc1.640028">'
-    )
+    expected = '<Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028" progressive="False" type="video">'
     assert stream == expected
