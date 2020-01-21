@@ -38,7 +38,7 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
     )
     for i, stream in enumerate(stream_manifest):
         try:
-            url = stream["url"]
+            url: str = stream["url"]
         except KeyError:
             if live_stream:
                 raise LiveStreamError("Video is currently being streamed live")
