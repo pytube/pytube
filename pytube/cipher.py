@@ -266,7 +266,6 @@ def get_signature(js: str, ciphered_signature: str) -> str:
 
     """
     transform_plan = get_transform_plan(js)
-    # DE.AJ(a,15) => DE, AJ(a,15)
     var, _ = transform_plan[0].split(".")
     transform_map = get_transform_map(js, var)
     signature = [s for s in ciphered_signature]
@@ -274,15 +273,12 @@ def get_signature(js: str, ciphered_signature: str) -> str:
     for js_func in transform_plan:
         name, argument = parse_function(js_func)
         signature = transform_map[name](signature, argument)
-        logger.debug("applied transform function\n")
-        # pprint.pformat(
-        #     {
-        #         "output": "".join(signature),
-        #         "js_function": name,
-        #         "argument": int(argument),
-        #         "function": transform_map[name],
-        #     },
-        #     indent=2,
-        # ),
+        logger.debug(
+            "applied transform function\noutput: %s\njs_function: %s\nargument: %d\nfunction: %s",
+            "".join(signature),
+            name,
+            argument,
+            transform_map[name],
+        )
 
     return "".join(signature)
