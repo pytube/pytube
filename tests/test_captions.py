@@ -1,6 +1,13 @@
 from pytube import Caption, CaptionQuery
 
 
+def test_float_to_srt_time_format():
+    caption1 = Caption(
+        {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
+    )
+    assert caption1.float_to_srt_time_format(3.89) == "00:00:03,890"
+
+
 def test_caption_query_all():
     caption1 = Caption(
         {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
