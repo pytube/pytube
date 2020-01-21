@@ -90,16 +90,8 @@ class YouTube(object):
             install_proxy(proxies)
 
         if not defer_prefetch_init:
-            self.prefetch_descramble()
-
-    def prefetch_descramble(self) -> None:
-        """Download data, descramble it, and build Stream instances.
-
-        :rtype: None
-
-        """
-        self.prefetch()
-        self.descramble()
+            self.prefetch()
+            self.descramble()
 
     def descramble(self) -> None:
         """Descramble the stream data and build Stream instances.
@@ -160,7 +152,9 @@ class YouTube(object):
             self.initialize_stream_objects(fmt)
 
         # load the player_response object (contains subtitle information)
-        self.player_config_args["player_response"] = json.loads(self.player_config_args["player_response"])
+        self.player_config_args["player_response"] = json.loads(
+            self.player_config_args["player_response"]
+        )
 
         self.initialize_caption_objects()
         logger.info("init finished successfully")
