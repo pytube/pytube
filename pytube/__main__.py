@@ -275,7 +275,11 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args["title"]
+        return self.player_config_args.get("title") or (
+            self.player_config_args.get("player_response", {})
+            .get("videoDetails", {})
+            .get("title")
+        )
 
     @property
     def description(self) -> str:
@@ -284,7 +288,11 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.vid_descr
+        return self.vid_descr or (
+            self.player_config_args.get("player_response", {})
+            .get("videoDetails", {})
+            .get("shortDescription")
+        )
 
     @property
     def rating(self) -> float:
@@ -306,7 +314,7 @@ class YouTube(object):
         :rtype: str
 
         """
-        return (
+        return self.player_config_args.get("length_seconds") or (
             self.player_config_args.get("player_response", {})
             .get("videoDetails", {})
             .get("lengthSeconds")
