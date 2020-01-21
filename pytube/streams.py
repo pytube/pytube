@@ -236,21 +236,20 @@ class Stream:
                 prefix=safe_filename(filename_prefix), filename=filename,
             )
 
-        # file path
-        fp = os.path.join(output_path, filename)
+        file_path = os.path.join(output_path, filename)
         bytes_remaining = self.filesize
         logger.debug(
-            "downloading (%s total bytes) file to %s", self.filesize, fp,
+            "downloading (%s total bytes) file to %s", self.filesize, file_path,
         )
 
-        with open(fp, "wb") as fh:
+        with open(file_path, "wb") as fh:
             for chunk in request.get(self.url, streaming=True):
                 # reduce the (bytes) remainder by the length of the chunk.
                 bytes_remaining -= len(chunk)
                 # send to the on_progress callback.
                 self.on_progress(chunk, fh, bytes_remaining)
         self.on_complete(fh)
-        return fp
+        return file_path
 
     def stream_to_buffer(self) -> io.BytesIO:
         """Write the media stream to buffer
