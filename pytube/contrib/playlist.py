@@ -70,7 +70,7 @@ class Playlist:
         # The above only returns 100 or fewer links
         # Simulating a browser request for the load more link
         load_more_url = self._load_more_url(req)
-        while len(load_more_url):  # there is an url found
+        while len(load_more_url) > 0:  # there is an url found
             logger.debug("load more url: %s", load_more_url)
             req = request.get(load_more_url)
             load_more = json.loads(req)
