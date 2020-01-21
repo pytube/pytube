@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from unittest import mock
 
+import pytest
+
 from pytube import YouTube
+from pytube.exceptions import VideoUnavailable
 
 
 @mock.patch("pytube.__main__.YouTube")
@@ -21,3 +24,13 @@ def test_install_proxy(opener):
         proxies=proxies,
     )
     opener.assert_called()
+
+
+@mock.patch("pytube.request.get")
+def test_video_unavailable(get):
+    get.return_value = None
+    youtube = YouTube(
+        "https://www.youtube.com/watch?v=9bZkp7q19f0", defer_prefetch_init=True
+    )
+    with pytest.raises(VideoUnavailable):
+        youtube.prefetch()
