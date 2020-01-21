@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Library specific exception definitions."""
-import sys
 from typing import Union, Pattern
 
 
@@ -27,7 +26,7 @@ class RegexMatchError(ExtractError):
         :param str pattern:
             Pattern that failed to match
         """
-        super(ExtractError, self).__init__(
+        super().__init__(
             "{caller}: could not find match for {pattern}".format(
                 caller=caller, pattern=pattern
             )
@@ -48,11 +47,8 @@ class VideoUnavailable(PytubeError):
         :param str video_id:
             A YouTube video identifier.
         """
-        super(PytubeError, self).__init__(
-            "{video_id} is unavailable".format(video_id=video_id)
-        )
+        super().__init__("{video_id} is unavailable".format(video_id=video_id))
 
-        self.exc_info = sys.exc_info()
         self.video_id = video_id
 
 

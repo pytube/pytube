@@ -80,4 +80,4 @@ def test_mime_type_codec():
 
 def test_mime_type_codec_with_no_match_should_error():
     with pytest.raises(RegexMatchError):
-        mime_type, mime_subtype = extract.mime_type_codec("audio/webm")
+        extract.mime_type_codec("audio/webm")

@@ -34,7 +34,7 @@ def get_initial_function_name(js: str) -> str:
        Function name from regex match
     """
 
-    pattern = [
+    function_patterns = [
         r"\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
         r"\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
         r'(?P<sig>[a-zA-Z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\)',  # noqa: E501
@@ -49,8 +49,8 @@ def get_initial_function_name(js: str) -> str:
     ]
 
     logger.debug("finding initial function name")
-    for p in pattern:
-        regex = re.compile(p)
+    for pattern in function_patterns:
+        regex = re.compile(pattern)
         results = regex.search(js)
         if results:
             logger.debug("finished regex search, matched: {pattern}".format(pattern=p))
