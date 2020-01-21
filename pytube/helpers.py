@@ -72,25 +72,6 @@ def regex_search(pattern, string, groups=False, group=None, flags=0):
                 return results
 
 
-def apply_mixin(dct, key, func, *args, **kwargs):
-    r"""Apply in-place data mutation to a dictionary.
-
-    :param dict dct:
-        Dictionary to apply mixin function to.
-    :param str key:
-        Key within dictionary to apply mixin function to.
-    :param callable func:
-        Transform function to apply to ``dct[key]``.
-    :param \*args:
-        (optional) positional arguments that ``func`` takes.
-    :param \*\*kwargs:
-        (optional) keyword arguments that ``func`` takes.
-    :rtype:
-        None
-    """
-    dct[key] = func(dct[key], *args, **kwargs)
-
-
 def safe_filename(s: str, max_length: int = 255) -> str:
     """Sanitize a string making it safe to use as a filename.
 

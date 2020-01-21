@@ -23,7 +23,6 @@ from pytube import Stream
 from pytube import StreamQuery
 from pytube.mixins import install_proxy
 from pytube.exceptions import VideoUnavailable
-from pytube.helpers import apply_mixin
 from pytube.monostate import OnProgress, OnComplete, Monostate
 
 logger = logging.getLogger(__name__)
@@ -161,7 +160,7 @@ class YouTube(object):
             self.initialize_stream_objects(fmt)
 
         # load the player_response object (contains subtitle information)
-        apply_mixin(self.player_config_args, "player_response", json.loads)
+        self.player_config_args["player_response"] = json.loads(self.player_config_args["player_response"])
 
         self.initialize_caption_objects()
         logger.info("init finished successfully")
