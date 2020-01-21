@@ -193,7 +193,7 @@ If you need to optimize for a specific feature, such as the "highest resolution"
 ```python
 >>> yt.streams.filter(progressive=True).order_by('resolution').desc().all()
 ```
-Note that ``order_by`` cannot be used if your attribute is undefined in any of the Stream instances, so be sure to apply a filter to remove those before calling it.
+Note: Using ``order_by`` on a given attribute will filter out all streams missing that attribute.
 
 ### Callbacks
 
