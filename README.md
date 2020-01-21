@@ -13,6 +13,15 @@
 
 # pytube3
 
+
+## Table of Contents
+  * [Installation](#installation)
+  * [Quick start](#quick-start)
+  * [Features](#features)
+  * [Usage](#usage)
+  * [Command-line interface](#command-line-interface)
+  * [Development](#development)
+
 ## Installation
 
 Download using pip via pypi.
