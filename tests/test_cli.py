@@ -79,3 +79,12 @@ def test_download_caption_with_language_not_found(youtube):
     ) as wrapped_all:
         cli.download_caption(youtube, "blah")
         wrapped_all.assert_called()
+
+
+@mock.patch("pytube.Stream")
+@mock.patch("io.BufferedWriter")
+def test_on_progress(stream, writer):
+    stream.filesize = 10
+    cli.display_progress_bar = MagicMock()
+    cli.on_progress(stream, "", writer, 7)
+    cli.display_progress_bar.assert_called_once_with(3, 10)

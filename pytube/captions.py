@@ -114,12 +114,12 @@ class Caption:
         else:
             filename = title
 
-        filename = safe_filename(filename)
-
         if filename_prefix:
             filename = "{prefix}{filename}".format(
                 prefix=safe_filename(filename_prefix), filename=filename,
             )
+
+        filename = safe_filename(filename)
 
         filename += " ({})".format(self.code)
 

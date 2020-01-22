@@ -56,6 +56,18 @@ def test_download(srt):
         assert m.call_args_list[0][0][0].split("/")[-1] == "title (en).srt"
 
 
+@mock.patch("pytube.captions.Caption.generate_srt_captions")
+def test_download_with_prefix(srt):
+    m = mock_open()
+    with patch("builtins.open", m):
+        srt.return_value = ""
+        caption = Caption(
+            {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
+        )
+        caption.download("title", filename_prefix="1 ")
+        assert m.call_args_list[0][0][0].split("/")[-1] == "1 title (en).srt"
+
+
 @mock.patch("pytube.captions.Caption.xml_captions")
 def test_download_xml_and_trim_extension(xml):
     m = mock_open()
@@ -66,3 +78,10 @@ def test_download_xml_and_trim_extension(xml):
         )
         caption.download("title.xml", srt=False)
         assert m.call_args_list[0][0][0].split("/")[-1] == "title (en).xml"
+
+
+def test_repr():
+    caption = Caption(
+        {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
+    )
+    assert str(caption) == '<Caption lang="name1" code="en">'
