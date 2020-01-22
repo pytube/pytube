@@ -9,7 +9,7 @@ import logging
 import os
 import sys
 from io import BufferedWriter
-from typing import Tuple, Any, Optional
+from typing import Tuple, Any, Optional, List
 
 from pytube import __version__, CaptionQuery
 from pytube import YouTube
@@ -22,6 +22,28 @@ def main():
     """Command line application to download youtube videos."""
     # noinspection PyTypeChecker
     parser = argparse.ArgumentParser(description=main.__doc__)
+    args = _parse_args(parser)
+    logging.getLogger().setLevel(max(3 - args.verbosity, 0) * 10)
+
+    if not args.url:
+        parser.print_help()
+        sys.exit(1)
+
+    youtube = YouTube(args.url)
+
+    if args.list:
+        display_streams(youtube)
+    if args.build_playback_report:
+        build_playback_report(youtube)
+    if args.itag:
+        download(youtube=youtube, itag=args.itag)
+    if hasattr(args, "caption_code"):
+        download_caption(youtube=youtube, lang_code=args.caption_code)
+
+
+def _parse_args(
+    parser: argparse.ArgumentParser, args: Optional[List] = None
+) -> argparse.Namespace:
     parser.add_argument("url", help="The YouTube /watch url", nargs="?")
     parser.add_argument(
         "--version", action="version", version="%(prog)s " + __version__,
@@ -63,23 +85,7 @@ def main():
         ),
     )
 
-    args = parser.parse_args()
-    logging.getLogger().setLevel(max(3 - args.verbosity, 0) * 10)
-
-    if not args.url:
-        parser.print_help()
-        sys.exit(1)
-
-    youtube = YouTube(args.url)
-
-    if args.list:
-        display_streams(youtube)
-    if args.build_playback_report:
-        build_playback_report(youtube)
-    if args.itag:
-        download(youtube=youtube, itag=args.itag)
-    if hasattr(args, "caption_code"):
-        download_caption(youtube=youtube, lang_code=args.caption_code)
+    return parser.parse_args(args)
 
 
 def build_playback_report(youtube: YouTube) -> None:
