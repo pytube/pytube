@@ -127,11 +127,11 @@ class Caption:
 
         file_path = os.path.join(output_path, filename)
 
-        with open(file_path, "w", encoding="utf-8") as fh:
+        with open(file_path, "w", encoding="utf-8") as file_handle:
             if srt:
-                fh.write(self.generate_srt_captions())
+                file_handle.write(self.generate_srt_captions())
             else:
-                fh.write(self.xml_captions())
+                file_handle.write(self.xml_captions)
 
         return file_path
 

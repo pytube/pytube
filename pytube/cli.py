@@ -77,31 +77,31 @@ def main():
     if args.build_playback_report:
         build_playback_report(youtube)
     if args.itag:
-        download(yt=youtube, itag=args.itag)
+        download(youtube=youtube, itag=args.itag)
     if hasattr(args, "caption_code"):
-        download_caption(yt=youtube, lang_code=args.caption_code)
+        download_caption(youtube=youtube, lang_code=args.caption_code)
 
 
-def build_playback_report(yt: YouTube) -> None:
+def build_playback_report(youtube: YouTube) -> None:
     """Serialize the request data to json for offline debugging.
 
-    :param YouTube yt:
+    :param YouTube youtube:
         A YouTube object.
     """
     ts = int(dt.datetime.utcnow().timestamp())
     fp = os.path.join(
-        os.getcwd(), "yt-video-{yt.video_id}-{ts}.json.gz".format(yt=yt, ts=ts),
+        os.getcwd(), "yt-video-{yt.video_id}-{ts}.json.gz".format(yt=youtube, ts=ts),
     )
 
-    js = yt.js
-    watch_html = yt.watch_html
-    vid_info = yt.vid_info
+    js = youtube.js
+    watch_html = youtube.watch_html
+    vid_info = youtube.vid_info
 
     with gzip.open(fp, "wb") as fh:
         fh.write(
             json.dumps(
                 {
-                    "url": yt.watch_url,
+                    "url": youtube.watch_url,
                     "js": js,
                     "watch_html": watch_html,
                     "video_info": vid_info,
@@ -159,10 +159,10 @@ def on_progress(
     display_progress_bar(bytes_received, filesize)
 
 
-def download(yt: YouTube, itag: str) -> None:
+def download(youtube: YouTube, itag: str) -> None:
     """Start downloading a YouTube video.
 
-    :param YouTube yt:
+    :param YouTube youtube:
         A valid YouTube object.
     :param str itag:
         YouTube format identifier code.
@@ -170,12 +170,12 @@ def download(yt: YouTube, itag: str) -> None:
     """
     # TODO(nficano): allow download target to be specified
     # TODO(nficano): allow dash itags to be selected
-    yt.register_on_progress_callback(on_progress)
-    stream = yt.streams.get_by_itag(int(itag))
+    youtube.register_on_progress_callback(on_progress)
+    stream = youtube.streams.get_by_itag(int(itag))
     if stream is None:
         print("Could not find a stream with itag: {itag}".format(itag=itag))
         print("Try one of these:")
-        display_streams(yt)
+        display_streams(youtube)
         sys.exit()
     print("\n{fn} | {fs} bytes".format(fn=stream.default_filename, fs=stream.filesize,))
     try:
@@ -185,37 +185,47 @@ def download(yt: YouTube, itag: str) -> None:
         sys.exit()
 
 
-def display_streams(yt: YouTube) -> None:
+def display_streams(youtube: YouTube) -> None:
     """Probe YouTube video and lists its available formats.
 
-    :param YouTube yt:
+    :param YouTube youtube:
         A valid YouTube watch URL.
 
     """
-    for stream in yt.streams.all():
+    for stream in youtube.streams.all():
         print(stream)
 
 
 def _print_available_captions(captions: CaptionQuery) -> None:
     print(
         "Available caption codes are: {}".format(
-            ", ".join([c.code for c in captions.all()])
+            ", ".join(c.code for c in captions.all())
         )
     )
 
 
-def download_caption(yt: YouTube, lang_code: Optional[str]) -> None:
+def download_caption(youtube: YouTube, lang_code: Optional[str]) -> None:
+    """Download a caption for the YouTube video.
+
+    :param YouTube youtube:
+        A valid YouTube object.
+    :param str lang_code:
+        Language code desired for caption file.
+        Prints available codes if the value is None
+        or the desired code is not available.
+
+    """
     if lang_code is None:
-        _print_available_captions(yt.captions)
+        _print_available_captions(youtube.captions)
         return
 
-    caption = yt.captions.get_by_language_code(lang_code=lang_code)
+    caption = youtube.captions.get_by_language_code(lang_code=lang_code)
     if caption:
-        downloaded_path = caption.download(title=yt.title)
+        downloaded_path = caption.download(title=youtube.title)
         print("Saved caption file to: {}".format(downloaded_path))
     else:
         print("Unable to find caption with code: {}".format(lang_code))
-        _print_available_captions(yt.captions)
+        _print_available_captions(youtube.captions)
 
 
 if __name__ == "__main__":
