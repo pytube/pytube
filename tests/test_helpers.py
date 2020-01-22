@@ -7,12 +7,11 @@ from pytube.exceptions import RegexMatchError
 
 def test_regex_search_no_match():
     with pytest.raises(RegexMatchError):
-        helpers.regex_search("^a$", "", groups=True)
+        helpers.regex_search("^a$", "", group=0)
 
 
 def test_regex_search():
-    # TODO(nficano): should check isinstance
-    assert helpers.regex_search("^a$", "a") is not None
+    assert helpers.regex_search("^a$", "a", group=0) == "a"
 
 
 def test_safe_filename():

@@ -3,12 +3,8 @@
 from urllib.request import Request
 from urllib.request import urlopen
 
-# 403 forbidden fix
 
-
-def get(
-    url, headers=False, streaming=False, chunk_size=8 * 1024,
-):
+def get(url, headers=False, streaming=False, chunk_size=8192):
     """Send an http GET request.
 
     :param str url:
@@ -18,7 +14,7 @@ def get(
     :param bool streaming:
         Returns the response body in chunks via a generator.
     :param int chunk_size:
-        The size in bytes of each chunk.
+        The size in bytes of each chunk. Defaults to 8*1024
     """
 
     req = Request(url, headers={"User-Agent": "Mozilla/5.0"})

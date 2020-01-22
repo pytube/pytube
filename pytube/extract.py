@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """This module contains all non-cipher related data extraction logic."""
 import json
+import re
 from collections import OrderedDict
 
 from html.parser import HTMLParser
@@ -170,7 +171,11 @@ def mime_type_codec(mime_type_codec: str) -> Tuple[str, List[str]]:
 
     """
     pattern = r"(\w+\/\w+)\;\scodecs=\"([a-zA-Z-0-9.,\s]*)\""
-    mime_type, codecs = regex_search(pattern, mime_type_codec, groups=True)
+    regex = re.compile(pattern)
+    results = regex.search(mime_type_codec)
+    if not results:
+        raise RegexMatchError(caller="mime_type_codec", pattern=pattern)
+    mime_type, codecs = results.groups()
     return mime_type, [c.strip() for c in codecs.split(",")]
 
 

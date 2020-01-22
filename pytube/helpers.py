@@ -7,69 +7,34 @@ import re
 
 from pytube.exceptions import RegexMatchError
 
-
 logger = logging.getLogger(__name__)
 
 
-def regex_search(pattern, string, groups=False, group=None, flags=0):
+def regex_search(pattern: str, string: str, group: int) -> str:
     """Shortcut method to search a string for a given pattern.
 
     :param str pattern:
         A regular expression pattern.
     :param str string:
         A target string to search.
-    :param bool groups:
-        Should the return value be ``.groups()``.
     :param int group:
         Index of group to return.
-    :param int flags:
-        Expression behavior modifiers.
     :rtype:
         str or tuple
     :returns:
         Substring pattern matches.
     """
-    if type(pattern) == list:
-        for p in pattern:
-            regex = re.compile(p, flags)
-            results = regex.search(string)
-            if not results:
-                raise RegexMatchError(
-                    "regex pattern ({pattern}) had zero matches".format(pattern=p),
-                )
-            else:
-                logger.debug(
-                    "finished regex search: %s",
-                    pprint.pformat(
-                        {"pattern": p, "results": results.group(0),}, indent=2,
-                    ),
-                )
-                if groups:
-                    return results.groups()
-                elif group is not None:
-                    return results.group(group)
-                else:
-                    return results
-    else:
-        regex = re.compile(pattern, flags)
-        results = regex.search(string)
-        if not results:
-            raise RegexMatchError(
-                "regex pattern ({pattern}) had zero matches".format(pattern=pattern),
-            )
-        else:
-            logger.debug(
-                "finished regex search: %s",
-                pprint.pformat(
-                    {"pattern": pattern, "results": results.group(0),}, indent=2,
-                ),
-            )
-            if groups:
-                return results.groups()
-            elif group is not None:
-                return results.group(group)
-            else:
-                return results
+    regex = re.compile(pattern)
+    results = regex.search(string)
+    if not results:
+        raise RegexMatchError(caller="regex_search", pattern=pattern)
+
+    logger.debug(
+        "finished regex search: %s",
+        pprint.pformat({"pattern": pattern, "results": results.group(0),}, indent=2,),
+    )
+
+    return results.group(group)
 
 
 def safe_filename(s: str, max_length: int = 255) -> str:

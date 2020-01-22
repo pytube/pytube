@@ -14,28 +14,27 @@ signature and decoding it.
 
 """
 
-import logging
-import pprint
 import re
 from itertools import chain
+from typing import List, Tuple, Dict, Callable
 
 from pytube.exceptions import RegexMatchError
-from pytube.helpers import regex_search
+from pytube.helpers import regex_search, create_logger
+
+logger = create_logger()
 
 
-logger = logging.getLogger(__name__)
-
-
-def get_initial_function_name(js):
+def get_initial_function_name(js: str) -> str:
     """Extract the name of the function responsible for computing the signature.
 
     :param str js:
         The contents of the base.js asset file.
-
+    :rtype: str
+    :returns:
+       Function name from regex match
     """
-    # c&&d.set("signature", EE(c));
 
-    pattern = [
+    function_patterns = [
         r"\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
         r"\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
         r'(?P<sig>[a-zA-Z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\)',  # noqa: E501
@@ -50,10 +49,19 @@ def get_initial_function_name(js):
     ]
 
     logger.debug("finding initial function name")
-    return regex_search(pattern, js, group=1)
+    for pattern in function_patterns:
+        regex = re.compile(pattern)
+        results = regex.search(js)
+        if results:
+            logger.debug(
+                "finished regex search, matched: {pattern}".format(pattern=pattern)
+            )
+            return results.group(1)
+
+    raise RegexMatchError(caller="get_initial_function_name", pattern="multiple")
 
 
-def get_transform_plan(js):
+def get_transform_plan(js: str) -> List[str]:
     """Extract the "transform plan".
 
     The "transform plan" is the functions that the ciphered signature is
@@ -80,7 +88,7 @@ def get_transform_plan(js):
     return regex_search(pattern, js, group=1).split(";")
 
 
-def get_transform_object(js, var):
+def get_transform_object(js: str, var: str) -> List[str]:
     """Extract the "transform object".
 
     The "transform object" contains the function definitions referenced in the
@@ -104,14 +112,15 @@ def get_transform_object(js, var):
     """
     pattern = r"var %s={(.*?)};" % re.escape(var)
     logger.debug("getting transform object")
-    return (
-        regex_search(pattern, js, group=1, flags=re.DOTALL)
-        .replace("\n", " ")
-        .split(", ")
-    )
+    regex = re.compile(pattern, flags=re.DOTALL)
+    results = regex.search(js)
+    if not results:
+        raise RegexMatchError(caller="get_transform_object", pattern=pattern)
+
+    return results.group(1).replace("\n", " ").split(", ")
 
 
-def get_transform_map(js, var):
+def get_transform_map(js: str, var: str) -> Dict:
     """Build a transform function lookup.
 
     Build a lookup table of obfuscated JavaScript function names to the
@@ -189,7 +198,7 @@ def swap(arr, b):
     return list(chain([arr[r]], arr[1:r], [arr[0]], arr[r + 1 :]))
 
 
-def map_functions(js_func):
+def map_functions(js_func: str) -> Callable:
     """For a given JavaScript transform function, return the Python equivalent.
 
     :param str js_func:
@@ -213,12 +222,10 @@ def map_functions(js_func):
     for pattern, fn in mapper:
         if re.search(pattern, js_func):
             return fn
-    raise RegexMatchError(
-        "could not find python equivalent function for: ", js_func,
-    )
+    raise RegexMatchError(caller="map_functions", pattern="multiple")
 
 
-def parse_function(js_func):
+def parse_function(js_func: str) -> Tuple[str, int]:
     """Parse the Javascript transform function.
 
     Break a JavaScript transform function down into a two element ``tuple``
@@ -237,7 +244,13 @@ def parse_function(js_func):
 
     """
     logger.debug("parsing transform function")
-    return regex_search(r"\w+\.(\w+)\(\w,(\d+)\)", js_func, groups=True)
+    pattern = r"\w+\.(\w+)\(\w,(\d+)\)"
+    regex = re.compile(pattern)
+    results = regex.search(js_func)
+    if not results:
+        raise RegexMatchError(caller="parse_function", pattern=pattern)
+    fn_name, fn_arg = results.groups()
+    return fn_name, int(fn_arg)
 
 
 def get_signature(js: str, ciphered_signature: str) -> str:
@@ -255,24 +268,23 @@ def get_signature(js: str, ciphered_signature: str) -> str:
 
     """
     transform_plan = get_transform_plan(js)
-    # DE.AJ(a,15) => DE, AJ(a,15)
     var, _ = transform_plan[0].split(".")
     transform_map = get_transform_map(js, var)
     signature = [s for s in ciphered_signature]
 
     for js_func in transform_plan:
         name, argument = parse_function(js_func)
-        signature = transform_map[name](signature, int(argument))
+        signature = transform_map[name](signature, argument)
         logger.debug(
-            "applied transform function\n%s",
-            pprint.pformat(
-                {
-                    "output": "".join(signature),
-                    "js_function": name,
-                    "argument": int(argument),
-                    "function": transform_map[name],
-                },
-                indent=2,
-            ),
+            "applied transform function\n"
+            "output: %s\n"
+            "js_function: %s\n"
+            "argument: %d\n"
+            "function: %s",
+            "".join(signature),
+            name,
+            argument,
+            transform_map[name],
         )
+
     return "".join(signature)
