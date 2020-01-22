@@ -9,9 +9,9 @@ import logging
 import os
 import sys
 from io import BufferedWriter
-from typing import Tuple, Any
+from typing import Tuple, Any, Optional
 
-from pytube import __version__
+from pytube import __version__, CaptionQuery
 from pytube import YouTube
 
 
@@ -51,6 +51,17 @@ def main():
         action="store_true",
         help="Save the html and js to disk",
     )
+    parser.add_argument(
+        "-c",
+        "--caption-code",
+        type=str,
+        default=argparse.SUPPRESS,
+        nargs="?",
+        help=(
+            "Download srt captions for given language code. "
+            "Prints available language codes if no argument given"
+        ),
+    )
 
     args = parser.parse_args()
     logging.getLogger().setLevel(max(3 - args.verbosity, 0) * 10)
@@ -63,12 +74,12 @@ def main():
 
     if args.list:
         display_streams(youtube)
-
     if args.build_playback_report:
         build_playback_report(youtube)
-
     if args.itag:
         download(yt=youtube, itag=args.itag)
+    if hasattr(args, "caption_code"):
+        download_caption(yt=youtube, lang_code=args.caption_code)
 
 
 def build_playback_report(yt: YouTube) -> None:
@@ -183,6 +194,28 @@ def display_streams(yt: YouTube) -> None:
     """
     for stream in yt.streams.all():
         print(stream)
+
+
+def _print_available_captions(captions: CaptionQuery) -> None:
+    print(
+        "Available caption codes are: {}".format(
+            ", ".join([c.code for c in captions.all()])
+        )
+    )
+
+
+def download_caption(yt: YouTube, lang_code: Optional[str]) -> None:
+    if lang_code is None:
+        _print_available_captions(yt.captions)
+        return
+
+    caption = yt.captions.get_by_language_code(lang_code=lang_code)
+    if caption:
+        downloaded_path = caption.download(title=yt.title)
+        print("Saved caption file to: {}".format(downloaded_path))
+    else:
+        print("Unable to find caption with code: {}".format(lang_code))
+        _print_available_captions(yt.captions)
 
 
 if __name__ == "__main__":
