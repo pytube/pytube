@@ -34,7 +34,6 @@ setup(
         "Operating System :: Microsoft",
         "Operating System :: POSIX",
         "Operating System :: Unix",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
@@ -50,7 +49,7 @@ setup(
     long_description_content_type="text/markdown",
     long_description=long_description,
     zip_safe=True,
-    python_requires=">=3.5",
+    python_requires=">=3.6",
     project_urls={
         "Bug Reports": "https://github.com/hbmartin/pytube3/issues",
         "Read the Docs": "https://pytube3.readthedocs.io/en/latest/?badge=latest",
