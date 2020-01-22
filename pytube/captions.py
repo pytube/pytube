@@ -108,15 +108,18 @@ class Caption:
 
         """
         output_path = output_path or os.getcwd()
-        filename = safe_filename(title)
+
+        if title.endswith(".srt") or title.endswith(".xml"):
+            filename = ".".join(title.split(".")[:-1])
+        else:
+            filename = title
+
+        filename = safe_filename(filename)
 
         if filename_prefix:
             filename = "{prefix}{filename}".format(
                 prefix=safe_filename(filename_prefix), filename=filename,
             )
-
-        if filename.endswith(".srt") or filename.endswith(".xml"):
-            filename = ".".join(filename.split(".")[:-1])
 
         filename += " ({})".format(self.code)
 
