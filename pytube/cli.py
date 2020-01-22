@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 """A simple command line application to download youtube videos."""
 
 import argparse
@@ -59,23 +59,24 @@ def main():
         parser.print_help()
         sys.exit(1)
 
+    youtube = YouTube(args.url)
+
     if args.list:
-        display_streams(args.url)
+        display_streams(youtube)
 
-    elif args.build_playback_report:
-        build_playback_report(args.url)
+    if args.build_playback_report:
+        build_playback_report(youtube)
 
-    elif args.itag:
-        download(args.url, args.itag)
+    if args.itag:
+        download(yt=youtube, itag=args.itag)
 
 
-def build_playback_report(url: str) -> None:
+def build_playback_report(yt: YouTube) -> None:
     """Serialize the request data to json for offline debugging.
 
-    :param str url:
-        A valid YouTube watch URL.
+    :param YouTube yt:
+        A YouTube object.
     """
-    yt = YouTube(url)
     ts = int(dt.datetime.utcnow().timestamp())
     fp = os.path.join(
         os.getcwd(), "yt-video-{yt.video_id}-{ts}.json.gz".format(yt=yt, ts=ts),
@@ -89,7 +90,7 @@ def build_playback_report(url: str) -> None:
         fh.write(
             json.dumps(
                 {
-                    "url": url,
+                    "url": yt.watch_url,
                     "js": js,
                     "watch_html": watch_html,
                     "video_info": vid_info,
@@ -147,21 +148,23 @@ def on_progress(
     display_progress_bar(bytes_received, filesize)
 
 
-def download(url: str, itag: str) -> None:
+def download(yt: YouTube, itag: str) -> None:
     """Start downloading a YouTube video.
 
-    :param str url:
-        A valid YouTube watch URL.
+    :param YouTube yt:
+        A valid YouTube object.
     :param str itag:
         YouTube format identifier code.
 
     """
     # TODO(nficano): allow download target to be specified
     # TODO(nficano): allow dash itags to be selected
-    yt = YouTube(url, on_progress_callback=on_progress)
+    yt.register_on_progress_callback(on_progress)
     stream = yt.streams.get_by_itag(int(itag))
     if stream is None:
-        print("Could not find a stream with itag: " + itag)
+        print("Could not find a stream with itag: {itag}".format(itag=itag))
+        print("Try one of these:")
+        display_streams(yt)
         sys.exit()
     print("\n{fn} | {fs} bytes".format(fn=stream.default_filename, fs=stream.filesize,))
     try:
@@ -171,14 +174,13 @@ def download(url: str, itag: str) -> None:
         sys.exit()
 
 
-def display_streams(url: str) -> None:
+def display_streams(yt: YouTube) -> None:
     """Probe YouTube video and lists its available formats.
 
-    :param str url:
+    :param YouTube yt:
         A valid YouTube watch URL.
 
     """
-    yt = YouTube(url)
     for stream in yt.streams.all():
         print(stream)
 

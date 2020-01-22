@@ -232,7 +232,7 @@ pytube also ships with a tiny cli interface for downloading and probing videos.
 Let's start with downloading:
 
 ```bash
-$ pytube3 http://youtube.com/watch?v=9bZkp7q19f0 --itag=22
+$ pytube3 http://youtube.com/watch?v=9bZkp7q19f0 --itag=18
 ```
 To view available streams:
 
