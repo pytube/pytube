@@ -47,7 +47,7 @@ def test_caption_query_get_by_language_code_when_not_exists():
 @mock.patch("pytube.captions.Caption.generate_srt_captions")
 def test_download(srt):
     open_mock = mock_open()
-    with patch("builtins.open", m):
+    with patch("builtins.open", open_mock):
         srt.return_value = ""
         caption = Caption(
             {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
@@ -59,7 +59,7 @@ def test_download(srt):
 @mock.patch("pytube.captions.Caption.generate_srt_captions")
 def test_download_with_prefix(srt):
     open_mock = mock_open()
-    with patch("builtins.open", m):
+    with patch("builtins.open", open_mock):
         srt.return_value = ""
         caption = Caption(
             {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
@@ -71,7 +71,7 @@ def test_download_with_prefix(srt):
 @mock.patch("pytube.captions.Caption.xml_captions")
 def test_download_xml_and_trim_extension(xml):
     open_mock = mock_open()
-    with patch("builtins.open", m):
+    with patch("builtins.open", open_mock):
         xml.return_value = ""
         caption = Caption(
             {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
