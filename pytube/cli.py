@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 """A simple command line application to download youtube videos."""
 
 import argparse
@@ -9,9 +9,9 @@ import logging
 import os
 import sys
 from io import BufferedWriter
-from typing import Tuple, Any
+from typing import Tuple, Any, Optional, List
 
-from pytube import __version__
+from pytube import __version__, CaptionQuery
 from pytube import YouTube
 
 
@@ -22,6 +22,28 @@ def main():
     """Command line application to download youtube videos."""
     # noinspection PyTypeChecker
     parser = argparse.ArgumentParser(description=main.__doc__)
+    args = _parse_args(parser)
+    logging.getLogger().setLevel(max(3 - args.verbosity, 0) * 10)
+
+    if not args.url:
+        parser.print_help()
+        sys.exit(1)
+
+    youtube = YouTube(args.url)
+
+    if args.list:
+        display_streams(youtube)
+    if args.build_playback_report:
+        build_playback_report(youtube)
+    if args.itag:
+        download(youtube=youtube, itag=args.itag)
+    if hasattr(args, "caption_code"):
+        download_caption(youtube=youtube, lang_code=args.caption_code)
+
+
+def _parse_args(
+    parser: argparse.ArgumentParser, args: Optional[List] = None
+) -> argparse.Namespace:
     parser.add_argument("url", help="The YouTube /watch url", nargs="?")
     parser.add_argument(
         "--version", action="version", version="%(prog)s " + __version__,
@@ -51,45 +73,41 @@ def main():
         action="store_true",
         help="Save the html and js to disk",
     )
-
-    args = parser.parse_args()
-    logging.getLogger().setLevel(max(3 - args.verbosity, 0) * 10)
-
-    if not args.url:
-        parser.print_help()
-        sys.exit(1)
-
-    if args.list:
-        display_streams(args.url)
-
-    elif args.build_playback_report:
-        build_playback_report(args.url)
-
-    elif args.itag:
-        download(args.url, args.itag)
-
-
-def build_playback_report(url: str) -> None:
-    """Serialize the request data to json for offline debugging.
-
-    :param str url:
-        A valid YouTube watch URL.
-    """
-    yt = YouTube(url)
-    ts = int(dt.datetime.utcnow().timestamp())
-    fp = os.path.join(
-        os.getcwd(), "yt-video-{yt.video_id}-{ts}.json.gz".format(yt=yt, ts=ts),
+    parser.add_argument(
+        "-c",
+        "--caption-code",
+        type=str,
+        default=argparse.SUPPRESS,
+        nargs="?",
+        help=(
+            "Download srt captions for given language code. "
+            "Prints available language codes if no argument given"
+        ),
     )
 
-    js = yt.js
-    watch_html = yt.watch_html
-    vid_info = yt.vid_info
+    return parser.parse_args(args)
+
+
+def build_playback_report(youtube: YouTube) -> None:
+    """Serialize the request data to json for offline debugging.
+
+    :param YouTube youtube:
+        A YouTube object.
+    """
+    ts = int(dt.datetime.utcnow().timestamp())
+    fp = os.path.join(
+        os.getcwd(), "yt-video-{yt.video_id}-{ts}.json.gz".format(yt=youtube, ts=ts),
+    )
+
+    js = youtube.js
+    watch_html = youtube.watch_html
+    vid_info = youtube.vid_info
 
     with gzip.open(fp, "wb") as fh:
         fh.write(
             json.dumps(
                 {
-                    "url": url,
+                    "url": youtube.watch_url,
                     "js": js,
                     "watch_html": watch_html,
                     "video_info": vid_info,
@@ -147,22 +165,25 @@ def on_progress(
     display_progress_bar(bytes_received, filesize)
 
 
-def download(url: str, itag: str) -> None:
+def download(youtube: YouTube, itag: int) -> None:
     """Start downloading a YouTube video.
 
-    :param str url:
-        A valid YouTube watch URL.
+    :param YouTube youtube:
+        A valid YouTube object.
     :param str itag:
         YouTube format identifier code.
 
     """
     # TODO(nficano): allow download target to be specified
     # TODO(nficano): allow dash itags to be selected
-    yt = YouTube(url, on_progress_callback=on_progress)
-    stream = yt.streams.get_by_itag(int(itag))
+    stream = youtube.streams.get_by_itag(itag)
     if stream is None:
-        print("Could not find a stream with itag: " + itag)
+        print("Could not find a stream with itag: {itag}".format(itag=itag))
+        print("Try one of these:")
+        display_streams(youtube)
         sys.exit()
+
+    youtube.register_on_progress_callback(on_progress)
     print("\n{fn} | {fs} bytes".format(fn=stream.default_filename, fs=stream.filesize,))
     try:
         stream.download()
@@ -171,16 +192,47 @@ def download(url: str, itag: str) -> None:
         sys.exit()
 
 
-def display_streams(url: str) -> None:
+def display_streams(youtube: YouTube) -> None:
     """Probe YouTube video and lists its available formats.
 
-    :param str url:
+    :param YouTube youtube:
         A valid YouTube watch URL.
 
     """
-    yt = YouTube(url)
-    for stream in yt.streams.all():
+    for stream in youtube.streams.all():
         print(stream)
+
+
+def _print_available_captions(captions: CaptionQuery) -> None:
+    print(
+        "Available caption codes are: {}".format(
+            ", ".join(c.code for c in captions.all())
+        )
+    )
+
+
+def download_caption(youtube: YouTube, lang_code: Optional[str]) -> None:
+    """Download a caption for the YouTube video.
+
+    :param YouTube youtube:
+        A valid YouTube object.
+    :param str lang_code:
+        Language code desired for caption file.
+        Prints available codes if the value is None
+        or the desired code is not available.
+
+    """
+    if lang_code is None:
+        _print_available_captions(youtube.captions)
+        return
+
+    caption = youtube.captions.get_by_language_code(lang_code=lang_code)
+    if caption:
+        downloaded_path = caption.download(title=youtube.title)
+        print("Saved caption file to: {}".format(downloaded_path))
+    else:
+        print("Unable to find caption with code: {}".format(lang_code))
+        _print_available_captions(youtube.captions)
 
 
 if __name__ == "__main__":

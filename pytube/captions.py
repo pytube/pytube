@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 import math
+import os
 import time
 import xml.etree.ElementTree as ElementTree
-from typing import Dict
+from typing import Dict, Optional
 
 from pytube import request
 from html import unescape
+
+from pytube.helpers import safe_filename
 
 
 class Caption:
@@ -72,6 +75,68 @@ class Caption:
             )
             segments.append(line)
         return "\n".join(segments).strip()
+
+    def download(
+        self,
+        title: str,
+        srt: bool = True,
+        output_path: Optional[str] = None,
+        filename_prefix: Optional[str] = None,
+    ) -> str:
+        """Write the media stream to disk.
+
+        :param filename:
+            Output filename (stem only) for writing media file.
+            If one is not specified, the default filename is used.
+        :type filename: str
+        :param srt:
+            Set to True to download srt, false to download xml. Defaults to True.
+        :type srt bool
+        :param output_path:
+            (optional) Output path for writing media file. If one is not
+            specified, defaults to the current working directory.
+        :type output_path: str or None
+        :param filename_prefix:
+            (optional) A string that will be prepended to the filename.
+            For example a number in a playlist or the name of a series.
+            If one is not specified, nothing will be prepended
+            This is separate from filename so you can use the default
+            filename but still add a prefix.
+        :type filename_prefix: str or None
+
+        :rtype: str
+
+        """
+        output_path = output_path or os.getcwd()
+
+        if title.endswith(".srt") or title.endswith(".xml"):
+            filename = ".".join(title.split(".")[:-1])
+        else:
+            filename = title
+
+        if filename_prefix:
+            filename = "{prefix}{filename}".format(
+                prefix=safe_filename(filename_prefix), filename=filename,
+            )
+
+        filename = safe_filename(filename)
+
+        filename += " ({})".format(self.code)
+
+        if srt:
+            filename += ".srt"
+        else:
+            filename += ".xml"
+
+        file_path = os.path.join(output_path, filename)
+
+        with open(file_path, "w", encoding="utf-8") as file_handle:
+            if srt:
+                file_handle.write(self.generate_srt_captions())
+            else:
+                file_handle.write(self.xml_captions)
+
+        return file_path
 
     def __repr__(self):
         """Printable object representation."""
