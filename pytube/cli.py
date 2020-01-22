@@ -159,7 +159,7 @@ def on_progress(
     display_progress_bar(bytes_received, filesize)
 
 
-def download(youtube: YouTube, itag: str) -> None:
+def download(youtube: YouTube, itag: int) -> None:
     """Start downloading a YouTube video.
 
     :param YouTube youtube:
@@ -170,13 +170,14 @@ def download(youtube: YouTube, itag: str) -> None:
     """
     # TODO(nficano): allow download target to be specified
     # TODO(nficano): allow dash itags to be selected
-    youtube.register_on_progress_callback(on_progress)
-    stream = youtube.streams.get_by_itag(int(itag))
+    stream = youtube.streams.get_by_itag(itag)
     if stream is None:
         print("Could not find a stream with itag: {itag}".format(itag=itag))
         print("Try one of these:")
         display_streams(youtube)
         sys.exit()
+
+    youtube.register_on_progress_callback(on_progress)
     print("\n{fn} | {fs} bytes".format(fn=stream.default_filename, fs=stream.filesize,))
     try:
         stream.download()
