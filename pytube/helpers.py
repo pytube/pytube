@@ -102,8 +102,9 @@ def create_logger(level: int = logging.ERROR) -> logging.Logger:
     return logger
 
 
-T = TypeVar("T")
+GenericType = TypeVar("T")
 
 
-def cache(func: Callable[..., T]) -> T:
+def cache(func: Callable[..., GenericType]) -> GenericType:
+    """ mypy compatible annotation wrapper for lru_cache"""
     return functools.lru_cache()(func)  # type: ignore
