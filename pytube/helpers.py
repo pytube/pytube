@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """Various helper functions implemented by pytube."""
-
+import functools
 import logging
 import pprint
 import re
+from typing import TypeVar, Callable
 
 from pytube.exceptions import RegexMatchError
 
@@ -99,3 +100,11 @@ def create_logger(level: int = logging.ERROR) -> logging.Logger:
     logger.addHandler(handler)
     logger.setLevel(level)
     return logger
+
+
+T = TypeVar('T')
+
+
+def cache(func: Callable[..., T]) -> T:
+    return functools.lru_cache()(func)  # type: ignore
+

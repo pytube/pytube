@@ -40,19 +40,19 @@ class Playlist:
         return self.playlist_url
 
     @staticmethod
-    def _load_more_url(req):
+    def _find_load_more_url(req: str) -> Optional[str]:
         """Given an html page or a fragment thereof, looks for
         and returns the "load more" url if found.
         """
-        try:
-            load_more_url = "https://www.youtube.com" + re.search(
+        match = re.search(
                 r"data-uix-load-more-href=\"(/browse_ajax\?"
                 'action_continuation=.*?)"',
                 req,
-            ).group(1)
-        except AttributeError:
-            load_more_url = ""
-        return load_more_url
+            )
+        if match:
+            return "https://www.youtube.com" + match.group(1)
+
+        return None
 
     def parse_links(self) -> List[str]:
         """Parse the video links from the page source, extracts and
@@ -69,8 +69,8 @@ class Playlist:
 
         # The above only returns 100 or fewer links
         # Simulating a browser request for the load more link
-        load_more_url = self._load_more_url(req)
-        while len(load_more_url) > 0:  # there is an url found
+        load_more_url = self._find_load_more_url(req)
+        while load_more_url:  # there is an url found
             logger.debug("load more url: %s", load_more_url)
             req = request.get(load_more_url)
             load_more = json.loads(req)
@@ -79,11 +79,11 @@ class Playlist:
             )
             # remove duplicates
             link_list.extend(list(OrderedDict.fromkeys(videos)))
-            load_more_url = self._load_more_url(load_more["load_more_widget_html"],)
+            load_more_url = self._find_load_more_url(load_more["load_more_widget_html"], )
 
         return link_list
 
-    def populate_video_urls(self):
+    def populate_video_urls(self) -> None:
         """Construct complete links of all the videos in playlist and
         populate video_urls list
 

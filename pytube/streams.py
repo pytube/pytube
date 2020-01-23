@@ -118,9 +118,7 @@ class Stream:
 
         :rtype: bool
         """
-        if self.is_progressive:
-            return True
-        return self.type == "audio"
+        return self.is_progressive or self.type == "audio"
 
     @property
     def includes_video_track(self) -> bool:
@@ -128,9 +126,7 @@ class Stream:
 
         :rtype: bool
         """
-        if self.is_progressive:
-            return True
-        return self.type == "video"
+        return self.is_progressive or self.type == "video"
 
     def parse_codecs(self) -> Tuple:
         """Get the video/audio codecs from list of codecs.

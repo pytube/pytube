@@ -61,7 +61,7 @@ class YouTube:
 
         # the url to vid info, parsed from watch html
         self.vid_info_url: Optional[str] = None
-        self.vid_info_raw = None  # content fetched by vid_info_url
+        self.vid_info_raw: Optional[str] = None  # content fetched by vid_info_url
         self.vid_info: Optional[Dict] = None  # parsed content of vid_info_raw
 
         self.watch_html: Optional[str] = None  # the html of /watch?v=<video_id>
