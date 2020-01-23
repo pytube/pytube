@@ -102,7 +102,7 @@ def create_logger(level: int = logging.ERROR) -> logging.Logger:
     return logger
 
 
-GenericType = TypeVar("T")
+GenericType = TypeVar("GenericType")
 
 
 def cache(func: Callable[..., GenericType]) -> GenericType:
