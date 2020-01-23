@@ -160,7 +160,7 @@ class Stream:
             Filesize (in bytes) of the stream.
         """
         if self._filesize is None:
-            headers = request.get(self.url, headers=True)
+            headers = request.headers(self.url)
             self._filesize = int(headers["content-length"])
         return self._filesize
 
@@ -239,7 +239,7 @@ class Stream:
         )
 
         with open(file_path, "wb") as fh:
-            for chunk in request.get(self.url, streaming=True):
+            for chunk in request.stream(self.url):
                 # reduce the (bytes) remainder by the length of the chunk.
                 bytes_remaining -= len(chunk)
                 # send to the on_progress callback.
@@ -258,7 +258,7 @@ class Stream:
             "downloading (%s total bytes) file to BytesIO buffer", self.filesize,
         )
 
-        for chunk in request.get(self.url, streaming=True):
+        for chunk in request.stream(self.url):
             # reduce the (bytes) remainder by the length of the chunk.
             bytes_remaining -= len(chunk)
             # send to the on_progress callback.
