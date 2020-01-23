@@ -15,12 +15,12 @@
 # pytube3
 
 ## Table of Contents
-* [Installation](#installation)
-* [Quick start](#quick-start)
-* [Features](#features)
-* [Usage](#usage)
-* [Command-line interface](#command-line-interface)
-* [Development](#development)
+  * [Installation](#installation)
+  * [Quick start](#quick-start)
+  * [Features](#features)
+  * [Usage](#usage)
+  * [Command-line interface](#command-line-interface)
+  * [Development](#development)
 
 ## Installation
 
@@ -47,15 +47,15 @@ $ pip install pytube3 --upgrade
 ```
 
 ## Features
-* Support for Both Progressive & DASH Streams
-* Support for downloading complete playlist
-* Easily Register ``on_download_progress`` & ``on_download_complete`` callbacks
-* Command-line Interfaced Included
-* Caption Track Support
-* Outputs Caption Tracks to .srt format (SubRip Subtitle)
-* Ability to Capture Thumbnail URL.
-* Extensively Documented Source Code
-* No Third-Party Dependencies
+  * Support for Both Progressive & DASH Streams
+  * Support for downloading complete playlist
+  * Easily Register ``on_download_progress`` & ``on_download_complete`` callbacks
+  * Command-line Interfaced Included
+  * Caption Track Support
+  * Outputs Caption Tracks to .srt format (SubRip Subtitle)
+  * Ability to Capture Thumbnail URL.
+  * Extensively Documented Source Code
+  * No Third-Party Dependencies
 
 ## Usage
 
@@ -243,6 +243,7 @@ Finally, if you're filing a bug report, the cli contains a switch called ``--bui
 ## Development
 
 <a href="https://deepsource.io/gh/hbmartin/pytube3/?ref=repository-badge" target="_blank"><img alt="DeepSource" title="DeepSource" src="https://static.deepsource.io/deepsource-badge-light-mini.svg"></a>
+<a href="https://www.codacy.com/manual/hbmartin/pytube3?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hbmartin/pytube3&amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/53794f06983a46829620b3284c6a5596"/></a>
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
