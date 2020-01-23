@@ -14,14 +14,13 @@
 
 # pytube3
 
-
 ## Table of Contents
-  * [Installation](#installation)
-  * [Quick start](#quick-start)
-  * [Features](#features)
-  * [Usage](#usage)
-  * [Command-line interface](#command-line-interface)
-  * [Development](#development)
+* [Installation](#installation)
+* [Quick start](#quick-start)
+* [Features](#features)
+* [Usage](#usage)
+* [Command-line interface](#command-line-interface)
+* [Development](#development)
 
 ## Installation
 
@@ -48,16 +47,15 @@ $ pip install pytube3 --upgrade
 ```
 
 ## Features
-- Support for Both Progressive & DASH Streams
-- Support for downloading complete playlist
-- Easily Register ``on_download_progress`` & ``on_download_complete`` callbacks
-- Command-line Interfaced Included
-- Caption Track Support
-- Outputs Caption Tracks to .srt format (SubRip Subtitle)
-- Ability to Capture Thumbnail URL.
-- Extensively Documented Source Code
-- No Third-Party Dependencies
-
+* Support for Both Progressive & DASH Streams
+* Support for downloading complete playlist
+* Easily Register ``on_download_progress`` & ``on_download_complete`` callbacks
+* Command-line Interfaced Included
+* Caption Track Support
+* Outputs Caption Tracks to .srt format (SubRip Subtitle)
+* Ability to Capture Thumbnail URL.
+* Extensively Documented Source Code
+* No Third-Party Dependencies
 
 ## Usage
 

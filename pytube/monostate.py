@@ -49,7 +49,6 @@ class OnComplete(Protocol):
         :py:class:`io.BufferedWriter`
 
     :rtype: None
-
     """
 
 
