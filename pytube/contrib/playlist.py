@@ -120,12 +120,11 @@ class Playlist:
         download_path: Optional[str] = None,
         prefix_number: bool = True,
         reverse_numbering: bool = False,
+        resolution:str = "720p"
     ) -> None:
         """Download all the videos in the the playlist. Initially, download
         resolution is 720p (or highest available), later more option
         should be added to download resolution of choice
-
-        TODO(nficano): Add option to download resolution of user's choice
 
         :param download_path:
             (optional) Output path for the playlist If one is not
@@ -140,6 +139,9 @@ class Playlist:
             (optional) Lets you number playlists in reverse, since some
             playlists are ordered newest -> oldest.
         :type reverse_numbering: bool
+        :param resolution:
+            Video resolution i.e. "720p", "480p", "360p", "240p", "144p"
+        :type resolution: str
         """
 
         self.populate_video_urls()
@@ -156,14 +158,8 @@ class Playlist:
                 if not self.suppress_exception:
                     raise e
             else:
-                # TODO: this should not be hardcoded to a single user's
-                # preference
-                dl_stream = (
-                    yt.streams.filter(progressive=True, subtype="mp4",)
-                    .order_by("resolution")
-                    .desc()
-                    .first()
-                )
+                dl_stream = yt.streams.get_by_resolution(resolution=resolution) or yt.streams.get_lowest_resolution()
+                assert dl_stream is not None
 
                 logger.debug("download path: %s", download_path)
                 if prefix_number:
