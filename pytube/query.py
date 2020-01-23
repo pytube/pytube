@@ -221,7 +221,7 @@ class StreamQuery:
         """
         return self
 
-    def get_by_itag(self, itag:int) -> Optional[Stream]:
+    def get_by_itag(self, itag: int) -> Optional[Stream]:
         """Get the corresponding :class:`Stream <Stream>` for a given itag.
 
         :param int itag:
@@ -234,7 +234,7 @@ class StreamQuery:
         """
         return self.itag_index.get(int(itag))
 
-    def get_by_resolution(self, resolution:str) -> Optional[Stream]:
+    def get_by_resolution(self, resolution: str) -> Optional[Stream]:
         """Get the corresponding :class:`Stream <Stream>` for a given resolution.
         Stream must be a progressive mp4.
 
@@ -247,7 +247,7 @@ class StreamQuery:
 
         """
         return self.filter(
-            progressive=True, subtype='mp4', resolution=resolution
+            progressive=True, subtype="mp4", resolution=resolution
         ).first()
 
     def get_lowest_resolution(self) -> Optional[Stream]:
@@ -259,7 +259,12 @@ class StreamQuery:
             not found.
 
         """
-        return self.filter(progressive=True, subtype='mp4').order_by('resolution').desc().last()
+        return (
+            self.filter(progressive=True, subtype="mp4")
+            .order_by("resolution")
+            .desc()
+            .last()
+        )
 
     def first(self) -> Optional[Stream]:
         """Get the first :class:`Stream <Stream>` in the results.

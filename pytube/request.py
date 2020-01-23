@@ -5,7 +5,7 @@ from urllib.request import Request
 from urllib.request import urlopen
 
 
-def _execute_request(url:str) -> Any:
+def _execute_request(url: str) -> Any:
     return urlopen(Request(url, headers={"User-Agent": "Mozilla/5.0"}))
 
 
@@ -21,7 +21,7 @@ def get(url) -> str:
     return _execute_request(url).read().decode("utf-8")
 
 
-def stream(url: str, chunk_size:int = 8192) -> Iterable[bytes]:
+def stream(url: str, chunk_size: int = 8192) -> Iterable[bytes]:
     """Read the response in chunks.
     :param str url:
         The URL to perform the GET request for.

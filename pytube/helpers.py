@@ -102,9 +102,8 @@ def create_logger(level: int = logging.ERROR) -> logging.Logger:
     return logger
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def cache(func: Callable[..., T]) -> T:
     return functools.lru_cache()(func)  # type: ignore
-

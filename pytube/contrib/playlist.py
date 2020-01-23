@@ -45,10 +45,9 @@ class Playlist:
         and returns the "load more" url if found.
         """
         match = re.search(
-                r"data-uix-load-more-href=\"(/browse_ajax\?"
-                'action_continuation=.*?)"',
-                req,
-            )
+            r"data-uix-load-more-href=\"(/browse_ajax\?" 'action_continuation=.*?)"',
+            req,
+        )
         if match:
             return "https://www.youtube.com" + match.group(1)
 
@@ -79,7 +78,9 @@ class Playlist:
             )
             # remove duplicates
             link_list.extend(list(OrderedDict.fromkeys(videos)))
-            load_more_url = self._find_load_more_url(load_more["load_more_widget_html"], )
+            load_more_url = self._find_load_more_url(
+                load_more["load_more_widget_html"],
+            )
 
         return link_list
 
@@ -120,7 +121,7 @@ class Playlist:
         download_path: Optional[str] = None,
         prefix_number: bool = True,
         reverse_numbering: bool = False,
-        resolution:str = "720p"
+        resolution: str = "720p",
     ) -> None:
         """Download all the videos in the the playlist. Initially, download
         resolution is 720p (or highest available), later more option
@@ -158,7 +159,10 @@ class Playlist:
                 if not self.suppress_exception:
                     raise e
             else:
-                dl_stream = yt.streams.get_by_resolution(resolution=resolution) or yt.streams.get_lowest_resolution()
+                dl_stream = (
+                    yt.streams.get_by_resolution(resolution=resolution)
+                    or yt.streams.get_lowest_resolution()
+                )
                 assert dl_stream is not None
 
                 logger.debug("download path: %s", download_path)
