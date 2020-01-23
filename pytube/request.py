@@ -6,6 +6,8 @@ from urllib.request import urlopen
 
 
 def _execute_request(url: str) -> Any:
+    if not url.lower().startswith('http'):
+        raise ValueError
     return urlopen(Request(url, headers={"User-Agent": "Mozilla/5.0"}))
 
 
