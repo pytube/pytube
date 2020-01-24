@@ -11,7 +11,7 @@ import sys
 from io import BufferedWriter
 from typing import Tuple, Any, Optional, List
 
-from pytube import __version__, CaptionQuery
+from pytube import __version__, CaptionQuery, Stream
 from pytube import YouTube
 
 
@@ -36,9 +36,11 @@ def main():
     if args.build_playback_report:
         build_playback_report(youtube)
     if args.itag:
-        download(youtube=youtube, itag=args.itag)
+        download_by_itag(youtube=youtube, itag=args.itag)
     if hasattr(args, "caption_code"):
         download_caption(youtube=youtube, lang_code=args.caption_code)
+    if args.resolution:
+        download_by_resolution(youtube=youtube, resolution=args.resolution)
 
 
 def _parse_args(
@@ -50,6 +52,9 @@ def _parse_args(
     )
     parser.add_argument(
         "--itag", type=int, help="The itag for the desired stream",
+    )
+    parser.add_argument(
+        "-r", "--resolution", type=str, help="The resolution for the desired stream",
     )
     parser.add_argument(
         "-l",
@@ -165,12 +170,18 @@ def on_progress(
     display_progress_bar(bytes_received, filesize)
 
 
-def download(youtube: YouTube, itag: int) -> None:
+def _download(stream: Stream) -> None:
+    print("\n{fn} | {fs} bytes".format(fn=stream.default_filename, fs=stream.filesize, ))
+    stream.download()
+    sys.stdout.write("\n")
+
+
+def download_by_itag(youtube: YouTube, itag: int) -> None:
     """Start downloading a YouTube video.
 
     :param YouTube youtube:
         A valid YouTube object.
-    :param str itag:
+    :param int itag:
         YouTube format identifier code.
 
     """
@@ -184,10 +195,35 @@ def download(youtube: YouTube, itag: int) -> None:
         sys.exit()
 
     youtube.register_on_progress_callback(on_progress)
-    print("\n{fn} | {fs} bytes".format(fn=stream.default_filename, fs=stream.filesize,))
+
     try:
-        stream.download()
-        sys.stdout.write("\n")
+        _download(stream)
+    except KeyboardInterrupt:
+        sys.exit()
+
+
+def download_by_resolution(youtube: YouTube, resolution: str) -> None:
+    """Start downloading a YouTube video.
+
+    :param YouTube youtube:
+        A valid YouTube object.
+    :param str resolution:
+        YouTube video resolution.
+
+    """
+    # TODO(nficano): allow download target to be specified
+    # TODO(nficano): allow dash itags to be selected
+    stream = youtube.streams.get_by_resolution(resolution)
+    if stream is None:
+        print("Could not find a stream with resolution: {resolution}".format(resolution=resolution))
+        print("Try one of these:")
+        display_streams(youtube)
+        sys.exit()
+
+    youtube.register_on_progress_callback(on_progress)
+
+    try:
+        _download(stream)
     except KeyboardInterrupt:
         sys.exit()
 

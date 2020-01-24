@@ -19,25 +19,14 @@ class Playlist:
     """
 
     def __init__(self, url: str, suppress_exception: bool = False):
-        self.playlist_url = url
         self.video_urls: List[str] = []
         self.suppress_exception = suppress_exception
+        self.playlist_url:str = url
 
-    def construct_playlist_url(self) -> str:
-        """There are two kinds of playlist urls in YouTube. One that contains
-        watch?v= in URL, another one contains the "playlist?list=" portion. It
-        is preferable to work with the later one.
-
-        :return: playlist url
-        """
-
-        if "watch?v=" in self.playlist_url:
+        if "watch?v=" in url:
             base_url = "https://www.youtube.com/playlist?list="
-            playlist_code = self.playlist_url.split("&list=")[1]
-            return base_url + playlist_code
-
-        # url is already in the desired format, so just return it
-        return self.playlist_url
+            playlist_code = self.playlist_url.split("&list=")[1]  # TODO: should be parse q
+            self.playlist_url = base_url + playlist_code
 
     @staticmethod
     def _find_load_more_url(req: str) -> Optional[str]:
@@ -59,8 +48,7 @@ class Playlist:
         It's an alternative for BeautifulSoup
         """
 
-        url = self.construct_playlist_url()
-        req = request.get(url)
+        req = request.get(self.playlist_url)
 
         # split the page source by line and process each line
         content = [x for x in req.split("\n") if "pl-video-title-link" in x]
@@ -176,8 +164,7 @@ class Playlist:
 
     def title(self) -> Optional[str]:
         """return playlist title (name)"""
-        url = self.construct_playlist_url()
-        req = request.get(url)
+        req = request.get(self.playlist_url)
         open_tag = "<title>"
         end_tag = "</title>"
         pattern = re.compile(open_tag + "(.+?)" + end_tag)
