@@ -3,6 +3,8 @@ import os
 
 from unittest import mock
 
+import pytest
+
 from pytube import request
 
 
@@ -39,3 +41,8 @@ def test_get(mock_urlopen):
     mock_urlopen.return_value = response
     response = request.get("http://fakeassurl.gov")
     assert response == "<html></html>"
+
+
+def test_get_non_http():
+    with pytest.raises(ValueError):
+        request.get("file://bad")

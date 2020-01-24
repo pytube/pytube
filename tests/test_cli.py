@@ -156,3 +156,14 @@ def test_main_download_caption(youtube):
     cli.main()
     youtube.assert_called()
     cli.download_caption.assert_called()
+
+
+@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
+def test_download_by_resolution(youtube):
+    parser = argparse.ArgumentParser()
+    args = parse_args(parser, ["urlhere", "-r", "720p"])
+    cli._parse_args = MagicMock(return_value=args)
+    cli.download_by_resolution = MagicMock()
+    cli.main()
+    youtube.assert_called()
+    cli.download_by_resolution.assert_called()
