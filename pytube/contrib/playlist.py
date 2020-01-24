@@ -21,11 +21,12 @@ class Playlist:
     def __init__(self, url: str, suppress_exception: bool = False):
         self.video_urls: List[str] = []
         self.suppress_exception = suppress_exception
-        self.playlist_url:str = url
+        self.playlist_url: str = url
 
         if "watch?v=" in url:
             base_url = "https://www.youtube.com/playlist?list="
-            playlist_code = self.playlist_url.split("&list=")[1]  # TODO: should be parse q
+            # TODO: should be parse q
+            playlist_code = self.playlist_url.split("&list=")[1]
             self.playlist_url = base_url + playlist_code
 
     @staticmethod

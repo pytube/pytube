@@ -171,7 +171,7 @@ def on_progress(
 
 
 def _download(stream: Stream) -> None:
-    print("\n{fn} | {fs} bytes".format(fn=stream.default_filename, fs=stream.filesize, ))
+    print("\n{fn} | {fs} bytes".format(fn=stream.default_filename, fs=stream.filesize))
     stream.download()
     sys.stdout.write("\n")
 
@@ -215,7 +215,11 @@ def download_by_resolution(youtube: YouTube, resolution: str) -> None:
     # TODO(nficano): allow dash itags to be selected
     stream = youtube.streams.get_by_resolution(resolution)
     if stream is None:
-        print("Could not find a stream with resolution: {resolution}".format(resolution=resolution))
+        print(
+            "Could not find a stream with resolution: {resolution}".format(
+                resolution=resolution
+            )
+        )
         print("Try one of these:")
         display_streams(youtube)
         sys.exit()
