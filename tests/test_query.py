@@ -145,3 +145,9 @@ def test_get_by_resolution(cipher_signature):
 
 def test_get_lowest_resolution(cipher_signature):
     assert cipher_signature.streams.get_lowest_resolution().itag == 18
+
+
+def test_filter_is_dash(cipher_signature):
+    streams = cipher_signature.streams.filter(is_dash=False).all()
+    itags = [s.itag for s in streams]
+    assert itags == [18, 398, 397, 396, 395, 394]
