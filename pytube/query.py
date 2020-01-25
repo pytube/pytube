@@ -34,6 +34,7 @@ class StreamQuery:
         only_video=None,
         progressive=None,
         adaptive=None,
+        is_dash=None,
         custom_filter_functions=None,
     ):
         """Apply the given filtering criterion.
@@ -103,6 +104,9 @@ class StreamQuery:
             Excludes progressive streams (audio and video are on separate
             tracks).
 
+        :param bool is_dash:
+            Include/exclude dash streams.
+
         :param bool only_audio:
             Excludes streams with video tracks.
 
@@ -160,6 +164,9 @@ class StreamQuery:
         if custom_filter_functions:
             for fn in custom_filter_functions:
                 filters.append(fn)
+
+        if is_dash is not None:
+            filters.append(lambda s: s.is_dash == is_dash)
 
         fmt_streams = self.fmt_streams
         for fn in filters:

@@ -137,3 +137,11 @@ def test_get_by_itag(cipher_signature):
 
 def test_get_by_non_existent_itag(cipher_signature):
     assert not cipher_signature.streams.get_by_itag(22983)
+
+
+def test_get_by_resolution(cipher_signature):
+    assert cipher_signature.streams.get_by_resolution("360p").itag == 18
+
+
+def test_get_lowest_resolution(cipher_signature):
+    assert cipher_signature.streams.get_lowest_resolution().itag == 18

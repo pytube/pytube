@@ -6,6 +6,7 @@ import logging
 import re
 from collections import OrderedDict
 from typing import List, Optional
+from urllib.parse import parse_qs
 
 from pytube import request
 from pytube.__main__ import YouTube
@@ -25,9 +26,8 @@ class Playlist:
 
         if "watch?v=" in url:
             base_url = "https://www.youtube.com/playlist?list="
-            # TODO: should be parse q
-            playlist_code = self.playlist_url.split("&list=")[1]
-            self.playlist_url = base_url + playlist_code
+            query_parameters = parse_qs(url.split("?")[1])
+            self.playlist_url = base_url + query_parameters["list"][0]
 
     @staticmethod
     def _find_load_more_url(req: str) -> Optional[str]:

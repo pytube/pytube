@@ -59,6 +59,7 @@ class Stream:
         self.codecs: List[str] = []  # audio/video encoders (e.g.: vp8, mp4a)
         self.audio_codec = None  # audio codec of the stream (e.g.: vorbis)
         self.video_codec = None  # video codec of the stream (e.g.: vp8)
+        self.is_dash: Optional[bool] = None
 
         # Iterates over the key/values of stream and sets them as class
         # attributes. This is an anti-pattern and should be removed.

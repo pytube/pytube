@@ -14,3 +14,15 @@ def test_title(request_get):
     pl = Playlist(url)
     pl_title = pl.title()
     assert pl_title == "(149) Python Tutorial for Beginners (For Absolute Beginners)"
+
+
+def test_init_with_playlist_url():
+    url = "https://www.youtube.com/playlist?list=PLynhp4cZEpTbRs_PYISQ8v_uwO0_mDg_X"
+    playlist = Playlist(url)
+    assert playlist.playlist_url == url
+
+
+def test_init_with_watch_url():
+    url = "https://www.youtube.com/watch?v=1KeYzjILqDo&list=PLynhp4cZEpTbRs_PYISQ8v_uwO0_mDg_X&index=2&t=661s"
+    playlist = Playlist(url)
+    assert playlist.playlist_url == "https://www.youtube.com/playlist?list=PLynhp4cZEpTbRs_PYISQ8v_uwO0_mDg_X"
