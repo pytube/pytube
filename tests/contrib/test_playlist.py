@@ -23,6 +23,12 @@ def test_init_with_playlist_url():
 
 
 def test_init_with_watch_url():
-    url = "https://www.youtube.com/watch?v=1KeYzjILqDo&list=PLynhp4cZEpTbRs_PYISQ8v_uwO0_mDg_X&index=2&t=661s"
+    url = (
+        "https://www.youtube.com/watch?v=1KeYzjILqDo&"
+        "list=PLynhp4cZEpTbRs_PYISQ8v_uwO0_mDg_X&index=2&t=661s"
+    )
     playlist = Playlist(url)
-    assert playlist.playlist_url == "https://www.youtube.com/playlist?list=PLynhp4cZEpTbRs_PYISQ8v_uwO0_mDg_X"
+    assert (
+        playlist.playlist_url
+        == "https://www.youtube.com/playlist?list=PLynhp4cZEpTbRs_PYISQ8v_uwO0_mDg_X"
+    )
