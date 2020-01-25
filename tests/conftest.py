@@ -57,8 +57,7 @@ def playlist_html():
     """Youtube playlist HTML loaded on 2020-01-25 from
     https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr"""
     file_path = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), "mocks", "playlist.html"
+        os.path.dirname(os.path.realpath(__file__)), "mocks", "playlist.html.gz"
     )
-    with open(file_path, encoding="utf-8") as f:
-        read_data = f.read()
-    return read_data
+    with gzip.open(file_path, "rb") as f:
+        return f.read().decode("utf-8")
