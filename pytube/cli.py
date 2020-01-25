@@ -118,8 +118,9 @@ def build_playback_report(youtube: YouTube) -> None:
 
 def get_terminal_size() -> Tuple[int, int]:
     """Return the terminal size in rows and columns."""
-    rows, columns = os.popen("stty size", "r").read().split()
-    return int(rows), int(columns)
+    dims = os.get_terminal_size()
+    rows, columns = dims.lines, dims.columns
+    return rows, columns
 
 
 def display_progress_bar(
