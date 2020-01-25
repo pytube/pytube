@@ -85,3 +85,12 @@ def test_repr():
         {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
     )
     assert str(caption) == '<Caption lang="name1" code="en">'
+
+
+@mock.patch("pytube.request.get")
+def test_xml_captions(request_get):
+    request_get.return_value = "test"
+    caption = Caption(
+        {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
+    )
+    assert caption.xml_captions == "test"

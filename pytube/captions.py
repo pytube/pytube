@@ -25,7 +25,7 @@ class Caption:
         self.code = caption_track["languageCode"]
 
     @property
-    def xml_captions(self):
+    def xml_captions(self) -> str:
         """Download the xml caption tracks."""
         return request.get(self.url)
 

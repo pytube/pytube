@@ -98,6 +98,30 @@ _3D = [82, 83, 84, 85, 100, 101, 102]
 LIVE = [91, 92, 93, 94, 95, 96, 132, 151]
 DASH_MP4_VIDEO = [133, 134, 135, 136, 137, 138, 160, 212, 264, 266, 298, 299]
 DASH_MP4_AUDIO = [139, 140, 141, 256, 258, 325, 328]
+DASH_WEBM_VIDEO = [
+    167,
+    168,
+    169,
+    170,
+    218,
+    219,
+    278,
+    242,
+    243,
+    244,
+    245,
+    246,
+    247,
+    248,
+    271,
+    272,
+    302,
+    303,
+    308,
+    313,
+    315,
+]
+DASH_WEBM_AUDIO = [171, 172, 249, 250, 251]
 
 
 def get_format_profile(itag: int) -> Dict:
@@ -118,4 +142,8 @@ def get_format_profile(itag: int) -> Dict:
         "is_3d": itag in _3D,
         "is_hdr": itag in HDR,
         "fps": 60 if itag in _60FPS else 30,
+        "is_dash": itag in DASH_MP4_VIDEO
+        or itag in DASH_MP4_AUDIO
+        or itag in DASH_WEBM_VIDEO
+        or itag in DASH_WEBM_AUDIO,
     }

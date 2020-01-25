@@ -16,7 +16,7 @@ def test_download_when_itag_not_found(youtube):
     youtube.streams.all.return_value = []
     youtube.streams.get_by_itag.return_value = None
     with pytest.raises(SystemExit):
-        cli.download(youtube, 123)
+        cli.download_by_itag(youtube, 123)
     youtube.streams.get_by_itag.assert_called_with(123)
 
 
@@ -28,7 +28,7 @@ def test_download_when_itag_is_found(youtube, stream):
     with patch.object(
         youtube.streams, "get_by_itag", wraps=youtube.streams.get_by_itag
     ) as wrapped_itag:
-        cli.download(youtube, 123)
+        cli.download_by_itag(youtube, 123)
         wrapped_itag.assert_called_with(123)
     youtube.register_on_progress_callback.assert_called_with(cli.on_progress)
     stream.download.assert_called()
@@ -115,14 +115,14 @@ def test_parse_args_truthy():
 
 
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
-def test_main_download(youtube):
+def test_main_download_by_itag(youtube):
     parser = argparse.ArgumentParser()
     args = parse_args(parser, ["urlhere", "--itag=10"])
     cli._parse_args = MagicMock(return_value=args)
-    cli.download = MagicMock()
+    cli.download_by_itag = MagicMock()
     cli.main()
     youtube.assert_called()
-    cli.download.assert_called()
+    cli.download_by_itag.assert_called()
 
 
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
@@ -156,3 +156,14 @@ def test_main_download_caption(youtube):
     cli.main()
     youtube.assert_called()
     cli.download_caption.assert_called()
+
+
+@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
+def test_download_by_resolution(youtube):
+    parser = argparse.ArgumentParser()
+    args = parse_args(parser, ["urlhere", "-r", "320p"])
+    cli._parse_args = MagicMock(return_value=args)
+    cli.download_by_resolution = MagicMock()
+    cli.main()
+    youtube.assert_called()
+    cli.download_by_resolution.assert_called()

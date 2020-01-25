@@ -34,6 +34,7 @@ class StreamQuery:
         only_video=None,
         progressive=None,
         adaptive=None,
+        is_dash=None,
         custom_filter_functions=None,
     ):
         """Apply the given filtering criterion.
@@ -103,6 +104,9 @@ class StreamQuery:
             Excludes progressive streams (audio and video are on separate
             tracks).
 
+        :param bool is_dash:
+            Include/exclude dash streams.
+
         :param bool only_audio:
             Excludes streams with video tracks.
 
@@ -160,6 +164,9 @@ class StreamQuery:
         if custom_filter_functions:
             for fn in custom_filter_functions:
                 filters.append(fn)
+
+        if is_dash is not None:
+            filters.append(lambda s: s.is_dash == is_dash)
 
         fmt_streams = self.fmt_streams
         for fn in filters:
@@ -221,7 +228,7 @@ class StreamQuery:
         """
         return self
 
-    def get_by_itag(self, itag) -> Optional[Stream]:
+    def get_by_itag(self, itag: int) -> Optional[Stream]:
         """Get the corresponding :class:`Stream <Stream>` for a given itag.
 
         :param int itag:
@@ -233,6 +240,38 @@ class StreamQuery:
 
         """
         return self.itag_index.get(int(itag))
+
+    def get_by_resolution(self, resolution: str) -> Optional[Stream]:
+        """Get the corresponding :class:`Stream <Stream>` for a given resolution.
+        Stream must be a progressive mp4.
+
+        :param str resolution:
+            Video resolution i.e. "720p", "480p", "360p", "240p", "144p"
+        :rtype: :class:`Stream <Stream>` or None
+        :returns:
+            The :class:`Stream <Stream>` matching the given itag or None if
+            not found.
+
+        """
+        return self.filter(
+            progressive=True, subtype="mp4", resolution=resolution
+        ).first()
+
+    def get_lowest_resolution(self) -> Optional[Stream]:
+        """Get lowest resolution stream that is a progressive mp4.
+
+        :rtype: :class:`Stream <Stream>` or None
+        :returns:
+            The :class:`Stream <Stream>` matching the given itag or None if
+            not found.
+
+        """
+        return (
+            self.filter(progressive=True, subtype="mp4")
+            .order_by("resolution")
+            .desc()
+            .last()
+        )
 
     def first(self) -> Optional[Stream]:
         """Get the first :class:`Stream <Stream>` in the results.
