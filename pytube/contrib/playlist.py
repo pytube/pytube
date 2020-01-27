@@ -5,11 +5,12 @@ import json
 import logging
 import re
 from collections import OrderedDict
-from typing import List, Optional, Iterable
+from typing import List, Optional, Iterable, Dict
 from urllib.parse import parse_qs
 
 from pytube import request, YouTube
 from pytube.helpers import cache, deprecated
+from pytube.mixins import install_proxy
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +20,10 @@ class Playlist:
     playlist
     """
 
-    def __init__(self, url: str, suppress_exception: bool = False):
-        self.suppress_exception = suppress_exception
+    def __init__(self, url: str, proxies: Optional[Dict[str, str]] = None):
+        if proxies:
+            install_proxy(proxies)
+
         self.playlist_url: str = url
 
         if "watch?v=" in url:
