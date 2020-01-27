@@ -13,7 +13,7 @@ from typing import Tuple, Any, Optional, List
 
 from pytube import __version__, CaptionQuery, Stream, Playlist
 from pytube import YouTube
-
+from pytube.exceptions import PytubeError
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,11 @@ def main():
     if "/playlist" in args.url:
         playlist = Playlist(args.url)
         for youtube_video in playlist.videos:
-            _perform_args_on_youtube(youtube_video, args)
+            try:
+                _perform_args_on_youtube(youtube_video, args)
+            except PytubeError as e:
+                print(f"There was an error with video: {youtube_video}")
+                print(e)
     else:
         youtube = YouTube(args.url)
         _perform_args_on_youtube(youtube, args)

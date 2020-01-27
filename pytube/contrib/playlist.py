@@ -163,27 +163,21 @@ class Playlist:
         prefix_gen = self._path_num_prefix_generator(reverse_numbering)
 
         for link in self.video_urls:
-            try:
-                yt = YouTube(link)
-            except Exception as e:
-                logger.debug(e)
-                if not self.suppress_exception:
-                    raise e
-            else:
-                dl_stream = (
-                    yt.streams.get_by_resolution(resolution=resolution)
-                    or yt.streams.get_lowest_resolution()
-                )
-                assert dl_stream is not None
+            yt = YouTube(link)
+            dl_stream = (
+                yt.streams.get_by_resolution(resolution=resolution)
+                or yt.streams.get_lowest_resolution()
+            )
+            assert dl_stream is not None
 
-                logger.debug("download path: %s", download_path)
-                if prefix_number:
-                    prefix = next(prefix_gen)
-                    logger.debug("file prefix is: %s", prefix)
-                    dl_stream.download(download_path, filename_prefix=prefix)
-                else:
-                    dl_stream.download(download_path)
-                logger.debug("download complete")
+            logger.debug("download path: %s", download_path)
+            if prefix_number:
+                prefix = next(prefix_gen)
+                logger.debug("file prefix is: %s", prefix)
+                dl_stream.download(download_path, filename_prefix=prefix)
+            else:
+                dl_stream.download(download_path)
+            logger.debug("download complete")
 
     @cache
     def title(self) -> Optional[str]:
