@@ -88,8 +88,6 @@ class Playlist:
 
     @property
     def videos(self) -> Iterable[YouTube]:
-        if not self.video_urls:
-            self.populate_video_urls()
         for url in self.video_urls:
             yield YouTube(url)
 
