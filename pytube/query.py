@@ -282,12 +282,7 @@ class StreamQuery:
             not found.
 
         """
-        return (
-            self.filter(progressive=True)
-            .order_by("resolution")
-            .asc()
-            .last()
-        )
+        return self.filter(progressive=True).order_by("resolution").asc().last()
 
     def first(self) -> Optional[Stream]:
         """Get the first :class:`Stream <Stream>` in the results.
