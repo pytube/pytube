@@ -88,7 +88,7 @@ def test_video_urls(request_get, playlist_html):
 
 @mock.patch("pytube.contrib.playlist.request.get")
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
-def test_video_urls(youtube, request_get, playlist_html):
+def test_videos(youtube, request_get, playlist_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.return_value = playlist_html
     playlist = Playlist(url)
