@@ -17,13 +17,17 @@ def test_title(request_get):
     assert pl_title == "(149) Python Tutorial for Beginners (For Absolute Beginners)"
 
 
-def test_init_with_playlist_url():
+@mock.patch("pytube.contrib.playlist.request.get")
+def test_init_with_playlist_url(request_get):
+    request_get.return_value = ""
     url = "https://www.youtube.com/playlist?list=PLynhp4cZEpTbRs_PYISQ8v_uwO0_mDg_X"
     playlist = Playlist(url)
     assert playlist.playlist_url == url
 
 
-def test_init_with_watch_url():
+@mock.patch("pytube.contrib.playlist.request.get")
+def test_init_with_watch_url(request_get):
+    request_get.return_value = ""
     url = (
         "https://www.youtube.com/watch?v=1KeYzjILqDo&"
         "list=PLynhp4cZEpTbRs_PYISQ8v_uwO0_mDg_X&index=2&t=661s"
@@ -60,12 +64,11 @@ def test_parse_links(request_get, playlist_html):
 
 
 @mock.patch("pytube.contrib.playlist.request.get")
-def test_populate_video_urls(request_get, playlist_html):
+def test_video_urls(request_get, playlist_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.return_value = playlist_html
     playlist = Playlist(url)
     playlist._find_load_more_url = MagicMock(return_value=None)
-    playlist.populate_video_urls()
     request_get.assert_called()
     assert playlist.video_urls == [
         "https://www.youtube.com/watch?v=ujTCoH21GlA",
