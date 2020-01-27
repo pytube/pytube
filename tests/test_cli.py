@@ -182,7 +182,7 @@ def test_download_by_resolution(youtube):
 @mock.patch("pytube.cli.Playlist")
 def test_download_with_playlist(playlist):
     parser = argparse.ArgumentParser()
-    args = parse_args(parser, ["https://www.youtube.com/playlist?list=PLyn", "-r", "320p"])
+    args = parse_args(parser, ["https://www.youtube.com/playlist?list=PLyn"])
     cli._parse_args = MagicMock(return_value=args)
     cli.download_by_resolution = MagicMock()
     cli.main()
