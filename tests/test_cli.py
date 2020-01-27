@@ -95,8 +95,8 @@ def test_on_progress(stream, writer):
 
 def test_parse_args_falsey():
     parser = argparse.ArgumentParser()
-    args = cli._parse_args(parser, ["urlhere"])
-    assert args.url == "urlhere"
+    args = cli._parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0"])
+    assert args.url == "http://youtube.com/watch?v=9bZkp7q19f0"
     assert args.build_playback_report is False
     assert args.itag is None
     assert args.list is False
@@ -106,9 +106,17 @@ def test_parse_args_falsey():
 def test_parse_args_truthy():
     parser = argparse.ArgumentParser()
     args = cli._parse_args(
-        parser, ["urlhere", "--build-playback-report", "-c", "en", "-l", "--itag=10"]
+        parser,
+        [
+            "http://youtube.com/watch?v=9bZkp7q19f0",
+            "--build-playback-report",
+            "-c",
+            "en",
+            "-l",
+            "--itag=10",
+        ],
     )
-    assert args.url == "urlhere"
+    assert args.url == "http://youtube.com/watch?v=9bZkp7q19f0"
     assert args.build_playback_report is True
     assert args.itag == 10
     assert args.list is True
@@ -117,7 +125,7 @@ def test_parse_args_truthy():
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
 def test_main_download_by_itag(youtube):
     parser = argparse.ArgumentParser()
-    args = parse_args(parser, ["urlhere", "--itag=10"])
+    args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "--itag=10"])
     cli._parse_args = MagicMock(return_value=args)
     cli.download_by_itag = MagicMock()
     cli.main()
@@ -128,7 +136,9 @@ def test_main_download_by_itag(youtube):
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
 def test_main_build_playback_report(youtube):
     parser = argparse.ArgumentParser()
-    args = parse_args(parser, ["urlhere", "--build-playback-report"])
+    args = parse_args(
+        parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "--build-playback-report"]
+    )
     cli._parse_args = MagicMock(return_value=args)
     cli.build_playback_report = MagicMock()
     cli.main()
@@ -139,7 +149,7 @@ def test_main_build_playback_report(youtube):
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
 def test_main_display_streams(youtube):
     parser = argparse.ArgumentParser()
-    args = parse_args(parser, ["urlhere", "-l"])
+    args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-l"])
     cli._parse_args = MagicMock(return_value=args)
     cli.display_streams = MagicMock()
     cli.main()
@@ -150,7 +160,7 @@ def test_main_display_streams(youtube):
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
 def test_main_download_caption(youtube):
     parser = argparse.ArgumentParser()
-    args = parse_args(parser, ["urlhere", "-c"])
+    args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-c"])
     cli._parse_args = MagicMock(return_value=args)
     cli.download_caption = MagicMock()
     cli.main()
@@ -161,9 +171,19 @@ def test_main_download_caption(youtube):
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
 def test_download_by_resolution(youtube):
     parser = argparse.ArgumentParser()
-    args = parse_args(parser, ["urlhere", "-r", "320p"])
+    args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-r", "320p"])
     cli._parse_args = MagicMock(return_value=args)
     cli.download_by_resolution = MagicMock()
     cli.main()
     youtube.assert_called()
     cli.download_by_resolution.assert_called()
+
+
+@mock.patch("pytube.cli.Playlist")
+def test_download_with_playlist(playlist):
+    parser = argparse.ArgumentParser()
+    args = parse_args(parser, ["https://www.youtube.com/playlist?list=PLyn"])
+    cli._parse_args = MagicMock(return_value=args)
+    cli.download_by_resolution = MagicMock()
+    cli.main()
+    playlist.assert_called()

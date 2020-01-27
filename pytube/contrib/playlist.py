@@ -5,11 +5,11 @@ import json
 import logging
 import re
 from collections import OrderedDict
-from typing import List, Optional
+from typing import List, Optional, Iterable
 from urllib.parse import parse_qs
 
-from pytube import request
-from pytube.__main__ import YouTube
+from pytube import request, YouTube
+from pytube.helpers import cache, deprecated
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,6 @@ class Playlist:
     """
 
     def __init__(self, url: str, suppress_exception: bool = False):
-        self.video_urls: List[str] = []
         self.suppress_exception = suppress_exception
         self.playlist_url: str = url
 
@@ -28,6 +27,8 @@ class Playlist:
             base_url = "https://www.youtube.com/playlist?list="
             query_parameters = parse_qs(url.split("?")[1])
             self.playlist_url = base_url + query_parameters["list"][0]
+
+        self.html = request.get(self.playlist_url)
 
     @staticmethod
     def _find_load_more_url(req: str) -> Optional[str]:
@@ -49,7 +50,7 @@ class Playlist:
         It's an alternative for BeautifulSoup
         """
 
-        req = request.get(self.playlist_url)
+        req = self.html
 
         # split the page source by line and process each line
         content = [x for x in req.split("\n") if "pl-video-title-link" in x]
@@ -73,20 +74,36 @@ class Playlist:
 
         return link_list
 
-    def populate_video_urls(self) -> None:
-        """Construct complete links of all the videos in playlist and
-        populate video_urls list
+    @property  # type: ignore
+    @cache
+    def video_urls(self) -> List[str]:
+        """Complete links of all the videos in playlist
+        :rtype: List[str]
+        :returns:
+            List of video URLs
+        """
+        return [
+            "https://www.youtube.com" + watch_path for watch_path in self.parse_links()
+        ]
 
-        :return: urls -> string
+    @property
+    def videos(self) -> Iterable[YouTube]:
+        for url in self.video_urls:
+            yield YouTube(url)
+
+    @deprecated(
+        "This call is unnecessary, you can directly access .video_urls or .videos"
+    )
+    def populate_video_urls(self) -> List[str]:
+        """Complete links of all the videos in playlist
+        :rtype: List[str]
+        :returns:
+            List of video URLs
         """
 
-        base_url = "https://www.youtube.com"
-        link_list = self.parse_links()
+        return self.video_urls
 
-        for video_id in link_list:
-            complete_url = base_url + video_id
-            self.video_urls.append(complete_url)
-
+    @deprecated("This function will be removed in the future.")
     def _path_num_prefix_generator(self, reverse=False):
         """
         This generator function generates number prefixes, for the items
@@ -105,6 +122,9 @@ class Playlist:
             start, stop, step = (1, len(self.video_urls) + 1, 1)
         return (str(i).zfill(digits) for i in range(start, stop, step))
 
+    @deprecated(
+        "This function will be removed in the future. Please iterate through .videos"
+    )
     def download_all(
         self,
         download_path: Optional[str] = None,
@@ -134,7 +154,6 @@ class Playlist:
         :type resolution: str
         """
 
-        self.populate_video_urls()
         logger.debug("total videos found: %d", len(self.video_urls))
         logger.debug("starting download")
 
@@ -163,13 +182,13 @@ class Playlist:
                     dl_stream.download(download_path)
                 logger.debug("download complete")
 
+    @cache
     def title(self) -> Optional[str]:
         """return playlist title (name)"""
-        req = request.get(self.playlist_url)
         open_tag = "<title>"
         end_tag = "</title>"
         pattern = re.compile(open_tag + "(.+?)" + end_tag)
-        match = pattern.search(req)
+        match = pattern.search(self.html)
 
         if match is None:
             return None

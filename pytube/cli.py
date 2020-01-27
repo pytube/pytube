@@ -11,7 +11,7 @@ import sys
 from io import BufferedWriter
 from typing import Tuple, Any, Optional, List
 
-from pytube import __version__, CaptionQuery, Stream
+from pytube import __version__, CaptionQuery, Stream, Playlist
 from pytube import YouTube
 
 
@@ -25,12 +25,20 @@ def main():
     args = _parse_args(parser)
     logging.getLogger().setLevel(max(3 - args.verbosity, 0) * 10)
 
-    if not args.url:
+    if not args.url or "youtu" not in args.url:
         parser.print_help()
         sys.exit(1)
 
-    youtube = YouTube(args.url)
+    if "/playlist" in args.url:
+        playlist = Playlist(args.url)
+        for youtube_video in playlist.videos:
+            _perform_args_on_youtube(youtube_video, args)
+    else:
+        youtube = YouTube(args.url)
+        _perform_args_on_youtube(youtube, args)
 
+
+def _perform_args_on_youtube(youtube: YouTube, args: argparse.Namespace) -> None:
     if args.list:
         display_streams(youtube)
     if args.build_playback_report:

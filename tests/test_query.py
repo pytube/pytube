@@ -132,7 +132,6 @@ def test_get_by_itag(cipher_signature):
     :class:`Stream <Stream>`.
     """
     assert cipher_signature.streams.get_by_itag(18).itag == 18
-    assert cipher_signature.streams.get_by_itag("18").itag == 18
 
 
 def test_get_by_non_existent_itag(cipher_signature):
@@ -145,6 +144,10 @@ def test_get_by_resolution(cipher_signature):
 
 def test_get_lowest_resolution(cipher_signature):
     assert cipher_signature.streams.get_lowest_resolution().itag == 18
+
+
+def test_get_highest_resolution(cipher_signature):
+    assert cipher_signature.streams.get_highest_resolution().itag == 18
 
 
 def test_filter_is_dash(cipher_signature):

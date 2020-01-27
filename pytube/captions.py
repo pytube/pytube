@@ -85,10 +85,10 @@ class Caption:
     ) -> str:
         """Write the media stream to disk.
 
-        :param filename:
+        :param title:
             Output filename (stem only) for writing media file.
             If one is not specified, the default filename is used.
-        :type filename: str
+        :type title: str
         :param srt:
             Set to True to download srt, false to download xml. Defaults to True.
         :type srt bool

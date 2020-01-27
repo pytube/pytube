@@ -273,6 +273,17 @@ class StreamQuery:
             .last()
         )
 
+    def get_highest_resolution(self) -> Optional[Stream]:
+        """Get highest resolution stream that is a progressive video.
+
+        :rtype: :class:`Stream <Stream>` or None
+        :returns:
+            The :class:`Stream <Stream>` matching the given itag or None if
+            not found.
+
+        """
+        return self.filter(progressive=True).order_by("resolution").asc().last()
+
     def first(self) -> Optional[Stream]:
         """Get the first :class:`Stream <Stream>` in the results.
 

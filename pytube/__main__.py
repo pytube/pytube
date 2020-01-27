@@ -81,7 +81,7 @@ class YouTube:
 
         self.embed_url = extract.embed_url(self.video_id)
         # A dictionary shared between all instances of :class:`Stream <Stream>`
-        # (Borg pattern).
+        # (Borg pattern). Boooooo.
         self.stream_monostate = Monostate(
             on_progress=on_progress_callback, on_complete=on_complete_callback
         )
