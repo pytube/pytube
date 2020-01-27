@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Various helper functions implemented by pytube."""
 import functools
-import inspect
 import logging
 import pprint
 import re
@@ -112,7 +111,7 @@ def cache(func: Callable[..., GenericType]) -> GenericType:
     return functools.lru_cache()(func)  # type: ignore
 
 
-def deprecated(reason):
+def deprecated(reason: str) -> Callable:
     """
     This is a decorator which can be used to mark functions
     as deprecated. It will result in a warning being emitted
@@ -120,16 +119,13 @@ def deprecated(reason):
     """
 
     def decorator(func1):
-        if inspect.isclass(func1):
-            fmt1 = "Call to deprecated class {name} ({reason})."
-        else:
-            fmt1 = "Call to deprecated function {name} ({reason})."
+        message = "Call to deprecated function {name} ({reason})."
 
         @functools.wraps(func1)
         def new_func1(*args, **kwargs):
             warnings.simplefilter("always", DeprecationWarning)
             warnings.warn(
-                fmt1.format(name=func1.__name__, reason=reason),
+                message.format(name=func1.__name__, reason=reason),
                 category=DeprecationWarning,
                 stacklevel=2,
             )
