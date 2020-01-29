@@ -68,7 +68,7 @@ def test_download_caption_with_language_found(youtube):
     caption.download = MagicMock(return_value="file_path")
     youtube.captions = CaptionQuery([caption])
     cli.download_caption(youtube, "en")
-    caption.download.assert_called_with(title="video title")
+    caption.download.assert_called_with(title="video title", output_path=None)
 
 
 @mock.patch("pytube.cli.YouTube")
@@ -181,6 +181,7 @@ def test_download_by_resolution(youtube):
 
 @mock.patch("pytube.cli.Playlist")
 def test_download_with_playlist(playlist):
+    cli.safe_filename = MagicMock(return_value="safe_title")
     parser = argparse.ArgumentParser()
     args = parse_args(parser, ["https://www.youtube.com/playlist?list=PLyn"])
     cli._parse_args = MagicMock(return_value=args)
