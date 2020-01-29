@@ -1,7 +1,7 @@
 from unittest import mock
-from unittest.mock import patch, mock_open
+from unittest.mock import patch, mock_open, MagicMock
 
-from pytube import Caption, CaptionQuery
+from pytube import Caption, CaptionQuery, captions
 
 
 def test_float_to_srt_time_format():
@@ -66,6 +66,20 @@ def test_download_with_prefix(srt):
         )
         caption.download("title", filename_prefix="1 ")
         assert open_mock.call_args_list[0][0][0].split("/")[-1] == "1 title (en).srt"
+
+
+@mock.patch("pytube.captions.Caption.generate_srt_captions")
+def test_download_with_output_path(srt):
+    open_mock = mock_open()
+    captions.target_directory = MagicMock(return_value="/target")
+    with patch("builtins.open", open_mock):
+        srt.return_value = ""
+        caption = Caption(
+            {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
+        )
+        file_path = caption.download("title", output_path="blah")
+        assert file_path == "/target/title (en).srt"
+        captions.target_directory.assert_called_with("blah")
 
 
 @mock.patch("pytube.captions.Caption.xml_captions")
