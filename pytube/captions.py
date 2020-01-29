@@ -8,7 +8,7 @@ from typing import Dict, Optional
 from pytube import request
 from html import unescape
 
-from pytube.helpers import safe_filename
+from pytube.helpers import safe_filename, target_directory
 
 
 class Caption:
@@ -107,8 +107,6 @@ class Caption:
         :rtype: str
 
         """
-        output_path = output_path or os.getcwd()
-
         if title.endswith(".srt") or title.endswith(".xml"):
             filename = ".".join(title.split(".")[:-1])
         else:
@@ -128,7 +126,7 @@ class Caption:
         else:
             filename += ".xml"
 
-        file_path = os.path.join(output_path, filename)
+        file_path = os.path.join(target_directory(output_path), filename)
 
         with open(file_path, "w", encoding="utf-8") as file_handle:
             if srt:

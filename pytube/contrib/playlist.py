@@ -5,11 +5,12 @@ import json
 import logging
 import re
 from collections import OrderedDict
-from typing import List, Optional, Iterable
+from typing import List, Optional, Iterable, Dict
 from urllib.parse import parse_qs
 
 from pytube import request, YouTube
 from pytube.helpers import cache, deprecated
+from pytube.mixins import install_proxy
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +20,10 @@ class Playlist:
     playlist
     """
 
-    def __init__(self, url: str, suppress_exception: bool = False):
-        self.suppress_exception = suppress_exception
+    def __init__(self, url: str, proxies: Optional[Dict[str, str]] = None):
+        if proxies:
+            install_proxy(proxies)
+
         self.playlist_url: str = url
 
         if "watch?v=" in url:
@@ -104,7 +107,7 @@ class Playlist:
         return self.video_urls
 
     @deprecated("This function will be removed in the future.")
-    def _path_num_prefix_generator(self, reverse=False):
+    def _path_num_prefix_generator(self, reverse=False):  # pragma: no cover
         """
         This generator function generates number prefixes, for the items
         in the playlist.
@@ -131,7 +134,7 @@ class Playlist:
         prefix_number: bool = True,
         reverse_numbering: bool = False,
         resolution: str = "720p",
-    ) -> None:
+    ) -> None:  # pragma: no cover
         """Download all the videos in the the playlist. Initially, download
         resolution is 720p (or highest available), later more option
         should be added to download resolution of choice
@@ -160,27 +163,21 @@ class Playlist:
         prefix_gen = self._path_num_prefix_generator(reverse_numbering)
 
         for link in self.video_urls:
-            try:
-                yt = YouTube(link)
-            except Exception as e:
-                logger.debug(e)
-                if not self.suppress_exception:
-                    raise e
-            else:
-                dl_stream = (
-                    yt.streams.get_by_resolution(resolution=resolution)
-                    or yt.streams.get_lowest_resolution()
-                )
-                assert dl_stream is not None
+            youtube = YouTube(link)
+            dl_stream = (
+                youtube.streams.get_by_resolution(resolution=resolution)
+                or youtube.streams.get_lowest_resolution()
+            )
+            assert dl_stream is not None
 
-                logger.debug("download path: %s", download_path)
-                if prefix_number:
-                    prefix = next(prefix_gen)
-                    logger.debug("file prefix is: %s", prefix)
-                    dl_stream.download(download_path, filename_prefix=prefix)
-                else:
-                    dl_stream.download(download_path)
-                logger.debug("download complete")
+            logger.debug("download path: %s", download_path)
+            if prefix_number:
+                prefix = next(prefix_gen)
+                logger.debug("file prefix is: %s", prefix)
+                dl_stream.download(download_path, filename_prefix=prefix)
+            else:
+                dl_stream.download(download_path)
+            logger.debug("download complete")
 
     @cache
     def title(self) -> Optional[str]:

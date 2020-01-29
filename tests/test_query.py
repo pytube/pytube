@@ -154,3 +154,11 @@ def test_filter_is_dash(cipher_signature):
     streams = cipher_signature.streams.filter(is_dash=False).all()
     itags = [s.itag for s in streams]
     assert itags == [18, 398, 397, 396, 395, 394]
+
+
+def test_get_audio_only(cipher_signature):
+    assert cipher_signature.streams.get_audio_only().itag == 140
+
+
+def test_get_audio_only_with_subtype(cipher_signature):
+    assert cipher_signature.streams.get_audio_only(subtype="webm").itag == 251

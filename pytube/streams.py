@@ -16,7 +16,7 @@ from typing import Dict, Tuple, Optional, List
 
 from pytube import extract
 from pytube import request
-from pytube.helpers import safe_filename
+from pytube.helpers import safe_filename, target_directory
 from pytube.itags import get_format_profile
 from pytube.monostate import Monostate
 
@@ -72,9 +72,7 @@ class Stream:
         # Same as above, except for the format profile attributes.
         self.set_attributes_from_dict(self.fmt_profile)
 
-        # The player configuration which contains information like the video
-        # title.
-        # TODO(nficano): this should be moved to the monostate.
+        # The player configuration, contains info like the video title.
         self.player_config_args = player_config_args
 
         # 'video/webm; codecs="vp8, vorbis"' -> 'video/webm', ['vp8', 'vorbis']
@@ -200,6 +198,7 @@ class Stream:
         output_path: Optional[str] = None,
         filename: Optional[str] = None,
         filename_prefix: Optional[str] = None,
+        skip_existing: bool = True,
     ) -> str:
         """Write the media stream to disk.
 
@@ -218,22 +217,37 @@ class Stream:
             This is separate from filename so you can use the default
             filename but still add a prefix.
         :type filename_prefix: str or None
-
+        :param skip_existing:
+            (optional) skip existing files, defaults to True
+        :type skip_existing: bool
+        :returns:
+            Path to the saved video
         :rtype: str
 
         """
-        output_path = output_path or os.getcwd()
         if filename:
-            safe = safe_filename(filename)
-            filename = "{filename}.{s.subtype}".format(filename=safe, s=self)
-        filename = filename or self.default_filename
+            filename = "{filename}.{s.subtype}".format(
+                filename=safe_filename(filename), s=self
+            )
+        else:
+            filename = self.default_filename
 
         if filename_prefix:
             filename = "{prefix}{filename}".format(
                 prefix=safe_filename(filename_prefix), filename=filename,
             )
 
-        file_path = os.path.join(output_path, filename)
+        file_path = os.path.join(target_directory(output_path), filename)
+
+        if (
+            skip_existing
+            and os.path.isfile(file_path)
+            and os.path.getsize(file_path) == self.filesize
+        ):
+            # likely the same file, so skip it
+            logger.debug("file %s already exists, skipping", file_path)
+            return file_path
+
         bytes_remaining = self.filesize
         logger.debug(
             "downloading (%s total bytes) file to %s", self.filesize, file_path,

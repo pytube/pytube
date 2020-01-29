@@ -7,13 +7,15 @@ import gzip
 import json
 import logging
 import os
+import shutil
 import sys
 from io import BufferedWriter
-from typing import Tuple, Any, Optional, List
+from typing import Any, Optional, List
 
 from pytube import __version__, CaptionQuery, Stream, Playlist
 from pytube import YouTube
-
+from pytube.exceptions import PytubeError
+from pytube.helpers import safe_filename
 
 logger = logging.getLogger(__name__)
 
@@ -30,10 +32,18 @@ def main():
         sys.exit(1)
 
     if "/playlist" in args.url:
+        print("Loading playlist...")
         playlist = Playlist(args.url)
+        if not args.target:
+            args.target = safe_filename(playlist.title())
         for youtube_video in playlist.videos:
-            _perform_args_on_youtube(youtube_video, args)
+            try:
+                _perform_args_on_youtube(youtube_video, args)
+            except PytubeError as e:
+                print(f"There was an error with video: {youtube_video}")
+                print(e)
     else:
+        print("Loading video...")
         youtube = YouTube(args.url)
         _perform_args_on_youtube(youtube, args)
 
@@ -44,17 +54,21 @@ def _perform_args_on_youtube(youtube: YouTube, args: argparse.Namespace) -> None
     if args.build_playback_report:
         build_playback_report(youtube)
     if args.itag:
-        download_by_itag(youtube=youtube, itag=args.itag)
+        download_by_itag(youtube=youtube, itag=args.itag, target=args.target)
     if hasattr(args, "caption_code"):
-        download_caption(youtube=youtube, lang_code=args.caption_code)
+        download_caption(
+            youtube=youtube, lang_code=args.caption_code, target=args.target
+        )
     if args.resolution:
-        download_by_resolution(youtube=youtube, resolution=args.resolution)
+        download_by_resolution(
+            youtube=youtube, resolution=args.resolution, target=args.target
+        )
 
 
 def _parse_args(
     parser: argparse.ArgumentParser, args: Optional[List] = None
 ) -> argparse.Namespace:
-    parser.add_argument("url", help="The YouTube /watch url", nargs="?")
+    parser.add_argument("url", help="The YouTube /watch or /playlist url", nargs="?")
     parser.add_argument(
         "--version", action="version", version="%(prog)s " + __version__,
     )
@@ -97,6 +111,14 @@ def _parse_args(
             "Prints available language codes if no argument given"
         ),
     )
+    parser.add_argument(
+        "-t",
+        "--target",
+        help=(
+            "The output directory for the downloaded stream. "
+            "Default is current working directory"
+        ),
+    )
 
     return parser.parse_args(args)
 
@@ -129,13 +151,6 @@ def build_playback_report(youtube: YouTube) -> None:
         )
 
 
-def get_terminal_size() -> Tuple[int, int]:
-    """Return the terminal size in rows and columns."""
-    dims = os.get_terminal_size()
-    rows, columns = dims.lines, dims.columns
-    return rows, columns
-
-
 def display_progress_bar(
     bytes_received: int, filesize: int, ch: str = "█", scale: float = 0.55
 ) -> None:
@@ -157,7 +172,7 @@ def display_progress_bar(
         Scale multiplier to reduce progress bar size.
 
     """
-    _, columns = get_terminal_size()
+    columns = shutil.get_terminal_size().columns
     max_width = int(columns * scale)
 
     filled = int(round(max_width * bytes_received / float(filesize)))
@@ -171,6 +186,7 @@ def display_progress_bar(
     sys.stdout.flush()
 
 
+# noinspection PyUnusedLocal
 def on_progress(
     stream: Any, chunk: Any, file_handler: BufferedWriter, bytes_remaining: int
 ) -> None:
@@ -179,23 +195,23 @@ def on_progress(
     display_progress_bar(bytes_received, filesize)
 
 
-def _download(stream: Stream) -> None:
-    print("\n{fn} | {fs} bytes".format(fn=stream.default_filename, fs=stream.filesize))
-    stream.download()
+def _download(stream: Stream, target: Optional[str] = None) -> None:
+    filesize_megabytes = stream.filesize // 1048576
+    print("{fn} | {fs} bytes".format(fn=stream.default_filename, fs=filesize_megabytes))
+    stream.download(output_path=target)
     sys.stdout.write("\n")
 
 
-def download_by_itag(youtube: YouTube, itag: int) -> None:
+def download_by_itag(youtube: YouTube, itag: int, target: Optional[str] = None) -> None:
     """Start downloading a YouTube video.
 
     :param YouTube youtube:
         A valid YouTube object.
     :param int itag:
         YouTube format identifier code.
-
+    :param str target:
+        Target directory for download
     """
-    # TODO(nficano): allow download target to be specified
-    # TODO(nficano): allow dash itags to be selected
     stream = youtube.streams.get_by_itag(itag)
     if stream is None:
         print("Could not find a stream with itag: {itag}".format(itag=itag))
@@ -206,21 +222,23 @@ def download_by_itag(youtube: YouTube, itag: int) -> None:
     youtube.register_on_progress_callback(on_progress)
 
     try:
-        _download(stream)
+        _download(stream, target=target)
     except KeyboardInterrupt:
         sys.exit()
 
 
-def download_by_resolution(youtube: YouTube, resolution: str) -> None:
+def download_by_resolution(
+    youtube: YouTube, resolution: str, target: Optional[str] = None
+) -> None:
     """Start downloading a YouTube video.
 
     :param YouTube youtube:
         A valid YouTube object.
     :param str resolution:
         YouTube video resolution.
-
+    :param str target:
+        Target directory for download
     """
-    # TODO(nficano): allow download target to be specified
     # TODO(nficano): allow dash itags to be selected
     stream = youtube.streams.get_by_resolution(resolution)
     if stream is None:
@@ -236,7 +254,7 @@ def download_by_resolution(youtube: YouTube, resolution: str) -> None:
     youtube.register_on_progress_callback(on_progress)
 
     try:
-        _download(stream)
+        _download(stream, target=target)
     except KeyboardInterrupt:
         sys.exit()
 
@@ -260,7 +278,9 @@ def _print_available_captions(captions: CaptionQuery) -> None:
     )
 
 
-def download_caption(youtube: YouTube, lang_code: Optional[str]) -> None:
+def download_caption(
+    youtube: YouTube, lang_code: Optional[str], target: Optional[str] = None
+) -> None:
     """Download a caption for the YouTube video.
 
     :param YouTube youtube:
@@ -269,7 +289,8 @@ def download_caption(youtube: YouTube, lang_code: Optional[str]) -> None:
         Language code desired for caption file.
         Prints available codes if the value is None
         or the desired code is not available.
-
+    :param str target:
+        Target directory for download
     """
     if lang_code is None:
         _print_available_captions(youtube.captions)
@@ -277,7 +298,7 @@ def download_caption(youtube: YouTube, lang_code: Optional[str]) -> None:
 
     caption = youtube.captions.get_by_language_code(lang_code=lang_code)
     if caption:
-        downloaded_path = caption.download(title=youtube.title)
+        downloaded_path = caption.download(title=youtube.title, output_path=target)
         print("Saved caption file to: {}".format(downloaded_path))
     else:
         print("Unable to find caption with code: {}".format(lang_code))

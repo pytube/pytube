@@ -16,7 +16,7 @@ signature and decoding it.
 
 import re
 from itertools import chain
-from typing import List, Tuple, Dict, Callable
+from typing import List, Tuple, Dict, Callable, Any, Optional
 
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search, create_logger
@@ -144,7 +144,7 @@ def get_transform_map(js: str, var: str) -> Dict:
     return mapper
 
 
-def reverse(arr, b):
+def reverse(arr: List, _: Optional[Any]):
     """Reverse elements in a list.
 
     This function is equivalent to:
@@ -164,7 +164,7 @@ def reverse(arr, b):
     return arr[::-1]
 
 
-def splice(arr, b):
+def splice(arr: List, b: int):
     """Add/remove items to/from a list.
 
     This function is equivalent to:
@@ -181,7 +181,7 @@ def splice(arr, b):
     return arr[:b] + arr[b * 2 :]
 
 
-def swap(arr, b):
+def swap(arr: List, b: int):
     """Swap positions at b modulus the list length.
 
     This function is equivalent to:
