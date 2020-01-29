@@ -138,7 +138,7 @@ def deprecated(reason: str) -> Callable:
     return decorator
 
 
-def target_directory(output_path: Optional[str]) -> str:
+def target_directory(output_path: Optional[str] = None) -> str:
     """
     Function for determining target directory of a download.
     Returns an absolute path (if relative one given) or the current

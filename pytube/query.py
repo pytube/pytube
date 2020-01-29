@@ -284,7 +284,7 @@ class StreamQuery:
         """
         return self.filter(progressive=True).order_by("resolution").asc().last()
 
-    def get_audio_only(self, codec: str = "mp4") -> Optional[Stream]:
+    def get_audio_only(self, subtype: str = "mp4") -> Optional[Stream]:
         """Get highest bitrate audio stream for given codec (defaults to mp4)
 
         :param str codec:
@@ -296,8 +296,8 @@ class StreamQuery:
 
         """
         return (
-            self.filter(only_audio=True, audio_codec=codec)
-            .order_by("resolution")
+            self.filter(only_audio=True, subtype=subtype)
+            .order_by("abr")
             .asc()
             .last()
         )
