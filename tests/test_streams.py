@@ -2,9 +2,10 @@
 import random
 
 from unittest import mock
+from unittest.mock import MagicMock
 
 from pytube import request
-from pytube import Stream
+from pytube import Stream, streams
 
 
 def test_filesize(cipher_signature, mocker):
@@ -43,6 +44,18 @@ def test_download(cipher_signature, mocker):
     with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
         stream = cipher_signature.streams.first()
         stream.download()
+
+
+def test_download_with_prefix(cipher_signature, mocker):
+    mocker.patch.object(request, "headers")
+    request.headers.return_value = {"content-length": "16384"}
+    mocker.patch.object(request, "stream")
+    request.stream.return_value = iter([str(random.getrandbits(8 * 1024))])
+    streams.target_directory = MagicMock(return_value="/target")
+    with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
+        stream = cipher_signature.streams.first()
+        file_path = stream.download(filename_prefix="prefix")
+        assert file_path == "/target/prefixPSY - GANGNAM STYLE(강남스타일) MV.mp4"
 
 
 def test_progressive_streams_return_includes_audio_track(cipher_signature):

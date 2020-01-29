@@ -107,7 +107,7 @@ class Playlist:
         return self.video_urls
 
     @deprecated("This function will be removed in the future.")
-    def _path_num_prefix_generator(self, reverse=False):
+    def _path_num_prefix_generator(self, reverse=False):  # pragma: no cover
         """
         This generator function generates number prefixes, for the items
         in the playlist.
@@ -134,7 +134,7 @@ class Playlist:
         prefix_number: bool = True,
         reverse_numbering: bool = False,
         resolution: str = "720p",
-    ) -> None:
+    ) -> None:  # pragma: no cover
         """Download all the videos in the the playlist. Initially, download
         resolution is 720p (or highest available), later more option
         should be added to download resolution of choice
