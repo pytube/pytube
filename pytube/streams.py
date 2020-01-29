@@ -191,7 +191,7 @@ class Stream:
         """
 
         filename = safe_filename(self.title)
-        return "{filename}.{s.subtype}".format(filename=filename, s=self)
+        return f"{filename}.{self.subtype}"
 
     def download(
         self,
@@ -226,16 +226,12 @@ class Stream:
 
         """
         if filename:
-            filename = "{filename}.{s.subtype}".format(
-                filename=safe_filename(filename), s=self
-            )
+            filename = f"{safe_filename(filename)}.{self.subtype}"
         else:
             filename = self.default_filename
 
         if filename_prefix:
-            filename = "{prefix}{filename}".format(
-                prefix=safe_filename(filename_prefix), filename=filename,
-            )
+            filename = f"{safe_filename(filename_prefix)}{filename}"
 
         file_path = os.path.join(target_directory(output_path), filename)
 
@@ -351,4 +347,4 @@ class Stream:
         else:
             parts.extend(['abr="{s.abr}"', 'acodec="{s.audio_codec}"'])
         parts.extend(['progressive="{s.is_progressive}"', 'type="{s.type}"'])
-        return "<Stream: {parts}>".format(parts=" ".join(parts).format(s=self))
+        return f"<Stream: {' '.join(parts).format(s=self)}>"

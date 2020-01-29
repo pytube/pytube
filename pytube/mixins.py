@@ -100,10 +100,10 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
         try:
             stream_data[key] = [
                 {
-                    u"url": format_item[u"url"],
-                    u"type": format_item[u"mimeType"],
-                    u"quality": format_item[u"quality"],
-                    u"itag": format_item[u"itag"],
+                    "url": format_item["url"],
+                    "type": format_item["mimeType"],
+                    "quality": format_item["quality"],
+                    "itag": format_item["itag"],
                 }
                 for format_item in formats
             ]
@@ -113,11 +113,11 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
             ]
             stream_data[key] = [
                 {
-                    u"url": cipher_url[i][u"url"][0],
-                    u"s": cipher_url[i][u"s"][0],
-                    u"type": format_item[u"mimeType"],
-                    u"quality": format_item[u"quality"],
-                    u"itag": format_item[u"itag"],
+                    "url": cipher_url[i]["url"][0],
+                    "s": cipher_url[i]["s"][0],
+                    "type": format_item["mimeType"],
+                    "quality": format_item["quality"],
+                    "itag": format_item["itag"],
                 }
                 for i, format_item in enumerate(formats)
             ]

@@ -49,7 +49,7 @@ class Caption:
         """
         fraction, whole = math.modf(d)
         time_fmt = time.strftime("%H:%M:%S,", time.gmtime(whole))
-        ms = "{:.3f}".format(fraction).replace("0.", "")
+        ms = f"{fraction:.3f}".replace("0.", "")
         return time_fmt + ms
 
     def xml_caption_to_srt(self, xml_captions: str) -> str:
@@ -113,13 +113,11 @@ class Caption:
             filename = title
 
         if filename_prefix:
-            filename = "{prefix}{filename}".format(
-                prefix=safe_filename(filename_prefix), filename=filename,
-            )
+            filename = f"{safe_filename(filename_prefix)}{filename}"
 
         filename = safe_filename(filename)
 
-        filename += " ({})".format(self.code)
+        filename += f" ({self.code})"
 
         if srt:
             filename += ".srt"

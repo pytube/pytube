@@ -130,9 +130,7 @@ def build_playback_report(youtube: YouTube) -> None:
         A YouTube object.
     """
     ts = int(dt.datetime.utcnow().timestamp())
-    fp = os.path.join(
-        os.getcwd(), "yt-video-{yt.video_id}-{ts}.json.gz".format(yt=youtube, ts=ts),
-    )
+    fp = os.path.join(os.getcwd(), f"yt-video-{youtube.video_id}-{ts}.json.gz")
 
     js = youtube.js
     watch_html = youtube.watch_html
@@ -179,9 +177,7 @@ def display_progress_bar(
     remaining = max_width - filled
     progress_bar = ch * filled + " " * remaining
     percent = round(100.0 * bytes_received / float(filesize), 1)
-    text = " ↳ |{progress_bar}| {percent}%\r".format(
-        progress_bar=progress_bar, percent=percent
-    )
+    text = f" ↳ |{progress_bar}| {percent}%\r"
     sys.stdout.write(text)
     sys.stdout.flush()
 
@@ -197,7 +193,7 @@ def on_progress(
 
 def _download(stream: Stream, target: Optional[str] = None) -> None:
     filesize_megabytes = stream.filesize // 1048576
-    print("{fn} | {fs} bytes".format(fn=stream.default_filename, fs=filesize_megabytes))
+    print(f"{stream.default_filename} | {filesize_megabytes} MB")
     stream.download(output_path=target)
     sys.stdout.write("\n")
 
@@ -214,7 +210,7 @@ def download_by_itag(youtube: YouTube, itag: int, target: Optional[str] = None) 
     """
     stream = youtube.streams.get_by_itag(itag)
     if stream is None:
-        print("Could not find a stream with itag: {itag}".format(itag=itag))
+        print(f"Could not find a stream with itag: {itag}")
         print("Try one of these:")
         display_streams(youtube)
         sys.exit()
@@ -242,11 +238,7 @@ def download_by_resolution(
     # TODO(nficano): allow dash itags to be selected
     stream = youtube.streams.get_by_resolution(resolution)
     if stream is None:
-        print(
-            "Could not find a stream with resolution: {resolution}".format(
-                resolution=resolution
-            )
-        )
+        print(f"Could not find a stream with resolution: {resolution}")
         print("Try one of these:")
         display_streams(youtube)
         sys.exit()
@@ -271,11 +263,7 @@ def display_streams(youtube: YouTube) -> None:
 
 
 def _print_available_captions(captions: CaptionQuery) -> None:
-    print(
-        "Available caption codes are: {}".format(
-            ", ".join(c.code for c in captions.all())
-        )
-    )
+    print(f"Available caption codes are: {', '.join(c.code for c in captions.all())}")
 
 
 def download_caption(
@@ -299,9 +287,9 @@ def download_caption(
     caption = youtube.captions.get_by_language_code(lang_code=lang_code)
     if caption:
         downloaded_path = caption.download(title=youtube.title, output_path=target)
-        print("Saved caption file to: {}".format(downloaded_path))
+        print(f"Saved caption file to: {downloaded_path}")
     else:
-        print("Unable to find caption with code: {}".format(lang_code))
+        print(f"Unable to find caption with code: {lang_code}")
         _print_available_captions(youtube.captions)
 
 

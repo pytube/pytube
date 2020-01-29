@@ -33,7 +33,7 @@ class PytubeHTMLParser(HTMLParser):
 
     def handle_data(self, data):
         if self.in_vid_descr_br:
-            self.vid_descr += "\n{}".format(data)
+            self.vid_descr += f"\n{data}"
             self.in_vid_descr_br = False
         elif self.in_vid_descr:
             self.vid_descr += data
@@ -89,11 +89,11 @@ def watch_url(video_id: str) -> str:
 
 
 def embed_url(video_id: str) -> str:
-    return "https://www.youtube.com/embed/{}".format(video_id)
+    return f"https://www.youtube.com/embed/{video_id}"
 
 
 def eurl(video_id: str) -> str:
-    return "https://youtube.googleapis.com/v/{}".format(video_id)
+    return f"https://youtube.googleapis.com/v/{video_id}"
 
 
 def video_info_url(
