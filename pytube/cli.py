@@ -7,6 +7,7 @@ import gzip
 import json
 import logging
 import os
+import shutil
 import sys
 from io import BufferedWriter
 from typing import Tuple, Any, Optional, List
@@ -14,6 +15,7 @@ from typing import Tuple, Any, Optional, List
 from pytube import __version__, CaptionQuery, Stream, Playlist
 from pytube import YouTube
 from pytube.exceptions import PytubeError
+from pytube.helpers import safe_filename
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +34,7 @@ def main():
     if "/playlist" in args.url:
         playlist = Playlist(args.url)
         if not args.target:
-            args.target = playlist.title()
+            args.target = safe_filename(playlist.title())
         for youtube_video in playlist.videos:
             try:
                 _perform_args_on_youtube(youtube_video, args)
@@ -52,9 +54,13 @@ def _perform_args_on_youtube(youtube: YouTube, args: argparse.Namespace) -> None
     if args.itag:
         download_by_itag(youtube=youtube, itag=args.itag, target=args.target)
     if hasattr(args, "caption_code"):
-        download_caption(youtube=youtube, lang_code=args.caption_code, target=args.target)
+        download_caption(
+            youtube=youtube, lang_code=args.caption_code, target=args.target
+        )
     if args.resolution:
-        download_by_resolution(youtube=youtube, resolution=args.resolution, target=args.target)
+        download_by_resolution(
+            youtube=youtube, resolution=args.resolution, target=args.target
+        )
     # TODO: default to download_highest_resultion if no actions specified
 
 
@@ -105,9 +111,11 @@ def _parse_args(
         ),
     )
     parser.add_argument(
-        '-t', '--target', help=(
-            'The output directory for the downloaded stream. '
-            'Default is current working directory'
+        "-t",
+        "--target",
+        help=(
+            "The output directory for the downloaded stream. "
+            "Default is current working directory"
         ),
     )
 
@@ -142,13 +150,6 @@ def build_playback_report(youtube: YouTube) -> None:
         )
 
 
-def get_terminal_size() -> Tuple[int, int]:
-    """Return the terminal size in rows and columns."""
-    dims = os.get_terminal_size()
-    rows, columns = dims.lines, dims.columns
-    return rows, columns
-
-
 def display_progress_bar(
     bytes_received: int, filesize: int, ch: str = "█", scale: float = 0.55
 ) -> None:
@@ -170,7 +171,7 @@ def display_progress_bar(
         Scale multiplier to reduce progress bar size.
 
     """
-    _, columns = get_terminal_size()
+    columns = shutil.get_terminal_size().columns
     max_width = int(columns * scale)
 
     filled = int(round(max_width * bytes_received / float(filesize)))
@@ -192,13 +193,13 @@ def on_progress(
     display_progress_bar(bytes_received, filesize)
 
 
-def _download(stream: Stream, target:Optional[str]=None) -> None:
+def _download(stream: Stream, target: Optional[str] = None) -> None:
     print("\n{fn} | {fs} bytes".format(fn=stream.default_filename, fs=stream.filesize))
     stream.download(output_path=target)
     sys.stdout.write("\n")
 
 
-def download_by_itag(youtube: YouTube, itag: int, target:Optional[str]=None) -> None:
+def download_by_itag(youtube: YouTube, itag: int, target: Optional[str] = None) -> None:
     """Start downloading a YouTube video.
 
     :param YouTube youtube:
@@ -223,7 +224,9 @@ def download_by_itag(youtube: YouTube, itag: int, target:Optional[str]=None) -> 
         sys.exit()
 
 
-def download_by_resolution(youtube: YouTube, resolution: str, target:Optional[str]=None) -> None:
+def download_by_resolution(
+    youtube: YouTube, resolution: str, target: Optional[str] = None
+) -> None:
     """Start downloading a YouTube video.
 
     :param YouTube youtube:
@@ -271,7 +274,9 @@ def _print_available_captions(captions: CaptionQuery) -> None:
     )
 
 
-def download_caption(youtube: YouTube, lang_code: Optional[str], target:Optional[str]=None) -> None:
+def download_caption(
+    youtube: YouTube, lang_code: Optional[str], target: Optional[str] = None
+) -> None:
     """Download a caption for the YouTube video.
 
     :param YouTube youtube:
