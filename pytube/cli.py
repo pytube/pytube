@@ -31,6 +31,7 @@ def main():
         parser.print_help()
         sys.exit(1)
 
+    print("Loading video")
     if "/playlist" in args.url:
         playlist = Playlist(args.url)
         if not args.target:
@@ -67,7 +68,7 @@ def _perform_args_on_youtube(youtube: YouTube, args: argparse.Namespace) -> None
 def _parse_args(
     parser: argparse.ArgumentParser, args: Optional[List] = None
 ) -> argparse.Namespace:
-    parser.add_argument("url", help="The YouTube /watch url", nargs="?")
+    parser.add_argument("url", help="The YouTube /watch or /playlist url", nargs="?")
     parser.add_argument(
         "--version", action="version", version="%(prog)s " + __version__,
     )
@@ -195,7 +196,7 @@ def on_progress(
 
 
 def _download(stream: Stream, target: Optional[str] = None) -> None:
-    print("\n{fn} | {fs} bytes".format(fn=stream.default_filename, fs=stream.filesize))
+    print("{fn} | {fs} bytes".format(fn=stream.default_filename, fs=stream.filesize))
     stream.download(output_path=target)
     sys.stdout.write("\n")
 
@@ -210,7 +211,6 @@ def download_by_itag(youtube: YouTube, itag: int, target: Optional[str] = None) 
     :param str target:
         Target directory for download
     """
-    # TODO(nficano): allow dash itags to be selected
     stream = youtube.streams.get_by_itag(itag)
     if stream is None:
         print("Could not find a stream with itag: {itag}".format(itag=itag))

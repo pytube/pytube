@@ -200,6 +200,7 @@ class Stream:
         output_path: Optional[str] = None,
         filename: Optional[str] = None,
         filename_prefix: Optional[str] = None,
+        skip_existing: bool = True,
     ) -> str:
         """Write the media stream to disk.
 
@@ -218,15 +219,27 @@ class Stream:
             This is separate from filename so you can use the default
             filename but still add a prefix.
         :type filename_prefix: str or None
-
+        :param skip_existing:
+            (optional) skip existing files, defaults to True
+        :type skip_existing: bool
+        :returns:
+            Path to the saved video
         :rtype: str
 
         """
-        output_path = output_path or os.getcwd()
+        if output_path:
+            if not os.path.isabs(output_path):
+                output_path = os.path.join(os.getcwd(), output_path)
+        else:
+            output_path = os.getcwd()
+        os.makedirs(output_path, exist_ok=True)
+
         if filename:
-            safe = safe_filename(filename)
-            filename = "{filename}.{s.subtype}".format(filename=safe, s=self)
-        filename = filename or self.default_filename
+            filename = "{filename}.{s.subtype}".format(
+                filename=safe_filename(filename), s=self
+            )
+        else:
+            filename = self.default_filename
 
         if filename_prefix:
             filename = "{prefix}{filename}".format(
@@ -234,6 +247,16 @@ class Stream:
             )
 
         file_path = os.path.join(output_path, filename)
+
+        if (
+            skip_existing
+            and os.path.isfile(file_path)
+            and os.path.getsize(file_path) == self.filesize
+        ):
+            # likely the same file, so skip it
+            logger.debug("file %s already exists, skipping", file_path)
+            return file_path
+
         bytes_remaining = self.filesize
         logger.debug(
             "downloading (%s total bytes) file to %s", self.filesize, file_path,
