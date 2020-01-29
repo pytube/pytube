@@ -10,7 +10,7 @@ import os
 import shutil
 import sys
 from io import BufferedWriter
-from typing import Tuple, Any, Optional, List
+from typing import Any, Optional, List
 
 from pytube import __version__, CaptionQuery, Stream, Playlist
 from pytube import YouTube
@@ -185,6 +185,7 @@ def display_progress_bar(
     sys.stdout.flush()
 
 
+# noinspection PyUnusedLocal
 def on_progress(
     stream: Any, chunk: Any, file_handler: BufferedWriter, bytes_remaining: int
 ) -> None:
@@ -206,7 +207,8 @@ def download_by_itag(youtube: YouTube, itag: int, target: Optional[str] = None) 
         A valid YouTube object.
     :param int itag:
         YouTube format identifier code.
-
+    :param str target:
+        Target directory for download
     """
     # TODO(nficano): allow dash itags to be selected
     stream = youtube.streams.get_by_itag(itag)
@@ -219,7 +221,7 @@ def download_by_itag(youtube: YouTube, itag: int, target: Optional[str] = None) 
     youtube.register_on_progress_callback(on_progress)
 
     try:
-        _download(stream)
+        _download(stream, target=target)
     except KeyboardInterrupt:
         sys.exit()
 
@@ -233,7 +235,8 @@ def download_by_resolution(
         A valid YouTube object.
     :param str resolution:
         YouTube video resolution.
-
+    :param str target:
+        Target directory for download
     """
     # TODO(nficano): allow dash itags to be selected
     stream = youtube.streams.get_by_resolution(resolution)
@@ -250,7 +253,7 @@ def download_by_resolution(
     youtube.register_on_progress_callback(on_progress)
 
     try:
-        _download(stream)
+        _download(stream, target=target)
     except KeyboardInterrupt:
         sys.exit()
 
@@ -285,7 +288,8 @@ def download_caption(
         Language code desired for caption file.
         Prints available codes if the value is None
         or the desired code is not available.
-
+    :param str target:
+        Target directory for download
     """
     if lang_code is None:
         _print_available_captions(youtube.captions)
