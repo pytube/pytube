@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import random
 
 from unittest import mock
@@ -56,6 +57,51 @@ def test_download_with_prefix(cipher_signature, mocker):
         stream = cipher_signature.streams.first()
         file_path = stream.download(filename_prefix="prefix")
         assert file_path == "/target/prefixPSY - GANGNAM STYLE(강남스타일) MV.mp4"
+
+
+def test_download_with_filename(cipher_signature, mocker):
+    mocker.patch.object(request, "headers")
+    request.headers.return_value = {"content-length": "16384"}
+    mocker.patch.object(request, "stream")
+    request.stream.return_value = iter([str(random.getrandbits(8 * 1024))])
+    streams.target_directory = MagicMock(return_value="/target")
+    with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
+        stream = cipher_signature.streams.first()
+        file_path = stream.download(filename="cool name bro")
+        assert file_path == "/target/cool name bro.mp4"
+
+
+def test_download_with_existing(cipher_signature, mocker):
+    mocker.patch.object(request, "headers")
+    request.headers.return_value = {"content-length": "16384"}
+    mocker.patch.object(request, "stream")
+    streams.target_directory = MagicMock(return_value="/target")
+    mocker.patch.object(os.path, "isfile")
+    os.path.isfile.return_value = True
+    with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
+        stream = cipher_signature.streams.first()
+        mocker.patch.object(os.path, "getsize")
+        os.path.getsize.return_value = stream.filesize
+        file_path = stream.download()
+        assert file_path == "/target/PSY - GANGNAM STYLE(강남스타일) MV.mp4"
+        assert not request.stream.called
+
+
+def test_download_with_existing_no_skip(cipher_signature, mocker):
+    mocker.patch.object(request, "headers")
+    request.headers.return_value = {"content-length": "16384"}
+    mocker.patch.object(request, "stream")
+    request.stream.return_value = iter([str(random.getrandbits(8 * 1024))])
+    streams.target_directory = MagicMock(return_value="/target")
+    mocker.patch.object(os.path, "isfile")
+    os.path.isfile.return_value = True
+    with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
+        stream = cipher_signature.streams.first()
+        mocker.patch.object(os.path, "getsize")
+        os.path.getsize.return_value = stream.filesize
+        file_path = stream.download(skip_existing=False)
+        assert file_path == "/target/PSY - GANGNAM STYLE(강남스타일) MV.mp4"
+        assert request.stream.called
 
 
 def test_progressive_streams_return_includes_audio_track(cipher_signature):
