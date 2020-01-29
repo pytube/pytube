@@ -296,10 +296,7 @@ class StreamQuery:
 
         """
         return (
-            self.filter(only_audio=True, subtype=subtype)
-            .order_by("abr")
-            .asc()
-            .last()
+            self.filter(only_audio=True, subtype=subtype).order_by("abr").asc().last()
         )
 
     def first(self) -> Optional[Stream]:
