@@ -5,7 +5,7 @@
 	  <a href="https://pypi.python.org/pypi/pytube3/"><img src="https://img.shields.io/pypi/pyversions/pytube3.svg" /></a>
 	  <a href="https://travis-ci.com/hbmartin/pytube3/"><img src="https://travis-ci.org/hbmartin/pytube3.svg?branch=master" /></a>
 	  <a href='https://pytube3.readthedocs.io/en/latest/?badge=latest'><img src='https://readthedocs.org/projects/pytube3/badge/?version=latest' alt='Documentation Status' /></a>
-	  <a href="https://coveralls.io/github/hbmartin/pytube3?branch=master"><img src="https://coveralls.io/repos/github/hbmartin/pytube3/badge.svg?branch=master" /></a>
+	<a href="https://codecov.io/gh/hbmartin/pytube3"><img src="https://codecov.io/gh/hbmartin/pytube3/branch/master/graph/badge.svg" /></a>
 	  <a href="https://www.codefactor.io/repository/github/hbmartin/pytube3/overview/master"><img src="https://www.codefactor.io/repository/github/hbmartin/pytube3/badge/master" alt="CodeFactor" /></a>
 	  <a href="https://github.com/ambv/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a>
 	  <a href="https://twitter.com/hmartin"><img src="https://img.shields.io/badge/twitter-@hmartin-blue.svg?style=flat" /></a>
@@ -225,7 +225,7 @@ Similarly, if your application requires on-download progress logic, pytube expos
 
 ## Command-line interface
 
-pytube also ships with a tiny cli interface for downloading and probing videos.
+pytube3 ships with a simple CLI interface for downloading videos, playlists, and captions.
 
 Let's start with downloading:
 
@@ -238,15 +238,42 @@ To view available streams:
 $ pytube3 http://youtube.com/watch?v=9bZkp7q19f0 --list
 ```
 
-Finally, if you're filing a bug report, the cli contains a switch called ``--build-playback-report``, which bundles up the state, allowing others to easily replay your issue.
+The complete set of flags are:
+
+```
+usage: pytube3 [-h] [--version] [--itag ITAG] [-r RESOLUTION] [-l] [-v]
+               [--build-playback-report] [-c [CAPTION_CODE]] [-t TARGET]
+               [url]
+
+Command line application to download youtube videos.
+
+positional arguments:
+  url                   The YouTube /watch or /playlist url
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --itag ITAG           The itag for the desired stream
+  -r RESOLUTION, --resolution RESOLUTION
+                        The resolution for the desired stream
+  -l, --list            The list option causes pytube cli to return a list of
+                        streams available to download
+  -v, --verbose         Verbosity level
+  --build-playback-report
+                        Save the html and js to disk
+  -c [CAPTION_CODE], --caption-code [CAPTION_CODE]
+                        Download srt captions for given language code. Prints
+                        available language codes if no argument given
+  -t TARGET, --target TARGET
+                        The output directory for the downloaded stream.
+                        Default is current working directory
+```
+
 
 ## Development
 
 <a href="https://deepsource.io/gh/hbmartin/pytube3/?ref=repository-badge" target="_blank"><img alt="DeepSource" title="DeepSource" src="https://static.deepsource.io/deepsource-badge-light-mini.svg"></a>
 <a href="https://www.codacy.com/manual/hbmartin/pytube3?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hbmartin/pytube3&amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/53794f06983a46829620b3284c6a5596"/></a>
-<a href="https://codecov.io/gh/hbmartin/pytube3">
-  <img src="https://codecov.io/gh/hbmartin/pytube3/branch/master/graph/badge.svg" />
-</a>
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
@@ -260,9 +287,6 @@ Virtual environment is setup with [pipenv](https://pipenv-fork.readthedocs.io/en
 
 This project is linted with [pyflakes](https://github.com/PyCQA/pyflakes), formatted with [black](https://github.com/ambv/black), and typed with [mypy](https://mypy.readthedocs.io/en/latest/introduction.html)
 
-#### Testing
-
-This project is tested with [pytest](https://docs.pytest.org/en/latest/) and coverage is evaluated with [coveralls](https://coveralls-python.readthedocs.io/en/latest/index.html).
 
 #### Code of Conduct
 
