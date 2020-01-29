@@ -163,10 +163,10 @@ class Playlist:
         prefix_gen = self._path_num_prefix_generator(reverse_numbering)
 
         for link in self.video_urls:
-            yt = YouTube(link)
+            youtube = YouTube(link)
             dl_stream = (
-                yt.streams.get_by_resolution(resolution=resolution)
-                or yt.streams.get_lowest_resolution()
+                youtube.streams.get_by_resolution(resolution=resolution)
+                or youtube.streams.get_lowest_resolution()
             )
             assert dl_stream is not None
 

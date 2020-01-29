@@ -63,7 +63,6 @@ def _perform_args_on_youtube(youtube: YouTube, args: argparse.Namespace) -> None
         download_by_resolution(
             youtube=youtube, resolution=args.resolution, target=args.target
         )
-    # TODO: default to download_highest_resultion if no actions specified
 
 
 def _parse_args(
@@ -299,7 +298,7 @@ def download_caption(
 
     caption = youtube.captions.get_by_language_code(lang_code=lang_code)
     if caption:
-        downloaded_path = caption.download(title=youtube.title)
+        downloaded_path = caption.download(title=youtube.title, output_path=target)
         print("Saved caption file to: {}".format(downloaded_path))
     else:
         print("Unable to find caption with code: {}".format(lang_code))

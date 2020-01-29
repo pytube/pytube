@@ -2,6 +2,7 @@
 """Various helper functions implemented by pytube."""
 import functools
 import logging
+import os
 import pprint
 import re
 import warnings
@@ -135,3 +136,13 @@ def deprecated(reason: str) -> Callable:
         return new_func1
 
     return decorator
+
+
+def target_directory(output_path: str) -> str:
+    if output_path:
+        if not os.path.isabs(output_path):
+            output_path = os.path.join(os.getcwd(), output_path)
+    else:
+        output_path = os.getcwd()
+    os.makedirs(output_path, exist_ok=True)
+    return output_path

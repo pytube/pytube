@@ -16,7 +16,7 @@ from typing import Dict, Tuple, Optional, List
 
 from pytube import extract
 from pytube import request
-from pytube.helpers import safe_filename
+from pytube.helpers import safe_filename, target_directory
 from pytube.itags import get_format_profile
 from pytube.monostate import Monostate
 
@@ -227,13 +227,6 @@ class Stream:
         :rtype: str
 
         """
-        if output_path:
-            if not os.path.isabs(output_path):
-                output_path = os.path.join(os.getcwd(), output_path)
-        else:
-            output_path = os.getcwd()
-        os.makedirs(output_path, exist_ok=True)
-
         if filename:
             filename = "{filename}.{s.subtype}".format(
                 filename=safe_filename(filename), s=self
@@ -246,7 +239,7 @@ class Stream:
                 prefix=safe_filename(filename_prefix), filename=filename,
             )
 
-        file_path = os.path.join(output_path, filename)
+        file_path = os.path.join(target_directory(output_path), filename)
 
         if (
             skip_existing
