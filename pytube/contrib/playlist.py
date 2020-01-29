@@ -8,7 +8,7 @@ from collections import OrderedDict
 from typing import List, Optional, Iterable, Dict
 from urllib.parse import parse_qs
 
-from pytube import request, YouTube
+from pytube import request, YouTube, extract
 from pytube.helpers import cache, deprecated
 from pytube.mixins import install_proxy
 
@@ -50,7 +50,6 @@ class Playlist:
     def parse_links(self) -> List[str]:
         """Parse the video links from the page source, extracts and
         returns the /watch?v= part from video link href
-        It's an alternative for BeautifulSoup
         """
 
         req = self.html
@@ -76,6 +75,23 @@ class Playlist:
             )
 
         return link_list
+
+    def trimmed(self, video_id: str) -> List[str]:
+        """Retrieve a list of YouTube video URLs trimmed at the given video ID
+        i.e. if the playlist has video IDs 1,2,3,4 calling trimmed(3) returns [1,2]
+        :type video_id: str
+            video ID to trim the returned list of playlist URLs at
+        :rtype: List[str]
+        :returns:
+            List of video URLs from the playlist trimmed at the given ID
+        """
+        trimmed_urls = []
+        for url in self.video_urls:
+            if extract.video_id(url) == video_id:
+                break
+            else:
+                trimmed_urls.append(url)
+        return trimmed_urls
 
     @property  # type: ignore
     @cache
