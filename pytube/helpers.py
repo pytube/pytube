@@ -6,7 +6,7 @@ import os
 import pprint
 import re
 import warnings
-from typing import TypeVar, Callable
+from typing import TypeVar, Callable, Optional
 
 from pytube.exceptions import RegexMatchError
 
@@ -138,7 +138,17 @@ def deprecated(reason: str) -> Callable:
     return decorator
 
 
-def target_directory(output_path: str) -> str:
+def target_directory(output_path: Optional[str]) -> str:
+    """
+    Function for determining target directory of a download.
+    Returns an absolute path (if relative one given) or the current
+    path (if none given). Makes directory if it does not exist.
+
+    :type output_path: str
+        :rtype: str
+    :returns:
+        An absolute directory path as a string.
+    """
     if output_path:
         if not os.path.isabs(output_path):
             output_path = os.path.join(os.getcwd(), output_path)

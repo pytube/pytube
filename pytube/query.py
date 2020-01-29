@@ -296,7 +296,7 @@ class StreamQuery:
 
         """
         return (
-            self.filter(only_audio=True, codec=codec)
+            self.filter(only_audio=True, audio_codec=codec)
             .order_by("resolution")
             .asc()
             .last()

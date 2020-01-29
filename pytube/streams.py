@@ -72,9 +72,7 @@ class Stream:
         # Same as above, except for the format profile attributes.
         self.set_attributes_from_dict(self.fmt_profile)
 
-        # The player configuration which contains information like the video
-        # title.
-        # TODO(nficano): this should be moved to the monostate.
+        # The player configuration, contains info like the video title.
         self.player_config_args = player_config_args
 
         # 'video/webm; codecs="vp8, vorbis"' -> 'video/webm', ['vp8', 'vorbis']

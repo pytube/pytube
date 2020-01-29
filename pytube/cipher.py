@@ -144,7 +144,7 @@ def get_transform_map(js: str, var: str) -> Dict:
     return mapper
 
 
-def reverse(arr: List, b: Optional[Any]):
+def reverse(arr: List, _: Optional[Any]):
     """Reverse elements in a list.
 
     This function is equivalent to:
