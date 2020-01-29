@@ -144,7 +144,7 @@ def get_transform_map(js: str, var: str) -> Dict:
     return mapper
 
 
-def reverse(arr:List, b:Optional[Any]):
+def reverse(arr: List, b: Optional[Any]):
     """Reverse elements in a list.
 
     This function is equivalent to:
@@ -164,7 +164,7 @@ def reverse(arr:List, b:Optional[Any]):
     return arr[::-1]
 
 
-def splice(arr:List, b:int):
+def splice(arr: List, b: int):
     """Add/remove items to/from a list.
 
     This function is equivalent to:
@@ -181,7 +181,7 @@ def splice(arr:List, b:int):
     return arr[:b] + arr[b * 2 :]
 
 
-def swap(arr:List, b:int):
+def swap(arr: List, b: int):
     """Swap positions at b modulus the list length.
 
     This function is equivalent to:

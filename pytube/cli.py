@@ -31,8 +31,8 @@ def main():
         parser.print_help()
         sys.exit(1)
 
-    print("Loading video")
     if "/playlist" in args.url:
+        print("Loading playlist...")
         playlist = Playlist(args.url)
         if not args.target:
             args.target = safe_filename(playlist.title())
@@ -43,6 +43,7 @@ def main():
                 print(f"There was an error with video: {youtube_video}")
                 print(e)
     else:
+        print("Loading video...")
         youtube = YouTube(args.url)
         _perform_args_on_youtube(youtube, args)
 
@@ -196,7 +197,8 @@ def on_progress(
 
 
 def _download(stream: Stream, target: Optional[str] = None) -> None:
-    print("{fn} | {fs} bytes".format(fn=stream.default_filename, fs=stream.filesize))
+    filesize_megabytes = stream.filesize // 1048576
+    print("{fn} | {fs} bytes".format(fn=stream.default_filename, fs=filesize_megabytes))
     stream.download(output_path=target)
     sys.stdout.write("\n")
 
