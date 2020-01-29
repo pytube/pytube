@@ -11,7 +11,7 @@ def test_title(request_get):
         "<title>(149) Python Tutorial for Beginners "
         "(For Absolute Beginners) - YouTube</title>"
     )
-    url = "https://www.fakeurl.com/playlist?list=PLsyeobzWxl7poL9JTVyndKe62ieoN"
+    url = "https://www.fakeurl.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n"
     pl = Playlist(url)
     pl_title = pl.title()
     assert pl_title == "(149) Python Tutorial for Beginners (For Absolute Beginners)"
@@ -20,7 +20,7 @@ def test_title(request_get):
 @mock.patch("pytube.contrib.playlist.request.get")
 def test_init_with_playlist_url(request_get):
     request_get.return_value = ""
-    url = "https://www.youtube.com/playlist?list=PLynhp4cZEpTbRs_PYISQ8v_uwO0_mDg_X"
+    url = "https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n"
     playlist = Playlist(url)
     assert playlist.playlist_url == url
 
@@ -30,12 +30,12 @@ def test_init_with_watch_url(request_get):
     request_get.return_value = ""
     url = (
         "https://www.youtube.com/watch?v=1KeYzjILqDo&"
-        "list=PLynhp4cZEpTbRs_PYISQ8v_uwO0_mDg_X&index=2&t=661s"
+        "list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n&index=2&t=661s"
     )
     playlist = Playlist(url)
     assert (
         playlist.playlist_url
-        == "https://www.youtube.com/playlist?list=PLynhp4cZEpTbRs_PYISQ8v_uwO0_mDg_X"
+        == "https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n"
     )
 
 
@@ -104,3 +104,15 @@ def test_proxy(install_proxy, request_get):
     request_get.return_value = ""
     Playlist(url, proxies={"http": "things"})
     install_proxy.assert_called_with({"http": "things"})
+
+
+@mock.patch("pytube.contrib.playlist.request.get")
+def test_trimmed(request_get, playlist_html):
+    url = "https://www.fakeurl.com/playlist?list=whatever"
+    request_get.return_value = playlist_html
+    playlist = Playlist(url)
+    playlist._find_load_more_url = MagicMock(return_value=None)
+    assert playlist.trimmed("1BYu65vLKdA") == [
+        "https://www.youtube.com/watch?v=ujTCoH21GlA",
+        "https://www.youtube.com/watch?v=45ryDIPHdGg",
+    ]
