@@ -118,7 +118,7 @@ def test_parse_args_truthy():
             "--itag=10",
             "--resolution=720p",
             "--audio=mp4",
-            "--ffmpeg=2160p"
+            "--ffmpeg=2160p",
         ],
     )
     assert args.url == "http://youtube.com/watch?v=9bZkp7q19f0"
