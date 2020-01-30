@@ -227,7 +227,8 @@ def _download(
 
 
 def unique_name(
-    base: str, subtype: str, video_audio: str, target: str) -> str:
+    base: str, subtype: str, video_audio: str, target: str
+) -> str:
     """
     Given a base name, the file format, and the target directory, will generate
     a filename unique for that directory and file format.
