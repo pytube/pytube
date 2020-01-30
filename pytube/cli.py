@@ -329,8 +329,13 @@ def ffmpeg_downloader(youtube: YouTube, stream: Stream, target: Path) -> None:
     audio_path = Path(target) / f"{audio_unique_name}.{stream.subtype}"
     final_path = Path(target) / f"{safe_filename(stream.title)}.{stream.subtype}"
 
-    subprocess.run([
-        "ffmpeg", "-i", f"{video_path}", "-i", f"{audio_path}", "-codec", "copy", f'{final_path}'
+    subprocess.run(
+        [
+        "ffmpeg", "-i",
+        f"{video_path}",
+        "-i", f"{audio_path}",
+        "-codec", "copy",
+        f'{final_path}'
         ]
     )
     video_path.unlink()
