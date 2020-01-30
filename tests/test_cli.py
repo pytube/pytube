@@ -101,8 +101,8 @@ def test_parse_args_falsey():
     assert args.itag is None
     assert args.list is False
     assert args.verbosity == 0
-    assert args.resolution == None
-    assert args.ffmpeg == None
+    assert args.resolution is None
+    assert args.ffmpeg is None
 
 
 def test_parse_args_truthy():
