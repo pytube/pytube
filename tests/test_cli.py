@@ -197,6 +197,7 @@ def test_download_with_playlist(playlist):
     cli.main()
     playlist.assert_called()
 
+
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
 def test_download_audio(youtube):
     parser = argparse.ArgumentParser()
@@ -206,6 +207,7 @@ def test_download_audio(youtube):
     cli.main()
     youtube.assert_called()
     cli.download_audio.assert_called()
+
 
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
 def test_ffmpeg_process(youtube):
