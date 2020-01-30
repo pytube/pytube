@@ -9,7 +9,7 @@ import logging
 import os
 import shutil
 import sys
-import subprocess # nosec
+import subprocess  # nosec
 from io import BufferedWriter
 from typing import Any, Optional, List
 from pathlib import Path
@@ -338,7 +338,7 @@ def ffmpeg_downloader(youtube: YouTube, stream: Stream, target: Path) -> None:
     audio_path = Path(target) / f"{audio_unique_name}.{stream.subtype}"
     final_path = Path(target) / f"{safe_filename(stream.title)}.{stream.subtype}"
 
-    subprocess.run( # nosec
+    subprocess.run(  # nosec
         [
             "ffmpeg",
             "-i",
