@@ -101,6 +101,8 @@ def test_parse_args_falsey():
     assert args.itag is None
     assert args.list is False
     assert args.verbosity == 0
+    assert args.resolution == None
+    assert args.ffmpeg == None
 
 
 def test_parse_args_truthy():
@@ -114,12 +116,18 @@ def test_parse_args_truthy():
             "en",
             "-l",
             "--itag=10",
+            "--resolution=720p",
+            "--audio=mp4",
+            "--ffmpeg=2160p"
         ],
     )
     assert args.url == "http://youtube.com/watch?v=9bZkp7q19f0"
     assert args.build_playback_report is True
     assert args.itag == 10
     assert args.list is True
+    assert args.resolution == "720p"
+    assert args.audio == "mp4"
+    assert args.ffmpeg == "2160p"
 
 
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
@@ -188,3 +196,23 @@ def test_download_with_playlist(playlist):
     cli.download_by_resolution = MagicMock()
     cli.main()
     playlist.assert_called()
+
+@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
+def test_download_audio(youtube):
+    parser = argparse.ArgumentParser()
+    args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-a", "mp4"])
+    cli._parse_args = MagicMock(return_value=args)
+    cli.download_audio = MagicMock()
+    cli.main()
+    youtube.assert_called()
+    cli.download_audio.assert_called()
+
+@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
+def test_ffmpeg_process(youtube):
+    parser = argparse.ArgumentParser()
+    args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-f", "2160p"])
+    cli._parse_args = MagicMock(return_value=args)
+    cli.ffmpeg_process = MagicMock()
+    cli.main()
+    youtube.assert_called()
+    cli.ffmpeg_process.assert_called()
