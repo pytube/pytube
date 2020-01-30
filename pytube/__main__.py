@@ -106,7 +106,7 @@ class YouTube:
         """
         logger.info("init started")
 
-        self.vid_info = {k: v for k, v in parse_qsl(self.vid_info_raw)}
+        self.vid_info = dict(parse_qsl(self.vid_info_raw))
         if self.age_restricted:
             self.player_config_args = self.vid_info
         else:
@@ -240,7 +240,7 @@ class YouTube:
 
         :rtype: :class:`CaptionQuery <CaptionQuery>`.
         """
-        return CaptionQuery([c for c in self.caption_tracks])
+        return CaptionQuery(self.caption_tracks)
 
     @property
     def streams(self) -> StreamQuery:
@@ -248,7 +248,7 @@ class YouTube:
 
         :rtype: :class:`StreamQuery <StreamQuery>`.
         """
-        return StreamQuery([s for s in self.fmt_streams])
+        return StreamQuery(self.fmt_streams)
 
     @property
     def thumbnail_url(self) -> str:

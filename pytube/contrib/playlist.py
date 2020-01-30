@@ -89,8 +89,7 @@ class Playlist:
         for url in self.video_urls:
             if extract.video_id(url) == video_id:
                 break
-            else:
-                trimmed_urls.append(url)
+            trimmed_urls.append(url)
         return trimmed_urls
 
     @property  # type: ignore
