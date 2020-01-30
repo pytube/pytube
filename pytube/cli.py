@@ -144,8 +144,8 @@ def _parse_args(
             "If no resolution provided, will download the highest quality video and\
             audio streams avaiable, will try to download mp4 but will then download\
             a webm if none are found"
-            )
         )
+    )
 
     return parser.parse_args(args)
 
@@ -232,11 +232,11 @@ def unique_name(base: str, subtype: str, video_audio: str, target: Path) -> str:
     Given a base name, the file format, and the target directory, will generate 
     a filename unique for that directory and file format.
     :param str base:
-        The given base-name, which the function uses to create the unique name.
+        The given base-name.
     :param str subtype:
         The filetype of the video which will be downloaded.
     :param Path target:
-        The target directory.
+        Target directory for download.
     """
     counter = 0
     while True:
@@ -252,10 +252,7 @@ def ffmpeg_process(
     youtube: YouTube, resolution: str, target: Optional[str] = None
 ) -> None:
     """
-    Downloads the adaptive audio and video streams given a resolution,
-    then uses ffmpeg to create a new file with the audio and video from
-    each, before deleting these files and keeping the combination.
-    If no resolution is given, will download the highest, trying mp4 first.
+    Decides the correct video stream to download, then calls ffmpeg_downloader.
 
     :param YouTube youtube:
         A valid YouTube object.
@@ -302,6 +299,19 @@ def ffmpeg_process(
 
 
 def ffmpeg_downloader(youtube: YouTube, stream: Stream, target: Path) -> None:
+    """
+    Given a YouTube Stream object, finds the correct audio stream, downloads them both
+    giving them a unique name, them uses ffmpeg to create a new file with the audio 
+    and video from the previously downloaded files. Then deletes the original adaptive 
+    streams, leaving the combination.
+
+    :param YouTube youtube:
+        A valid YouTube object
+    :param Stream stream:
+        A valid Stream object
+    :param Path target:
+        A valid Path object
+    """
     audio_stream = youtube.streams.filter(
         only_audio=True, subtype=stream.subtype
         ).order_by("abr").desc().first()
@@ -433,6 +443,8 @@ def download_audio(
         A valid YouTube object.
     :param str filetype:
         Desired file format to download.
+    :param str target:
+        Target directory for download
     """
     audio = youtube.streams.filter(
         only_audio=True, subtype=filetype
