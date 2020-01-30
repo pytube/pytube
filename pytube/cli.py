@@ -227,8 +227,7 @@ def _download(
 
 
 def unique_name(
-    base: str, subtype: str, video_audio: str, target: Optional[str]
-) -> str:
+    base: str, subtype: str, video_audio: str, target: str) -> str:
     """
     Given a base name, the file format, and the target directory, will generate
     a filename unique for that directory and file format.
@@ -302,7 +301,7 @@ def ffmpeg_process(
             ffmpeg_downloader(youtube=youtube, stream=video_stream, target=target)
 
 
-def ffmpeg_downloader(youtube: YouTube, stream: Stream, target: Optional[str]) -> None:
+def ffmpeg_downloader(youtube: YouTube, stream: Stream, target: str) -> None:
     """
     Given a YouTube Stream object, finds the correct audio stream, downloads them both
     giving them a unique name, them uses ffmpeg to create a new file with the audio
