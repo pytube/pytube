@@ -12,7 +12,6 @@ import sys
 import subprocess  # nosec
 from io import BufferedWriter
 from typing import Any, Optional, List
-from pathlib import Path
 
 from pytube import __version__, CaptionQuery, Stream, Playlist
 from pytube import YouTube
@@ -227,7 +226,7 @@ def _download(
     sys.stdout.write("\n")
 
 
-def unique_name(base: str, subtype: str, video_audio: str, target: Path) -> str:
+def unique_name(base: str, subtype: str, video_audio: str, target: str) -> str:
     """
     Given a base name, the file format, and the target directory, will generate
     a filename unique for that directory and file format.
@@ -241,9 +240,8 @@ def unique_name(base: str, subtype: str, video_audio: str, target: Path) -> str:
     counter = 0
     while True:
         name = f"{base}_{video_audio}_{counter}"
-        unique = target / f"{name}.{subtype}"
-
-        if not unique.exists():
+        unique = os.path.join(target, f"{name}.{subtype}")
+        if not os.path.exists(unique):
             return str(name)
         counter += 1
 
@@ -263,9 +261,7 @@ def ffmpeg_process(
     """
     youtube.register_on_progress_callback(on_progress)
     if target is None:
-        target = Path.cwd()
-    else:
-        target = Path(target)
+        target = os.getcwd()
 
     if resolution == "best":
         highest_quality = (
@@ -304,7 +300,7 @@ def ffmpeg_process(
             ffmpeg_downloader(youtube=youtube, stream=video_stream, target=target)
 
 
-def ffmpeg_downloader(youtube: YouTube, stream: Stream, target: Path) -> None:
+def ffmpeg_downloader(youtube: YouTube, stream: Stream, target: str) -> None:
     """
     Given a YouTube Stream object, finds the correct audio stream, downloads them both
     giving them a unique name, them uses ffmpeg to create a new file with the audio
@@ -331,12 +327,12 @@ def ffmpeg_downloader(youtube: YouTube, stream: Stream, target: Path) -> None:
     audio_unique_name = unique_name(
         safe_filename(stream.title), stream.subtype, "audio", target=target
     )
-    _download(stream=stream, target=str(target), filename=video_unique_name)
-    _download(stream=audio_stream, target=str(target), filename=audio_unique_name)
+    _download(stream=stream, target=target, filename=video_unique_name)
+    _download(stream=audio_stream, target=target, filename=audio_unique_name)
 
-    video_path = Path(target) / f"{video_unique_name}.{stream.subtype}"
-    audio_path = Path(target) / f"{audio_unique_name}.{stream.subtype}"
-    final_path = Path(target) / f"{safe_filename(stream.title)}.{stream.subtype}"
+    video_path = os.path.join(target, f"{video_unique_name}.{stream.subtype}")
+    audio_path = os.path.join(target, f"{audio_unique_name}.{stream.subtype}")
+    final_path = os.path.join(target, f"{safe_filename(stream.title)}.{stream.subtype}")
 
     subprocess.run(  # nosec
         [
@@ -350,8 +346,8 @@ def ffmpeg_downloader(youtube: YouTube, stream: Stream, target: Path) -> None:
             f"{final_path}",
         ]
     )
-    video_path.unlink()
-    audio_path.unlink()
+    os.unlink(video_path)
+    os.unlink(audio_path)
 
 
 def download_by_itag(youtube: YouTube, itag: int, target: Optional[str] = None) -> None:
