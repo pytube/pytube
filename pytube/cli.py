@@ -229,7 +229,7 @@ def _download(
 
 def unique_name(base: str, subtype: str, video_audio: str, target: Path) -> str:
     """
-    Given a base name, the file format, and the target directory, will generate 
+    Given a base name, the file format, and the target directory, will generate
     a filename unique for that directory and file format.
     :param str base:
         The given base-name.
@@ -267,14 +267,14 @@ def ffmpeg_process(
     else:
         target = Path(target)
 
-    if resolution is "best":
+    if resolution == "best":
         highest_quality = youtube.streams.filter(
             progressive=False
-            ).order_by("resolution").desc().first()
+        ).order_by("resolution").desc().first()
 
         video_stream = youtube.streams.filter(
             progressive=False, subtype="mp4"
-            ).order_by("resolution").desc().first()
+        ).order_by("resolution").desc().first()
 
         if highest_quality.resolution == video_stream.resolution:
             ffmpeg_downloader(youtube=youtube, stream=video_stream, target=target)
@@ -283,13 +283,13 @@ def ffmpeg_process(
     else:
         video_stream = youtube.streams.filter(
             progressive=False, resolution=resolution, subtype="mp4"
-            ).first()
+        ).first()
         if video_stream is not None:
             ffmpeg_downloader(youtube=youtube, stream=video_stream, target=target)
         else:
             video_stream = youtube.streams.filter(
                 progressive=False, resolution=resolution
-                ).first()
+            ).first()
             if video_stream is None:
                 print(f"Could not find a stream with resolution: {resolution}")
                 print("Try one of these:")
@@ -301,8 +301,8 @@ def ffmpeg_process(
 def ffmpeg_downloader(youtube: YouTube, stream: Stream, target: Path) -> None:
     """
     Given a YouTube Stream object, finds the correct audio stream, downloads them both
-    giving them a unique name, them uses ffmpeg to create a new file with the audio 
-    and video from the previously downloaded files. Then deletes the original adaptive 
+    giving them a unique name, them uses ffmpeg to create a new file with the audio
+    and video from the previously downloaded files. Then deletes the original adaptive
     streams, leaving the combination.
 
     :param YouTube youtube:
@@ -314,14 +314,14 @@ def ffmpeg_downloader(youtube: YouTube, stream: Stream, target: Path) -> None:
     """
     audio_stream = youtube.streams.filter(
         only_audio=True, subtype=stream.subtype
-        ).order_by("abr").desc().first()
+    ).order_by("abr").desc().first()
 
     video_unique_name = unique_name(
         safe_filename(stream.title), stream.subtype, "video", target=target
-        )
+    )
     audio_unique_name = unique_name(
         safe_filename(stream.title), stream.subtype, "audio", target=target
-        )
+    )
     _download(stream=stream, target=str(target), filename=video_unique_name)
     _download(stream=audio_stream, target=str(target), filename=audio_unique_name)
 
@@ -329,8 +329,8 @@ def ffmpeg_downloader(youtube: YouTube, stream: Stream, target: Path) -> None:
     audio_path = Path(target) / f"{audio_unique_name}.{stream.subtype}"
     final_path = Path(target) / f"{safe_filename(stream.title)}.{stream.subtype}"
 
-    subprocess.run(["ffmpeg", "-i", f"{video_path}", "-i",
-        f"{audio_path}", "-codec", "copy", f'{final_path}'
+    subprocess.run([
+        "ffmpeg", "-i", f"{video_path}", "-i", f"{audio_path}", "-codec", "copy", f'{final_path}'
         ]
     )
     video_path.unlink()
@@ -436,9 +436,9 @@ def download_audio(
     youtube: YouTube, filetype: str, target: Optional[str] = None
 ) -> None:
     """
-    Given a filetype, downloads the highest quality available audio stream for a 
+    Given a filetype, downloads the highest quality available audio stream for a
     YouTube video.
-    
+
     :param YouTube youtube:
         A valid YouTube object.
     :param str filetype:
@@ -448,7 +448,7 @@ def download_audio(
     """
     audio = youtube.streams.filter(
         only_audio=True, subtype=filetype
-        ).order_by("abr").desc().first()
+    ).order_by("abr").desc().first()
 
     if audio is None:
         print(
@@ -459,7 +459,7 @@ def download_audio(
     youtube.register_on_progress_callback(on_progress)
 
     try:
-        _download(audio)
+        _download(audio, target=target)
     except KeyboardInterrupt:
         sys.exit()
 
