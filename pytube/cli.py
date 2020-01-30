@@ -331,11 +331,11 @@ def ffmpeg_downloader(youtube: YouTube, stream: Stream, target: Path) -> None:
 
     subprocess.run(
         [
-        "ffmpeg", "-i",
-        f"{video_path}",
-        "-i", f"{audio_path}",
-        "-codec", "copy",
-        f'{final_path}'
+            "ffmpeg", "-i",
+            f"{video_path}",
+            "-i", f"{audio_path}",
+            "-codec", "copy",
+            f'{final_path}'
         ]
     )
     video_path.unlink()
