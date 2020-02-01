@@ -24,7 +24,11 @@ class Playlist:
         if proxies:
             install_proxy(proxies)
 
-        self.playlist_id: str = parse_qs(url.split("?")[1])["list"][0]
+        try:
+            self.playlist_id: str = parse_qs(url.split("?")[1])["list"][0]
+        except IndexError:  # assume that url is just the id
+            self.playlist_id = url
+
         self.playlist_url: str = (
             "https://www.youtube.com/playlist?list=" + self.playlist_id
         )

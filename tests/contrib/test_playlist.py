@@ -40,6 +40,16 @@ def test_init_with_watch_url(request_get):
 
 
 @mock.patch("pytube.contrib.playlist.request.get")
+def test_init_with_watch_id(request_get):
+    request_get.return_value = ""
+    playlist = Playlist("PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n")
+    assert (
+        playlist.playlist_url
+        == "https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n"
+    )
+
+
+@mock.patch("pytube.contrib.playlist.request.get")
 def test_parse_links(request_get, playlist_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.return_value = playlist_html
