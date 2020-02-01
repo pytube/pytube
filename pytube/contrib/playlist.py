@@ -24,13 +24,10 @@ class Playlist:
         if proxies:
             install_proxy(proxies)
 
-        self.playlist_url: str = url
-
-        if "watch?v=" in url:
-            base_url = "https://www.youtube.com/playlist?list="
-            query_parameters = parse_qs(url.split("?")[1])
-            self.playlist_url = base_url + query_parameters["list"][0]
-
+        self.playlist_id: str = parse_qs(url.split("?")[1])["list"][0]
+        self.playlist_url: str = (
+            "https://www.youtube.com/playlist?list=" + self.playlist_id
+        )
         self.html = request.get(self.playlist_url)
 
     @staticmethod
