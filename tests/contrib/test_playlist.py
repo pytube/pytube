@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -37,6 +38,14 @@ def test_init_with_watch_url(request_get):
         playlist.playlist_url
         == "https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n"
     )
+
+
+@mock.patch("pytube.contrib.playlist.request.get")
+def test_last_update(request_get, playlist_html):
+    expected = datetime.date(2019, 3, 7)
+    request_get.return_value = playlist_html
+    playlist = Playlist("url")
+    assert playlist.last_update == expected
 
 
 @mock.patch("pytube.contrib.playlist.request.get")

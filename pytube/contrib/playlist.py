@@ -5,6 +5,7 @@ import json
 import logging
 import re
 from collections import OrderedDict
+from datetime import date, datetime
 from typing import List, Optional, Iterable, Dict
 from urllib.parse import parse_qs
 
@@ -33,6 +34,13 @@ class Playlist:
             "https://www.youtube.com/playlist?list=" + self.playlist_id
         )
         self.html = request.get(self.playlist_url)
+
+        # Needs testing with non-English
+        self.last_update: Optional[date] = None
+        results = re.search(r"<li>Last updated on (\w{3}) (\d{1,2}), (\d{4})<\/li>", self.html)
+        if results:
+            month, day, year = results.groups()
+            self.last_update = datetime.strptime(f"{month} {day:0>2} {year}", "%b %d %Y").date()
 
     @staticmethod
     def _find_load_more_url(req: str) -> Optional[str]:
