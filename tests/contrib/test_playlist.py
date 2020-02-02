@@ -130,7 +130,8 @@ def test_trimmed(request_get, playlist_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.return_value = playlist_html
     playlist = Playlist(url)
-    playlist._find_load_more_url = MagicMock(return_value=None)
+    playlist._find_load_more_url = MagicMock(return_value="dummy")
+    assert request_get.call_count == 1
     assert playlist.trimmed("1BYu65vLKdA") == [
         "https://www.youtube.com/watch?v=ujTCoH21GlA",
         "https://www.youtube.com/watch?v=45ryDIPHdGg",
