@@ -122,7 +122,7 @@ def test_parse_args_truthy():
     assert args.list is True
 
 
-@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
+@mock.patch("pytube.cli.YouTube", return_value=None)
 def test_main_download_by_itag(youtube):
     parser = argparse.ArgumentParser()
     args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "--itag=10"])
@@ -133,7 +133,7 @@ def test_main_download_by_itag(youtube):
     cli.download_by_itag.assert_called()
 
 
-@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
+@mock.patch("pytube.cli.YouTube", return_value=None)
 def test_main_build_playback_report(youtube):
     parser = argparse.ArgumentParser()
     args = parse_args(
@@ -146,7 +146,7 @@ def test_main_build_playback_report(youtube):
     cli.build_playback_report.assert_called()
 
 
-@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
+@mock.patch("pytube.cli.YouTube", return_value=None)
 def test_main_display_streams(youtube):
     parser = argparse.ArgumentParser()
     args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-l"])
@@ -157,7 +157,7 @@ def test_main_display_streams(youtube):
     cli.display_streams.assert_called()
 
 
-@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
+@mock.patch("pytube.cli.YouTube", return_value=None)
 def test_main_download_caption(youtube):
     parser = argparse.ArgumentParser()
     args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-c"])
@@ -168,15 +168,15 @@ def test_main_download_caption(youtube):
     cli.download_caption.assert_called()
 
 
-@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
-def test_download_by_resolution(youtube):
+@mock.patch("pytube.cli.YouTube", return_value=None)
+@mock.patch("pytube.cli.download_by_resolution")
+def test_download_by_resolution_flag(youtube, download_by_resolution):
     parser = argparse.ArgumentParser()
     args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-r", "320p"])
     cli._parse_args = MagicMock(return_value=args)
-    cli.download_by_resolution = MagicMock()
     cli.main()
     youtube.assert_called()
-    cli.download_by_resolution.assert_called()
+    download_by_resolution.assert_called()
 
 
 @mock.patch("pytube.cli.Playlist")
@@ -185,6 +185,16 @@ def test_download_with_playlist(playlist):
     parser = argparse.ArgumentParser()
     args = parse_args(parser, ["https://www.youtube.com/playlist?list=PLyn"])
     cli._parse_args = MagicMock(return_value=args)
-    cli.download_by_resolution = MagicMock()
     cli.main()
     playlist.assert_called()
+
+
+@mock.patch("pytube.cli.YouTube")
+@mock.patch("pytube.StreamQuery")
+@mock.patch("pytube.Stream")
+def test_download_by_resolution(youtube, stream_query, stream):
+    stream_query.get_by_resolution.return_value = stream
+    youtube.streams = stream_query
+    cli._download = MagicMock()
+    cli.download_by_resolution(youtube=youtube, resolution="320p", target="test_target")
+    cli._download.assert_called_with(stream, target="test_target")
