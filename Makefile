@@ -49,4 +49,7 @@ tag:
 	git tag "v`pipenv run python pytube/version.py`"
 	git push --tags
 
-release: clean test tag clean-pyc package upload
+check-master:
+	if [[ `git rev-parse --abbrev-ref HEAD` != "master" ]]; then exit 1; fi
+
+release: check-master clean test tag clean-pyc package upload
