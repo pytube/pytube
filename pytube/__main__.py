@@ -69,6 +69,7 @@ class YouTube:
         self.player_config_args: Dict = {}  # inline js in the html containing
         # streams
         self.age_restricted: Optional[bool] = None
+        self.vid_descr: Optional[str] = None
 
         self.fmt_streams: List[Stream] = []
         self.caption_tracks: List[Caption] = []

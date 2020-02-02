@@ -38,7 +38,7 @@ class Playlist:
         # Needs testing with non-English
         self.last_update: Optional[date] = None
         results = re.search(
-            r"<li>Last updated on (\w{3}) (\d{1,2}), (\d{4})<\/li>", self.html
+            r"<li>Last updated on (\w{3}) (\d{1,2}), (\d{4})</li>", self.html
         )
         if results:
             month, day, year = results.groups()

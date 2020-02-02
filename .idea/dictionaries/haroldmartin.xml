@@ -12,7 +12,9 @@
       <w>descrambling</w>
       <w>eurl</w>
       <w>ficano</w>
+      <w>filenames</w>
       <w>filesize</w>
+      <w>gangnam</w>
       <w>itag</w>
       <w>itags</w>
       <w>lsig</w>
@@ -23,11 +25,13 @@
       <w>nficano</w>
       <w>noqa</w>
       <w>noreorder</w>
+      <w>nosec</w>
       <w>ntfs</w>
       <w>prog</w>
       <w>pytube</w>
       <w>recompiles</w>
       <w>samp</w>
+      <w>scodecs</w>
       <w>streamability</w>
       <w>stty</w>
       <w>tracklist</w>

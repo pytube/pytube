@@ -86,7 +86,7 @@ def test_download_caption_with_language_not_found(youtube):
 
 def test_display_progress_bar(capsys):
     cli.display_progress_bar(bytes_received=25, filesize=100, scale=0.55)
-    out, err = capsys.readouterr()
+    out, _ = capsys.readouterr()
     assert "25.0%" in out
 
 

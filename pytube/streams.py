@@ -264,7 +264,7 @@ class Stream:
         additional callback is defined in the monostate. This is exposed to
         allow things like displaying a progress bar.
 
-        :param str chunk:
+        :param bytes chunk:
             Segment of media file binary data, not yet written to disk.
         :param file_handler:
             The file handle where the media is being written to.

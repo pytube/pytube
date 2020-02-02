@@ -235,7 +235,6 @@ def download_by_resolution(
     :param str target:
         Target directory for download
     """
-    # TODO(nficano): allow dash itags to be selected
     stream = youtube.streams.get_by_resolution(resolution)
     if stream is None:
         print(f"Could not find a stream with resolution: {resolution}")

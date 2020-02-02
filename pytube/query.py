@@ -287,8 +287,8 @@ class StreamQuery:
     def get_audio_only(self, subtype: str = "mp4") -> Optional[Stream]:
         """Get highest bitrate audio stream for given codec (defaults to mp4)
 
-        :param str codec:
-            Audio codec, defaults to mp4
+        :param str subtype:
+            Audio subtype, defaults to mp4
         :rtype: :class:`Stream <Stream>` or None
         :returns:
             The :class:`Stream <Stream>` matching the given itag or None if

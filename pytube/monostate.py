@@ -8,7 +8,7 @@ from typing_extensions import Protocol
 class OnProgress(Protocol):
     def __call__(
         self,
-        stream: Any,
+        stream: bytes,
         chunk: Any,
         file_handler: io.BufferedWriter,
         bytes_remaining: int,
