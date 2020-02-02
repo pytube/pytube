@@ -84,6 +84,12 @@ def test_download_caption_with_language_not_found(youtube):
         wrapped_all.assert_called()
 
 
+def test_display_progress_bar(capsys):
+    cli.display_progress_bar(bytes_received=25, filesize=100, scale=0.55)
+    out, err = capsys.readouterr()
+    assert "25.0%" in out
+
+
 @mock.patch("pytube.Stream")
 @mock.patch("io.BufferedWriter")
 def test_on_progress(stream, writer):
