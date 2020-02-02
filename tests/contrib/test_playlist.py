@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -37,6 +38,14 @@ def test_init_with_watch_url(request_get):
         playlist.playlist_url
         == "https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n"
     )
+
+
+@mock.patch("pytube.contrib.playlist.request.get")
+def test_last_update(request_get, playlist_html):
+    expected = datetime.date(2019, 3, 7)
+    request_get.return_value = playlist_html
+    playlist = Playlist("url")
+    assert playlist.last_update == expected
 
 
 @mock.patch("pytube.contrib.playlist.request.get")
@@ -108,6 +117,20 @@ def test_videos(youtube, request_get, playlist_html):
 
 
 @mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
+def test_load_more(youtube, request_get, playlist_html):
+    url = "https://www.fakeurl.com/playlist?list=whatever"
+    request_get.side_effect = [
+        playlist_html,
+        '{"content_html":"", "load_more_widget_html":""}',
+    ]
+    playlist = Playlist(url)
+    playlist._find_load_more_url = MagicMock(side_effect=["dummy", None])
+    request_get.assert_called()
+    assert len(list(playlist.videos)) == 12
+
+
+@mock.patch("pytube.contrib.playlist.request.get")
 @mock.patch("pytube.contrib.playlist.install_proxy", return_value=None)
 def test_proxy(install_proxy, request_get):
     url = "https://www.fakeurl.com/playlist?list=whatever"
@@ -121,7 +144,8 @@ def test_trimmed(request_get, playlist_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.return_value = playlist_html
     playlist = Playlist(url)
-    playlist._find_load_more_url = MagicMock(return_value=None)
+    playlist._find_load_more_url = MagicMock(return_value="dummy")
+    assert request_get.call_count == 1
     assert playlist.trimmed("1BYu65vLKdA") == [
         "https://www.youtube.com/watch?v=ujTCoH21GlA",
         "https://www.youtube.com/watch?v=45ryDIPHdGg",

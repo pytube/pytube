@@ -5,10 +5,11 @@ import json
 import logging
 import re
 from collections import OrderedDict
+from datetime import date, datetime
 from typing import List, Optional, Iterable, Dict
 from urllib.parse import parse_qs
 
-from pytube import request, YouTube, extract
+from pytube import request, YouTube
 from pytube.helpers import cache, deprecated
 from pytube.mixins import install_proxy
 
@@ -34,6 +35,17 @@ class Playlist:
         )
         self.html = request.get(self.playlist_url)
 
+        # Needs testing with non-English
+        self.last_update: Optional[date] = None
+        results = re.search(
+            r"<li>Last updated on (\w{3}) (\d{1,2}), (\d{4})<\/li>", self.html
+        )
+        if results:
+            month, day, year = results.groups()
+            self.last_update = datetime.strptime(
+                f"{month} {day:0>2} {year}", "%b %d %Y"
+            ).date()
+
     @staticmethod
     def _find_load_more_url(req: str) -> Optional[str]:
         """Given an html page or a fragment thereof, looks for
@@ -48,11 +60,10 @@ class Playlist:
 
         return None
 
-    def parse_links(self) -> List[str]:
+    def parse_links(self, until_watch_id: Optional[str] = None) -> List[str]:
         """Parse the video links from the page source, extracts and
         returns the /watch?v= part from video link href
         """
-
         req = self.html
 
         # split the page source by line and process each line
@@ -63,6 +74,12 @@ class Playlist:
         # Simulating a browser request for the load more link
         load_more_url = self._find_load_more_url(req)
         while load_more_url:  # there is an url found
+            if until_watch_id:
+                try:
+                    trim_index = link_list.index(f"/watch?v={until_watch_id}")
+                    return link_list[:trim_index]
+                except ValueError:
+                    pass
             logger.debug("load more url: %s", load_more_url)
             req = request.get(load_more_url)
             load_more = json.loads(req)
@@ -86,12 +103,8 @@ class Playlist:
         :returns:
             List of video URLs from the playlist trimmed at the given ID
         """
-        trimmed_urls = []
-        for url in self.video_urls:
-            if extract.video_id(url) == video_id:
-                break
-            trimmed_urls.append(url)
-        return trimmed_urls
+        trimmed_watch = self.parse_links(until_watch_id=video_id)
+        return [self._video_url(watch_path) for watch_path in trimmed_watch]
 
     @property  # type: ignore
     @cache
@@ -101,9 +114,7 @@ class Playlist:
         :returns:
             List of video URLs
         """
-        return [
-            "https://www.youtube.com" + watch_path for watch_path in self.parse_links()
-        ]
+        return [self._video_url(watch_path) for watch_path in self.parse_links()]
 
     @property
     def videos(self) -> Iterable[YouTube]:
@@ -213,3 +224,7 @@ class Playlist:
             .replace("- YouTube", "")
             .strip()
         )
+
+    @staticmethod
+    def _video_url(watch_path: str):
+        return f"https://www.youtube.com{watch_path}"
