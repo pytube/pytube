@@ -117,6 +117,20 @@ def test_videos(youtube, request_get, playlist_html):
 
 
 @mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
+def test_load_more(youtube, request_get, playlist_html):
+    url = "https://www.fakeurl.com/playlist?list=whatever"
+    request_get.side_effect = [
+        playlist_html,
+        '{"content_html":"", "load_more_widget_html":""}',
+    ]
+    playlist = Playlist(url)
+    playlist._find_load_more_url = MagicMock(side_effect=["dummy", None])
+    request_get.assert_called()
+    assert len(list(playlist.videos)) == 12
+
+
+@mock.patch("pytube.contrib.playlist.request.get")
 @mock.patch("pytube.contrib.playlist.install_proxy", return_value=None)
 def test_proxy(install_proxy, request_get):
     url = "https://www.fakeurl.com/playlist?list=whatever"
