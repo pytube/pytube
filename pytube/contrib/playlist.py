@@ -66,8 +66,8 @@ class Playlist:
 
     def _paginate(self, until_watch_id: Optional[str] = None) -> Iterable[List[str]]:
         """Parse the video links from the page source, extracts and
-          returns the /watch?v= part from video link href
-          """
+        returns the /watch?v= part from video link href
+        """
         req = self.html
         videos_urls = self._extract_videos(req)
         if until_watch_id:

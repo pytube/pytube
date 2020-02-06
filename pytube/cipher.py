@@ -54,7 +54,7 @@ def get_initial_function_name(js: str) -> str:
         regex = re.compile(pattern)
         results = regex.search(js)
         if results:
-            logger.debug(f"finished regex search, matched: {pattern}")
+            logger.debug("finished regex search, matched: %s", pattern)
             return results.group(1)
 
     raise RegexMatchError(caller="get_initial_function_name", pattern="multiple")
