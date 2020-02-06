@@ -6,7 +6,8 @@ import os
 import pprint
 import re
 import warnings
-from typing import TypeVar, Callable, Optional
+from typing import TypeVar, Callable, Optional, Dict, List, Any
+from urllib import request
 
 from pytube.exceptions import RegexMatchError
 
@@ -156,3 +157,20 @@ def target_directory(output_path: Optional[str] = None) -> str:
         output_path = os.getcwd()
     os.makedirs(output_path, exist_ok=True)
     return output_path
+
+
+def install_proxy(proxy_handler: Dict[str, str]) -> None:
+    proxy_support = request.ProxyHandler(proxy_handler)
+    opener = request.build_opener(proxy_support)
+    request.install_opener(opener)
+
+
+def uniqueify(duped_list: List) -> List:
+    seen: Dict[Any, bool] = {}
+    result = []
+    for item in duped_list:
+        if item in seen:
+            continue
+        seen[item] = True
+        result.append(item)
+    return result

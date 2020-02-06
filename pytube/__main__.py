@@ -17,11 +17,11 @@ from html import unescape
 from pytube import Caption
 from pytube import CaptionQuery
 from pytube import extract
-from pytube import mixins
 from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
-from pytube.mixins import install_proxy
+from pytube.extract import apply_descrambler, apply_signature
+from pytube.helpers import install_proxy
 from pytube.exceptions import VideoUnavailable
 from pytube.monostate import OnProgress, OnComplete, Monostate
 
@@ -135,11 +135,11 @@ class YouTube:
         # unscramble the progressive and adaptive stream manifests.
         for fmt in stream_maps:
             if not self.age_restricted and fmt in self.vid_info:
-                mixins.apply_descrambler(self.vid_info, fmt)
-            mixins.apply_descrambler(self.player_config_args, fmt)
+                apply_descrambler(self.vid_info, fmt)
+            apply_descrambler(self.player_config_args, fmt)
 
             try:
-                mixins.apply_signature(
+                apply_signature(
                     self.player_config_args, fmt, self.js  # type: ignore
                 )
             except TypeError:
@@ -147,7 +147,7 @@ class YouTube:
                 self.js_url = extract.js_url(self.embed_html, self.age_restricted)
                 self.js = request.get(self.js_url)
                 assert self.js is not None
-                mixins.apply_signature(self.player_config_args, fmt, self.js)
+                apply_signature(self.player_config_args, fmt, self.js)
 
             # build instances of :class:`Stream <Stream>`
             self.initialize_stream_objects(fmt)

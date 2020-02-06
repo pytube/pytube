@@ -61,3 +61,14 @@ def playlist_html():
     )
     with gzip.open(file_path, "rb") as f:
         return f.read().decode("utf-8")
+
+
+@pytest.fixture
+def playlist_long_html():
+    """Youtube playlist HTML loaded on 2020-01-25 from
+    https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr"""
+    file_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), "mocks", "playlist_long.html.gz"
+    )
+    with gzip.open(file_path, "rb") as f:
+        return f.read().decode("utf-8")

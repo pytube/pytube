@@ -59,30 +59,6 @@ def test_init_with_watch_id(request_get):
 
 
 @mock.patch("pytube.contrib.playlist.request.get")
-def test_parse_links(request_get, playlist_html):
-    url = "https://www.fakeurl.com/playlist?list=whatever"
-    request_get.return_value = playlist_html
-    playlist = Playlist(url)
-    playlist._find_load_more_url = MagicMock(return_value=None)
-    links = playlist.parse_links()
-    request_get.assert_called()
-    assert links == [
-        "/watch?v=ujTCoH21GlA",
-        "/watch?v=45ryDIPHdGg",
-        "/watch?v=1BYu65vLKdA",
-        "/watch?v=3AQ_74xrch8",
-        "/watch?v=ddqQUz9mZaM",
-        "/watch?v=vwLT6bZrHEE",
-        "/watch?v=TQKI0KE-JYY",
-        "/watch?v=dNBvQ38MlT8",
-        "/watch?v=JHxyrMgOUWI",
-        "/watch?v=l2I8NycJMCY",
-        "/watch?v=g1Zbuk1gAfk",
-        "/watch?v=zixd-si9Q-o",
-    ]
-
-
-@mock.patch("pytube.contrib.playlist.request.get")
 def test_video_urls(request_get, playlist_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.return_value = playlist_html
@@ -144,9 +120,68 @@ def test_trimmed(request_get, playlist_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.return_value = playlist_html
     playlist = Playlist(url)
-    playlist._find_load_more_url = MagicMock(return_value="dummy")
+    playlist._find_load_more_url = MagicMock(return_value=None)
     assert request_get.call_count == 1
-    assert playlist.trimmed("1BYu65vLKdA") == [
+    trimmed = list(playlist.trimmed("1BYu65vLKdA"))
+    assert trimmed == [
         "https://www.youtube.com/watch?v=ujTCoH21GlA",
         "https://www.youtube.com/watch?v=45ryDIPHdGg",
     ]
+
+
+@mock.patch("pytube.contrib.playlist.request.get")
+def test_playlist_failed_pagination(request_get, playlist_long_html):
+    url = "https://www.fakeurl.com/playlist?list=whatever"
+    request_get.side_effect = [
+        playlist_long_html,
+        "{}",
+    ]
+    playlist = Playlist(url)
+    video_urls = playlist.video_urls
+    assert len(video_urls) == 100
+    assert request_get.call_count == 2
+    request_get.assert_called_with(
+        "https://www.youtube.com/browse_ajax?action_continuation=1&amp;continuation"
+        "=4qmFsgIsEhpWTFVVYS12aW9HaGUyYnRCY1puZWFQb25LQRoOZWdaUVZEcERSMUUlM0Q%253D"
+    )
+
+
+@mock.patch("pytube.contrib.playlist.request.get")
+def test_playlist_pagination(request_get, playlist_html, playlist_long_html):
+    url = "https://www.fakeurl.com/playlist?list=whatever"
+    request_get.side_effect = [
+        playlist_long_html,
+        '{"content_html":"<a href=\\"/watch?v=BcWz41-4cDk&amp;feature=plpp_video&amp;ved'
+        '=CCYQxjQYACITCO33n5-pn-cCFUG3xAodLogN2yj6LA\\">}", "load_more_widget_html":""}',
+        "{}",
+    ]
+    playlist = Playlist(url)
+    assert len(playlist.video_urls) == 101
+    assert request_get.call_count == 2
+
+
+@mock.patch("pytube.contrib.playlist.request.get")
+def test_trimmed_pagination(request_get, playlist_html, playlist_long_html):
+    url = "https://www.fakeurl.com/playlist?list=whatever"
+    request_get.side_effect = [
+        playlist_long_html,
+        '{"content_html":"<a href=\\"/watch?v=BcWz41-4cDk&amp;feature=plpp_video&amp;ved'
+        '=CCYQxjQYACITCO33n5-pn-cCFUG3xAodLogN2yj6LA\\">}", "load_more_widget_html":""}',
+        "{}",
+    ]
+    playlist = Playlist(url)
+    assert len(list(playlist.trimmed("FN9vC8aR7Yk"))) == 3
+    assert request_get.call_count == 1
+
+
+@mock.patch("pytube.contrib.playlist.request.get")
+def test_trimmed_pagination_not_found(request_get, playlist_html, playlist_long_html):
+    url = "https://www.fakeurl.com/playlist?list=whatever"
+    request_get.side_effect = [
+        playlist_long_html,
+        '{"content_html":"<a href=\\"/watch?v=BcWz41-4cDk&amp;feature=plpp_video&amp;ved'
+        '=CCYQxjQYACITCO33n5-pn-cCFUG3xAodLogN2yj6LA\\">}", "load_more_widget_html":""}',
+        "{}",
+    ]
+    playlist = Playlist(url)
+    assert len(list(playlist.trimmed("wont-be-found"))) == 101

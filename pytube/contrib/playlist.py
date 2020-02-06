@@ -4,14 +4,12 @@
 import json
 import logging
 import re
-from collections import OrderedDict
 from datetime import date, datetime
 from typing import List, Optional, Iterable, Dict
 from urllib.parse import parse_qs
 
 from pytube import request, YouTube
-from pytube.helpers import cache, deprecated
-from pytube.mixins import install_proxy
+from pytube.helpers import cache, deprecated, install_proxy, uniqueify
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +44,8 @@ class Playlist:
                 f"{month} {day:0>2} {year}", "%b %d %Y"
             ).date()
 
+        self._video_regex = re.compile(r"href=\"(/watch\?v=[\w-]*)")
+
     @staticmethod
     def _find_load_more_url(req: str) -> Optional[str]:
         """Given an html page or a fragment thereof, looks for
@@ -60,41 +60,58 @@ class Playlist:
 
         return None
 
-    def parse_links(self, until_watch_id: Optional[str] = None) -> List[str]:
+    @deprecated("This function will be removed in the future, please use .video_urls")
+    def parse_links(self) -> List[str]:  # pragma: no cover
+        return self.video_urls
+
+    def _paginate(self, until_watch_id: Optional[str] = None) -> Iterable[List[str]]:
         """Parse the video links from the page source, extracts and
         returns the /watch?v= part from video link href
         """
         req = self.html
-
-        # split the page source by line and process each line
-        content = [x for x in req.split("\n") if "pl-video-title-link" in x]
-        link_list = [x.split('href="', 1)[1].split("&", 1)[0] for x in content]
+        videos_urls = self._extract_videos(req)
+        if until_watch_id:
+            try:
+                trim_index = videos_urls.index(f"/watch?v={until_watch_id}")
+                yield videos_urls[:trim_index]
+                return
+            except ValueError:
+                pass
+        yield videos_urls
 
         # The above only returns 100 or fewer links
         # Simulating a browser request for the load more link
         load_more_url = self._find_load_more_url(req)
+
         while load_more_url:  # there is an url found
-            if until_watch_id:
-                try:
-                    trim_index = link_list.index(f"/watch?v={until_watch_id}")
-                    return link_list[:trim_index]
-                except ValueError:
-                    pass
             logger.debug("load more url: %s", load_more_url)
             req = request.get(load_more_url)
             load_more = json.loads(req)
-            videos = re.findall(
-                r"href=\"(/watch\?v=[\w-]*)", load_more["content_html"],
-            )
-            # remove duplicates
-            link_list.extend(list(OrderedDict.fromkeys(videos)))
+            try:
+                html = load_more["content_html"]
+            except KeyError:
+                logger.debug("Could not find content_html")
+                return
+            videos_urls = self._extract_videos(html)
+            if until_watch_id:
+                try:
+                    trim_index = videos_urls.index(f"/watch?v={until_watch_id}")
+                    yield videos_urls[:trim_index]
+                    return
+                except ValueError:
+                    pass
+            yield videos_urls
+
             load_more_url = self._find_load_more_url(
                 load_more["load_more_widget_html"],
             )
 
-        return link_list
+        return
 
-    def trimmed(self, video_id: str) -> List[str]:
+    def _extract_videos(self, html: str) -> List[str]:
+        return uniqueify(self._video_regex.findall(html))
+
+    def trimmed(self, video_id: str) -> Iterable[str]:
         """Retrieve a list of YouTube video URLs trimmed at the given video ID
         i.e. if the playlist has video IDs 1,2,3,4 calling trimmed(3) returns [1,2]
         :type video_id: str
@@ -103,8 +120,9 @@ class Playlist:
         :returns:
             List of video URLs from the playlist trimmed at the given ID
         """
-        trimmed_watch = self.parse_links(until_watch_id=video_id)
-        return [self._video_url(watch_path) for watch_path in trimmed_watch]
+        for page in self._paginate(until_watch_id=video_id):
+            for watch_path in page:
+                yield self._video_url(watch_path)
 
     @property  # type: ignore
     @cache
@@ -114,10 +132,15 @@ class Playlist:
         :returns:
             List of video URLs
         """
-        return [self._video_url(watch_path) for watch_path in self.parse_links()]
+        return [
+            self._video_url(video) for page in list(self._paginate()) for video in page
+        ]
 
     @property
     def videos(self) -> Iterable[YouTube]:
+        """Iterable of YouTube objects representing videos in this playlist
+        :rtype: Iterable[YouTube]
+        """
         for url in self.video_urls:
             yield YouTube(url)
 
