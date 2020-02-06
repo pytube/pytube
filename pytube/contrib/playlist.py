@@ -90,7 +90,7 @@ class Playlist:
             try:
                 html = load_more["content_html"]
             except KeyError:
-                logger.debug("Could not find next pagination url")
+                logger.debug("Could not find content_html")
                 return
             videos_urls = self._extract_videos(html)
             if until_watch_id:
@@ -138,6 +138,9 @@ class Playlist:
 
     @property
     def videos(self) -> Iterable[YouTube]:
+        """Iterable of YouTube objects representing videos in this playlist
+        :rtype: Iterable[YouTube]
+        """
         for url in self.video_urls:
             yield YouTube(url)
 

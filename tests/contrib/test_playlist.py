@@ -127,3 +127,20 @@ def test_trimmed(request_get, playlist_html):
         "https://www.youtube.com/watch?v=ujTCoH21GlA",
         "https://www.youtube.com/watch?v=45ryDIPHdGg",
     ]
+
+
+@mock.patch("pytube.contrib.playlist.request.get")
+def test_playlist_pagination(request_get, playlist_long_html):
+    url = "https://www.fakeurl.com/playlist?list=whatever"
+    request_get.side_effect = [
+        playlist_long_html,
+        "{}",
+    ]
+    playlist = Playlist(url)
+    video_urls = playlist.video_urls
+    assert len(video_urls) == 100
+    assert request_get.call_count == 2
+    request_get.assert_called_with(
+        "https://www.youtube.com/browse_ajax?action_continuation=1&amp;continuation"
+        "=4qmFsgIsEhpWTFVVYS12aW9HaGUyYnRCY1puZWFQb25LQRoOZWdaUVZEcERSMUUlM0Q%253D"
+    )
