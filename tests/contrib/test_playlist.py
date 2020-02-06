@@ -158,3 +158,30 @@ def test_playlist_pagination(request_get, playlist_html, playlist_long_html):
     playlist = Playlist(url)
     assert len(playlist.video_urls) == 101
     assert request_get.call_count == 2
+
+
+@mock.patch("pytube.contrib.playlist.request.get")
+def test_trimmed_pagination(request_get, playlist_html, playlist_long_html):
+    url = "https://www.fakeurl.com/playlist?list=whatever"
+    request_get.side_effect = [
+        playlist_long_html,
+        '{"content_html":"<a href=\\"/watch?v=BcWz41-4cDk&amp;feature=plpp_video&amp;ved'
+        '=CCYQxjQYACITCO33n5-pn-cCFUG3xAodLogN2yj6LA\\">}", "load_more_widget_html":""}',
+        "{}",
+    ]
+    playlist = Playlist(url)
+    assert len(list(playlist.trimmed("FN9vC8aR7Yk"))) == 3
+    assert request_get.call_count == 1
+
+
+@mock.patch("pytube.contrib.playlist.request.get")
+def test_trimmed_pagination_not_found(request_get, playlist_html, playlist_long_html):
+    url = "https://www.fakeurl.com/playlist?list=whatever"
+    request_get.side_effect = [
+        playlist_long_html,
+        '{"content_html":"<a href=\\"/watch?v=BcWz41-4cDk&amp;feature=plpp_video&amp;ved'
+        '=CCYQxjQYACITCO33n5-pn-cCFUG3xAodLogN2yj6LA\\">}", "load_more_widget_html":""}',
+        "{}",
+    ]
+    playlist = Playlist(url)
+    assert len(list(playlist.trimmed("wont-be-found"))) == 101
