@@ -43,6 +43,7 @@ class Playlist:
             self.last_update = datetime.strptime(
                 f"{month} {day:0>2} {year}", "%b %d %Y"
             ).date()
+
         self._video_regex = re.compile(r"href=\"(/watch\?v=[\w-]*)")
 
     @staticmethod
@@ -59,12 +60,9 @@ class Playlist:
 
         return None
 
-    def parse_links(self, until_watch_id: Optional[str] = None) -> List[str]:
-        """Parse the video links from the page source, extracts and
-        returns the /watch?v= part from video link href
-        """
-        pages = list(self._paginate(until_watch_id=until_watch_id))
-        return [video for page in pages for video in page]
+    @deprecated("This function will be removed in the future, please use .video_urls")
+    def parse_links(self) -> List[str]:  # pragma: no cover
+        return self.video_urls
 
     def _paginate(self, until_watch_id: Optional[str] = None) -> Iterable[List[str]]:
         """Parse the video links from the page source, extracts and
@@ -134,7 +132,9 @@ class Playlist:
         :returns:
             List of video URLs
         """
-        return [self._video_url(watch_path) for watch_path in self.parse_links()]
+        return [
+            self._video_url(video) for page in list(self._paginate()) for video in page
+        ]
 
     @property
     def videos(self) -> Iterable[YouTube]:

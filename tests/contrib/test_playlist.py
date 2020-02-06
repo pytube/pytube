@@ -59,30 +59,6 @@ def test_init_with_watch_id(request_get):
 
 
 @mock.patch("pytube.contrib.playlist.request.get")
-def test_parse_links(request_get, playlist_html):
-    url = "https://www.fakeurl.com/playlist?list=whatever"
-    request_get.return_value = playlist_html
-    playlist = Playlist(url)
-    playlist._find_load_more_url = MagicMock(return_value=None)
-    links = playlist.parse_links()
-    request_get.assert_called()
-    assert links == [
-        "/watch?v=ujTCoH21GlA",
-        "/watch?v=45ryDIPHdGg",
-        "/watch?v=1BYu65vLKdA",
-        "/watch?v=3AQ_74xrch8",
-        "/watch?v=ddqQUz9mZaM",
-        "/watch?v=vwLT6bZrHEE",
-        "/watch?v=TQKI0KE-JYY",
-        "/watch?v=dNBvQ38MlT8",
-        "/watch?v=JHxyrMgOUWI",
-        "/watch?v=l2I8NycJMCY",
-        "/watch?v=g1Zbuk1gAfk",
-        "/watch?v=zixd-si9Q-o",
-    ]
-
-
-@mock.patch("pytube.contrib.playlist.request.get")
 def test_video_urls(request_get, playlist_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.return_value = playlist_html
