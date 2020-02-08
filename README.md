@@ -21,6 +21,7 @@
   * [Usage](#usage)
   * [Command-line interface](#command-line-interface)
   * [Development](#development)
+  * [GUIs and other libraries](#guis-and-other-libraries)
 
 ## Installation
 
@@ -292,7 +293,8 @@ This project is linted with [pyflakes](https://github.com/PyCQA/pyflakes), forma
 
 Treat other people with helpfulness, gratitude, and consideration! See the [Python Community Code of Conduct](https://www.python.org/psf/codeofconduct/).
 
-#### See also
+## GUIs and other libraries
 * [youtube-python](https://github.com/rohitkhatri/youtube-python) - client for the YouTube data API
 * [YouTubeDownload](https://github.com/hbmartin/YouTubeDownload) - GUI frontend for pytube3
 * [Pytube-GUI](https://github.com/GAO23/Pytube-GUI) - Simple GUI frontend for pytube3
+* [StackOverflow questions](https://stackoverflow.com/questions/tagged/pytube)
