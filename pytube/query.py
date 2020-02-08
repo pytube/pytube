@@ -162,16 +162,15 @@ class StreamQuery:
             filters.append(lambda s: s.is_adaptive)
 
         if custom_filter_functions:
-            for fn in custom_filter_functions:
-                filters.append(fn)
+            filters.extend(custom_filter_functions)
 
         if is_dash is not None:
             filters.append(lambda s: s.is_dash == is_dash)
 
         fmt_streams = self.fmt_streams
         for fn in filters:
-            fmt_streams = list(filter(fn, fmt_streams))
-        return StreamQuery(fmt_streams)
+            fmt_streams = filter(fn, fmt_streams)
+        return StreamQuery(list(fmt_streams))
 
     def order_by(self, attribute_name: str) -> "StreamQuery":
         """Apply a sort order. Filters out stream the do not have the attribute.
@@ -182,31 +181,23 @@ class StreamQuery:
         has_attribute = [
             s for s in self.fmt_streams if getattr(s, attribute_name) is not None
         ]
-        integer_attr_repr: Optional[Dict[str, int]] = None
 
-        # check that the attribute value is a string
-        if len(has_attribute) > 0 and isinstance(
+        # Check that the attributes have string values.
+        if has_attribute and isinstance(
             getattr(has_attribute[0], attribute_name), str
         ):
-            # attempt to extract numerical values from string
+            # Try to return a StreamQuery with the values sorted by their integer representations.
             try:
-                integer_attr_repr = {
-                    getattr(s, attribute_name): int(
-                        "".join(list(filter(str.isdigit, getattr(s, attribute_name))))
+                return StreamQuery(
+                    sorted(
+                        has_attribute,
+                        key=lambda s: int(
+                            "".join(list(filter(str.isdigit, getattr(s, attribute_name))))
+                        ),  # type: ignore  # noqa: E501
                     )
-                    for s in has_attribute
-                }
-            except ValueError:
-                integer_attr_repr = None
-
-        # lookup integer values if we have them
-        if integer_attr_repr is not None:
-            return StreamQuery(
-                sorted(
-                    has_attribute,
-                    key=lambda s: integer_attr_repr[getattr(s, attribute_name)],  # type: ignore  # noqa: E501
                 )
-            )
+            except ValueError:
+                pass
 
         return StreamQuery(
             sorted(has_attribute, key=lambda s: getattr(s, attribute_name))
