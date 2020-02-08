@@ -310,26 +310,29 @@ class YouTube:
         )
 
     @property
-    def length(self) -> str:
+    def length(self) -> int:
         """Get the video length in seconds.
 
         :rtype: str
 
         """
-        return self.player_config_args.get("length_seconds") or (
-            self.player_config_args.get("player_response", {})
-            .get("videoDetails", {})
-            .get("lengthSeconds")
+        return int(
+            self.player_config_args.get("length_seconds")
+            or (
+                self.player_config_args.get("player_response", {})
+                .get("videoDetails", {})
+                .get("lengthSeconds")
+            )
         )
 
     @property
-    def views(self) -> str:
+    def views(self) -> int:
         """Get the number of the times the video has been viewed.
 
         :rtype: str
 
         """
-        return (
+        return int(
             self.player_config_args.get("player_response", {})
             .get("videoDetails", {})
             .get("viewCount")
