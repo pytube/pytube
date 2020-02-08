@@ -316,11 +316,14 @@ class YouTube:
         :rtype: str
 
         """
-        return int(self.player_config_args.get("length_seconds") or (
-            self.player_config_args.get("player_response", {})
-            .get("videoDetails", {})
-            .get("lengthSeconds")
-        ))
+        return int(
+            self.player_config_args.get("length_seconds")
+            or (
+                self.player_config_args.get("player_response", {})
+                .get("videoDetails", {})
+                .get("lengthSeconds")
+            )
+        )
 
     @property
     def views(self) -> int:
