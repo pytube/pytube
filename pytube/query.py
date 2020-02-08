@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """This module provides a query interface for media streams and captions."""
-from typing import List, Optional, Dict
+from typing import List, Optional
 
 from pytube import Stream, Caption
 
@@ -186,13 +186,16 @@ class StreamQuery:
         if has_attribute and isinstance(
             getattr(has_attribute[0], attribute_name), str
         ):
-            # Try to return a StreamQuery with the values sorted by their integer representations.
+            # Try to return a StreamQuery sorted by the integer representations
+            # of the values.
             try:
                 return StreamQuery(
                     sorted(
                         has_attribute,
                         key=lambda s: int(
-                            "".join(list(filter(str.isdigit, getattr(s, attribute_name))))
+                            "".join(
+                                list(filter(str.isdigit, getattr(s, attribute_name)))
+                            )
                         ),  # type: ignore  # noqa: E501
                     )
                 )
