@@ -193,9 +193,7 @@ class StreamQuery:
                     sorted(
                         has_attribute,
                         key=lambda s: int(
-                            "".join(
-                                list(filter(str.isdigit, getattr(s, attribute_name)))
-                            )
+                            "".join(filter(str.isdigit, getattr(s, attribute_name)))
                         ),  # type: ignore  # noqa: E501
                     )
                 )
