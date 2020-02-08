@@ -182,7 +182,7 @@ class StreamQuery:
         has_attribute = [
             s for s in self.fmt_streams if getattr(s, attribute_name) is not None
         ]
-        
+
         integer_attr_repr: Optional[Dict[str, int]] = None
 
         # check that the attribute value is a string
