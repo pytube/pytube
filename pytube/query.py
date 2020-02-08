@@ -186,9 +186,7 @@ class StreamQuery:
         integer_attr_repr: Optional[Dict[str, int]] = None
 
         # check that the attribute value is a string
-        if has_attribute and isinstance(
-            getattr(has_attribute[0], attribute_name), str
-        ):
+        if has_attribute and isinstance(getattr(has_attribute[0], attribute_name), str):
             # attempt to extract numerical values from string
             try:
                 integer_attr_repr = {
@@ -268,9 +266,7 @@ class StreamQuery:
 
         """
         return (
-            self.filter(progressive=True, subtype="mp4")
-            .order_by("resolution")
-            .first()
+            self.filter(progressive=True, subtype="mp4").order_by("resolution").first()
         )
 
     def get_highest_resolution(self) -> Optional[Stream]:
@@ -295,9 +291,7 @@ class StreamQuery:
             not found.
 
         """
-        return (
-            self.filter(only_audio=True, subtype=subtype).order_by("abr").last()
-        )
+        return self.filter(only_audio=True, subtype=subtype).order_by("abr").last()
 
     def first(self) -> Optional[Stream]:
         """Get the first :class:`Stream <Stream>` in the results.
