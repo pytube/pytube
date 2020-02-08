@@ -182,10 +182,11 @@ class StreamQuery:
         has_attribute = [
             s for s in self.fmt_streams if getattr(s, attribute_name) is not None
         ]
+        
         integer_attr_repr: Optional[Dict[str, int]] = None
 
         # check that the attribute value is a string
-        if len(has_attribute) > 0 and isinstance(
+        if has_attribute and isinstance(
             getattr(has_attribute[0], attribute_name), str
         ):
             # attempt to extract numerical values from string
@@ -269,8 +270,7 @@ class StreamQuery:
         return (
             self.filter(progressive=True, subtype="mp4")
             .order_by("resolution")
-            .desc()
-            .last()
+            .first()
         )
 
     def get_highest_resolution(self) -> Optional[Stream]:
@@ -282,7 +282,7 @@ class StreamQuery:
             not found.
 
         """
-        return self.filter(progressive=True).order_by("resolution").asc().last()
+        return self.filter(progressive=True).order_by("resolution").last()
 
     def get_audio_only(self, subtype: str = "mp4") -> Optional[Stream]:
         """Get highest bitrate audio stream for given codec (defaults to mp4)
@@ -296,7 +296,7 @@ class StreamQuery:
 
         """
         return (
-            self.filter(only_audio=True, subtype=subtype).order_by("abr").asc().last()
+            self.filter(only_audio=True, subtype=subtype).order_by("abr").last()
         )
 
     def first(self) -> Optional[Stream]:
@@ -343,7 +343,7 @@ class StreamQuery:
         """
         return self.fmt_streams
 
-
+        
 class CaptionQuery:
     """Interface for querying the available captions."""
 
