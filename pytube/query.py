@@ -343,7 +343,7 @@ class StreamQuery:
         """
         return self.fmt_streams
 
-        
+
 class CaptionQuery:
     """Interface for querying the available captions."""
 
