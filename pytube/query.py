@@ -183,9 +183,7 @@ class StreamQuery:
         ]
 
         # Check that the attributes have string values.
-        if has_attribute and isinstance(
-            getattr(has_attribute[0], attribute_name), str
-        ):
+        if has_attribute and isinstance(getattr(has_attribute[0], attribute_name), str):
             # Try to return a StreamQuery sorted by the integer representations
             # of the values.
             try:
