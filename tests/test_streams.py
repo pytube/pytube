@@ -37,6 +37,55 @@ def test_title(cipher_signature):
     assert stream.title == expected
 
 
+def test_description(cipher_signature):
+    expected = (
+        "PSY - ‘I LUV IT’ M/V @ https://youtu.be/Xvjnoagk6GU\n"
+        "PSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\n"
+        "PSY - 8TH ALBUM '4X2=8' on iTunes @\n"
+        "https://smarturl.it/PSY_8thAlbum\n"
+        "PSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n"
+        "#PSY #싸이 #GANGNAMSTYLE #강남스타일\n"
+        "More about PSY@\nhttp://www.youtube.com/officialpsy\n"
+        "http://www.facebook.com/officialpsy\n"
+        "http://twitter.com/psy_oppa\n"
+        "https://www.instagram.com/42psy42\n"
+        "http://iTunes.com/PSY\n"
+        "http://sptfy.com/PSY\n"
+        "http://weibo.com/psyoppa"
+    )
+    assert cipher_signature.description == expected
+
+    cipher_signature.vid_descr = None
+    expected = (
+        "PSY - ‘I LUV IT’ M/V @ https://youtu.be/Xvjnoagk6GU\n"
+        "PSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\n\n"
+        "PSY - 8TH ALBUM '4X2=8' on iTunes @\n"
+        "https://smarturl.it/PSY_8thAlbum\n\n"
+        "PSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n\n"
+        "#PSY #싸이 #GANGNAMSTYLE #강남스타일\n\n"
+        "More about PSY@\nhttp://www.youtube.com/officialpsy\n"
+        "http://www.facebook.com/officialpsy\n"
+        "http://twitter.com/psy_oppa\n"
+        "https://www.instagram.com/42psy42\n"
+        "http://iTunes.com/PSY\n"
+        "http://sptfy.com/PSY\n"
+        "http://weibo.com/psyoppa"
+    )
+    assert cipher_signature.description == expected
+
+
+def test_rating(cipher_signature):
+    assert cipher_signature.rating == 4.522203
+
+
+def test_length(cipher_signature):
+    assert cipher_signature.length == 252
+
+
+def test_views(cipher_signature):
+    assert cipher_signature.views == 3494704859
+
+
 def test_download(cipher_signature, mocker):
     mocker.patch.object(request, "headers")
     request.headers.return_value = {"content-length": "16384"}
