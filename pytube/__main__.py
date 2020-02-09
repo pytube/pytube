@@ -256,7 +256,7 @@ class YouTube:
             thumbnail_details = thumbnail_details[-1]  # last item has max size
             return thumbnail_details["url"]
 
-        return "https://img.youtube.com/vi/" + self.video_id + "/maxresdefault.jpg"
+        return f"https://img.youtube.com/vi/{self.video_id}/maxresdefault.jpg"
 
     @property
     def title(self) -> str:

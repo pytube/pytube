@@ -9,7 +9,8 @@ pipenv:
 	pipenv install --dev
 
 test:
-	pipenv run flake8
+	pipenv run flake8 pytube/
+	pipenv run flake8 tests/
 	pipenv run black pytube --check
 	pipenv run black tests --check
 	pipenv run mypy pytube
