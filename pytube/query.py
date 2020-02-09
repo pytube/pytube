@@ -233,6 +233,7 @@ class StreamQuery:
 
     def get_by_resolution(self, resolution: str) -> Optional[Stream]:
         """Get the corresponding :class:`Stream <Stream>` for a given resolution.
+
         Stream must be a progressive mp4.
 
         :param str resolution:

@@ -209,7 +209,9 @@ def test_author(cipher_signature):
 
 def test_thumbnail_when_in_details(cipher_signature):
     expected = "some url"
-    cipher_signature.player_response = {"videoDetails": {"thumbnail": {"thumbnails": [{"url": expected}]}}}
+    cipher_signature.player_response = {
+        "videoDetails": {"thumbnail": {"thumbnails": [{"url": expected}]}}
+    }
     assert cipher_signature.thumbnail_url == expected
 
 

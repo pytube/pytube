@@ -218,8 +218,7 @@ class YouTube:
         :rtype: List[Caption]
         """
         raw_tracks = (
-            self.player_response
-            .get("captions", {})
+            self.player_response.get("captions", {})
             .get("playerCaptionsTracklistRenderer", {})
             .get("captionTracks", [])
         )
@@ -267,9 +266,7 @@ class YouTube:
 
         """
         return self.player_config_args.get("title") or (
-            self.player_response
-            .get("videoDetails", {})
-            .get("title")
+            self.player_response.get("videoDetails", {}).get("title")
         )
 
     @property
@@ -280,9 +277,7 @@ class YouTube:
 
         """
         return self.vid_descr or (
-            self.player_response
-            .get("videoDetails", {})
-            .get("shortDescription")
+            self.player_response.get("videoDetails", {}).get("shortDescription")
         )
 
     @property
@@ -292,11 +287,7 @@ class YouTube:
         :rtype: float
 
         """
-        return (
-            self.player_response
-            .get("videoDetails", {})
-            .get("averageRating")
-        )
+        return self.player_response.get("videoDetails", {}).get("averageRating")
 
     @property
     def length(self) -> int:
@@ -307,11 +298,7 @@ class YouTube:
         """
         return int(
             self.player_config_args.get("length_seconds")
-            or (
-                self.player_response
-                .get("videoDetails", {})
-                .get("lengthSeconds")
-            )
+            or (self.player_response.get("videoDetails", {}).get("lengthSeconds"))
         )
 
     @property
@@ -321,22 +308,14 @@ class YouTube:
         :rtype: str
 
         """
-        return int(
-            self.player_response
-            .get("videoDetails", {})
-            .get("viewCount")
-        )
+        return int(self.player_response.get("videoDetails", {}).get("viewCount"))
 
     @property
     def author(self) -> str:
         """Get the video author.
         :rtype: str
         """
-        return (
-            self.player_response
-            .get("videoDetails", {})
-            .get("author", "unknown")
-        )
+        return self.player_response.get("videoDetails", {}).get("author", "unknown")
 
     def register_on_progress_callback(self, func: OnProgress):
         """Register a download progress callback function post initialization.
