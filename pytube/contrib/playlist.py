@@ -138,7 +138,7 @@ class Playlist:
     def videos(self) -> Iterable[YouTube]:
         """Yields YouTube objects of videos in this playlist
 
-        :rtype: Iterable[YouTube]
+        :Yields: YouTube
         """
         yield from (YouTube(url) for url in self.video_urls)
 
