@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """Implements a simple wrapper around urlopen."""
 from typing import Any, Iterable, Dict
 from urllib.request import Request
@@ -25,10 +26,8 @@ def get(url) -> str:
 
 def stream(url: str, chunk_size: int = 8192) -> Iterable[bytes]:
     """Read the response in chunks.
-    :param str url:
-        The URL to perform the GET request for.
-    :param int chunk_size:
-        The size in bytes of each chunk. Defaults to 8*1024
+    :param str url: The URL to perform the GET request for.
+    :param int chunk_size: The size in bytes of each chunk. Defaults to 8*1024
     :rtype: Iterable[bytes]
     """
     response = _execute_request(url)

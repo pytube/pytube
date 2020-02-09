@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """
 This module contains all logic necessary to decipher the signature.
 
@@ -26,7 +27,6 @@ logger = create_logger()
 
 def get_initial_function_name(js: str) -> str:
     """Extract the name of the function responsible for computing the signature.
-
     :param str js:
         The contents of the base.js asset file.
     :rtype: str
@@ -52,10 +52,10 @@ def get_initial_function_name(js: str) -> str:
     logger.debug("finding initial function name")
     for pattern in function_patterns:
         regex = re.compile(pattern)
-        results = regex.search(js)
-        if results:
+        function_match = regex.search(js)
+        if function_match:
             logger.debug("finished regex search, matched: %s", pattern)
-            return results.group(1)
+            return function_match.group(1)
 
     raise RegexMatchError(caller="get_initial_function_name", pattern="multiple")
 
@@ -112,11 +112,11 @@ def get_transform_object(js: str, var: str) -> List[str]:
     pattern = r"var %s={(.*?)};" % re.escape(var)
     logger.debug("getting transform object")
     regex = re.compile(pattern, flags=re.DOTALL)
-    results = regex.search(js)
-    if not results:
+    transform_match = regex.search(js)
+    if not transform_match:
         raise RegexMatchError(caller="get_transform_object", pattern=pattern)
 
-    return results.group(1).replace("\n", " ").split(", ")
+    return transform_match.group(1).replace("\n", " ").split(", ")
 
 
 def get_transform_map(js: str, var: str) -> Dict:
@@ -245,10 +245,10 @@ def parse_function(js_func: str) -> Tuple[str, int]:
     logger.debug("parsing transform function")
     pattern = r"\w+\.(\w+)\(\w,(\d+)\)"
     regex = re.compile(pattern)
-    results = regex.search(js_func)
-    if not results:
+    parse_match = regex.search(js_func)
+    if not parse_match:
         raise RegexMatchError(caller="parse_function", pattern=pattern)
-    fn_name, fn_arg = results.groups()
+    fn_name, fn_arg = parse_match.groups()
     return fn_name, int(fn_arg)
 
 
@@ -269,7 +269,7 @@ def get_signature(js: str, ciphered_signature: str) -> str:
     transform_plan = get_transform_plan(js)
     var, _ = transform_plan[0].split(".")
     transform_map = get_transform_map(js, var)
-    signature = [s for s in ciphered_signature]
+    signature = list(ciphered_signature)
 
     for js_func in transform_plan:
         name, argument = parse_function(js_func)

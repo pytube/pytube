@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """
 This module contains a container for stream manifest data.
 
@@ -169,7 +170,6 @@ class Stream:
         :returns:
             An os file system compatible filename.
         """
-
         filename = safe_filename(self.title)
         return f"{filename}.{self.subtype}"
 

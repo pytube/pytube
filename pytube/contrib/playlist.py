@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Module to download a complete playlist from a youtube channel"""
+
+"""Module to download a complete playlist from a youtube channel."""
 
 import json
 import logging
@@ -15,9 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class Playlist:
-    """Handles all the task of manipulating and downloading a whole YouTube
-    playlist
-    """
+    """Load a YouTube playlist with URL or ID"""
 
     def __init__(self, url: str, proxies: Optional[Dict[str, str]] = None):
         if proxies:
@@ -28,18 +27,16 @@ class Playlist:
         except IndexError:  # assume that url is just the id
             self.playlist_id = url
 
-        self.playlist_url: str = (
-            "https://www.youtube.com/playlist?list=" + self.playlist_id
-        )
+        self.playlist_url = f"https://www.youtube.com/playlist?list={self.playlist_id}"
         self.html = request.get(self.playlist_url)
 
         # Needs testing with non-English
         self.last_update: Optional[date] = None
-        results = re.search(
+        date_match = re.search(
             r"<li>Last updated on (\w{3}) (\d{1,2}), (\d{4})</li>", self.html
         )
-        if results:
-            month, day, year = results.groups()
+        if date_match:
+            month, day, year = date_match.groups()
             self.last_update = datetime.strptime(
                 f"{month} {day:0>2} {year}", "%b %d %Y"
             ).date()
@@ -48,25 +45,26 @@ class Playlist:
 
     @staticmethod
     def _find_load_more_url(req: str) -> Optional[str]:
-        """Given an html page or a fragment thereof, looks for
-        and returns the "load more" url if found.
-        """
+        """Given an html page or fragment, returns the "load more" url if found."""
         match = re.search(
             r"data-uix-load-more-href=\"(/browse_ajax\?" 'action_continuation=.*?)"',
             req,
         )
         if match:
-            return "https://www.youtube.com" + match.group(1)
+            return f"https://www.youtube.com{match.group(1)}"
 
         return None
 
     @deprecated("This function will be removed in the future, please use .video_urls")
     def parse_links(self) -> List[str]:  # pragma: no cover
+        """ Deprecated function for returning list of URLs
+
+        :return: List[str]
+        """
         return self.video_urls
 
     def _paginate(self, until_watch_id: Optional[str] = None) -> Iterable[List[str]]:
-        """Parse the video links from the page source, extracts and
-        returns the /watch?v= part from video link href
+        """Parse the video links from the page source, yields the /watch?v= part from video link
         """
         req = self.html
         videos_urls = self._extract_videos(req)
@@ -113,6 +111,7 @@ class Playlist:
 
     def trimmed(self, video_id: str) -> Iterable[str]:
         """Retrieve a list of YouTube video URLs trimmed at the given video ID
+
         i.e. if the playlist has video IDs 1,2,3,4 calling trimmed(3) returns [1,2]
         :type video_id: str
             video ID to trim the returned list of playlist URLs at
@@ -121,16 +120,15 @@ class Playlist:
             List of video URLs from the playlist trimmed at the given ID
         """
         for page in self._paginate(until_watch_id=video_id):
-            for watch_path in page:
-                yield self._video_url(watch_path)
+            yield from (self._video_url(watch_path) for watch_path in page)
 
     @property  # type: ignore
     @cache
     def video_urls(self) -> List[str]:
         """Complete links of all the videos in playlist
+
         :rtype: List[str]
-        :returns:
-            List of video URLs
+        :returns: List of video URLs
         """
         return [
             self._video_url(video) for page in list(self._paginate()) for video in page
@@ -138,29 +136,27 @@ class Playlist:
 
     @property
     def videos(self) -> Iterable[YouTube]:
-        """Iterable of YouTube objects representing videos in this playlist
-        :rtype: Iterable[YouTube]
+        """Yields YouTube objects of videos in this playlist
+
+        :Yields: YouTube
         """
-        for url in self.video_urls:
-            yield YouTube(url)
+        yield from (YouTube(url) for url in self.video_urls)
 
     @deprecated(
         "This call is unnecessary, you can directly access .video_urls or .videos"
     )
     def populate_video_urls(self) -> List[str]:
         """Complete links of all the videos in playlist
-        :rtype: List[str]
-        :returns:
-            List of video URLs
-        """
 
+        :rtype: List[str]
+        :returns: List of video URLs
+        """
         return self.video_urls
 
     @deprecated("This function will be removed in the future.")
     def _path_num_prefix_generator(self, reverse=False):  # pragma: no cover
-        """
-        This generator function generates number prefixes, for the items
-        in the playlist.
+        """Generate number prefixes for the items in the playlist.
+
         If the number of digits required to name a file,is less than is
         required to name the last file,it prepends 0s.
         So if you have a playlist of 100 videos it will number them like:
@@ -185,9 +181,7 @@ class Playlist:
         reverse_numbering: bool = False,
         resolution: str = "720p",
     ) -> None:  # pragma: no cover
-        """Download all the videos in the the playlist. Initially, download
-        resolution is 720p (or highest available), later more option
-        should be added to download resolution of choice
+        """Download all the videos in the the playlist.
 
         :param download_path:
             (optional) Output path for the playlist If one is not
@@ -206,7 +200,6 @@ class Playlist:
             Video resolution i.e. "720p", "480p", "360p", "240p", "144p"
         :type resolution: str
         """
-
         logger.debug("total videos found: %d", len(self.video_urls))
         logger.debug("starting download")
 
@@ -231,22 +224,18 @@ class Playlist:
 
     @cache
     def title(self) -> Optional[str]:
-        """return playlist title (name)"""
-        open_tag = "<title>"
-        end_tag = "</title>"
-        pattern = re.compile(open_tag + "(.+?)" + end_tag)
+        """Extract playlist title
+
+        :return: playlist title (name)
+        :rtype: Optional[str]
+        """
+        pattern = re.compile("<title>(.+?)</title>")
         match = pattern.search(self.html)
 
         if match is None:
             return None
 
-        return (
-            match.group()
-            .replace(open_tag, "")
-            .replace(end_tag, "")
-            .replace("- YouTube", "")
-            .strip()
-        )
+        return match.group(1).replace("- YouTube", "").strip()
 
     @staticmethod
     def _video_url(watch_path: str):
