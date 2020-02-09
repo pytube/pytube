@@ -45,8 +45,7 @@ class Playlist:
 
     @staticmethod
     def _find_load_more_url(req: str) -> Optional[str]:
-        """Given an html page or fragment, returns the "load more" url if found.
-        """
+        """Given an html page or fragment, returns the "load more" url if found."""
         match = re.search(
             r"data-uix-load-more-href=\"(/browse_ajax\?" 'action_continuation=.*?)"',
             req,
@@ -58,6 +57,10 @@ class Playlist:
 
     @deprecated("This function will be removed in the future, please use .video_urls")
     def parse_links(self) -> List[str]:  # pragma: no cover
+        """ Deprecated function for returning list of URLs
+
+        :return: List[str]
+        """
         return self.video_urls
 
     def _paginate(self, until_watch_id: Optional[str] = None) -> Iterable[List[str]]:

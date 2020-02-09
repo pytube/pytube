@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """This module provides a query interface for media streams and captions."""
 from typing import List, Optional
 

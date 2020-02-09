@@ -67,12 +67,12 @@ class YouTube:
         self.watch_html: Optional[str] = None  # the html of /watch?v=<video_id>
         self.embed_html: Optional[str] = None
         self.player_config_args: Dict = {}  # inline js in the html containing
+        self.player_response: Dict = {}
         # streams
         self.age_restricted: Optional[bool] = None
         self.vid_descr: Optional[str] = None
 
         self.fmt_streams: List[Stream] = []
-        self.caption_tracks: List[Caption] = []
 
         # video_id part of /watch?v=<video_id>
         self.video_id = extract.video_id(url)
@@ -153,11 +153,9 @@ class YouTube:
             self.initialize_stream_objects(fmt)
 
         # load the player_response object (contains subtitle information)
-        self.player_config_args["player_response"] = json.loads(
-            self.player_config_args["player_response"]
-        )
+        self.player_response = json.loads(self.player_config_args["player_response"])
+        del self.player_config_args["player_response"]
 
-        self.initialize_caption_objects()
         logger.info("init finished successfully")
 
     def prefetch(self) -> None:
@@ -173,8 +171,7 @@ class YouTube:
         self.watch_html = request.get(url=self.watch_url)
         if (
             self.watch_html is None
-            or '<img class="icon meh" src="/yts/img'  # noqa: W503
-            not in self.watch_html  # noqa: W503
+            or '<img class="icon meh" src="/yts/img' not in self.watch_html
         ):
             raise VideoUnavailable(video_id=self.video_id)
 
@@ -214,26 +211,19 @@ class YouTube:
             )
             self.fmt_streams.append(video)
 
-    def initialize_caption_objects(self) -> None:
-        """Populate instances of :class:`Caption <Caption>`.
+    @property
+    def caption_tracks(self) -> List[Caption]:
+        """Get a list of :class:`Caption <Caption>`.
 
-        Take the unscrambled player response data, and use it to initialize
-        instances of :class:`Caption <Caption>`.
-
-        :rtype: None
-
+        :rtype: List[Caption]
         """
-        if "captions" not in self.player_config_args["player_response"]:
-            return
-        # https://github.com/nficano/pytube/issues/167
-        caption_tracks = (
-            self.player_config_args.get("player_response", {})
+        raw_tracks = (
+            self.player_response
             .get("captions", {})
             .get("playerCaptionsTracklistRenderer", {})
             .get("captionTracks", [])
         )
-        for caption_track in caption_tracks:
-            self.caption_tracks.append(Caption(caption_track))
+        return [Caption(track) for track in raw_tracks]
 
     @property
     def captions(self) -> CaptionQuery:
@@ -258,9 +248,8 @@ class YouTube:
         :rtype: str
 
         """
-        player_response = self.player_config_args.get("player_response", {})
         thumbnail_details = (
-            player_response.get("videoDetails", {})
+            self.player_response.get("videoDetails", {})
             .get("thumbnail", {})
             .get("thumbnails")
         )
@@ -278,7 +267,7 @@ class YouTube:
 
         """
         return self.player_config_args.get("title") or (
-            self.player_config_args.get("player_response", {})
+            self.player_response
             .get("videoDetails", {})
             .get("title")
         )
@@ -291,7 +280,7 @@ class YouTube:
 
         """
         return self.vid_descr or (
-            self.player_config_args.get("player_response", {})
+            self.player_response
             .get("videoDetails", {})
             .get("shortDescription")
         )
@@ -304,7 +293,7 @@ class YouTube:
 
         """
         return (
-            self.player_config_args.get("player_response", {})
+            self.player_response
             .get("videoDetails", {})
             .get("averageRating")
         )
@@ -319,7 +308,7 @@ class YouTube:
         return int(
             self.player_config_args.get("length_seconds")
             or (
-                self.player_config_args.get("player_response", {})
+                self.player_response
                 .get("videoDetails", {})
                 .get("lengthSeconds")
             )
@@ -333,7 +322,7 @@ class YouTube:
 
         """
         return int(
-            self.player_config_args.get("player_response", {})
+            self.player_response
             .get("videoDetails", {})
             .get("viewCount")
         )
@@ -344,7 +333,7 @@ class YouTube:
         :rtype: str
         """
         return (
-            self.player_config_args.get("player_response", {})
+            self.player_response
             .get("videoDetails", {})
             .get("author", "unknown")
         )
