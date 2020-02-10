@@ -3,7 +3,6 @@
 import json
 import re
 from collections import OrderedDict
-
 from html.parser import HTMLParser
 from typing import Any, Optional, Tuple, List, Dict
 from urllib.parse import quote, parse_qs, unquote, parse_qsl

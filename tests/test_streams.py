@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import random
-
 from unittest import mock
 from unittest.mock import MagicMock
 
