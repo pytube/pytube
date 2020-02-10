@@ -40,11 +40,11 @@ def test_title(cipher_signature):
 def test_description(cipher_signature):
     expected = (
         "PSY - ‘I LUV IT’ M/V @ https://youtu.be/Xvjnoagk6GU\n"
-        "PSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\n"
+        "PSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\n\n"
         "PSY - 8TH ALBUM '4X2=8' on iTunes @\n"
-        "https://smarturl.it/PSY_8thAlbum\n"
-        "PSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n"
-        "#PSY #싸이 #GANGNAMSTYLE #강남스타일\n"
+        "https://smarturl.it/PSY_8thAlbum\n\n"
+        "PSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n\n"
+        "#PSY #싸이 #GANGNAMSTYLE #강남스타일\n\n"
         "More about PSY@\nhttp://www.youtube.com/officialpsy\n"
         "http://www.facebook.com/officialpsy\n"
         "http://twitter.com/psy_oppa\n"
@@ -55,14 +55,14 @@ def test_description(cipher_signature):
     )
     assert cipher_signature.description == expected
 
-    cipher_signature.vid_descr = None
+    cipher_signature.player_response = {}
     expected = (
         "PSY - ‘I LUV IT’ M/V @ https://youtu.be/Xvjnoagk6GU\n"
-        "PSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\n\n"
+        "PSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\n"
         "PSY - 8TH ALBUM '4X2=8' on iTunes @\n"
-        "https://smarturl.it/PSY_8thAlbum\n\n"
-        "PSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n\n"
-        "#PSY #싸이 #GANGNAMSTYLE #강남스타일\n\n"
+        "https://smarturl.it/PSY_8thAlbum\n"
+        "PSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n"
+        "#PSY #싸이 #GANGNAMSTYLE #강남스타일\n"
         "More about PSY@\nhttp://www.youtube.com/officialpsy\n"
         "http://www.facebook.com/officialpsy\n"
         "http://twitter.com/psy_oppa\n"

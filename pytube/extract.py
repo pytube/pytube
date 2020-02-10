@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """This module contains all non-cipher related data extraction logic."""
 import json
-import pprint
 import re
 from collections import OrderedDict
 
@@ -10,7 +9,7 @@ from typing import Any, Optional, Tuple, List, Dict
 from urllib.parse import quote, parse_qs, unquote, parse_qsl
 from urllib.parse import urlencode
 
-from pytube import cipher
+from pytube.cipher import Cipher
 from pytube.exceptions import RegexMatchError, HTMLParseError, LiveStreamError
 from pytube.helpers import regex_search, logger
 
@@ -205,9 +204,10 @@ def get_ytplayer_config(html: str, age_restricted: bool = False) -> Any:
     return json.loads(yt_player_config)
 
 
-def get_vid_descr(html: str) -> str:
+def get_vid_descr(html: Optional[str]) -> str:
     html_parser = PytubeHTMLParser()
-    html_parser.feed(html)
+    if html:
+        html_parser.feed(html)
     return html_parser.vid_descr
 
 
@@ -224,6 +224,7 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
         The contents of the base.js asset file.
 
     """
+    cipher = Cipher(js=js)
     stream_manifest = config_args[fmt]
     live_stream = (
         json.loads(config_args["player_response"])
@@ -247,17 +248,13 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
             continue
 
         if js is not None:
-            signature = cipher.get_signature(js, stream["s"])
+            signature = cipher.get_signature(ciphered_signature=stream["s"])
         else:
             # signature not present in url (line 33), need js to descramble
             # TypeError caught in __main__
             raise TypeError("JS is None")
 
-        logger.debug(
-            "finished descrambling signature for itag=%s\n%s",
-            stream["itag"],
-            pprint.pformat({"s": stream["s"], "signature": signature,}, indent=2,),
-        )
+        logger.debug("finished descrambling signature for itag=%s", stream["itag"])
         # 403 forbidden fix
         stream_manifest[i]["url"] = url + "&sig=" + signature
 
@@ -320,6 +317,5 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
             {k: unquote(v) for k, v in parse_qsl(i)}
             for i in stream_data[key].split(",")
         ]
-    logger.debug(
-        "applying descrambler\n%s", pprint.pformat(stream_data[key], indent=2),
-    )
+
+    logger.debug("applying descrambler")

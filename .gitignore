@@ -54,7 +54,11 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
+*.mp4
+
+# Performance profiling
 prof/
+*.cprof
 
 # Debian Files
 debian/files
