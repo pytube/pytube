@@ -213,5 +213,7 @@ def test_download_by_resolution_not_exists(youtube, stream_query):
     youtube.streams = stream_query
     cli._download = MagicMock()
     with pytest.raises(SystemExit):
-        cli.download_by_resolution(youtube=youtube, resolution="DOESNT EXIST", target="test_target")
+        cli.download_by_resolution(
+            youtube=youtube, resolution="DOESNT EXIST", target="test_target"
+        )
     cli._download.assert_not_called()

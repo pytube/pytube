@@ -36,6 +36,14 @@ def test_title(cipher_signature):
     assert stream.title == expected
 
 
+def test_caption_tracks(presigned_video):
+    assert len(presigned_video.caption_tracks) == 13
+
+
+def test_captions(presigned_video):
+    assert len(presigned_video.captions.all()) == 13
+
+
 def test_description(cipher_signature):
     expected = (
         "PSY - ‘I LUV IT’ M/V @ https://youtu.be/Xvjnoagk6GU\n"
