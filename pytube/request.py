@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 
 """Implements a simple wrapper around urlopen."""
-from typing import Any, Iterable, Dict
+from typing import Any, Iterable, Dict, Optional
 from urllib.request import Request
 from urllib.request import urlopen
 
 
-def _execute_request(url: str) -> Any:
-    if not url.lower().startswith("http"):
+def _execute_request(url: str, method:Optional[str] = None) -> Any:
+    if url.lower().startswith("http"):
+        request = Request(url, headers={"User-Agent": "Mozilla/5.0"}, method=method)
+    else:
         raise ValueError
-    return urlopen(Request(url, headers={"User-Agent": "Mozilla/5.0"}))  # nosec
+    return urlopen(request)
 
 
 def get(url) -> str:
@@ -47,4 +49,5 @@ def headers(url: str) -> Dict:
     :returns:
         dictionary of lowercase headers
     """
-    return {k.lower(): v for k, v in _execute_request(url).info().items()}
+    response_headers = _execute_request(url, method="HEAD").info()
+    return {k.lower(): v for k, v in response_headers.items()}
