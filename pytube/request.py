@@ -6,7 +6,9 @@ from urllib.request import Request
 from urllib.request import urlopen
 
 
-def _execute_request(url: str, method: Optional[str] = None, headers: Optional[Dict[str, str]] = None) -> Any:
+def _execute_request(
+    url: str, method: Optional[str] = None, headers: Optional[Dict[str, str]] = None
+) -> Any:
     base_headers = {"User-Agent": "Mozilla/5.0"}
     if headers:
         base_headers.update(headers)
