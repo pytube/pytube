@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import random
-
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -35,6 +34,14 @@ def test_title(cipher_signature):
     expected = "Unknown YouTube Video Title"
     stream.player_config_args = {}
     assert stream.title == expected
+
+
+def test_caption_tracks(presigned_video):
+    assert len(presigned_video.caption_tracks) == 13
+
+
+def test_captions(presigned_video):
+    assert len(presigned_video.captions.all()) == 13
 
 
 def test_description(cipher_signature):

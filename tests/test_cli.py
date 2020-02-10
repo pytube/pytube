@@ -204,3 +204,16 @@ def test_download_by_resolution(youtube, stream_query, stream):
     cli._download = MagicMock()
     cli.download_by_resolution(youtube=youtube, resolution="320p", target="test_target")
     cli._download.assert_called_with(stream, target="test_target")
+
+
+@mock.patch("pytube.cli.YouTube")
+@mock.patch("pytube.StreamQuery")
+def test_download_by_resolution_not_exists(youtube, stream_query):
+    stream_query.get_by_resolution.return_value = None
+    youtube.streams = stream_query
+    cli._download = MagicMock()
+    with pytest.raises(SystemExit):
+        cli.download_by_resolution(
+            youtube=youtube, resolution="DOESNT EXIST", target="test_target"
+        )
+    cli._download.assert_not_called()

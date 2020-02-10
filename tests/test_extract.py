@@ -3,7 +3,6 @@
 import pytest
 
 from pytube.exceptions import RegexMatchError
-
 from pytube import extract
 
 
