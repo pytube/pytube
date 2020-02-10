@@ -6,9 +6,12 @@ from urllib.request import Request
 from urllib.request import urlopen
 
 
-def _execute_request(url: str, method: Optional[str] = None) -> Any:
+def _execute_request(url: str, method: Optional[str] = None, headers: Optional[Dict[str, str]] = None) -> Any:
+    base_headers = {"User-Agent": "Mozilla/5.0"}
+    if headers:
+        base_headers.update(headers)
     if url.lower().startswith("http"):
-        request = Request(url, headers={"User-Agent": "Mozilla/5.0"}, method=method)
+        request = Request(url, headers=base_headers, method=method)
     else:
         raise ValueError
     return urlopen(request)  # nosec
@@ -32,7 +35,7 @@ def stream(url: str, chunk_size: int = 8192) -> Iterable[bytes]:
     :param int chunk_size: The size in bytes of each chunk. Defaults to 8*1024
     :rtype: Iterable[bytes]
     """
-    response = _execute_request(url)
+    response = _execute_request(url, headers={"Range": "bytes=0-"})
     while True:
         buf = response.read(chunk_size)
         if not buf:
@@ -40,7 +43,7 @@ def stream(url: str, chunk_size: int = 8192) -> Iterable[bytes]:
         yield buf
 
 
-def headers(url: str) -> Dict:
+def head(url: str) -> Dict:
     """Fetch headers returned http GET request.
 
     :param str url:

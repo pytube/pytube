@@ -11,7 +11,7 @@ from pytube import Stream, streams
 
 def test_filesize(cipher_signature, mocker):
     mocker.patch.object(request, "headers")
-    request.headers.return_value = {"content-length": "6796391"}
+    request.head.return_value = {"content-length": "6796391"}
     assert cipher_signature.streams.first().filesize == 6796391
 
 
@@ -40,11 +40,11 @@ def test_title(cipher_signature):
 def test_description(cipher_signature):
     expected = (
         "PSY - ‘I LUV IT’ M/V @ https://youtu.be/Xvjnoagk6GU\n"
-        "PSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\n"
+        "PSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\n\n"
         "PSY - 8TH ALBUM '4X2=8' on iTunes @\n"
-        "https://smarturl.it/PSY_8thAlbum\n"
-        "PSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n"
-        "#PSY #싸이 #GANGNAMSTYLE #강남스타일\n"
+        "https://smarturl.it/PSY_8thAlbum\n\n"
+        "PSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n\n"
+        "#PSY #싸이 #GANGNAMSTYLE #강남스타일\n\n"
         "More about PSY@\nhttp://www.youtube.com/officialpsy\n"
         "http://www.facebook.com/officialpsy\n"
         "http://twitter.com/psy_oppa\n"
@@ -55,14 +55,14 @@ def test_description(cipher_signature):
     )
     assert cipher_signature.description == expected
 
-    cipher_signature.vid_descr = None
+    cipher_signature.player_response = {}
     expected = (
         "PSY - ‘I LUV IT’ M/V @ https://youtu.be/Xvjnoagk6GU\n"
-        "PSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\n\n"
+        "PSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\n"
         "PSY - 8TH ALBUM '4X2=8' on iTunes @\n"
-        "https://smarturl.it/PSY_8thAlbum\n\n"
-        "PSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n\n"
-        "#PSY #싸이 #GANGNAMSTYLE #강남스타일\n\n"
+        "https://smarturl.it/PSY_8thAlbum\n"
+        "PSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n"
+        "#PSY #싸이 #GANGNAMSTYLE #강남스타일\n"
         "More about PSY@\nhttp://www.youtube.com/officialpsy\n"
         "http://www.facebook.com/officialpsy\n"
         "http://twitter.com/psy_oppa\n"
@@ -88,7 +88,7 @@ def test_views(cipher_signature):
 
 def test_download(cipher_signature, mocker):
     mocker.patch.object(request, "headers")
-    request.headers.return_value = {"content-length": "16384"}
+    request.head.return_value = {"content-length": "16384"}
     mocker.patch.object(request, "stream")
     request.stream.return_value = iter([str(random.getrandbits(8 * 1024))])
     with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
@@ -98,7 +98,7 @@ def test_download(cipher_signature, mocker):
 
 def test_download_with_prefix(cipher_signature, mocker):
     mocker.patch.object(request, "headers")
-    request.headers.return_value = {"content-length": "16384"}
+    request.head.return_value = {"content-length": "16384"}
     mocker.patch.object(request, "stream")
     request.stream.return_value = iter([str(random.getrandbits(8 * 1024))])
     streams.target_directory = MagicMock(return_value="/target")
@@ -110,7 +110,7 @@ def test_download_with_prefix(cipher_signature, mocker):
 
 def test_download_with_filename(cipher_signature, mocker):
     mocker.patch.object(request, "headers")
-    request.headers.return_value = {"content-length": "16384"}
+    request.head.return_value = {"content-length": "16384"}
     mocker.patch.object(request, "stream")
     request.stream.return_value = iter([str(random.getrandbits(8 * 1024))])
     streams.target_directory = MagicMock(return_value="/target")
@@ -122,7 +122,7 @@ def test_download_with_filename(cipher_signature, mocker):
 
 def test_download_with_existing(cipher_signature, mocker):
     mocker.patch.object(request, "headers")
-    request.headers.return_value = {"content-length": "16384"}
+    request.head.return_value = {"content-length": "16384"}
     mocker.patch.object(request, "stream")
     streams.target_directory = MagicMock(return_value="/target")
     mocker.patch.object(os.path, "isfile")
@@ -138,7 +138,7 @@ def test_download_with_existing(cipher_signature, mocker):
 
 def test_download_with_existing_no_skip(cipher_signature, mocker):
     mocker.patch.object(request, "headers")
-    request.headers.return_value = {"content-length": "16384"}
+    request.head.return_value = {"content-length": "16384"}
     mocker.patch.object(request, "stream")
     request.stream.return_value = iter([str(random.getrandbits(8 * 1024))])
     streams.target_directory = MagicMock(return_value="/target")
@@ -168,7 +168,7 @@ def test_on_progress_hook(cipher_signature, mocker):
     cipher_signature.register_on_progress_callback(callback_fn)
 
     mocker.patch.object(request, "headers")
-    request.headers.return_value = {"content-length": "16384"}
+    request.head.return_value = {"content-length": "16384"}
     mocker.patch.object(request, "stream")
     request.stream.return_value = iter([str(random.getrandbits(8 * 1024))])
 
@@ -187,7 +187,7 @@ def test_on_complete_hook(cipher_signature, mocker):
     cipher_signature.register_on_complete_callback(callback_fn)
 
     mocker.patch.object(request, "headers")
-    request.headers.return_value = {"content-length": "16384"}
+    request.head.return_value = {"content-length": "16384"}
     mocker.patch.object(request, "stream")
     request.stream.return_value = iter([str(random.getrandbits(8 * 1024))])
 

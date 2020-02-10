@@ -140,7 +140,7 @@ class Stream:
             Filesize (in bytes) of the stream.
         """
         if self._filesize is None:
-            headers = request.headers(self.url)
+            headers = request.head(self.url)
             self._filesize = int(headers["content-length"])
         return self._filesize
 

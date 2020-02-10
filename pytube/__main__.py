@@ -70,7 +70,6 @@ class YouTube:
         self.player_response: Dict = {}
         # streams
         self.age_restricted: Optional[bool] = None
-        self.vid_descr: Optional[str] = None
 
         self.fmt_streams: List[Stream] = []
 
@@ -125,8 +124,6 @@ class YouTube:
                 title = title[:index] if index > 0 else title
                 self.player_config_args["title"] = unescape(title)
 
-        if self.watch_html:
-            self.vid_descr = extract.get_vid_descr(self.watch_html)
         # https://github.com/nficano/pytube/issues/165
         stream_maps = ["url_encoded_fmt_stream_map"]
         if "adaptive_fmts" in self.player_config_args:
@@ -276,9 +273,9 @@ class YouTube:
         :rtype: str
 
         """
-        return self.vid_descr or (
-            self.player_response.get("videoDetails", {}).get("shortDescription")
-        )
+        return self.player_response.get("videoDetails", {}).get(
+            "shortDescription"
+        ) or extract.get_vid_descr(self.watch_html)
 
     @property
     def rating(self) -> float:

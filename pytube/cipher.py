@@ -20,9 +20,73 @@ from itertools import chain
 from typing import List, Tuple, Dict, Callable, Any, Optional
 
 from pytube.exceptions import RegexMatchError
-from pytube.helpers import regex_search, create_logger
+from pytube.helpers import regex_search, create_logger, cache
 
 logger = create_logger()
+
+
+class Cipher:
+    def __init__(self, js: str):
+        self.transform_plan: List[str] = get_transform_plan(js)
+        var, _ = self.transform_plan[0].split(".")
+        self.transform_map = get_transform_map(js, var)
+        self.js_func_regex = re.compile(r"\w+\.(\w+)\(\w,(\d+)\)")
+
+    def get_signature(self, ciphered_signature: str) -> str:
+        """Decipher the signature.
+
+        Taking the ciphered signature, applies the transform functions.
+
+        :param str ciphered_signature:
+            The ciphered signature sent in the ``player_config``.
+        :rtype: str
+        :returns:
+           Decrypted signature required to download the media content.
+        """
+        signature = list(ciphered_signature)
+
+        for js_func in self.transform_plan:
+            name, argument = self.parse_function(js_func)  # type: ignore
+            signature = self.transform_map[name](signature, argument)
+            logger.debug(
+                "applied transform function\n"
+                "output: %s\n"
+                "js_function: %s\n"
+                "argument: %d\n"
+                "function: %s",
+                "".join(signature),
+                name,
+                argument,
+                self.transform_map[name],
+            )
+
+        return "".join(signature)
+
+    @cache
+    def parse_function(self, js_func: str) -> Tuple[str, int]:
+        """Parse the Javascript transform function.
+
+        Break a JavaScript transform function down into a two element ``tuple``
+        containing the function name and some integer-based argument.
+
+        :param str js_func:
+            The JavaScript version of the transform function.
+        :rtype: tuple
+        :returns:
+            two element tuple containing the function name and an argument.
+
+        **Example**:
+
+        >>> parse_function('DE.AJ(a,15)')
+        ('AJ', 15)
+
+        """
+        logger.debug("parsing transform function")
+        parse_match = self.js_func_regex.search(js_func)
+        if not parse_match:
+            raise RegexMatchError(caller="parse_function", pattern="js_func_regex")
+        fn_name, fn_arg = parse_match.groups()
+        return fn_name, int(fn_arg)
 
 
 def get_initial_function_name(js: str) -> str:
@@ -48,7 +112,6 @@ def get_initial_function_name(js: str) -> str:
         r"\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
         r"\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
     ]
-
     logger.debug("finding initial function name")
     for pattern in function_patterns:
         regex = re.compile(pattern)
@@ -71,7 +134,6 @@ def get_transform_plan(js: str) -> List[str]:
 
     **Example**:
 
-    >>> get_transform_plan(js)
     ['DE.AJ(a,15)',
     'DE.VR(a,3)',
     'DE.AJ(a,51)',
@@ -222,68 +284,3 @@ def map_functions(js_func: str) -> Callable:
         if re.search(pattern, js_func):
             return fn
     raise RegexMatchError(caller="map_functions", pattern="multiple")
-
-
-def parse_function(js_func: str) -> Tuple[str, int]:
-    """Parse the Javascript transform function.
-
-    Break a JavaScript transform function down into a two element ``tuple``
-    containing the function name and some integer-based argument.
-
-    :param str js_func:
-        The JavaScript version of the transform function.
-    :rtype: tuple
-    :returns:
-        two element tuple containing the function name and an argument.
-
-    **Example**:
-
-    >>> parse_function('DE.AJ(a,15)')
-    ('AJ', 15)
-
-    """
-    logger.debug("parsing transform function")
-    pattern = r"\w+\.(\w+)\(\w,(\d+)\)"
-    regex = re.compile(pattern)
-    parse_match = regex.search(js_func)
-    if not parse_match:
-        raise RegexMatchError(caller="parse_function", pattern=pattern)
-    fn_name, fn_arg = parse_match.groups()
-    return fn_name, int(fn_arg)
-
-
-def get_signature(js: str, ciphered_signature: str) -> str:
-    """Decipher the signature.
-
-    Taking the ciphered signature, applies the transform functions.
-
-    :param str js:
-        The contents of the base.js asset file.
-    :param str ciphered_signature:
-        The ciphered signature sent in the ``player_config``.
-    :rtype: str
-    :returns:
-       Decrypted signature required to download the media content.
-
-    """
-    transform_plan = get_transform_plan(js)
-    var, _ = transform_plan[0].split(".")
-    transform_map = get_transform_map(js, var)
-    signature = list(ciphered_signature)
-
-    for js_func in transform_plan:
-        name, argument = parse_function(js_func)
-        signature = transform_map[name](signature, argument)
-        logger.debug(
-            "applied transform function\n"
-            "output: %s\n"
-            "js_function: %s\n"
-            "argument: %d\n"
-            "function: %s",
-            "".join(signature),
-            name,
-            argument,
-            transform_map[name],
-        )
-
-    return "".join(signature)
