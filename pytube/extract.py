@@ -77,26 +77,6 @@ def video_id(url: str) -> str:
     return regex_search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url, group=1)
 
 
-def watch_url(video_id: str) -> str:
-    """Construct a sanitized YouTube watch url, given a video id.
-
-    :param str video_id:
-        A YouTube video identifier.
-    :rtype: str
-    :returns:
-        Sanitized YouTube watch url.
-    """
-    return "https://youtube.com/watch?v=" + video_id
-
-
-def embed_url(video_id: str) -> str:
-    return f"https://www.youtube.com/embed/{video_id}"
-
-
-def eurl(video_id: str) -> str:
-    return f"https://youtube.googleapis.com/v/{video_id}"
-
-
 def video_info_url(
     video_id: str, watch_url: str, embed_html: Optional[str], age_restricted: bool,
 ) -> str:
@@ -120,8 +100,9 @@ def video_info_url(
         sts = regex_search(r'"sts"\s*:\s*(\d+)', embed_html, group=1)
         # Here we use ``OrderedDict`` so that the output is consistent between
         # Python 2.7+.
+        eurl = f"https://youtube.googleapis.com/v/{video_id}"
         params = OrderedDict(
-            [("video_id", video_id), ("eurl", eurl(video_id)), ("sts", sts),]
+            [("video_id", video_id), ("eurl", eurl), ("sts", sts),]
         )
     else:
         params = OrderedDict(

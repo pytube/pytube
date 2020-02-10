@@ -76,10 +76,9 @@ class YouTube:
         # video_id part of /watch?v=<video_id>
         self.video_id = extract.video_id(url)
 
-        # https://www.youtube.com/watch?v=<video_id>
-        self.watch_url = extract.watch_url(self.video_id)
+        self.watch_url = f"https://youtube.com/watch?v={self.video_id}"
+        self.embed_url = f"https://www.youtube.com/embed/{self.video_id}"
 
-        self.embed_url = extract.embed_url(self.video_id)
         # A dictionary shared between all instances of :class:`Stream <Stream>`
         # (Borg pattern). Boooooo.
         self.stream_monostate = Monostate(
