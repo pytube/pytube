@@ -6,12 +6,12 @@ from urllib.request import Request
 from urllib.request import urlopen
 
 
-def _execute_request(url: str, method:Optional[str] = None) -> Any:
+def _execute_request(url: str, method: Optional[str] = None) -> Any:
     if url.lower().startswith("http"):
         request = Request(url, headers={"User-Agent": "Mozilla/5.0"}, method=method)
     else:
         raise ValueError
-    return urlopen(request)
+    return urlopen(request)  # nosec
 
 
 def get(url) -> str:
