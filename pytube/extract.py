@@ -259,6 +259,8 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
     {'foo': [{'bar': '1', 'var': 'test'}, {'em': '5', 't': 'url encoded'}]}
 
     """
+    otf_type = "FORMAT_STREAM_TYPE_OTF"
+
     if key == "url_encoded_fmt_stream_map" and not stream_data.get(
         "url_encoded_fmt_stream_map"
     ):
@@ -275,6 +277,8 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
                     "type": format_item["mimeType"],
                     "quality": format_item["quality"],
                     "itag": format_item["itag"],
+                    "bitrate": format_item["bitrate"],
+                    "is_otf": (format_item.get("type") == otf_type),
                 }
                 for format_item in formats
             ]
@@ -289,6 +293,8 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
                     "type": format_item["mimeType"],
                     "quality": format_item["quality"],
                     "itag": format_item["itag"],
+                    "bitrate": format_item["bitrate"],
+                    "is_otf": (format_item.get("type") == otf_type),
                 }
                 for i, format_item in enumerate(formats)
             ]
