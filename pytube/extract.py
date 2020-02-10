@@ -10,7 +10,7 @@ from typing import Any, Optional, Tuple, List, Dict
 from urllib.parse import quote, parse_qs, unquote, parse_qsl
 from urllib.parse import urlencode
 
-from pytube import cipher
+from pytube.cipher import Cipher
 from pytube.exceptions import RegexMatchError, HTMLParseError, LiveStreamError
 from pytube.helpers import regex_search, logger
 
@@ -224,6 +224,7 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
         The contents of the base.js asset file.
 
     """
+    cipher = Cipher(js=js)
     stream_manifest = config_args[fmt]
     live_stream = (
         json.loads(config_args["player_response"])
@@ -247,7 +248,7 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
             continue
 
         if js is not None:
-            signature = cipher.get_signature(js, stream["s"])
+            signature = cipher.get_signature(ciphered_signature=stream["s"])
         else:
             # signature not present in url (line 33), need js to descramble
             # TypeError caught in __main__
