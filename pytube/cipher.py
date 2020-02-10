@@ -27,7 +27,7 @@ logger = create_logger()
 
 class Cipher:
     def __init__(self, js: str):
-        self.transform_plan = get_transform_plan(js)
+        self.transform_plan: List[str] = get_transform_plan(js)
         var, _ = self.transform_plan[0].split(".")
         self.transform_map = get_transform_map(js, var)
         self.js_func_regex = re.compile(r"\w+\.(\w+)\(\w,(\d+)\)")
@@ -37,19 +37,16 @@ class Cipher:
 
         Taking the ciphered signature, applies the transform functions.
 
-        :param str js:
-            The contents of the base.js asset file.
         :param str ciphered_signature:
             The ciphered signature sent in the ``player_config``.
         :rtype: str
         :returns:
            Decrypted signature required to download the media content.
-
         """
         signature = list(ciphered_signature)
 
         for js_func in self.transform_plan:
-            name, argument = self.parse_function(js_func)
+            name, argument = self.parse_function(js_func)  # type: ignore
             signature = self.transform_map[name](signature, argument)
             logger.debug(
                 "applied transform function\n"
