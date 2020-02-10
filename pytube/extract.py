@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """This module contains all non-cipher related data extraction logic."""
 import json
-import pprint
 import re
 from collections import OrderedDict
 
@@ -254,11 +253,7 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
             # TypeError caught in __main__
             raise TypeError("JS is None")
 
-        logger.debug(
-            "finished descrambling signature for itag=%s\n%s",
-            stream["itag"],
-            pprint.pformat({"s": stream["s"], "signature": signature,}, indent=2,),
-        )
+        logger.debug("finished descrambling signature for itag=%s", stream["itag"])
         # 403 forbidden fix
         stream_manifest[i]["url"] = url + "&sig=" + signature
 
@@ -321,6 +316,5 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
             {k: unquote(v) for k, v in parse_qsl(i)}
             for i in stream_data[key].split(",")
         ]
-    logger.debug(
-        "applying descrambler\n%s", pprint.pformat(stream_data[key], indent=2),
-    )
+
+    logger.debug("applying descrambler")
