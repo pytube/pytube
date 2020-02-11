@@ -59,7 +59,7 @@ class Stream:
         self.video_codec, self.audio_codec = self.parse_codecs()
 
         self.is_otf: bool = stream["is_otf"]
-        self.bitrate: int = stream["bitrate"]
+        self.bitrate: Optional[int] = stream["bitrate"]
 
         self._filesize: Optional[int] = None  # filesize in bytes
 
@@ -159,16 +159,18 @@ class Stream:
 
     @property
     def filesize_approx(self) -> int:
-        """Get approximate filesize of the video, avoiding HTTP call
+        """Get approximate filesize of the video
+
+        Falls back to HTTP call if there is not sufficient information to approximate
 
         :rtype: int
         :returns: size of video in bytes
         """
-        if self._monostate.duration:
+        if self._monostate.duration and self.bitrate:
             bits_in_byte = 8
             return int((self._monostate.duration * self.bitrate) / bits_in_byte)
-        else:
-            return self.filesize
+
+        return self.filesize
 
     @property
     def default_filename(self) -> str:

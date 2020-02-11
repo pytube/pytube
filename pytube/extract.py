@@ -182,7 +182,7 @@ def get_ytplayer_config(html: str, age_restricted: bool = False) -> Any:
     return json.loads(yt_player_config)
 
 
-def get_vid_descr(html: Optional[str]) -> str:
+def _get_vid_descr(html: Optional[str]) -> str:
     html_parser = PytubeHTMLParser()
     if html:
         html_parser.feed(html)

@@ -172,8 +172,8 @@ class StreamQuery:
 
     def _filter(self, filters: List[Callable]) -> "StreamQuery":
         fmt_streams = self.fmt_streams
-        for fn in filters:
-            fmt_streams = filter(fn, fmt_streams)
+        for filter_lambda in filters:
+            fmt_streams = filter(filter_lambda, fmt_streams)
         print(fmt_streams)
         return StreamQuery(list(fmt_streams))
 

@@ -57,7 +57,7 @@ def test_get_vid_desc(cipher_signature):
         "http://sptfy.com/PSY\n"
         "http://weibo.com/psyoppa"
     )
-    assert extract.get_vid_descr(cipher_signature.watch_html) == expected
+    assert extract._get_vid_descr(cipher_signature.watch_html) == expected
 
 
 def test_mime_type_codec():

@@ -276,7 +276,7 @@ class YouTube:
         """
         return self.player_response.get("videoDetails", {}).get(
             "shortDescription"
-        ) or extract.get_vid_descr(self.watch_html)
+        ) or extract._get_vid_descr(self.watch_html)
 
     @property
     def rating(self) -> float:
