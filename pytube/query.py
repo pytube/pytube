@@ -288,7 +288,13 @@ class StreamQuery:
         """
         return self.filter(only_audio=True, subtype=subtype).order_by("abr").last()
 
-    def otf(self, is_otf: bool = False):
+    def otf(self, is_otf: bool = False) -> "StreamQuery":
+        """Filter stream by OTF, useful if some streams have 404 URLs
+
+        :param bool is_otf: Set to False to retrieve only non-OTF streams
+        :rtype: :class:`StreamQuery <StreamQuery>`
+        :returns: A StreamQuery object with otf filtered streams
+        """
         return self._filter([lambda s: s.is_otf == is_otf])
 
     def first(self) -> Optional[Stream]:

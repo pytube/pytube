@@ -162,3 +162,11 @@ def test_get_audio_only(cipher_signature):
 
 def test_get_audio_only_with_subtype(cipher_signature):
     assert cipher_signature.streams.get_audio_only(subtype="webm").itag == 251
+
+
+def test_otf(cipher_signature):
+    non_otf = cipher_signature.streams.otf().all()
+    assert len(non_otf) == 22
+
+    otf = cipher_signature.streams.otf(True).all()
+    assert len(otf) == 0

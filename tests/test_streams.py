@@ -14,6 +14,15 @@ def test_filesize(cipher_signature, mocker):
     assert cipher_signature.streams.first().filesize == 6796391
 
 
+def test_filesize_approx(cipher_signature, mocker):
+    mocker.patch.object(request, "head")
+    request.head.return_value = {"content-length": "123"}
+    stream = cipher_signature.streams.first()
+    assert stream.filesize_approx == 22350604
+    stream.bitrate = None
+    assert stream.filesize_approx == 123
+
+
 def test_default_filename(cipher_signature):
     expected = "PSY - GANGNAM STYLE(강남스타일) MV.mp4"
     stream = cipher_signature.streams.first()
