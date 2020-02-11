@@ -174,7 +174,6 @@ class StreamQuery:
         fmt_streams = self.fmt_streams
         for filter_lambda in filters:
             fmt_streams = filter(filter_lambda, fmt_streams)
-        print(fmt_streams)
         return StreamQuery(list(fmt_streams))
 
     def order_by(self, attribute_name: str) -> "StreamQuery":

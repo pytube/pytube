@@ -118,7 +118,7 @@ def video_info_url(
     return "https://youtube.com/get_video_info?" + urlencode(params)
 
 
-def js_url(html: str, age_restricted: Optional[bool] = False) -> str:
+def js_url(html: str) -> str:
     """Get the base JavaScript url.
 
     Construct the base JavaScript url, which contains the decipher
@@ -126,12 +126,8 @@ def js_url(html: str, age_restricted: Optional[bool] = False) -> str:
 
     :param str html:
         The html contents of the watch page.
-    :param bool age_restricted:
-        Is video age restricted.
-
     """
-    ytplayer_config = get_ytplayer_config(html, age_restricted or False)
-    base_js = ytplayer_config["assets"]["js"]
+    base_js = get_ytplayer_config(html)["assets"]["js"]
     return "https://youtube.com" + base_js
 
 
@@ -162,7 +158,7 @@ def mime_type_codec(mime_type_codec: str) -> Tuple[str, List[str]]:
     return mime_type, [c.strip() for c in codecs.split(",")]
 
 
-def get_ytplayer_config(html: str, age_restricted: bool = False) -> Any:
+def get_ytplayer_config(html: str) -> Any:
     """Get the YouTube player configuration data from the watch html.
 
     Extract the ``ytplayer_config``, which is json data embedded within the
@@ -171,18 +167,26 @@ def get_ytplayer_config(html: str, age_restricted: bool = False) -> Any:
 
     :param str html:
         The html contents of the watch page.
-    :param bool age_restricted:
-        Is video age restricted.
     :rtype: str
     :returns:
         Substring of the html containing the encoded manifest data.
     """
-    if age_restricted:
-        pattern = r";yt\.setConfig\(\{'PLAYER_CONFIG':\s*({.*})(,'EXPERIMENT_FLAGS'|;)"  # noqa: E501
-    else:
-        pattern = r";ytplayer\.config\s*=\s*({.*?});"
-    yt_player_config = regex_search(pattern, html, group=1)
-    return json.loads(yt_player_config)
+    config_patterns = [
+        r";ytplayer\.config\s*=\s*({.*?});",
+        r';ytplayer\.config\s*=\s*({.+?});ytplayer',
+        r";yt\.setConfig\(\{'PLAYER_CONFIG':\s*({.*})}\);",
+        r";yt\.setConfig\(\{'PLAYER_CONFIG':\s*({.*})(,'EXPERIMENT_FLAGS'|;)"  # noqa: E501
+    ]
+    logger.debug("finding initial function name")
+    for pattern in config_patterns:
+        regex = re.compile(pattern)
+        function_match = regex.search(html)
+        if function_match:
+            logger.debug("finished regex search, matched: %s", pattern)
+            yt_player_config = function_match.group(1)
+            return json.loads(yt_player_config)
+
+    raise RegexMatchError(caller="get_ytplayer_config", pattern="config_patterns")
 
 
 def _get_vid_descr(html: Optional[str]) -> str:
