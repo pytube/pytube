@@ -1,14 +1,14 @@
+# -*- coding: utf-8 -*-
+
 import io
 from typing import Any, Optional
 from typing_extensions import Protocol
-
-# from __future__ import annotations
 
 
 class OnProgress(Protocol):
     def __call__(
         self,
-        stream: Any,
+        stream: bytes,
         chunk: Any,
         file_handler: io.BufferedWriter,
         bytes_remaining: int,

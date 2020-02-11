@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-
 from unittest import mock
 
 import pytest
@@ -30,7 +29,7 @@ def test_headers(mock_urlopen):
     response = mock.Mock()
     response.info.return_value = {"content-length": "16384"}
     mock_urlopen.return_value = response
-    response = request.headers("http://fakeassurl.gov")
+    response = request.head("http://fakeassurl.gov")
     assert response == {"content-length": "16384"}
 
 

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """Library specific exception definitions."""
 from typing import Union, Pattern
 

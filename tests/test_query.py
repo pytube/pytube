@@ -9,7 +9,7 @@ def test_count(cipher_signature):
 
 
 @pytest.mark.parametrize(
-    "test_input,expected",
+    ("test_input", "expected"),
     [
         ({"progressive": True}, [18]),
         ({"resolution": "720p"}, [136, 247]),

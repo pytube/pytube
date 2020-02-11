@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """A simple command line application to download youtube videos."""
 
 import argparse
@@ -389,7 +390,6 @@ def download_by_resolution(
     :param str target:
         Target directory for download
     """
-    # TODO(nficano): allow dash itags to be selected
     stream = youtube.streams.get_by_resolution(resolution)
     if stream is None:
         print(f"Could not find a stream with resolution: {resolution}")

@@ -4,10 +4,8 @@ import os
 import time
 import xml.etree.ElementTree as ElementTree
 from typing import Dict, Optional
-
 from pytube import request
 from html import unescape
-
 from pytube.helpers import safe_filename, target_directory
 
 
@@ -105,7 +103,6 @@ class Caption:
         :type filename_prefix: str or None
 
         :rtype: str
-
         """
         if title.endswith(".srt") or title.endswith(".xml"):
             filename = ".".join(title.split(".")[:-1])

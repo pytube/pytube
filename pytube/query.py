@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+
 """This module provides a query interface for media streams and captions."""
-from typing import List, Optional, Dict
+from typing import List, Optional
 
 from pytube import Stream, Caption
 
@@ -162,16 +163,15 @@ class StreamQuery:
             filters.append(lambda s: s.is_adaptive)
 
         if custom_filter_functions:
-            for fn in custom_filter_functions:
-                filters.append(fn)
+            filters.extend(custom_filter_functions)
 
         if is_dash is not None:
             filters.append(lambda s: s.is_dash == is_dash)
 
         fmt_streams = self.fmt_streams
         for fn in filters:
-            fmt_streams = list(filter(fn, fmt_streams))
-        return StreamQuery(fmt_streams)
+            fmt_streams = filter(fn, fmt_streams)
+        return StreamQuery(list(fmt_streams))
 
     def order_by(self, attribute_name: str) -> "StreamQuery":
         """Apply a sort order. Filters out stream the do not have the attribute.
@@ -182,31 +182,21 @@ class StreamQuery:
         has_attribute = [
             s for s in self.fmt_streams if getattr(s, attribute_name) is not None
         ]
-        integer_attr_repr: Optional[Dict[str, int]] = None
-
-        # check that the attribute value is a string
-        if len(has_attribute) > 0 and isinstance(
-            getattr(has_attribute[0], attribute_name), str
-        ):
-            # attempt to extract numerical values from string
+        # Check that the attributes have string values.
+        if has_attribute and isinstance(getattr(has_attribute[0], attribute_name), str):
+            # Try to return a StreamQuery sorted by the integer representations
+            # of the values.
             try:
-                integer_attr_repr = {
-                    getattr(s, attribute_name): int(
-                        "".join(list(filter(str.isdigit, getattr(s, attribute_name))))
+                return StreamQuery(
+                    sorted(
+                        has_attribute,
+                        key=lambda s: int(
+                            "".join(filter(str.isdigit, getattr(s, attribute_name)))
+                        ),  # type: ignore  # noqa: E501
                     )
-                    for s in has_attribute
-                }
-            except ValueError:
-                integer_attr_repr = None
-
-        # lookup integer values if we have them
-        if integer_attr_repr is not None:
-            return StreamQuery(
-                sorted(
-                    has_attribute,
-                    key=lambda s: integer_attr_repr[getattr(s, attribute_name)],  # type: ignore  # noqa: E501
                 )
-            )
+            except ValueError:
+                pass
 
         return StreamQuery(
             sorted(has_attribute, key=lambda s: getattr(s, attribute_name))
@@ -243,6 +233,7 @@ class StreamQuery:
 
     def get_by_resolution(self, resolution: str) -> Optional[Stream]:
         """Get the corresponding :class:`Stream <Stream>` for a given resolution.
+
         Stream must be a progressive mp4.
 
         :param str resolution:
@@ -267,10 +258,7 @@ class StreamQuery:
 
         """
         return (
-            self.filter(progressive=True, subtype="mp4")
-            .order_by("resolution")
-            .desc()
-            .last()
+            self.filter(progressive=True, subtype="mp4").order_by("resolution").first()
         )
 
     def get_highest_resolution(self) -> Optional[Stream]:
@@ -282,22 +270,20 @@ class StreamQuery:
             not found.
 
         """
-        return self.filter(progressive=True).order_by("resolution").asc().last()
+        return self.filter(progressive=True).order_by("resolution").last()
 
     def get_audio_only(self, subtype: str = "mp4") -> Optional[Stream]:
         """Get highest bitrate audio stream for given codec (defaults to mp4)
 
-        :param str codec:
-            Audio codec, defaults to mp4
+        :param str subtype:
+            Audio subtype, defaults to mp4
         :rtype: :class:`Stream <Stream>` or None
         :returns:
             The :class:`Stream <Stream>` matching the given itag or None if
             not found.
 
         """
-        return (
-            self.filter(only_audio=True, subtype=subtype).order_by("abr").asc().last()
-        )
+        return self.filter(only_audio=True, subtype=subtype).order_by("abr").last()
 
     def first(self) -> Optional[Stream]:
         """Get the first :class:`Stream <Stream>` in the results.

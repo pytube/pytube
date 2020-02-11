@@ -17,11 +17,11 @@ from html import unescape
 from pytube import Caption
 from pytube import CaptionQuery
 from pytube import extract
-from pytube import mixins
 from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
-from pytube.mixins import install_proxy
+from pytube.extract import apply_descrambler, apply_signature
+from pytube.helpers import install_proxy
 from pytube.exceptions import VideoUnavailable
 from pytube.monostate import OnProgress, OnComplete, Monostate
 
@@ -67,11 +67,11 @@ class YouTube:
         self.watch_html: Optional[str] = None  # the html of /watch?v=<video_id>
         self.embed_html: Optional[str] = None
         self.player_config_args: Dict = {}  # inline js in the html containing
+        self.player_response: Dict = {}
         # streams
         self.age_restricted: Optional[bool] = None
 
         self.fmt_streams: List[Stream] = []
-        self.caption_tracks: List[Caption] = []
 
         # video_id part of /watch?v=<video_id>
         self.video_id = extract.video_id(url)
@@ -106,7 +106,7 @@ class YouTube:
         """
         logger.info("init started")
 
-        self.vid_info = {k: v for k, v in parse_qsl(self.vid_info_raw)}
+        self.vid_info = dict(parse_qsl(self.vid_info_raw))
         if self.age_restricted:
             self.player_config_args = self.vid_info
         else:
@@ -124,8 +124,6 @@ class YouTube:
                 title = title[:index] if index > 0 else title
                 self.player_config_args["title"] = unescape(title)
 
-        if self.watch_html:
-            self.vid_descr = extract.get_vid_descr(self.watch_html)
         # https://github.com/nficano/pytube/issues/165
         stream_maps = ["url_encoded_fmt_stream_map"]
         if "adaptive_fmts" in self.player_config_args:
@@ -134,11 +132,11 @@ class YouTube:
         # unscramble the progressive and adaptive stream manifests.
         for fmt in stream_maps:
             if not self.age_restricted and fmt in self.vid_info:
-                mixins.apply_descrambler(self.vid_info, fmt)
-            mixins.apply_descrambler(self.player_config_args, fmt)
+                apply_descrambler(self.vid_info, fmt)
+            apply_descrambler(self.player_config_args, fmt)
 
             try:
-                mixins.apply_signature(
+                apply_signature(
                     self.player_config_args, fmt, self.js  # type: ignore
                 )
             except TypeError:
@@ -146,17 +144,15 @@ class YouTube:
                 self.js_url = extract.js_url(self.embed_html, self.age_restricted)
                 self.js = request.get(self.js_url)
                 assert self.js is not None
-                mixins.apply_signature(self.player_config_args, fmt, self.js)
+                apply_signature(self.player_config_args, fmt, self.js)
 
             # build instances of :class:`Stream <Stream>`
             self.initialize_stream_objects(fmt)
 
         # load the player_response object (contains subtitle information)
-        self.player_config_args["player_response"] = json.loads(
-            self.player_config_args["player_response"]
-        )
+        self.player_response = json.loads(self.player_config_args["player_response"])
+        del self.player_config_args["player_response"]
 
-        self.initialize_caption_objects()
         logger.info("init finished successfully")
 
     def prefetch(self) -> None:
@@ -172,8 +168,7 @@ class YouTube:
         self.watch_html = request.get(url=self.watch_url)
         if (
             self.watch_html is None
-            or '<img class="icon meh" src="/yts/img'  # noqa: W503
-            not in self.watch_html  # noqa: W503
+            or '<img class="icon meh" src="/yts/img' not in self.watch_html
         ):
             raise VideoUnavailable(video_id=self.video_id)
 
@@ -213,26 +208,18 @@ class YouTube:
             )
             self.fmt_streams.append(video)
 
-    def initialize_caption_objects(self) -> None:
-        """Populate instances of :class:`Caption <Caption>`.
+    @property
+    def caption_tracks(self) -> List[Caption]:
+        """Get a list of :class:`Caption <Caption>`.
 
-        Take the unscrambled player response data, and use it to initialize
-        instances of :class:`Caption <Caption>`.
-
-        :rtype: None
-
+        :rtype: List[Caption]
         """
-        if "captions" not in self.player_config_args["player_response"]:
-            return
-        # https://github.com/nficano/pytube/issues/167
-        caption_tracks = (
-            self.player_config_args.get("player_response", {})
-            .get("captions", {})
+        raw_tracks = (
+            self.player_response.get("captions", {})
             .get("playerCaptionsTracklistRenderer", {})
             .get("captionTracks", [])
         )
-        for caption_track in caption_tracks:
-            self.caption_tracks.append(Caption(caption_track))
+        return [Caption(track) for track in raw_tracks]
 
     @property
     def captions(self) -> CaptionQuery:
@@ -240,7 +227,7 @@ class YouTube:
 
         :rtype: :class:`CaptionQuery <CaptionQuery>`.
         """
-        return CaptionQuery([c for c in self.caption_tracks])
+        return CaptionQuery(self.caption_tracks)
 
     @property
     def streams(self) -> StreamQuery:
@@ -248,7 +235,7 @@ class YouTube:
 
         :rtype: :class:`StreamQuery <StreamQuery>`.
         """
-        return StreamQuery([s for s in self.fmt_streams])
+        return StreamQuery(self.fmt_streams)
 
     @property
     def thumbnail_url(self) -> str:
@@ -257,9 +244,8 @@ class YouTube:
         :rtype: str
 
         """
-        player_response = self.player_config_args.get("player_response", {})
         thumbnail_details = (
-            player_response.get("videoDetails", {})
+            self.player_response.get("videoDetails", {})
             .get("thumbnail", {})
             .get("thumbnails")
         )
@@ -267,7 +253,7 @@ class YouTube:
             thumbnail_details = thumbnail_details[-1]  # last item has max size
             return thumbnail_details["url"]
 
-        return "https://img.youtube.com/vi/" + self.video_id + "/maxresdefault.jpg"
+        return f"https://img.youtube.com/vi/{self.video_id}/maxresdefault.jpg"
 
     @property
     def title(self) -> str:
@@ -277,9 +263,7 @@ class YouTube:
 
         """
         return self.player_config_args.get("title") or (
-            self.player_config_args.get("player_response", {})
-            .get("videoDetails", {})
-            .get("title")
+            self.player_response.get("videoDetails", {}).get("title")
         )
 
     @property
@@ -289,11 +273,9 @@ class YouTube:
         :rtype: str
 
         """
-        return self.vid_descr or (
-            self.player_config_args.get("player_response", {})
-            .get("videoDetails", {})
-            .get("shortDescription")
-        )
+        return self.player_response.get("videoDetails", {}).get(
+            "shortDescription"
+        ) or extract.get_vid_descr(self.watch_html)
 
     @property
     def rating(self) -> float:
@@ -302,48 +284,35 @@ class YouTube:
         :rtype: float
 
         """
-        return (
-            self.player_config_args.get("player_response", {})
-            .get("videoDetails", {})
-            .get("averageRating")
-        )
+        return self.player_response.get("videoDetails", {}).get("averageRating")
 
     @property
-    def length(self) -> str:
+    def length(self) -> int:
         """Get the video length in seconds.
 
         :rtype: str
 
         """
-        return self.player_config_args.get("length_seconds") or (
-            self.player_config_args.get("player_response", {})
-            .get("videoDetails", {})
-            .get("lengthSeconds")
+        return int(
+            self.player_config_args.get("length_seconds")
+            or (self.player_response.get("videoDetails", {}).get("lengthSeconds"))
         )
 
     @property
-    def views(self) -> str:
+    def views(self) -> int:
         """Get the number of the times the video has been viewed.
 
         :rtype: str
 
         """
-        return (
-            self.player_config_args.get("player_response", {})
-            .get("videoDetails", {})
-            .get("viewCount")
-        )
+        return int(self.player_response.get("videoDetails", {}).get("viewCount"))
 
     @property
     def author(self) -> str:
         """Get the video author.
         :rtype: str
         """
-        return (
-            self.player_config_args.get("player_response", {})
-            .get("videoDetails", {})
-            .get("author", "unknown")
-        )
+        return self.player_response.get("videoDetails", {}).get("author", "unknown")
 
     def register_on_progress_callback(self, func: OnProgress):
         """Register a download progress callback function post initialization.

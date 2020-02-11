@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """
 This module contains a container for stream manifest data.
 
@@ -12,7 +13,7 @@ import io
 import logging
 import os
 import pprint
-from typing import Dict, Tuple, Optional, List
+from typing import Dict, Tuple, Optional
 
 from pytube import extract
 from pytube import request
@@ -44,39 +45,11 @@ class Stream:
 
         self.url = stream["url"]  # signed download url
         self.itag = int(stream["itag"])  # stream format id (youtube nomenclature)
-        self.type = stream[
-            "type"
-        ]  # the part of the mime before the slash, overwritten later
 
-        self.abr = None  # average bitrate (audio streams only)
-        self.fps = None  # frames per second (video streams only)
-        self.res = None  # resolution (e.g.: 480p, 720p, 1080p)
-
-        self._filesize: Optional[int] = None  # filesize in bytes
-        self.mime_type = None  # content identifier (e.g.: video/mp4)
-        self.subtype = None  # the part of the mime after the slash
-
-        self.codecs: List[str] = []  # audio/video encoders (e.g.: vp8, mp4a)
-        self.audio_codec = None  # audio codec of the stream (e.g.: vorbis)
-        self.video_codec = None  # video codec of the stream (e.g.: vp8)
-        self.is_dash: Optional[bool] = None
-
-        # Iterates over the key/values of stream and sets them as class
-        # attributes. This is an anti-pattern and should be removed.
-        self.set_attributes_from_dict(stream)
-
-        # Additional information about the stream format, such as resolution,
-        # frame rate, and whether the stream is live (HLS) or 3D.
-        self.fmt_profile: Dict = get_format_profile(self.itag)
-
-        # Same as above, except for the format profile attributes.
-        self.set_attributes_from_dict(self.fmt_profile)
-
-        # The player configuration, contains info like the video title.
-        self.player_config_args = player_config_args
+        # set type and codec info
 
         # 'video/webm; codecs="vp8, vorbis"' -> 'video/webm', ['vp8', 'vorbis']
-        self.mime_type, self.codecs = extract.mime_type_codec(self.type)
+        self.mime_type, self.codecs = extract.mime_type_codec(stream["type"])
 
         # 'video/webm' -> 'video', 'webm'
         self.type, self.subtype = self.mime_type.split("/")
@@ -85,13 +58,21 @@ class Stream:
         # streams return NoneType for audio/video depending.
         self.video_codec, self.audio_codec = self.parse_codecs()
 
-    def set_attributes_from_dict(self, dct: Dict) -> None:
-        """Set class attributes from dictionary items.
+        self._filesize: Optional[int] = None  # filesize in bytes
 
-        :rtype: None
-        """
-        for key, val in dct.items():
-            setattr(self, key, val)
+        # Additional information about the stream format, such as resolution,
+        # frame rate, and whether the stream is live (HLS) or 3D.
+        itag_profile = get_format_profile(self.itag)
+        self.is_dash = itag_profile["is_dash"]
+        self.abr = itag_profile["abr"]  # average bitrate (audio streams only)
+        self.fps = itag_profile["fps"]  # frames per second (video streams only)
+        self.resolution = itag_profile["resolution"]  # resolution (e.g.: "480p")
+        self.is_3d = itag_profile["is_3d"]
+        self.is_hdr = itag_profile["is_hdr"]
+        self.is_live = itag_profile["is_live"]
+
+        # The player configuration, contains info like the video title.
+        self.player_config_args = player_config_args
 
     @property
     def is_adaptive(self) -> bool:
@@ -127,7 +108,7 @@ class Stream:
         """
         return self.is_progressive or self.type == "video"
 
-    def parse_codecs(self) -> Tuple:
+    def parse_codecs(self) -> Tuple[Optional[str], Optional[str]]:
         """Get the video/audio codecs from list of codecs.
 
         Parse a variable length sized list of codecs and returns a
@@ -159,7 +140,7 @@ class Stream:
             Filesize (in bytes) of the stream.
         """
         if self._filesize is None:
-            headers = request.headers(self.url)
+            headers = request.head(self.url)
             self._filesize = int(headers["content-length"])
         return self._filesize
 
@@ -189,7 +170,6 @@ class Stream:
         :returns:
             An os file system compatible filename.
         """
-
         filename = safe_filename(self.title)
         return f"{filename}.{self.subtype}"
 
@@ -284,7 +264,7 @@ class Stream:
         additional callback is defined in the monostate. This is exposed to
         allow things like displaying a progress bar.
 
-        :param str chunk:
+        :param bytes chunk:
             Segment of media file binary data, not yet written to disk.
         :param file_handler:
             The file handle where the media is being written to.
@@ -334,7 +314,6 @@ class Stream:
         :returns:
             A string representation of a :class:`Stream <Stream>` object.
         """
-        # TODO(nficano): this can probably be written better.
         parts = ['itag="{s.itag}"', 'mime_type="{s.mime_type}"']
         if self.includes_video_track:
             parts.extend(['res="{s.resolution}"', 'fps="{s.fps}fps"'])

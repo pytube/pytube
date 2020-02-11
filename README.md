@@ -21,6 +21,7 @@
   * [Usage](#usage)
   * [Command-line interface](#command-line-interface)
   * [Development](#development)
+  * [GUIs and other libraries](#guis-and-other-libraries)
 
 ## Installation
 
@@ -292,8 +293,8 @@ This project is linted with [pyflakes](https://github.com/PyCQA/pyflakes), forma
 
 Treat other people with helpfulness, gratitude, and consideration! See the [Python Community Code of Conduct](https://www.python.org/psf/codeofconduct/).
 
-#### See also
+## GUIs and other libraries
 * [youtube-python](https://github.com/rohitkhatri/youtube-python) - client for the YouTube data API
-* [youtube-dl](https://github.com/ytdl-org/youtube-dl) - command line downloader with sophisticated options
-* [youtube-dl-gui](https://github.com/MrS0m30n3/youtube-dl-gui) - wxPython GUI frontend for youtube-dl
-* [youtube-dl-server](https://github.com/manbearwiz/youtube-dl-server) - web frontend for youtube-dl
+* [YouTubeDownload](https://github.com/hbmartin/YouTubeDownload) - GUI frontend for pytube3
+* [Pytube-GUI](https://github.com/GAO23/Pytube-GUI) - Simple GUI frontend for pytube3
+* [StackOverflow questions](https://stackoverflow.com/questions/tagged/pytube)
