@@ -164,9 +164,11 @@ class Stream:
         :rtype: int
         :returns: size of video in bytes
         """
-        assert self._monostate.duration is not None
-        bits_in_byte = 8
-        return int((self._monostate.duration * self.bitrate) / bits_in_byte)
+        if self._monostate.duration:
+            bits_in_byte = 8
+            return int((self._monostate.duration * self.bitrate) / bits_in_byte)
+        else:
+            return self.filesize
 
     @property
     def default_filename(self) -> str:

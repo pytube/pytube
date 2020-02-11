@@ -275,7 +275,7 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
                     "type": format_item["mimeType"],
                     "quality": format_item["quality"],
                     "itag": format_item["itag"],
-                    "bitrate": format_item["bitrate"],
+                    "bitrate": format_item.get("bitrate"),
                     "is_otf": (format_item.get("type") == otf_type),
                 }
                 for format_item in formats
@@ -291,7 +291,7 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
                     "type": format_item["mimeType"],
                     "quality": format_item["quality"],
                     "itag": format_item["itag"],
-                    "bitrate": format_item["bitrate"],
+                    "bitrate": format_item.get("bitrate"),
                     "is_otf": (format_item.get("type") == otf_type),
                 }
                 for i, format_item in enumerate(formats)
