@@ -101,9 +101,7 @@ def video_info_url(
         # Here we use ``OrderedDict`` so that the output is consistent between
         # Python 2.7+.
         eurl = f"https://youtube.googleapis.com/v/{video_id}"
-        params = OrderedDict(
-            [("video_id", video_id), ("eurl", eurl), ("sts", sts),]
-        )
+        params = OrderedDict([("video_id", video_id), ("eurl", eurl), ("sts", sts),])
     else:
         params = OrderedDict(
             [

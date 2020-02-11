@@ -52,7 +52,11 @@ class OnComplete(Protocol):
 
 class Monostate:
     def __init__(
-        self, on_progress: Optional[OnProgress], on_complete: Optional[OnComplete], title: Optional[str]=None, duration: Optional[int] = None
+        self,
+        on_progress: Optional[OnProgress],
+        on_complete: Optional[OnComplete],
+        title: Optional[str] = None,
+        duration: Optional[int] = None,
     ):
         self.on_progress = on_progress
         self.on_complete = on_complete

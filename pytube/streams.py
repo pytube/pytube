@@ -155,7 +155,7 @@ class Stream:
         :returns:
             Youtube video title
         """
-        return self._monostate.title
+        return self._monostate.title or "Unknown YouTube Video Title"
 
     @property
     def filesize_approx(self) -> int:
@@ -164,8 +164,9 @@ class Stream:
         :rtype: int
         :returns: size of video in bytes
         """
+        assert self._monostate.duration is not None
         bits_in_byte = 8
-        return (self._monostate.duration * self.bitrate) / bits_in_byte
+        return int((self._monostate.duration * self.bitrate) / bits_in_byte)
 
     @property
     def default_filename(self) -> str:

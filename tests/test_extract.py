@@ -12,12 +12,6 @@ def test_extract_video_id():
     assert video_id == "9bZkp7q19f0"
 
 
-def test_extract_watch_url():
-    video_id = "9bZkp7q19f0"
-    watch_url = extract.watch_url(video_id)
-    assert watch_url == "https://youtube.com/watch?v=9bZkp7q19f0"
-
-
 def test_info_url(cipher_signature):
     video_info_url = extract.video_info_url(
         video_id=cipher_signature.video_id,
@@ -64,11 +58,6 @@ def test_get_vid_desc(cipher_signature):
         "http://weibo.com/psyoppa"
     )
     assert extract.get_vid_descr(cipher_signature.watch_html) == expected
-
-
-def test_eurl():
-    url = extract.eurl("videoid")
-    assert url == "https://youtube.googleapis.com/v/videoid"
 
 
 def test_mime_type_codec():

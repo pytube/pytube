@@ -21,19 +21,14 @@ def test_default_filename(cipher_signature):
 
 
 def test_title(cipher_signature):
-    expected = "PSY - GANGNAM STYLE(강남스타일) M/V"
-    stream = cipher_signature.streams.first()
-    assert stream.title == expected
+    expected = "title"
+    cipher_signature.player_config_args["title"] = expected
+    assert cipher_signature.title == expected
 
-    expected = "PSY - GANGNAM STYLE(강남스타일)"
-    stream.player_config_args = {
-        "player_response": {"videoDetails": {"title": expected}},
-    }
-    assert stream.title == expected
-
-    expected = "Unknown YouTube Video Title"
-    stream.player_config_args = {}
-    assert stream.title == expected
+    expected = "title2"
+    del cipher_signature.player_config_args["title"]
+    cipher_signature.player_response = {"videoDetails": {"title": expected}}
+    assert cipher_signature.title == expected
 
 
 def test_caption_tracks(presigned_video):
