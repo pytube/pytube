@@ -174,15 +174,17 @@ class YouTube:
         ):
             raise VideoUnavailable(video_id=self.video_id)
 
-        if self.age_restricted and not self.embed_html:
-            self.embed_html = request.get(url=self.embed_url)
+        if self.age_restricted:
+            if not self.embed_html:
+                self.embed_html = request.get(url=self.embed_url)
+            self.vid_info_url = extract.video_info_url_age_restricted(
+                self.video_id, self.watch_url
+            )
+        else:
+            self.vid_info_url = extract.video_info_url(
+                video_id=self.video_id, watch_url=self.watch_url
+            )
 
-        self.vid_info_url = extract.video_info_url(
-            video_id=self.video_id,
-            watch_url=self.watch_url,
-            embed_html=self.embed_html,
-            age_restricted=self.age_restricted,
-        )
         self.vid_info_raw = request.get(self.vid_info_url)
         if not self.age_restricted:
             self.js_url = extract.js_url(self.watch_html)

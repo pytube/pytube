@@ -13,11 +13,9 @@ def test_extract_video_id():
 
 
 def test_info_url(age_restricted):
-    video_info_url = extract.video_info_url(
+    video_info_url = extract.video_info_url_age_restricted(
         video_id="QRS8MkLhQmM",
-        watch_url=age_restricted["url"],
         embed_html=age_restricted["embed_html"],
-        age_restricted=True,
     )
     expected = (
         "https://youtube.com/get_video_info?video_id=QRS8MkLhQmM&eurl"
@@ -29,9 +27,7 @@ def test_info_url(age_restricted):
 def test_info_url_age_restricted(cipher_signature):
     video_info_url = extract.video_info_url(
         video_id=cipher_signature.video_id,
-        watch_url=cipher_signature.watch_url,
-        embed_html="",
-        age_restricted=False,
+        watch_url=cipher_signature.watch_url
     )
     expected = (
         "https://youtube.com/get_video_info?video_id=9bZkp7q19f0&el=%24el"

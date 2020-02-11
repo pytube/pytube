@@ -77,44 +77,54 @@ def video_id(url: str) -> str:
     return regex_search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url, group=1)
 
 
-def video_info_url(
-    video_id: str, watch_url: str, embed_html: Optional[str], age_restricted: bool,
-) -> str:
+def video_info_url(video_id: str, watch_url: str) -> str:
     """Construct the video_info url.
 
     :param str video_id:
         A YouTube video identifier.
     :param str watch_url:
         A YouTube watch url.
-    :param str embed_html:
-        The html contents of the embed page (for age restricted videos).
-    :param bool age_restricted:
-        Is video age restricted.
     :rtype: str
     :returns:
         :samp:`https://youtube.com/get_video_info` with necessary GET
         parameters.
     """
-    if age_restricted:
-        assert embed_html is not None
-        try:
-            sts = regex_search(r'"sts"\s*:\s*(\d+)', embed_html, group=1)
-        except RegexMatchError:
-            sts = ""
-        # Here we use ``OrderedDict`` so that the output is consistent between
-        # Python 2.7+.
-        eurl = f"https://youtube.googleapis.com/v/{video_id}"
-        params = OrderedDict([("video_id", video_id), ("eurl", eurl), ("sts", sts),])
-    else:
-        params = OrderedDict(
-            [
-                ("video_id", video_id),
-                ("el", "$el"),
-                ("ps", "default"),
-                ("eurl", quote(watch_url)),
-                ("hl", "en_US"),
-            ]
-        )
+    params = OrderedDict(
+        [
+            ("video_id", video_id),
+            ("el", "$el"),
+            ("ps", "default"),
+            ("eurl", quote(watch_url)),
+            ("hl", "en_US"),
+        ]
+    )
+    return _video_info_url(params)
+
+
+def video_info_url_age_restricted(video_id: str, embed_html: str) -> str:
+    """Construct the video_info url.
+
+    :param str video_id:
+        A YouTube video identifier.
+    :param str embed_html:
+        The html contents of the embed page (for age restricted videos).
+    :rtype: str
+    :returns:
+        :samp:`https://youtube.com/get_video_info` with necessary GET
+        parameters.
+    """
+    try:
+        sts = regex_search(r'"sts"\s*:\s*(\d+)', embed_html, group=1)
+    except RegexMatchError:
+        sts = ""
+    # Here we use ``OrderedDict`` so that the output is consistent between
+    # Python 2.7+.
+    eurl = f"https://youtube.googleapis.com/v/{video_id}"
+    params = OrderedDict([("video_id", video_id), ("eurl", eurl), ("sts", sts),])
+    return _video_info_url(params)
+
+
+def _video_info_url(params: OrderedDict) -> str:
     return "https://youtube.com/get_video_info?" + urlencode(params)
 
 
