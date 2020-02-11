@@ -217,3 +217,50 @@ def test_download_by_resolution_not_exists(youtube, stream_query):
             youtube=youtube, resolution="DOESNT EXIST", target="test_target"
         )
     cli._download.assert_not_called()
+
+
+@mock.patch("pytube.cli.YouTube")
+@mock.patch("pytube.cli.Stream")
+def test_ffmpeg_downloader(youtube, stream):
+    parser = argparse.ArgumentParser()
+    args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-f", "best"])
+    cli._parse_args = MagicMock(return_value=args)
+    cli.safe_filename = MagicMock(return_value="PSY - GANGNAM STYLE(강남스타일) MV")
+    cli.subprocess.run = MagicMock()
+    cli.os.unlink = MagicMock()
+    cli.ffmpeg_downloader = MagicMock()
+    cli.main()
+    cli.ffmpeg_downloader.assert_called()
+
+
+@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
+def test_download_audio(youtube):
+    parser = argparse.ArgumentParser()
+    args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-a", "mp4"])
+    cli._parse_args = MagicMock(return_value=args)
+    cli.download_audio = MagicMock()
+    cli.main()
+    youtube.assert_called()
+    cli.download_audio.assert_called()
+
+
+@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
+def test_ffmpeg_process(youtube):
+    parser = argparse.ArgumentParser()
+    args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-f", "2160p"])
+    cli._parse_args = MagicMock(return_value=args)
+    cli.ffmpeg_process = MagicMock()
+    cli.main()
+    youtube.assert_called()
+    cli.ffmpeg_process.assert_called()
+
+
+@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
+def test_perform_args_on_youtube(youtube):
+    parser = argparse.ArgumentParser()
+    args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0"])
+    cli._parse_args = MagicMock(return_value=args)
+    cli._perform_args_on_youtube = MagicMock()
+    cli.main()
+    youtube.assert_called()
+    cli._perform_args_on_youtube.assert_called()

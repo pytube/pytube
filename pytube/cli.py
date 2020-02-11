@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """A simple command line application to download youtube videos."""
 
 import argparse
@@ -10,6 +9,7 @@ import logging
 import os
 import shutil
 import sys
+import subprocess  # nosec
 from io import BufferedWriter
 from typing import Any, Optional, List
 
@@ -64,6 +64,10 @@ def _perform_args_on_youtube(youtube: YouTube, args: argparse.Namespace) -> None
         download_by_resolution(
             youtube=youtube, resolution=args.resolution, target=args.target
         )
+    if args.audio:
+        download_audio(youtube=youtube, filetype=args.audio, target=args.target)
+    if args.ffmpeg:
+        ffmpeg_process(youtube=youtube, resolution=args.ffmpeg, target=args.target)
 
 
 def _parse_args(
@@ -118,6 +122,27 @@ def _parse_args(
         help=(
             "The output directory for the downloaded stream. "
             "Default is current working directory"
+        ),
+    )
+    parser.add_argument(
+        "-a",
+        "--audio",
+        const="mp4",
+        nargs="?",
+        help=(
+            "Download the audio for a given URL at the highest bitrate available"
+            "Defaults to mp4 format if none is specified"
+        ),
+    )
+    parser.add_argument(
+        "-f",
+        "--ffmpeg",
+        const="best",
+        nargs="?",
+        help=(
+            "Downloads the audio and video stream for resolution provided"
+            "If no resolution is provided, downloads the best resolution"
+            "Runs the command line program ffmpeg to combine the audio and video"
         ),
     )
 
@@ -192,11 +217,139 @@ def on_progress(
     display_progress_bar(bytes_received, filesize)
 
 
-def _download(stream: Stream, target: Optional[str] = None) -> None:
+def _download(
+    stream: Stream, target: Optional[str] = None, filename: Optional[str] = None
+) -> None:
     filesize_megabytes = stream.filesize // 1048576
     print(f"{stream.default_filename} | {filesize_megabytes} MB")
-    stream.download(output_path=target)
+    stream.download(output_path=target, filename=filename)
     sys.stdout.write("\n")
+
+
+def unique_name(
+    base: str, subtype: Optional[str], video_audio: str, target: str
+) -> str:
+    """
+    Given a base name, the file format, and the target directory, will generate
+    a filename unique for that directory and file format.
+    :param str base:
+        The given base-name.
+    :param str subtype:
+        The filetype of the video which will be downloaded.
+    :param Path target:
+        Target directory for download.
+    """
+    counter = 0
+    while True:
+        name = f"{base}_{video_audio}_{counter}"
+        unique = os.path.join(target, f"{name}.{subtype}")
+        if not os.path.exists(unique):
+            return str(name)
+        counter += 1
+
+
+def ffmpeg_process(
+    youtube: YouTube, resolution: str, target: Optional[str] = None
+) -> None:
+    """
+    Decides the correct video stream to download, then calls ffmpeg_downloader.
+
+    :param YouTube youtube:
+        A valid YouTube object.
+    :param str resolution:
+        YouTube video resolution.
+    :param str target:
+        Target directory for download
+    """
+    youtube.register_on_progress_callback(on_progress)
+    if target is None:
+        target = os.getcwd()
+
+    if resolution == "best":
+        highest_quality = (
+            youtube.streams.filter(progressive=False)
+            .order_by("resolution")
+            .desc()
+            .first()
+        )
+
+        video_stream = (
+            youtube.streams.filter(progressive=False, subtype="mp4")
+            .order_by("resolution")
+            .desc()
+            .first()
+        )
+
+        if highest_quality.resolution == video_stream.resolution:
+            ffmpeg_downloader(youtube=youtube, stream=video_stream, target=target)
+        else:
+            ffmpeg_downloader(youtube=youtube, stream=highest_quality, target=target)
+    else:
+        video_stream = youtube.streams.filter(
+            progressive=False, resolution=resolution, subtype="mp4"
+        ).first()
+        if video_stream is not None:
+            ffmpeg_downloader(youtube=youtube, stream=video_stream, target=target)
+        else:
+            video_stream = youtube.streams.filter(
+                progressive=False, resolution=resolution
+            ).first()
+            if video_stream is None:
+                print(f"Could not find a stream with resolution: {resolution}")
+                print("Try one of these:")
+                display_streams(youtube)
+                sys.exit()
+            ffmpeg_downloader(youtube=youtube, stream=video_stream, target=target)
+
+
+def ffmpeg_downloader(youtube: YouTube, stream: Stream, target: str) -> None:
+    """
+    Given a YouTube Stream object, finds the correct audio stream, downloads them both
+    giving them a unique name, them uses ffmpeg to create a new file with the audio
+    and video from the previously downloaded files. Then deletes the original adaptive
+    streams, leaving the combination.
+
+    :param YouTube youtube:
+        A valid YouTube object
+    :param Stream stream:
+        A valid Stream object
+    :param Path target:
+        A valid Path object
+    """
+    audio_stream = (
+        youtube.streams.filter(only_audio=True, subtype=stream.subtype)
+        .order_by("abr")
+        .desc()
+        .first()
+    )
+
+    video_unique_name = unique_name(
+        safe_filename(stream.title), stream.subtype, "video", target=target
+    )
+    audio_unique_name = unique_name(
+        safe_filename(stream.title), stream.subtype, "audio", target=target
+    )
+    _download(stream=stream, target=target, filename=video_unique_name)
+    _download(stream=audio_stream, target=target, filename=audio_unique_name)
+
+    video_path = os.path.join(target, f"{video_unique_name}.{stream.subtype}")
+    audio_path = os.path.join(target, f"{audio_unique_name}.{stream.subtype}")
+    final_path = os.path.join(target, f"{safe_filename(stream.title)}.{stream.subtype}")
+
+    subprocess.run(  # nosec
+        [
+            "ffmpeg",
+            "-i",
+            f"{video_path}",
+            "-i",
+            f"{audio_path}",
+            "-codec",
+            "copy",
+            f"{final_path}",
+        ]
+    )
+    os.unlink(video_path)
+    os.unlink(audio_path)
 
 
 def download_by_itag(youtube: YouTube, itag: int, target: Optional[str] = None) -> None:
@@ -236,6 +389,7 @@ def download_by_resolution(
     :param str target:
         Target directory for download
     """
+    # TODO(nficano): allow dash itags to be selected
     stream = youtube.streams.get_by_resolution(resolution)
     if stream is None:
         print(f"Could not find a stream with resolution: {resolution}")
@@ -291,6 +445,40 @@ def download_caption(
     else:
         print(f"Unable to find caption with code: {lang_code}")
         _print_available_captions(youtube.captions)
+
+
+def download_audio(
+    youtube: YouTube, filetype: str, target: Optional[str] = None
+) -> None:
+    """
+    Given a filetype, downloads the highest quality available audio stream for a
+    YouTube video.
+
+    :param YouTube youtube:
+        A valid YouTube object.
+    :param str filetype:
+        Desired file format to download.
+    :param str target:
+        Target directory for download
+    """
+    audio = (
+        youtube.streams.filter(only_audio=True, subtype=filetype)
+        .order_by("abr")
+        .desc()
+        .first()
+    )
+
+    if audio is None:
+        print("No audio only stream found. Try one of these:")
+        display_streams(youtube)
+        sys.exit()
+
+    youtube.register_on_progress_callback(on_progress)
+
+    try:
+        _download(audio, target=target)
+    except KeyboardInterrupt:
+        sys.exit()
 
 
 if __name__ == "__main__":
