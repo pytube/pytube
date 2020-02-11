@@ -168,7 +168,10 @@ class YouTube:
         if self.watch_html is None:
             raise VideoUnavailable(video_id=self.video_id)
         self.age_restricted = extract.is_age_restricted(self.watch_html)
-        if not self.age_restricted and ('yt-badge-live' in self.watch_html or "This video is private" in self.watch_html):
+        if not self.age_restricted and (
+            "yt-badge-live" in self.watch_html
+            or "This video is private" in self.watch_html
+        ):
             raise VideoUnavailable(video_id=self.video_id)
 
         if self.age_restricted and not self.embed_html:
