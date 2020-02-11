@@ -97,7 +97,10 @@ def video_info_url(
     """
     if age_restricted:
         assert embed_html is not None
-        sts = regex_search(r'"sts"\s*:\s*(\d+)', embed_html, group=1)
+        try:
+            sts = regex_search(r'"sts"\s*:\s*(\d+)', embed_html, group=1)
+        except RegexMatchError:
+            sts = ""
         # Here we use ``OrderedDict`` so that the output is consistent between
         # Python 2.7+.
         eurl = f"https://youtube.googleapis.com/v/{video_id}"

@@ -79,8 +79,7 @@ class YouTube:
         self.watch_url = f"https://youtube.com/watch?v={self.video_id}"
         self.embed_url = f"https://www.youtube.com/embed/{self.video_id}"
 
-        # A dictionary shared between all instances of :class:`Stream <Stream>`
-        # (Borg pattern). Boooooo.
+        # Shared between all instances of `Stream` (Borg pattern).
         self.stream_monostate = Monostate(
             on_progress=on_progress_callback, on_complete=on_complete_callback
         )
@@ -139,7 +138,8 @@ class YouTube:
                     self.player_config_args, fmt, self.js  # type: ignore
                 )
             except TypeError:
-                assert self.embed_html is not None
+                if not self.embed_html:
+                    self.embed_html = request.get(url=self.embed_url)
                 self.js_url = extract.js_url(self.embed_html, self.age_restricted)
                 self.js = request.get(self.js_url)
                 assert self.js is not None
@@ -167,14 +167,15 @@ class YouTube:
 
         """
         self.watch_html = request.get(url=self.watch_url)
-        if (
-            self.watch_html is None
-            or '<img class="icon meh" src="/yts/img' not in self.watch_html
-        ):
+        if self.watch_html is None:
+            raise VideoUnavailable(video_id=self.video_id)
+        self.age_restricted = extract.is_age_restricted(self.watch_html)
+        if not self.age_restricted and 'id="player-unavailable"' in self.watch_html:
             raise VideoUnavailable(video_id=self.video_id)
 
-        self.embed_html = request.get(url=self.embed_url)
-        self.age_restricted = extract.is_age_restricted(self.watch_html)
+        if self.age_restricted:
+            self.embed_html = request.get(url=self.embed_url)
+
         self.vid_info_url = extract.video_info_url(
             video_id=self.video_id,
             watch_url=self.watch_url,
