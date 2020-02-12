@@ -305,6 +305,43 @@ def test_ffmpeg_process_res_none_should_not_download(_ffmpeg_downloader, youtube
     _ffmpeg_downloader.assert_not_called()
 
 
+@mock.patch("pytube.cli.YouTube")
+@mock.patch("pytube.cli._ffmpeg_downloader")
+def test_ffmpeg_process_audio_none_should_fallback_download(
+    _ffmpeg_downloader, youtube
+):
+    # Given
+    target = "/target"
+    streams = MagicMock()
+    youtube.streams = streams
+    stream = MagicMock()
+    streams.filter.return_value.order_by.return_value.last.return_value = stream
+    streams.get_audio_only.return_value = None
+    # When
+    cli.ffmpeg_process(youtube, "best", target)
+    # Then
+    _ffmpeg_downloader.assert_called_with(
+        audio_stream=stream, video_stream=stream, target=target
+    )
+
+
+@mock.patch("pytube.cli.YouTube")
+@mock.patch("pytube.cli._ffmpeg_downloader")
+def test_ffmpeg_process_audio_fallback_none_should_exit(_ffmpeg_downloader, youtube):
+    # Given
+    target = "/target"
+    streams = MagicMock()
+    youtube.streams = streams
+    stream = MagicMock()
+    streams.filter.return_value.order_by.return_value.last.side_effect = [stream, None]
+    streams.get_audio_only.return_value = None
+    # When
+    with pytest.raises(SystemExit):
+        cli.ffmpeg_process(youtube, "best", target)
+    # Then
+    _ffmpeg_downloader.assert_not_called()
+
+
 @mock.patch("pytube.cli.os.unlink", return_value=None)
 @mock.patch("pytube.cli.subprocess.run", return_value=None)
 @mock.patch("pytube.cli._download", return_value=None)
