@@ -131,17 +131,13 @@ class YouTube:
                 apply_descrambler(self.vid_info, fmt)
             apply_descrambler(self.player_config_args, fmt)
 
-            try:
-                apply_signature(
-                    self.player_config_args, fmt, self.js  # type: ignore
-                )
-            except TypeError:
+            if not self.js:
                 if not self.embed_html:
                     self.embed_html = request.get(url=self.embed_url)
                 self.js_url = extract.js_url(self.embed_html)
                 self.js = request.get(self.js_url)
-                assert self.js is not None
-                apply_signature(self.player_config_args, fmt, self.js)
+
+            apply_signature(self.player_config_args, fmt, self.js)
 
             # build instances of :class:`Stream <Stream>`
             self.initialize_stream_objects(fmt)
