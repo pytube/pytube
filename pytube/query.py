@@ -2,7 +2,7 @@
 
 """This module provides a query interface for media streams and captions."""
 from typing import Callable, List, Optional, Union
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 from pytube import Stream, Caption
 from pytube.helpers import deprecated
@@ -356,7 +356,7 @@ class StreamQuery(Sequence):
         return f"{self.fmt_streams}"
 
 
-class CaptionQuery(Sequence):
+class CaptionQuery(Mapping):
     """Interface for querying the available captions."""
 
     def __init__(self, captions: List[Caption]):
@@ -366,9 +366,9 @@ class CaptionQuery(Sequence):
             list of :class:`Caption <Caption>` instances.
 
         """
-        self.captions = captions
         self.lang_code_index = {c.code: c for c in captions}
 
+    @deprecated("This object can be treated as a dictionary, i.e. captions['en']")
     def get_by_language_code(self, lang_code: str) -> Optional[Caption]:
         """Get the :class:`Caption <Caption>` for a given ``lang_code``.
 
@@ -381,20 +381,23 @@ class CaptionQuery(Sequence):
         """
         return self.lang_code_index.get(lang_code)
 
-    @deprecated("This object can be treated as a list, all() is useless")
+    @deprecated("This object can be treated as a dictionary")
     def all(self) -> List[Caption]:  # pragma: no cover
         """Get all the results represented by this query as a list.
 
         :rtype: list
 
         """
-        return self.captions
+        return list(self.lang_code_index.values())
 
-    def __getitem__(self, i: Union[slice, int]):
-        return self.captions[i]
+    def __getitem__(self, i: str):
+        return self.lang_code_index[i]
 
     def __len__(self) -> int:
-        return len(self.captions)
+        return len(self.lang_code_index)
+
+    def __iter__(self):
+        return iter(self.lang_code_index)
 
     def __repr__(self) -> str:
-        return f"{self.captions}"
+        return f"{self.lang_code_index}"
