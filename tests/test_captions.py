@@ -26,7 +26,8 @@ def test_caption_query_sequence():
     assert caption_query["en"] == caption1
     assert caption_query["fr"] == caption2
     with pytest.raises(KeyError):
-        caption_query["nada"]
+        not_exists = caption_query["nada"]
+        assert not_exists is not None  # should never reach this
 
 
 def test_caption_query_get_by_language_code_when_exists():

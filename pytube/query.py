@@ -397,7 +397,7 @@ class CaptionQuery(Mapping):
         return len(self.lang_code_index)
 
     def __iter__(self):
-        return iter(self.lang_code_index)
+        return iter(self.lang_code_index.values())
 
     def __repr__(self) -> str:
         return f"{self.lang_code_index}"

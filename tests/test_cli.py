@@ -100,6 +100,22 @@ def test_download_caption_with_lang_not_found(youtube, print_available):
     print_available.assert_called_with(youtube.captions)
 
 
+def test_print_available_captions(capsys):
+    # Given
+    caption1 = Caption(
+        {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
+    )
+    caption2 = Caption(
+        {"url": "url2", "name": {"simpleText": "name2"}, "languageCode": "fr"}
+    )
+    query = CaptionQuery([caption1, caption2])
+    # When
+    cli._print_available_captions(query)
+    # Then
+    captured = capsys.readouterr()
+    assert captured.out == "Available caption codes are: en, fr\n"
+
+
 def test_display_progress_bar(capsys):
     cli.display_progress_bar(bytes_received=25, filesize=100, scale=0.55)
     out, _ = capsys.readouterr()
