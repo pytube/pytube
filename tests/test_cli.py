@@ -253,6 +253,25 @@ def test_ffmpeg_process_best_should_download(_ffmpeg_downloader, youtube):
     )
 
 
+@mock.patch("pytube.cli.YouTube")
+@mock.patch("pytube.cli._ffmpeg_downloader")
+def test_ffmpeg_process_res_should_download(_ffmpeg_downloader, youtube):
+    # Given
+    target = "/target"
+    streams = MagicMock()
+    youtube.streams = streams
+    video_stream = MagicMock()
+    streams.filter.return_value.first.return_value = video_stream
+    audio_stream = MagicMock()
+    streams.get_audio_only.return_value = audio_stream
+    # When
+    cli.ffmpeg_process(youtube, "XYZp", target)
+    # Then
+    _ffmpeg_downloader.assert_called_with(
+        audio_stream=audio_stream, video_stream=video_stream, target=target
+    )
+
+
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
 def test_download_audio(youtube):
     parser = argparse.ArgumentParser()
