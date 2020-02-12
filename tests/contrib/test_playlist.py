@@ -90,6 +90,7 @@ def test_sequence(request_get, playlist_html):
     assert playlist[0] == "https://www.youtube.com/watch?v=ujTCoH21GlA"
     assert len(playlist) == 12
 
+
 @mock.patch("pytube.contrib.playlist.request.get")
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
 def test_videos(youtube, request_get, playlist_html):

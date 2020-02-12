@@ -12,7 +12,7 @@ def test_float_to_srt_time_format():
     assert caption1.float_to_srt_time_format(3.89) == "00:00:03,890"
 
 
-def test_caption_query_all():
+def test_caption_query_sequence():
     caption1 = Caption(
         {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
     )
@@ -21,6 +21,8 @@ def test_caption_query_all():
     )
     caption_query = CaptionQuery(captions=[caption1, caption2])
     assert caption_query.captions == [caption1, caption2]
+    assert len(caption_query) == 2
+    assert caption_query[0] == caption1
 
 
 def test_caption_query_get_by_language_code_when_exists():

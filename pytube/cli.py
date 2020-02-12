@@ -413,12 +413,12 @@ def display_streams(youtube: YouTube) -> None:
         A valid YouTube watch URL.
 
     """
-    for stream in youtube.streams.all():
+    for stream in youtube.streams:
         print(stream)
 
 
 def _print_available_captions(captions: CaptionQuery) -> None:
-    print(f"Available caption codes are: {', '.join(c.code for c in captions.all())}")
+    print(f"Available caption codes are: {', '.join(c.code for c in captions)}")
 
 
 def download_caption(

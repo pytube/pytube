@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 """This module provides a query interface for media streams and captions."""
-from typing import List, Optional
+from typing import List, Optional, Union
+from collections.abc import Sequence
 
 from pytube import Stream, Caption
+from pytube.helpers import deprecated
 
 
-class StreamQuery:
+class StreamQuery(Sequence):
     """Interface for querying the available media streams."""
 
     def __init__(self, fmt_streams):
@@ -313,14 +315,16 @@ class StreamQuery:
         except IndexError:
             pass
 
+    @deprecated("Get the size of this list directly using len()")
     def count(self) -> int:
         """Get the count the query would return.
 
         :rtype: int
 
         """
-        return len(self.fmt_streams)
+        return len(self)
 
+    @deprecated("This object can be treated as a list, all() is useless")
     def all(self) -> List[Stream]:
         """Get all the results represented by this query as a list.
 
@@ -329,8 +333,14 @@ class StreamQuery:
         """
         return self.fmt_streams
 
+    def __getitem__(self, i: Union[slice, int]):
+        return self.fmt_streams[i]
 
-class CaptionQuery:
+    def __len__(self) -> int:
+        return len(self.fmt_streams)
+
+
+class CaptionQuery(Sequence):
     """Interface for querying the available captions."""
 
     def __init__(self, captions: List[Caption]):
@@ -355,6 +365,7 @@ class CaptionQuery:
         """
         return self.lang_code_index.get(lang_code)
 
+    @deprecated("This object can be treated as a list, all() is useless")
     def all(self) -> List[Caption]:
         """Get all the results represented by this query as a list.
 
@@ -362,3 +373,9 @@ class CaptionQuery:
 
         """
         return self.captions
+
+    def __getitem__(self, i: Union[slice, int]):
+        return self.captions[i]
+
+    def __len__(self) -> int:
+        return len(self.captions)

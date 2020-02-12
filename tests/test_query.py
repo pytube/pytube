@@ -3,11 +3,6 @@
 import pytest
 
 
-def test_count(cipher_signature):
-    """Ensure :meth:`~pytube.StreamQuery.count` returns an accurate amount."""
-    assert cipher_signature.streams.count() == 22
-
-
 @pytest.mark.parametrize(
     ("test_input", "expected"),
     [
@@ -30,7 +25,7 @@ def test_count(cipher_signature):
 )
 def test_filters(test_input, expected, cipher_signature):
     """Ensure filters produce the expected results."""
-    result = [s.itag for s in cipher_signature.streams.filter(**test_input).all()]
+    result = [s.itag for s in cipher_signature.streams.filter(**test_input)]
     assert result == expected
 
 
@@ -64,8 +59,7 @@ def test_order_by(cipher_signature):
     :class:`Stream <Stream>` instances in the expected order.
     """
     itags = [
-        s.itag
-        for s in cipher_signature.streams.filter(type="audio").order_by("itag").all()
+        s.itag for s in cipher_signature.streams.filter(type="audio").order_by("itag")
     ]
     assert itags == [140, 249, 250, 251]
 
@@ -77,10 +71,7 @@ def test_order_by_descending(cipher_signature):
     # numerical values
     itags = [
         s.itag
-        for s in cipher_signature.streams.filter(type="audio")
-        .order_by("itag")
-        .desc()
-        .all()
+        for s in cipher_signature.streams.filter(type="audio").order_by("itag").desc()
     ]
     assert itags == [251, 250, 249, 140]
 
@@ -91,7 +82,6 @@ def test_order_by_non_numerical(cipher_signature):
         for s in cipher_signature.streams.filter(res="360p")
         .order_by("mime_type")
         .desc()
-        .all()
     ]
     assert mime_types == ["video/webm", "video/mp4", "video/mp4"]
 
@@ -103,10 +93,7 @@ def test_order_by_ascending(cipher_signature):
     # numerical values
     itags = [
         s.itag
-        for s in cipher_signature.streams.filter(type="audio")
-        .order_by("itag")
-        .asc()
-        .all()
+        for s in cipher_signature.streams.filter(type="audio").order_by("itag").asc()
     ]
     assert itags == [140, 249, 250, 251]
 
@@ -114,16 +101,13 @@ def test_order_by_ascending(cipher_signature):
 def test_order_by_non_numerical_ascending(cipher_signature):
     mime_types = [
         s.mime_type
-        for s in cipher_signature.streams.filter(res="360p")
-        .order_by("mime_type")
-        .asc()
-        .all()
+        for s in cipher_signature.streams.filter(res="360p").order_by("mime_type").asc()
     ]
     assert mime_types == ["video/mp4", "video/mp4", "video/webm"]
 
 
 def test_order_by_with_none_values(cipher_signature):
-    abrs = [s.abr for s in cipher_signature.streams.order_by("abr").asc().all()]
+    abrs = [s.abr for s in cipher_signature.streams.order_by("abr").asc()]
     assert abrs == ["50kbps", "70kbps", "96kbps", "128kbps", "160kbps"]
 
 
@@ -151,7 +135,7 @@ def test_get_highest_resolution(cipher_signature):
 
 
 def test_filter_is_dash(cipher_signature):
-    streams = cipher_signature.streams.filter(is_dash=False).all()
+    streams = cipher_signature.streams.filter(is_dash=False)
     itags = [s.itag for s in streams]
     assert itags == [18, 398, 397, 396, 395, 394]
 
@@ -162,3 +146,8 @@ def test_get_audio_only(cipher_signature):
 
 def test_get_audio_only_with_subtype(cipher_signature):
     assert cipher_signature.streams.get_audio_only(subtype="webm").itag == 251
+
+
+def test_sequence(cipher_signature):
+    assert len(cipher_signature.streams) == 22
+    assert cipher_signature.streams[0] is not None
