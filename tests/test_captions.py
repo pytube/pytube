@@ -103,6 +103,9 @@ def test_repr():
     )
     assert str(caption) == '<Caption lang="name1" code="en">'
 
+    caption_query = CaptionQuery(captions=[caption])
+    assert repr(caption_query) == '[<Caption lang="name1" code="en">]'
+
 
 @mock.patch("pytube.request.get")
 def test_xml_captions(request_get):

@@ -327,16 +327,18 @@ class StreamQuery(Sequence):
             pass
 
     @deprecated("Get the size of this list directly using len()")
-    def count(self) -> int:
-        """Get the count the query would return.
+    def count(self, value: Optional[str] = None) -> int:  # pragma: no cover
+        """Get the count of items in the list.
 
         :rtype: int
-
         """
-        return len(self)
+        if value:
+            return self.fmt_streams.count(value)
+        else:
+            return len(self)
 
     @deprecated("This object can be treated as a list, all() is useless")
-    def all(self) -> List[Stream]:
+    def all(self) -> List[Stream]:  # pragma: no cover
         """Get all the results represented by this query as a list.
 
         :rtype: list
@@ -380,7 +382,7 @@ class CaptionQuery(Sequence):
         return self.lang_code_index.get(lang_code)
 
     @deprecated("This object can be treated as a list, all() is useless")
-    def all(self) -> List[Caption]:
+    def all(self) -> List[Caption]:  # pragma: no cover
         """Get all the results represented by this query as a list.
 
         :rtype: list

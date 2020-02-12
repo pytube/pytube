@@ -159,3 +159,15 @@ def test_otf(cipher_signature):
 
     otf = cipher_signature.streams.otf(True).all()
     assert len(otf) == 0
+
+
+def test_repr(cipher_signature):
+    assert repr(
+        cipher_signature.streams.filter(
+            progressive=True, subtype="mp4", resolution="360p"
+        )
+    ) == (
+        '[<Stream: itag="18" mime_type="video/mp4" '
+        'res="360p" fps="30fps" vcodec="avc1.42001E" '
+        'acodec="mp4a.40.2" progressive="True" type="video">]'
+    )

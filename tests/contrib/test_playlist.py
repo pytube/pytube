@@ -82,6 +82,29 @@ def test_video_urls(request_get, playlist_html):
 
 
 @mock.patch("pytube.contrib.playlist.request.get")
+def test_repr(request_get, playlist_html):
+    url = "https://www.fakeurl.com/playlist?list=whatever"
+    request_get.return_value = playlist_html
+    playlist = Playlist(url)
+    playlist._find_load_more_url = MagicMock(return_value=None)
+    request_get.assert_called()
+    assert (
+        repr(playlist) == "['https://www.youtube.com/watch?v=ujTCoH21GlA', "
+        "'https://www.youtube.com/watch?v=45ryDIPHdGg', "
+        "'https://www.youtube.com/watch?v=1BYu65vLKdA', "
+        "'https://www.youtube.com/watch?v=3AQ_74xrch8', "
+        "'https://www.youtube.com/watch?v=ddqQUz9mZaM', "
+        "'https://www.youtube.com/watch?v=vwLT6bZrHEE', "
+        "'https://www.youtube.com/watch?v=TQKI0KE-JYY', "
+        "'https://www.youtube.com/watch?v=dNBvQ38MlT8', "
+        "'https://www.youtube.com/watch?v=JHxyrMgOUWI', "
+        "'https://www.youtube.com/watch?v=l2I8NycJMCY', "
+        "'https://www.youtube.com/watch?v=g1Zbuk1gAfk', "
+        "'https://www.youtube.com/watch?v=zixd-si9Q-o']"
+    )
+
+
+@mock.patch("pytube.contrib.playlist.request.get")
 def test_sequence(request_get, playlist_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.return_value = playlist_html

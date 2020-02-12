@@ -155,7 +155,7 @@ class Playlist(Sequence):
     @deprecated(
         "This call is unnecessary, you can directly access .video_urls or .videos"
     )
-    def populate_video_urls(self) -> List[str]:
+    def populate_video_urls(self) -> List[str]:  # pragma: no cover
         """Complete links of all the videos in playlist
 
         :rtype: List[str]
