@@ -149,6 +149,9 @@ class Playlist(Sequence):
     def __len__(self) -> int:
         return len(self.video_urls)
 
+    def __repr__(self) -> str:
+        return f"{self.video_urls}"
+
     @deprecated(
         "This call is unnecessary, you can directly access .video_urls or .videos"
     )

@@ -350,6 +350,9 @@ class StreamQuery(Sequence):
     def __len__(self) -> int:
         return len(self.fmt_streams)
 
+    def __repr__(self) -> str:
+        return f"{self.fmt_streams}"
+
 
 class CaptionQuery(Sequence):
     """Interface for querying the available captions."""
@@ -390,3 +393,6 @@ class CaptionQuery(Sequence):
 
     def __len__(self) -> int:
         return len(self.captions)
+
+    def __repr__(self) -> str:
+        return f"{self.captions}"
