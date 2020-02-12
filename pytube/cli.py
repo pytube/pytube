@@ -266,9 +266,18 @@ def ffmpeg_process(
     target = target or os.getcwd()
 
     if resolution == "best":
-        video_stream = (
+        highest_quality_stream = (
             youtube.streams.filter(progressive=False).order_by("resolution").last()
         )
+        mp4_stream = (
+            youtube.streams.filter(progressive=False, subtype="mp4")
+            .order_by("resolution")
+            .last()
+        )
+        if highest_quality_stream.resolution == mp4_stream.resolution:
+            video_stream = mp4_stream
+        else:
+            video_stream = highest_quality_stream
     else:
         video_stream = youtube.streams.filter(
             progressive=False, resolution=resolution, subtype="mp4"

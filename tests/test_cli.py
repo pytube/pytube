@@ -380,7 +380,11 @@ def test_ffmpeg_process_audio_fallback_none_should_exit(_ffmpeg_downloader, yout
     streams = MagicMock()
     youtube.streams = streams
     stream = MagicMock()
-    streams.filter.return_value.order_by.return_value.last.side_effect = [stream, None]
+    streams.filter.return_value.order_by.return_value.last.side_effect = [
+        stream,
+        stream,
+        None,
+    ]
     streams.get_audio_only.return_value = None
     # When
     with pytest.raises(SystemExit):
