@@ -77,3 +77,8 @@ def test_mime_type_codec():
 def test_mime_type_codec_with_no_match_should_error():
     with pytest.raises(RegexMatchError):
         extract.mime_type_codec("audio/webm")
+
+
+def test_get_ytplayer_config_with_no_match_should_error():
+    with pytest.raises(RegexMatchError):
+        extract.get_ytplayer_config("")

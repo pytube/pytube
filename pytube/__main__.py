@@ -22,7 +22,7 @@ from pytube import Stream
 from pytube import StreamQuery
 from pytube.extract import apply_descrambler, apply_signature, get_ytplayer_config
 from pytube.helpers import install_proxy
-from pytube.exceptions import VideoUnavailable
+from pytube.exceptions import VideoUnavailable, LiveStreamError
 from pytube.monostate import OnProgress, OnComplete, Monostate
 
 logger = logging.getLogger(__name__)
@@ -131,17 +131,13 @@ class YouTube:
                 apply_descrambler(self.vid_info, fmt)
             apply_descrambler(self.player_config_args, fmt)
 
-            try:
-                apply_signature(
-                    self.player_config_args, fmt, self.js  # type: ignore
-                )
-            except TypeError:
+            if not self.js:
                 if not self.embed_html:
                     self.embed_html = request.get(url=self.embed_url)
                 self.js_url = extract.js_url(self.embed_html)
                 self.js = request.get(self.js_url)
-                assert self.js is not None
-                apply_signature(self.player_config_args, fmt, self.js)
+
+            apply_signature(self.player_config_args, fmt, self.js)
 
             # build instances of :class:`Stream <Stream>`
             self.initialize_stream_objects(fmt)
@@ -162,17 +158,17 @@ class YouTube:
         which blocks for long periods of time.
 
         :rtype: None
-
         """
         self.watch_html = request.get(url=self.watch_url)
         if self.watch_html is None:
             raise VideoUnavailable(video_id=self.video_id)
         self.age_restricted = extract.is_age_restricted(self.watch_html)
-        if not self.age_restricted and (
-            "yt-badge-live" in self.watch_html
-            or "This video is private" in self.watch_html
-        ):
-            raise VideoUnavailable(video_id=self.video_id)
+
+        if not self.age_restricted:
+            if "yt-badge-live" in self.watch_html:
+                raise LiveStreamError(self.video_id)
+            if "This video is private" in self.watch_html:
+                raise VideoUnavailable(video_id=self.video_id)
 
         if self.age_restricted:
             if not self.embed_html:

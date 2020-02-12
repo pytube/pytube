@@ -231,7 +231,7 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
             url: str = stream["url"]
         except KeyError:
             if live_stream:
-                raise LiveStreamError("Video is currently being streamed live")
+                raise LiveStreamError("UNKNOWN")
         # 403 Forbidden fix.
         if "signature" in url or (
             "s" not in stream and ("&sig=" in url or "&lsig=" in url)
@@ -242,12 +242,7 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
             logger.debug("signature found, skip decipher")
             continue
 
-        if js is not None:
-            signature = cipher.get_signature(ciphered_signature=stream["s"])
-        else:
-            # signature not present in url (line 33), need js to descramble
-            # TypeError caught in __main__
-            raise TypeError("JS is None")
+        signature = cipher.get_signature(ciphered_signature=stream["s"])
 
         logger.debug("finished descrambling signature for itag=%s", stream["itag"])
         # 403 forbidden fix

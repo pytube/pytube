@@ -35,6 +35,15 @@ class RegexMatchError(ExtractError):
 class LiveStreamError(ExtractError):
     """Video is a live stream."""
 
+    def __init__(self, video_id: str):
+        """
+        :param str video_id:
+            A YouTube video identifier.
+        """
+        super().__init__(f"{video_id} is streaming live and cannot be loaded")
+
+        self.video_id = video_id
+
 
 class VideoUnavailable(PytubeError):
     """Video is unavailable."""

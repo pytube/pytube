@@ -2,6 +2,8 @@
 from unittest import mock
 from unittest.mock import patch, mock_open, MagicMock
 
+import pytest
+
 from pytube import Caption, CaptionQuery, captions
 
 
@@ -12,7 +14,7 @@ def test_float_to_srt_time_format():
     assert caption1.float_to_srt_time_format(3.89) == "00:00:03,890"
 
 
-def test_caption_query_all():
+def test_caption_query_sequence():
     caption1 = Caption(
         {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
     )
@@ -20,7 +22,11 @@ def test_caption_query_all():
         {"url": "url2", "name": {"simpleText": "name2"}, "languageCode": "fr"}
     )
     caption_query = CaptionQuery(captions=[caption1, caption2])
-    assert caption_query.captions == [caption1, caption2]
+    assert len(caption_query) == 2
+    assert caption_query["en"] == caption1
+    assert caption_query["fr"] == caption2
+    with pytest.raises(KeyError):
+        caption_query["nada"]
 
 
 def test_caption_query_get_by_language_code_when_exists():
@@ -100,6 +106,9 @@ def test_repr():
         {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
     )
     assert str(caption) == '<Caption lang="name1" code="en">'
+
+    caption_query = CaptionQuery(captions=[caption])
+    assert repr(caption_query) == '{\'en\': <Caption lang="name1" code="en">}'
 
 
 @mock.patch("pytube.request.get")

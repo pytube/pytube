@@ -45,7 +45,7 @@ def test_caption_tracks(presigned_video):
 
 
 def test_captions(presigned_video):
-    assert len(presigned_video.captions.all()) == 13
+    assert len(presigned_video.captions) == 13
 
 
 def test_description(cipher_signature):
