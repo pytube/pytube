@@ -48,7 +48,7 @@ def presigned_video():
 @pytest.fixture
 def age_restricted():
     """Youtube instance initialized with video id zRbsm3e2ltw."""
-    filename = "yt-video-zRbsm3e2ltw-1507777044.json.gz"
+    filename = "yt-video-irauhITDrsE.json.gz"
     return load_playback_file(filename)
 
 

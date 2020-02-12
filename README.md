@@ -36,14 +36,12 @@ $ pip install pytube3 --upgrade
 ## Quick start
 ```python
  >>> from pytube import YouTube
- >>> YouTube('https://youtu.be/9bZkp7q19f0').streams.first().download()
+ >>> YouTube('https://youtu.be/9bZkp7q19f0').streams[0].download()
  >>>
  >>> yt = YouTube('http://youtube.com/watch?v=9bZkp7q19f0')
  >>> yt.streams
   ... .filter(progressive=True, file_extension='mp4')
-  ... .order_by('resolution')
-  ... .desc()
-  ... .first()
+  ... .order_by('resolution')[-1]
   ... .download()
 ```
 
@@ -64,7 +62,7 @@ Let's begin with showing how easy it is to download a video with pytube:
 
 ```python
 >>> from pytube import YouTube
->>> YouTube('http://youtube.com/watch?v=9bZkp7q19f0').streams.first().download()
+>>> YouTube('http://youtube.com/watch?v=9bZkp7q19f0').streams[0].download()
 ```
 This example will download the highest quality progressive download stream available.
 
@@ -72,7 +70,7 @@ Next, let's explore how we would view what video streams are available:
 
 ```python
 >>> yt = YouTube('http://youtube.com/watch?v=9bZkp7q19f0')
->>> yt.streams.all()
+>>> print(yt.streams)
  [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
  <Stream: itag="43" mime_type="video/webm" res="360p" fps="30fps" vcodec="vp8.0" acodec="vorbis">,
  <Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">,
@@ -108,7 +106,7 @@ The legacy streams that contain the audio and video in a single file (referred t
 To only view these progressive download streams:
 
 ```python
- >>> yt.streams.filter(progressive=True).all()
+ >>> yt.streams.filter(progressive=True)
   [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
   <Stream: itag="43" mime_type="video/webm" res="360p" fps="30fps" vcodec="vp8.0" acodec="vorbis">,
   <Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">,
@@ -119,7 +117,7 @@ To only view these progressive download streams:
 Conversely, if you only want to see the DASH streams (also referred to as "adaptive") you can do:
 
 ```python
->>> yt.streams.filter(adaptive=True).all()
+>>> yt.streams.filter(adaptive=True)
  [<Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028">,
   <Stream: itag="248" mime_type="video/webm" res="1080p" fps="30fps" vcodec="vp9">,
   <Stream: itag="136" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.4d401f">,
@@ -146,7 +144,7 @@ You can also download a complete Youtube playlist:
 ```python
 >>> from pytube import Playlist
 >>> playlist = Playlist("https://www.youtube.com/playlist?list=PLynhp4cZEpTbRs_PYISQ8v_uwO0_mDg_X")
->>> for video in playlist.videos:
+>>> for video in playlist:
 >>> 	video.streams.get_highest_resolution().download()
 ```
 This will download the highest progressive stream available (generally 720p) from the given playlist.
@@ -158,7 +156,7 @@ Pytube allows you to filter on every property available (see the documentation f
 To list the audio only streams:
 
 ```python
->>> yt.streams.filter(only_audio=True).all()
+>>> yt.streams.filter(only_audio=True)
   [<Stream: itag="140" mime_type="audio/mp4" abr="128kbps" acodec="mp4a.40.2">,
   <Stream: itag="171" mime_type="audio/webm" abr="128kbps" acodec="vorbis">,
   <Stream: itag="249" mime_type="audio/webm" abr="50kbps" acodec="opus">,
@@ -169,7 +167,7 @@ To list the audio only streams:
 To list only ``mp4`` streams:
 
 ```python
->>> yt.streams.filter(subtype='mp4').all()
+>>> yt.streams.filter(subtype='mp4')
  [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
   <Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">,
   <Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" vcodec="avc1.640028">,
@@ -184,9 +182,9 @@ To list only ``mp4`` streams:
 Multiple filters can also be specified:
 
 ```python
->>> yt.streams.filter(subtype='mp4', progressive=True).all()
+>>> yt.streams.filter(subtype='mp4', progressive=True)
 >>> # this can also be expressed as:
->>> yt.streams.filter(subtype='mp4').filter(progressive=True).all()
+>>> yt.streams.filter(subtype='mp4').filter(progressive=True)
   [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2">,
   <Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2">]
 ```
@@ -200,7 +198,7 @@ You also have an interface to select streams by their itag, without needing to f
 If you need to optimize for a specific feature, such as the "highest resolution" or "lowest average bitrate":
 
 ```python
->>> yt.streams.filter(progressive=True).order_by('resolution').desc().all()
+>>> yt.streams.filter(progressive=True).order_by('resolution').desc()
 ```
 Note: Using ``order_by`` on a given attribute will filter out all streams missing that attribute.
 

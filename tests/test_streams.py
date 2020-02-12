@@ -14,6 +14,15 @@ def test_filesize(cipher_signature, mocker):
     assert cipher_signature.streams.first().filesize == 6796391
 
 
+def test_filesize_approx(cipher_signature, mocker):
+    mocker.patch.object(request, "head")
+    request.head.return_value = {"content-length": "123"}
+    stream = cipher_signature.streams.first()
+    assert stream.filesize_approx == 22350604
+    stream.bitrate = None
+    assert stream.filesize_approx == 123
+
+
 def test_default_filename(cipher_signature):
     expected = "PSY - GANGNAM STYLE(강남스타일) MV.mp4"
     stream = cipher_signature.streams.first()
@@ -21,19 +30,14 @@ def test_default_filename(cipher_signature):
 
 
 def test_title(cipher_signature):
-    expected = "PSY - GANGNAM STYLE(강남스타일) M/V"
-    stream = cipher_signature.streams.first()
-    assert stream.title == expected
+    expected = "title"
+    cipher_signature.player_config_args["title"] = expected
+    assert cipher_signature.title == expected
 
-    expected = "PSY - GANGNAM STYLE(강남스타일)"
-    stream.player_config_args = {
-        "player_response": {"videoDetails": {"title": expected}},
-    }
-    assert stream.title == expected
-
-    expected = "Unknown YouTube Video Title"
-    stream.player_config_args = {}
-    assert stream.title == expected
+    expected = "title2"
+    del cipher_signature.player_config_args["title"]
+    cipher_signature.player_response = {"videoDetails": {"title": expected}}
+    assert cipher_signature.title == expected
 
 
 def test_caption_tracks(presigned_video):
@@ -41,7 +45,7 @@ def test_caption_tracks(presigned_video):
 
 
 def test_captions(presigned_video):
-    assert len(presigned_video.captions.all()) == 13
+    assert len(presigned_video.captions) == 13
 
 
 def test_description(cipher_signature):

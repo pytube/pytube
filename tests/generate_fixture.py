@@ -19,6 +19,7 @@ output = {
     "watch_html": yt.watch_html,
     "video_info": yt.vid_info,
     "js": yt.js,
+    "embed_html": yt.embed_html,
 }
 
 outpath = path.join(currentdir, "mocks", "yt-video-" + yt.video_id + ".json")

@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 """This module provides a query interface for media streams and captions."""
-from typing import List, Optional
+from typing import Callable, List, Optional, Union
+from collections.abc import Mapping, Sequence
 
 from pytube import Stream, Caption
+from pytube.helpers import deprecated
 
 
-class StreamQuery:
+class StreamQuery(Sequence):
     """Interface for querying the available media streams."""
 
     def __init__(self, fmt_streams):
@@ -168,9 +170,12 @@ class StreamQuery:
         if is_dash is not None:
             filters.append(lambda s: s.is_dash == is_dash)
 
+        return self._filter(filters)
+
+    def _filter(self, filters: List[Callable]) -> "StreamQuery":
         fmt_streams = self.fmt_streams
-        for fn in filters:
-            fmt_streams = filter(fn, fmt_streams)
+        for filter_lambda in filters:
+            fmt_streams = filter(filter_lambda, fmt_streams)
         return StreamQuery(list(fmt_streams))
 
     def order_by(self, attribute_name: str) -> "StreamQuery":
@@ -281,9 +286,17 @@ class StreamQuery:
         :returns:
             The :class:`Stream <Stream>` matching the given itag or None if
             not found.
-
         """
         return self.filter(only_audio=True, subtype=subtype).order_by("abr").last()
+
+    def otf(self, is_otf: bool = False) -> "StreamQuery":
+        """Filter stream by OTF, useful if some streams have 404 URLs
+
+        :param bool is_otf: Set to False to retrieve only non-OTF streams
+        :rtype: :class:`StreamQuery <StreamQuery>`
+        :returns: A StreamQuery object with otf filtered streams
+        """
+        return self._filter([lambda s: s.is_otf == is_otf])
 
     def first(self) -> Optional[Stream]:
         """Get the first :class:`Stream <Stream>` in the results.
@@ -313,15 +326,19 @@ class StreamQuery:
         except IndexError:
             pass
 
-    def count(self) -> int:
-        """Get the count the query would return.
+    @deprecated("Get the size of this list directly using len()")
+    def count(self, value: Optional[str] = None) -> int:  # pragma: no cover
+        """Get the count of items in the list.
 
         :rtype: int
-
         """
-        return len(self.fmt_streams)
+        if value:
+            return self.fmt_streams.count(value)
 
-    def all(self) -> List[Stream]:
+        return len(self)
+
+    @deprecated("This object can be treated as a list, all() is useless")
+    def all(self) -> List[Stream]:  # pragma: no cover
         """Get all the results represented by this query as a list.
 
         :rtype: list
@@ -329,8 +346,17 @@ class StreamQuery:
         """
         return self.fmt_streams
 
+    def __getitem__(self, i: Union[slice, int]):
+        return self.fmt_streams[i]
 
-class CaptionQuery:
+    def __len__(self) -> int:
+        return len(self.fmt_streams)
+
+    def __repr__(self) -> str:
+        return f"{self.fmt_streams}"
+
+
+class CaptionQuery(Mapping):
     """Interface for querying the available captions."""
 
     def __init__(self, captions: List[Caption]):
@@ -340,9 +366,9 @@ class CaptionQuery:
             list of :class:`Caption <Caption>` instances.
 
         """
-        self.captions = captions
         self.lang_code_index = {c.code: c for c in captions}
 
+    @deprecated("This object can be treated as a dictionary, i.e. captions['en']")
     def get_by_language_code(self, lang_code: str) -> Optional[Caption]:
         """Get the :class:`Caption <Caption>` for a given ``lang_code``.
 
@@ -355,10 +381,23 @@ class CaptionQuery:
         """
         return self.lang_code_index.get(lang_code)
 
-    def all(self) -> List[Caption]:
+    @deprecated("This object can be treated as a dictionary")
+    def all(self) -> List[Caption]:  # pragma: no cover
         """Get all the results represented by this query as a list.
 
         :rtype: list
 
         """
-        return self.captions
+        return list(self.lang_code_index.values())
+
+    def __getitem__(self, i: str):
+        return self.lang_code_index[i]
+
+    def __len__(self) -> int:
+        return len(self.lang_code_index)
+
+    def __iter__(self):
+        return iter(self.lang_code_index)
+
+    def __repr__(self) -> str:
+        return f"{self.lang_code_index}"
