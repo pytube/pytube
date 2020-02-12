@@ -22,7 +22,7 @@ from pytube import Stream
 from pytube import StreamQuery
 from pytube.extract import apply_descrambler, apply_signature, get_ytplayer_config
 from pytube.helpers import install_proxy
-from pytube.exceptions import VideoUnavailable
+from pytube.exceptions import VideoUnavailable, LiveStreamError
 from pytube.monostate import OnProgress, OnComplete, Monostate
 
 logger = logging.getLogger(__name__)
@@ -162,17 +162,17 @@ class YouTube:
         which blocks for long periods of time.
 
         :rtype: None
-
         """
         self.watch_html = request.get(url=self.watch_url)
         if self.watch_html is None:
             raise VideoUnavailable(video_id=self.video_id)
         self.age_restricted = extract.is_age_restricted(self.watch_html)
-        if not self.age_restricted and (
-            "yt-badge-live" in self.watch_html
-            or "This video is private" in self.watch_html
-        ):
-            raise VideoUnavailable(video_id=self.video_id)
+
+        if not self.age_restricted:
+            if "yt-badge-live" in self.watch_html:
+                raise LiveStreamError(self.video_id)
+            if "This video is private" in self.watch_html:
+                raise VideoUnavailable(video_id=self.video_id)
 
         if self.age_restricted:
             if not self.embed_html:

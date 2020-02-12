@@ -231,7 +231,7 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
             url: str = stream["url"]
         except KeyError:
             if live_stream:
-                raise LiveStreamError("Video is currently being streamed live")
+                raise LiveStreamError("UNKNOWN")
         # 403 Forbidden fix.
         if "signature" in url or (
             "s" not in stream and ("&sig=" in url or "&lsig=" in url)
