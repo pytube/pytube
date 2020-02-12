@@ -258,9 +258,7 @@ def test_ffmpeg_process_best_should_download(_ffmpeg_downloader, youtube):
     streams = MagicMock()
     youtube.streams = streams
     video_stream = MagicMock()
-    streams.filter.return_value.order_by.return_value.desc.return_value.first.return_value = (
-        video_stream
-    )
+    streams.filter.return_value.order_by.return_value.last.return_value = video_stream
     audio_stream = MagicMock()
     streams.get_audio_only.return_value = audio_stream
     # When
@@ -305,6 +303,38 @@ def test_ffmpeg_process_res_none_should_not_download(_ffmpeg_downloader, youtube
         cli.ffmpeg_process(youtube, "XYZp", target)
     # Then
     _ffmpeg_downloader.assert_not_called()
+
+
+@mock.patch("pytube.cli.os.unlink", return_value=None)
+@mock.patch("pytube.cli.subprocess.run", return_value=None)
+@mock.patch("pytube.cli._download", return_value=None)
+@mock.patch("pytube.cli._unique_name", return_value=None)
+def test_ffmpeg_downloader(unique_name, download, run, unlink):
+    # Given
+    target = "target"
+    audio_stream = MagicMock()
+    video_stream = MagicMock()
+    video_stream.id = "video_id"
+    video_stream.subtype = "video_subtype"
+    unique_name.side_effect = ["video_name", "audio_name"]
+
+    # When
+    cli._ffmpeg_downloader(
+        audio_stream=audio_stream, video_stream=video_stream, target=target
+    )
+    # Then
+    download.assert_called()
+    run.assert_called_with([
+            "ffmpeg",
+            "-i",
+            f"target/video_name",
+            "-i",
+            f"target/audio_name",
+            "-codec",
+            "copy",
+            f"target/safe_title.video_subtype",
+        ])
+    unlink.assert_called()
 
 
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)

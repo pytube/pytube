@@ -267,10 +267,7 @@ def ffmpeg_process(
 
     if resolution == "best":
         video_stream = (
-            youtube.streams.filter(progressive=False)
-            .order_by("resolution")
-            .desc()
-            .first()
+            youtube.streams.filter(progressive=False).order_by("resolution").last()
         )
     else:
         video_stream = youtube.streams.filter(
