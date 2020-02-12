@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """A simple command line application to download youtube videos."""
 
 import argparse
@@ -226,9 +227,7 @@ def _download(
     sys.stdout.write("\n")
 
 
-def unique_name(
-    base: str, subtype: Optional[str], video_audio: str, target: str
-) -> str:
+def _unique_name(base: str, subtype: str, media_type: str, target: str) -> str:
     """
     Given a base name, the file format, and the target directory, will generate
     a filename unique for that directory and file format.
@@ -236,15 +235,17 @@ def unique_name(
         The given base-name.
     :param str subtype:
         The filetype of the video which will be downloaded.
+    :param str media_type:
+        The media_type of the file, ie. "audio" or "video"
     :param Path target:
         Target directory for download.
     """
     counter = 0
     while True:
-        name = f"{base}_{video_audio}_{counter}"
-        unique = os.path.join(target, f"{name}.{subtype}")
-        if not os.path.exists(unique):
-            return str(name)
+        file_name = f"{base}_{media_type}_{counter}.{subtype}"
+        file_path = os.path.join(target, file_name)
+        if not os.path.exists(file_path):
+            return file_path
         counter += 1
 
 
@@ -252,7 +253,7 @@ def ffmpeg_process(
     youtube: YouTube, resolution: str, target: Optional[str] = None
 ) -> None:
     """
-    Decides the correct video stream to download, then calls ffmpeg_downloader.
+    Decides the correct video stream to download, then calls _ffmpeg_downloader.
 
     :param YouTube youtube:
         A valid YouTube object.
@@ -262,79 +263,69 @@ def ffmpeg_process(
         Target directory for download
     """
     youtube.register_on_progress_callback(on_progress)
-    if target is None:
-        target = os.getcwd()
+    target = target or os.getcwd()
 
     if resolution == "best":
-        highest_quality = (
+        video_stream = (
             youtube.streams.filter(progressive=False)
             .order_by("resolution")
             .desc()
             .first()
         )
-
-        video_stream = (
-            youtube.streams.filter(progressive=False, subtype="mp4")
-            .order_by("resolution")
-            .desc()
-            .first()
-        )
-
-        if highest_quality.resolution == video_stream.resolution:
-            ffmpeg_downloader(youtube=youtube, stream=video_stream, target=target)
-        else:
-            ffmpeg_downloader(youtube=youtube, stream=highest_quality, target=target)
     else:
         video_stream = youtube.streams.filter(
             progressive=False, resolution=resolution, subtype="mp4"
         ).first()
-        if video_stream is not None:
-            ffmpeg_downloader(youtube=youtube, stream=video_stream, target=target)
-        else:
+        if not video_stream:
             video_stream = youtube.streams.filter(
                 progressive=False, resolution=resolution
             ).first()
-            if video_stream is None:
-                print(f"Could not find a stream with resolution: {resolution}")
-                print("Try one of these:")
-                display_streams(youtube)
-                sys.exit()
-            ffmpeg_downloader(youtube=youtube, stream=video_stream, target=target)
+    if video_stream is None:
+        print(f"Could not find a stream with resolution: {resolution}")
+        print("Try one of these:")
+        display_streams(youtube)
+        sys.exit()
+
+    audio_stream = youtube.streams.get_audio_only(video_stream.subtype)
+    if not audio_stream:
+        audio_stream = youtube.streams.filter(only_audio=True).order_by("abr").last()
+    if not audio_stream:
+        print("Could not find an audio only stream")
+        sys.exit()
+    _ffmpeg_downloader(
+        audio_stream=audio_stream, video_stream=video_stream, target=target
+    )
 
 
-def ffmpeg_downloader(youtube: YouTube, stream: Stream, target: str) -> None:
+def _ffmpeg_downloader(audio_stream: Stream, video_stream: Stream, target: str) -> None:
     """
     Given a YouTube Stream object, finds the correct audio stream, downloads them both
     giving them a unique name, them uses ffmpeg to create a new file with the audio
     and video from the previously downloaded files. Then deletes the original adaptive
     streams, leaving the combination.
 
-    :param YouTube youtube:
-        A valid YouTube object
-    :param Stream stream:
-        A valid Stream object
+    :param Stream audio_stream:
+        A valid Stream object representing the audio to download
+    :param Stream video_stream:
+        A valid Stream object representing the video to download
     :param Path target:
         A valid Path object
     """
-    audio_stream = (
-        youtube.streams.filter(only_audio=True, subtype=stream.subtype)
-        .order_by("abr")
-        .desc()
-        .first()
-    )
 
-    video_unique_name = unique_name(
-        safe_filename(stream.title), stream.subtype, "video", target=target
+    video_unique_name = _unique_name(
+        safe_filename(video_stream.title), video_stream.subtype, "video", target=target
     )
-    audio_unique_name = unique_name(
-        safe_filename(stream.title), stream.subtype, "audio", target=target
+    audio_unique_name = _unique_name(
+        safe_filename(video_stream.title), audio_stream.subtype, "audio", target=target
     )
-    _download(stream=stream, target=target, filename=video_unique_name)
+    _download(stream=video_stream, target=target, filename=video_unique_name)
     _download(stream=audio_stream, target=target, filename=audio_unique_name)
 
-    video_path = os.path.join(target, f"{video_unique_name}.{stream.subtype}")
-    audio_path = os.path.join(target, f"{audio_unique_name}.{stream.subtype}")
-    final_path = os.path.join(target, f"{safe_filename(stream.title)}.{stream.subtype}")
+    video_path = os.path.join(target, video_unique_name)
+    audio_path = os.path.join(target, audio_unique_name)
+    final_path = os.path.join(
+        target, f"{safe_filename(video_stream.title)}.{video_stream.subtype}"
+    )
 
     subprocess.run(  # nosec
         [

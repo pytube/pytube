@@ -220,17 +220,37 @@ def test_download_by_resolution_not_exists(youtube, stream_query):
 
 
 @mock.patch("pytube.cli.YouTube")
-@mock.patch("pytube.cli.Stream")
-def test_ffmpeg_downloader(youtube, stream):
+@mock.patch("pytube.cli.ffmpeg_process")
+def test_perform_args_should_ffmpeg_process(ffmpeg_process, youtube):
+    # Given
     parser = argparse.ArgumentParser()
     args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-f", "best"])
     cli._parse_args = MagicMock(return_value=args)
-    cli.safe_filename = MagicMock(return_value="PSY - GANGNAM STYLE(강남스타일) MV")
-    cli.subprocess.run = MagicMock()
-    cli.os.unlink = MagicMock()
-    cli.ffmpeg_downloader = MagicMock()
-    cli.main()
-    cli.ffmpeg_downloader.assert_called()
+    # When
+    cli._perform_args_on_youtube(youtube, args)
+    # Then
+    ffmpeg_process.assert_called_with(youtube=youtube, resolution="best", target=None)
+
+
+@mock.patch("pytube.cli.YouTube")
+@mock.patch("pytube.cli._ffmpeg_downloader")
+def test_ffmpeg_process_best_should_download(_ffmpeg_downloader, youtube):
+    # Given
+    target = "/target"
+    streams = MagicMock()
+    youtube.streams = streams
+    video_stream = MagicMock()
+    streams.filter.return_value.order_by.return_value.desc.return_value.first.return_value = (
+        video_stream
+    )
+    audio_stream = MagicMock()
+    streams.get_audio_only.return_value = audio_stream
+    # When
+    cli.ffmpeg_process(youtube, "best", target)
+    # Then
+    _ffmpeg_downloader.assert_called_with(
+        audio_stream=audio_stream, video_stream=video_stream, target=target
+    )
 
 
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
@@ -242,17 +262,6 @@ def test_download_audio(youtube):
     cli.main()
     youtube.assert_called()
     cli.download_audio.assert_called()
-
-
-@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
-def test_ffmpeg_process(youtube):
-    parser = argparse.ArgumentParser()
-    args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-f", "2160p"])
-    cli._parse_args = MagicMock(return_value=args)
-    cli.ffmpeg_process = MagicMock()
-    cli.main()
-    youtube.assert_called()
-    cli.ffmpeg_process.assert_called()
 
 
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
