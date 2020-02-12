@@ -426,11 +426,11 @@ def download_caption(
         _print_available_captions(youtube.captions)
         return
 
-    caption = youtube.captions.get_by_language_code(lang_code=lang_code)
-    if caption:
+    try:
+        caption = youtube.captions[lang_code]
         downloaded_path = caption.download(title=youtube.title, output_path=target)
         print(f"Saved caption file to: {downloaded_path}")
-    else:
+    except KeyError:
         print(f"Unable to find caption with code: {lang_code}")
         _print_available_captions(youtube.captions)
 

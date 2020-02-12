@@ -38,7 +38,7 @@ def test_caption_query_get_by_language_code_when_exists():
         {"url": "url2", "name": {"simpleText": "name2"}, "languageCode": "fr"}
     )
     caption_query = CaptionQuery(captions=[caption1, caption2])
-    assert caption_query.get_by_language_code("en") == caption1
+    assert caption_query["en"] == caption1
 
 
 def test_caption_query_get_by_language_code_when_not_exists():
@@ -49,7 +49,9 @@ def test_caption_query_get_by_language_code_when_not_exists():
         {"url": "url2", "name": {"simpleText": "name2"}, "languageCode": "fr"}
     )
     caption_query = CaptionQuery(captions=[caption1, caption2])
-    assert caption_query.get_by_language_code("hello") is None
+    with pytest.raises(KeyError):
+        not_found = caption_query["hello"]
+        assert not_found is not None  # should never reach here
 
 
 @mock.patch("pytube.captions.Caption.generate_srt_captions")
