@@ -79,7 +79,7 @@ def test_download_caption_with_language_found(youtube):
 
 @mock.patch("pytube.cli._print_available_captions")
 @mock.patch("pytube.cli.YouTube")
-def test_download_caption_with_none(youtube, print_available):
+def test_download_caption_with_lang_not_found(youtube, print_available):
     # Given
     caption = Caption(
         {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
