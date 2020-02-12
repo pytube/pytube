@@ -194,14 +194,23 @@ def test_download_by_resolution_flag(youtube, download_by_resolution):
     download_by_resolution.assert_called()
 
 
+@mock.patch("pytube.cli.YouTube")
 @mock.patch("pytube.cli.Playlist")
-def test_download_with_playlist(playlist):
+@mock.patch("pytube.cli._perform_args_on_youtube")
+def test_download_with_playlist(perform_args_on_youtube, playlist, youtube):
+    # Given
     cli.safe_filename = MagicMock(return_value="safe_title")
     parser = argparse.ArgumentParser()
     args = parse_args(parser, ["https://www.youtube.com/playlist?list=PLyn"])
     cli._parse_args = MagicMock(return_value=args)
+    videos = [youtube]
+    playlist_instance = playlist.return_value
+    playlist_instance.videos = videos
+    # When
     cli.main()
+    # Then
     playlist.assert_called()
+    perform_args_on_youtube.assert_called_with(youtube, args)
 
 
 @mock.patch("pytube.cli.YouTube")
