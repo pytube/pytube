@@ -6,8 +6,9 @@ import json
 import logging
 import re
 from datetime import date, datetime
-from typing import List, Optional, Iterable, Dict
+from typing import List, Optional, Iterable, Dict, Union
 from urllib.parse import parse_qs
+from collections.abc import Sequence
 
 from pytube import request, YouTube
 from pytube.helpers import cache, deprecated, install_proxy, uniqueify
@@ -15,7 +16,7 @@ from pytube.helpers import cache, deprecated, install_proxy, uniqueify
 logger = logging.getLogger(__name__)
 
 
-class Playlist:
+class Playlist(Sequence):
     """Load a YouTube playlist with URL or ID"""
 
     def __init__(self, url: str, proxies: Optional[Dict[str, str]] = None):
@@ -141,6 +142,12 @@ class Playlist:
         :Yields: YouTube
         """
         yield from (YouTube(url) for url in self.video_urls)
+
+    def __getitem__(self, i: Union[slice, int]):
+        return self.video_urls[i]
+
+    def __len__(self) -> int:
+        return len(self.video_urls)
 
     @deprecated(
         "This call is unnecessary, you can directly access .video_urls or .videos"
