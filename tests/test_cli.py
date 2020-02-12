@@ -324,7 +324,8 @@ def test_ffmpeg_downloader(unique_name, download, run, unlink):
     )
     # Then
     download.assert_called()
-    run.assert_called_with([
+    run.assert_called_with(
+        [
             "ffmpeg",
             "-i",
             f"target/video_name",
@@ -333,19 +334,38 @@ def test_ffmpeg_downloader(unique_name, download, run, unlink):
             "-codec",
             "copy",
             f"target/safe_title.video_subtype",
-        ])
+        ]
+    )
     unlink.assert_called()
 
 
+@mock.patch("pytube.cli.download_audio")
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
-def test_download_audio(youtube):
+def test_download_audio_args(youtube, download_audio):
+    # Given
     parser = argparse.ArgumentParser()
     args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-a", "mp4"])
     cli._parse_args = MagicMock(return_value=args)
-    cli.download_audio = MagicMock()
+    # When
     cli.main()
+    # Then
     youtube.assert_called()
-    cli.download_audio.assert_called()
+    download_audio.assert_called()
+
+
+@mock.patch("pytube.cli._download")
+@mock.patch("pytube.cli.YouTube")
+def test_download_audio(youtube, download):
+    # Given
+    youtube_instance = youtube.return_value
+    audio_stream = MagicMock()
+    youtube_instance.streams.filter.return_value.order_by.return_value.last.return_value = (
+        audio_stream
+    )
+    # When
+    cli.download_audio(youtube_instance, "filetype", "target")
+    # Then
+    download.assert_called_with(audio_stream, target="target")
 
 
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)

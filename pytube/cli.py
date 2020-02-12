@@ -450,10 +450,7 @@ def download_audio(
         Target directory for download
     """
     audio = (
-        youtube.streams.filter(only_audio=True, subtype=filetype)
-        .order_by("abr")
-        .desc()
-        .first()
+        youtube.streams.filter(only_audio=True, subtype=filetype).order_by("abr").last()
     )
 
     if audio is None:
