@@ -77,66 +77,58 @@ def video_id(url: str) -> str:
     return regex_search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url, group=1)
 
 
-def watch_url(video_id: str) -> str:
-    """Construct a sanitized YouTube watch url, given a video id.
-
-    :param str video_id:
-        A YouTube video identifier.
-    :rtype: str
-    :returns:
-        Sanitized YouTube watch url.
-    """
-    return "https://youtube.com/watch?v=" + video_id
-
-
-def embed_url(video_id: str) -> str:
-    return f"https://www.youtube.com/embed/{video_id}"
-
-
-def eurl(video_id: str) -> str:
-    return f"https://youtube.googleapis.com/v/{video_id}"
-
-
-def video_info_url(
-    video_id: str, watch_url: str, embed_html: Optional[str], age_restricted: bool,
-) -> str:
+def video_info_url(video_id: str, watch_url: str) -> str:
     """Construct the video_info url.
 
     :param str video_id:
         A YouTube video identifier.
     :param str watch_url:
         A YouTube watch url.
-    :param str embed_html:
-        The html contents of the embed page (for age restricted videos).
-    :param bool age_restricted:
-        Is video age restricted.
     :rtype: str
     :returns:
         :samp:`https://youtube.com/get_video_info` with necessary GET
         parameters.
     """
-    if age_restricted:
-        assert embed_html is not None
+    params = OrderedDict(
+        [
+            ("video_id", video_id),
+            ("el", "$el"),
+            ("ps", "default"),
+            ("eurl", quote(watch_url)),
+            ("hl", "en_US"),
+        ]
+    )
+    return _video_info_url(params)
+
+
+def video_info_url_age_restricted(video_id: str, embed_html: str) -> str:
+    """Construct the video_info url.
+
+    :param str video_id:
+        A YouTube video identifier.
+    :param str embed_html:
+        The html contents of the embed page (for age restricted videos).
+    :rtype: str
+    :returns:
+        :samp:`https://youtube.com/get_video_info` with necessary GET
+        parameters.
+    """
+    try:
         sts = regex_search(r'"sts"\s*:\s*(\d+)', embed_html, group=1)
-        # Here we use ``OrderedDict`` so that the output is consistent between
-        # Python 2.7+.
-        params = OrderedDict(
-            [("video_id", video_id), ("eurl", eurl(video_id)), ("sts", sts),]
-        )
-    else:
-        params = OrderedDict(
-            [
-                ("video_id", video_id),
-                ("el", "$el"),
-                ("ps", "default"),
-                ("eurl", quote(watch_url)),
-                ("hl", "en_US"),
-            ]
-        )
+    except RegexMatchError:
+        sts = ""
+    # Here we use ``OrderedDict`` so that the output is consistent between
+    # Python 2.7+.
+    eurl = f"https://youtube.googleapis.com/v/{video_id}"
+    params = OrderedDict([("video_id", video_id), ("eurl", eurl), ("sts", sts),])
+    return _video_info_url(params)
+
+
+def _video_info_url(params: OrderedDict) -> str:
     return "https://youtube.com/get_video_info?" + urlencode(params)
 
 
-def js_url(html: str, age_restricted: Optional[bool] = False) -> str:
+def js_url(html: str) -> str:
     """Get the base JavaScript url.
 
     Construct the base JavaScript url, which contains the decipher
@@ -144,12 +136,8 @@ def js_url(html: str, age_restricted: Optional[bool] = False) -> str:
 
     :param str html:
         The html contents of the watch page.
-    :param bool age_restricted:
-        Is video age restricted.
-
     """
-    ytplayer_config = get_ytplayer_config(html, age_restricted or False)
-    base_js = ytplayer_config["assets"]["js"]
+    base_js = get_ytplayer_config(html)["assets"]["js"]
     return "https://youtube.com" + base_js
 
 
@@ -180,7 +168,7 @@ def mime_type_codec(mime_type_codec: str) -> Tuple[str, List[str]]:
     return mime_type, [c.strip() for c in codecs.split(",")]
 
 
-def get_ytplayer_config(html: str, age_restricted: bool = False) -> Any:
+def get_ytplayer_config(html: str) -> Any:
     """Get the YouTube player configuration data from the watch html.
 
     Extract the ``ytplayer_config``, which is json data embedded within the
@@ -189,21 +177,29 @@ def get_ytplayer_config(html: str, age_restricted: bool = False) -> Any:
 
     :param str html:
         The html contents of the watch page.
-    :param bool age_restricted:
-        Is video age restricted.
     :rtype: str
     :returns:
         Substring of the html containing the encoded manifest data.
     """
-    if age_restricted:
-        pattern = r";yt\.setConfig\(\{'PLAYER_CONFIG':\s*({.*})(,'EXPERIMENT_FLAGS'|;)"  # noqa: E501
-    else:
-        pattern = r";ytplayer\.config\s*=\s*({.*?});"
-    yt_player_config = regex_search(pattern, html, group=1)
-    return json.loads(yt_player_config)
+    config_patterns = [
+        r";ytplayer\.config\s*=\s*({.*?});",
+        r";ytplayer\.config\s*=\s*({.+?});ytplayer",
+        r";yt\.setConfig\(\{'PLAYER_CONFIG':\s*({.*})}\);",
+        r";yt\.setConfig\(\{'PLAYER_CONFIG':\s*({.*})(,'EXPERIMENT_FLAGS'|;)",  # noqa: E501
+    ]
+    logger.debug("finding initial function name")
+    for pattern in config_patterns:
+        regex = re.compile(pattern)
+        function_match = regex.search(html)
+        if function_match:
+            logger.debug("finished regex search, matched: %s", pattern)
+            yt_player_config = function_match.group(1)
+            return json.loads(yt_player_config)
+
+    raise RegexMatchError(caller="get_ytplayer_config", pattern="config_patterns")
 
 
-def get_vid_descr(html: Optional[str]) -> str:
+def _get_vid_descr(html: Optional[str]) -> str:
     html_parser = PytubeHTMLParser()
     if html:
         html_parser.feed(html)
@@ -278,6 +274,8 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
     {'foo': [{'bar': '1', 'var': 'test'}, {'em': '5', 't': 'url encoded'}]}
 
     """
+    otf_type = "FORMAT_STREAM_TYPE_OTF"
+
     if key == "url_encoded_fmt_stream_map" and not stream_data.get(
         "url_encoded_fmt_stream_map"
     ):
@@ -294,6 +292,8 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
                     "type": format_item["mimeType"],
                     "quality": format_item["quality"],
                     "itag": format_item["itag"],
+                    "bitrate": format_item.get("bitrate"),
+                    "is_otf": (format_item.get("type") == otf_type),
                 }
                 for format_item in formats
             ]
@@ -308,6 +308,8 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
                     "type": format_item["mimeType"],
                     "quality": format_item["quality"],
                     "itag": format_item["itag"],
+                    "bitrate": format_item.get("bitrate"),
+                    "is_otf": (format_item.get("type") == otf_type),
                 }
                 for i, format_item in enumerate(formats)
             ]

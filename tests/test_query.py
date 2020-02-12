@@ -151,3 +151,11 @@ def test_get_audio_only_with_subtype(cipher_signature):
 def test_sequence(cipher_signature):
     assert len(cipher_signature.streams) == 22
     assert cipher_signature.streams[0] is not None
+
+
+def test_otf(cipher_signature):
+    non_otf = cipher_signature.streams.otf().all()
+    assert len(non_otf) == 22
+
+    otf = cipher_signature.streams.otf(True).all()
+    assert len(otf) == 0

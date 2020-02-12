@@ -58,6 +58,9 @@ class Stream:
         # streams return NoneType for audio/video depending.
         self.video_codec, self.audio_codec = self.parse_codecs()
 
+        self.is_otf: bool = stream["is_otf"]
+        self.bitrate: Optional[int] = stream["bitrate"]
+
         self._filesize: Optional[int] = None  # filesize in bytes
 
         # Additional information about the stream format, such as resolution,
@@ -152,15 +155,22 @@ class Stream:
         :returns:
             Youtube video title
         """
-        return (
-            self.player_config_args.get("title")
-            or (
-                self.player_config_args.get("player_response", {})
-                .get("videoDetails", {})
-                .get("title")
-            )
-            or "Unknown YouTube Video Title"
-        )
+        return self._monostate.title or "Unknown YouTube Video Title"
+
+    @property
+    def filesize_approx(self) -> int:
+        """Get approximate filesize of the video
+
+        Falls back to HTTP call if there is not sufficient information to approximate
+
+        :rtype: int
+        :returns: size of video in bytes
+        """
+        if self._monostate.duration and self.bitrate:
+            bits_in_byte = 8
+            return int((self._monostate.duration * self.bitrate) / bits_in_byte)
+
+        return self.filesize
 
     @property
     def default_filename(self) -> str:
