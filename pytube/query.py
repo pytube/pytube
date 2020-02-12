@@ -334,8 +334,8 @@ class StreamQuery(Sequence):
         """
         if value:
             return self.fmt_streams.count(value)
-        else:
-            return len(self)
+
+        return len(self)
 
     @deprecated("This object can be treated as a list, all() is useless")
     def all(self) -> List[Stream]:  # pragma: no cover
