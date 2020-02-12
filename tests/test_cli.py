@@ -10,6 +10,15 @@ from pytube import cli, StreamQuery, Caption, CaptionQuery
 parse_args = cli._parse_args
 
 
+@mock.patch("pytube.cli._parse_args")
+def test_main_invalid_url(_parse_args):
+    parser = argparse.ArgumentParser()
+    args = parse_args(parser, ["crikey",],)
+    _parse_args.return_value = args
+    with pytest.raises(SystemExit):
+        cli.main()
+
+
 @mock.patch("pytube.cli.YouTube")
 def test_download_when_itag_not_found(youtube):
     youtube.streams = mock.Mock()
@@ -270,6 +279,23 @@ def test_ffmpeg_process_res_should_download(_ffmpeg_downloader, youtube):
     _ffmpeg_downloader.assert_called_with(
         audio_stream=audio_stream, video_stream=video_stream, target=target
     )
+
+
+@mock.patch("pytube.cli.YouTube")
+@mock.patch("pytube.cli._ffmpeg_downloader")
+def test_ffmpeg_process_res_none_should_not_download(_ffmpeg_downloader, youtube):
+    # Given
+    target = "/target"
+    streams = MagicMock()
+    youtube.streams = streams
+    streams.filter.return_value.first.return_value = None
+    audio_stream = MagicMock()
+    streams.get_audio_only.return_value = audio_stream
+    # When
+    with pytest.raises(SystemExit):
+        cli.ffmpeg_process(youtube, "XYZp", target)
+    # Then
+    _ffmpeg_downloader.assert_not_called()
 
 
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
