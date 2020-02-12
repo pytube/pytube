@@ -410,7 +410,9 @@ def test_download_audio(youtube, download):
 def test_download_audio_none(youtube, download):
     # Given
     youtube_instance = youtube.return_value
-    youtube_instance.streams.filter.return_value.order_by.return_value.last.return_value = None
+    youtube_instance.streams.filter.return_value.order_by.return_value.last.return_value = (
+        None
+    )
     # When
     with pytest.raises(SystemExit):
         cli.download_audio(youtube_instance, "filetype", "target")
