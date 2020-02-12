@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """This module provides a query interface for media streams and captions."""
-from typing import List, Optional
+from typing import List, Optional, Callable
 
 from pytube import Stream, Caption
 
@@ -168,9 +168,12 @@ class StreamQuery:
         if is_dash is not None:
             filters.append(lambda s: s.is_dash == is_dash)
 
+        return self._filter(filters)
+
+    def _filter(self, filters: List[Callable]) -> "StreamQuery":
         fmt_streams = self.fmt_streams
-        for fn in filters:
-            fmt_streams = filter(fn, fmt_streams)
+        for filter_lambda in filters:
+            fmt_streams = filter(filter_lambda, fmt_streams)
         return StreamQuery(list(fmt_streams))
 
     def order_by(self, attribute_name: str) -> "StreamQuery":
@@ -281,9 +284,17 @@ class StreamQuery:
         :returns:
             The :class:`Stream <Stream>` matching the given itag or None if
             not found.
-
         """
         return self.filter(only_audio=True, subtype=subtype).order_by("abr").last()
+
+    def otf(self, is_otf: bool = False) -> "StreamQuery":
+        """Filter stream by OTF, useful if some streams have 404 URLs
+
+        :param bool is_otf: Set to False to retrieve only non-OTF streams
+        :rtype: :class:`StreamQuery <StreamQuery>`
+        :returns: A StreamQuery object with otf filtered streams
+        """
+        return self._filter([lambda s: s.is_otf == is_otf])
 
     def first(self) -> Optional[Stream]:
         """Get the first :class:`Stream <Stream>` in the results.

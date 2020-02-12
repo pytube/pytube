@@ -12,18 +12,20 @@ def test_extract_video_id():
     assert video_id == "9bZkp7q19f0"
 
 
-def test_extract_watch_url():
-    video_id = "9bZkp7q19f0"
-    watch_url = extract.watch_url(video_id)
-    assert watch_url == "https://youtube.com/watch?v=9bZkp7q19f0"
+def test_info_url(age_restricted):
+    video_info_url = extract.video_info_url_age_restricted(
+        video_id="QRS8MkLhQmM", embed_html=age_restricted["embed_html"],
+    )
+    expected = (
+        "https://youtube.com/get_video_info?video_id=QRS8MkLhQmM&eurl"
+        "=https%3A%2F%2Fyoutube.googleapis.com%2Fv%2FQRS8MkLhQmM&sts="
+    )
+    assert video_info_url == expected
 
 
-def test_info_url(cipher_signature):
+def test_info_url_age_restricted(cipher_signature):
     video_info_url = extract.video_info_url(
-        video_id=cipher_signature.video_id,
-        watch_url=cipher_signature.watch_url,
-        embed_html="",
-        age_restricted=False,
+        video_id=cipher_signature.video_id, watch_url=cipher_signature.watch_url
     )
     expected = (
         "https://youtube.com/get_video_info?video_id=9bZkp7q19f0&el=%24el"
@@ -63,12 +65,7 @@ def test_get_vid_desc(cipher_signature):
         "http://sptfy.com/PSY\n"
         "http://weibo.com/psyoppa"
     )
-    assert extract.get_vid_descr(cipher_signature.watch_html) == expected
-
-
-def test_eurl():
-    url = extract.eurl("videoid")
-    assert url == "https://youtube.googleapis.com/v/videoid"
+    assert extract._get_vid_descr(cipher_signature.watch_html) == expected
 
 
 def test_mime_type_codec():

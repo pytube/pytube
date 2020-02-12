@@ -20,7 +20,7 @@ from pytube import extract
 from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
-from pytube.extract import apply_descrambler, apply_signature
+from pytube.extract import apply_descrambler, apply_signature, get_ytplayer_config
 from pytube.helpers import install_proxy
 from pytube.exceptions import VideoUnavailable
 from pytube.monostate import OnProgress, OnComplete, Monostate
@@ -76,12 +76,10 @@ class YouTube:
         # video_id part of /watch?v=<video_id>
         self.video_id = extract.video_id(url)
 
-        # https://www.youtube.com/watch?v=<video_id>
-        self.watch_url = extract.watch_url(self.video_id)
+        self.watch_url = f"https://youtube.com/watch?v={self.video_id}"
+        self.embed_url = f"https://www.youtube.com/embed/{self.video_id}"
 
-        self.embed_url = extract.embed_url(self.video_id)
-        # A dictionary shared between all instances of :class:`Stream <Stream>`
-        # (Borg pattern). Boooooo.
+        # Shared between all instances of `Stream` (Borg pattern).
         self.stream_monostate = Monostate(
             on_progress=on_progress_callback, on_complete=on_complete_callback
         )
@@ -111,9 +109,7 @@ class YouTube:
             self.player_config_args = self.vid_info
         else:
             assert self.watch_html is not None
-            self.player_config_args = extract.get_ytplayer_config(self.watch_html,)[
-                "args"
-            ]
+            self.player_config_args = get_ytplayer_config(self.watch_html)["args"]
 
             # Fix for KeyError: 'title' issue #434
             if "title" not in self.player_config_args:  # type: ignore
@@ -140,8 +136,9 @@ class YouTube:
                     self.player_config_args, fmt, self.js  # type: ignore
                 )
             except TypeError:
-                assert self.embed_html is not None
-                self.js_url = extract.js_url(self.embed_html, self.age_restricted)
+                if not self.embed_html:
+                    self.embed_html = request.get(url=self.embed_url)
+                self.js_url = extract.js_url(self.embed_html)
                 self.js = request.get(self.js_url)
                 assert self.js is not None
                 apply_signature(self.player_config_args, fmt, self.js)
@@ -152,6 +149,8 @@ class YouTube:
         # load the player_response object (contains subtitle information)
         self.player_response = json.loads(self.player_config_args["player_response"])
         del self.player_config_args["player_response"]
+        self.stream_monostate.title = self.title
+        self.stream_monostate.duration = self.length
 
         logger.info("init finished successfully")
 
@@ -166,23 +165,29 @@ class YouTube:
 
         """
         self.watch_html = request.get(url=self.watch_url)
-        if (
-            self.watch_html is None
-            or '<img class="icon meh" src="/yts/img' not in self.watch_html
+        if self.watch_html is None:
+            raise VideoUnavailable(video_id=self.video_id)
+        self.age_restricted = extract.is_age_restricted(self.watch_html)
+        if not self.age_restricted and (
+            "yt-badge-live" in self.watch_html
+            or "This video is private" in self.watch_html
         ):
             raise VideoUnavailable(video_id=self.video_id)
 
-        self.embed_html = request.get(url=self.embed_url)
-        self.age_restricted = extract.is_age_restricted(self.watch_html)
-        self.vid_info_url = extract.video_info_url(
-            video_id=self.video_id,
-            watch_url=self.watch_url,
-            embed_html=self.embed_html,
-            age_restricted=self.age_restricted,
-        )
+        if self.age_restricted:
+            if not self.embed_html:
+                self.embed_html = request.get(url=self.embed_url)
+            self.vid_info_url = extract.video_info_url_age_restricted(
+                self.video_id, self.watch_url
+            )
+        else:
+            self.vid_info_url = extract.video_info_url(
+                video_id=self.video_id, watch_url=self.watch_url
+            )
+
         self.vid_info_raw = request.get(self.vid_info_url)
         if not self.age_restricted:
-            self.js_url = extract.js_url(self.watch_html, self.age_restricted)
+            self.js_url = extract.js_url(self.watch_html)
             self.js = request.get(self.js_url)
 
     def initialize_stream_objects(self, fmt: str) -> None:
@@ -275,7 +280,7 @@ class YouTube:
         """
         return self.player_response.get("videoDetails", {}).get(
             "shortDescription"
-        ) or extract.get_vid_descr(self.watch_html)
+        ) or extract._get_vid_descr(self.watch_html)
 
     @property
     def rating(self) -> float:
