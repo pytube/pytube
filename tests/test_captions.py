@@ -109,3 +109,24 @@ def test_xml_captions(request_get):
         {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
     )
     assert caption.xml_captions == "test"
+
+
+@mock.patch("pytube.captions.request")
+def test_generate_srt_captions(request):
+    request.get.return_value = (
+        '<?xml version="1.0" encoding="utf-8" ?><transcript><text start="6.5" dur="1.7">['
+        'Herb, Software Engineer]\n本影片包含隱藏式字幕。</text><text start="8.3" dur="2.7">'
+        "如要啓動字幕，請按一下這裡的圖示。</text></transcript>"
+    )
+    caption = Caption(
+        {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
+    )
+    assert caption.generate_srt_captions() == (
+        "1\n"
+        "00:00:06,500 --> 00:00:08,200\n"
+        "[Herb, Software Engineer] 本影片包含隱藏式字幕。\n"
+        "\n"
+        "2\n"
+        "00:00:08,300 --> 00:00:11,000\n"
+        "如要啓動字幕，請按一下這裡的圖示。"
+    )
