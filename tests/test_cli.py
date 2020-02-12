@@ -405,6 +405,19 @@ def test_download_audio(youtube, download):
     download.assert_called_with(audio_stream, target="target")
 
 
+@mock.patch("pytube.cli._download")
+@mock.patch("pytube.cli.YouTube")
+def test_download_audio_none(youtube, download):
+    # Given
+    youtube_instance = youtube.return_value
+    youtube_instance.streams.filter.return_value.order_by.return_value.last.return_value = None
+    # When
+    with pytest.raises(SystemExit):
+        cli.download_audio(youtube_instance, "filetype", "target")
+    # Then
+    download.assert_not_called()
+
+
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
 def test_perform_args_on_youtube(youtube):
     parser = argparse.ArgumentParser()
