@@ -10,14 +10,18 @@ from pytube import cli, StreamQuery, Caption, CaptionQuery
 parse_args = cli._parse_args
 
 
+@mock.patch("pytube.cli.display_streams")
 @mock.patch("pytube.cli.YouTube")
-def test_download_when_itag_not_found(youtube):
+def test_download_when_itag_not_found(youtube, display_streams):
+    # Given
     youtube.streams = mock.Mock()
-    youtube.streams.all.return_value = []
     youtube.streams.get_by_itag.return_value = None
+    # When
     with pytest.raises(SystemExit):
         cli.download_by_itag(youtube, 123)
+    # Then
     youtube.streams.get_by_itag.assert_called_with(123)
+    display_streams.assert_called_with(youtube)
 
 
 @mock.patch("pytube.cli.YouTube")
@@ -37,26 +41,28 @@ def test_download_when_itag_is_found(youtube, stream):
 @mock.patch("pytube.cli.YouTube")
 @mock.patch("pytube.Stream")
 def test_display_stream(youtube, stream):
+    # Given
     stream.itag = 123
     stream.__repr__ = MagicMock(return_value="")
     youtube.streams = StreamQuery([stream])
-    with patch.object(youtube.streams, "all", wraps=youtube.streams.all) as wrapped_all:
-        cli.display_streams(youtube)
-        wrapped_all.assert_called()
-        stream.__repr__.assert_called()
+    # When
+    cli.display_streams(youtube)
+    # Then
+    stream.__repr__.assert_called()
 
 
+@mock.patch("pytube.cli._print_available_captions")
 @mock.patch("pytube.cli.YouTube")
-def test_download_caption_with_none(youtube):
+def test_download_caption_with_none(youtube, print_available):
+    # Given
     caption = Caption(
         {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
     )
     youtube.captions = CaptionQuery([caption])
-    with patch.object(
-        youtube.captions, "all", wraps=youtube.captions.all
-    ) as wrapped_all:
-        cli.download_caption(youtube, None)
-        wrapped_all.assert_called()
+    # When
+    cli.download_caption(youtube, None)
+    # Then
+    print_available.assert_called_with(youtube.captions)
 
 
 @mock.patch("pytube.cli.YouTube")
@@ -71,17 +77,18 @@ def test_download_caption_with_language_found(youtube):
     caption.download.assert_called_with(title="video title", output_path=None)
 
 
+@mock.patch("pytube.cli._print_available_captions")
 @mock.patch("pytube.cli.YouTube")
-def test_download_caption_with_language_not_found(youtube):
+def test_download_caption_with_none(youtube, print_available):
+    # Given
     caption = Caption(
         {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
     )
     youtube.captions = CaptionQuery([caption])
-    with patch.object(
-        youtube.captions, "all", wraps=youtube.captions.all
-    ) as wrapped_all:
-        cli.download_caption(youtube, "blah")
-        wrapped_all.assert_called()
+    # When
+    cli.download_caption(youtube, "blah")
+    # Then
+    print_available.assert_called_with(youtube.captions)
 
 
 def test_display_progress_bar(capsys):
