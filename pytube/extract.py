@@ -228,8 +228,8 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
         except KeyError:
             live_stream = (
                 json.loads(config_args["player_response"])
-                    .get("playabilityStatus", {}, )
-                    .get("liveStreamability")
+                .get("playabilityStatus", {},)
+                .get("liveStreamability")
             )
             if live_stream:
                 raise LiveStreamError("UNKNOWN")
