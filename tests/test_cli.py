@@ -403,6 +403,7 @@ def test_ffmpeg_downloader(unique_name, download, run, unlink):
     audio_stream = MagicMock()
     video_stream = MagicMock()
     video_stream.id = "video_id"
+    audio_stream.subtype = "audio_subtype"
     video_stream.subtype = "video_subtype"
     unique_name.side_effect = ["video_name", "audio_name"]
 
@@ -416,12 +417,12 @@ def test_ffmpeg_downloader(unique_name, download, run, unlink):
         [
             "ffmpeg",
             "-i",
-            f"target/video_name",
+            "target/video_name.video_subtype",
             "-i",
-            f"target/audio_name",
+            "target/audio_name.audio_subtype",
             "-codec",
             "copy",
-            f"target/safe_title.video_subtype",
+            "target/safe_title.video_subtype",
         ]
     )
     unlink.assert_called()

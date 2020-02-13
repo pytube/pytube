@@ -222,7 +222,7 @@ def _download(
     stream: Stream, target: Optional[str] = None, filename: Optional[str] = None
 ) -> None:
     filesize_megabytes = stream.filesize // 1048576
-    print(f"{stream.default_filename} | {filesize_megabytes} MB")
+    print(f"{filename or stream.default_filename} | {filesize_megabytes} MB")
     stream.download(output_path=target, filename=filename)
     sys.stdout.write("\n")
 
@@ -317,7 +317,6 @@ def _ffmpeg_downloader(audio_stream: Stream, video_stream: Stream, target: str) 
     :param Path target:
         A valid Path object
     """
-
     video_unique_name = _unique_name(
         safe_filename(video_stream.title), video_stream.subtype, "video", target=target
     )
@@ -325,25 +324,17 @@ def _ffmpeg_downloader(audio_stream: Stream, video_stream: Stream, target: str) 
         safe_filename(video_stream.title), audio_stream.subtype, "audio", target=target
     )
     _download(stream=video_stream, target=target, filename=video_unique_name)
+    print("Loading audio...")
     _download(stream=audio_stream, target=target, filename=audio_unique_name)
 
-    video_path = os.path.join(target, video_unique_name)
-    audio_path = os.path.join(target, audio_unique_name)
+    video_path = os.path.join(target, f"{video_unique_name}.{video_stream.subtype}")
+    audio_path = os.path.join(target, f"{audio_unique_name}.{audio_stream.subtype}")
     final_path = os.path.join(
         target, f"{safe_filename(video_stream.title)}.{video_stream.subtype}"
     )
 
     subprocess.run(  # nosec
-        [
-            "ffmpeg",
-            "-i",
-            f"{video_path}",
-            "-i",
-            f"{audio_path}",
-            "-codec",
-            "copy",
-            f"{final_path}",
-        ]
+        ["ffmpeg", "-i", video_path, "-i", audio_path, "-codec", "copy", final_path,]
     )
     os.unlink(video_path)
     os.unlink(audio_path)
