@@ -484,16 +484,10 @@ def test_perform_args_on_youtube(youtube):
 
 @mock.patch("pytube.cli.os.path.exists", return_value=False)
 def test_unique_name(path_exists):
-    assert (
-        cli._unique_name("base", "subtype", "video", "target")
-        == "target/base_video_0.subtype"
-    )
+    assert cli._unique_name("base", "subtype", "video", "target") == "base_video_0"
 
 
 @mock.patch("pytube.cli.os.path.exists")
 def test_unique_name_counter(path_exists):
     path_exists.side_effect = [True, False]
-    assert (
-        cli._unique_name("base", "subtype", "video", "target")
-        == "target/base_video_1.subtype"
-    )
+    assert cli._unique_name("base", "subtype", "video", "target") == "base_video_1"

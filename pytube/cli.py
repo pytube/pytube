@@ -242,10 +242,10 @@ def _unique_name(base: str, subtype: str, media_type: str, target: str) -> str:
     """
     counter = 0
     while True:
-        file_name = f"{base}_{media_type}_{counter}.{subtype}"
-        file_path = os.path.join(target, file_name)
+        file_name = f"{base}_{media_type}_{counter}"
+        file_path = os.path.join(target, f"{file_name}.{subtype}")
         if not os.path.exists(file_path):
-            return file_path
+            return file_name
         counter += 1
 
 
