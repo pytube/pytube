@@ -293,6 +293,6 @@ Treat other people with helpfulness, gratitude, and consideration! See the [Pyth
 
 ## GUIs and other libraries
 * [youtube-python](https://github.com/rohitkhatri/youtube-python) - client for the YouTube data API
-* [YouTubeDownload](https://github.com/hbmartin/YouTubeDownload) - GUI frontend for pytube3
+* [YouTubeDownload](https://github.com/YouTubeDownload/YouTubeDownload) - GUI frontend for pytube3
 * [Pytube-GUI](https://github.com/GAO23/Pytube-GUI) - Simple GUI frontend for pytube3
 * [StackOverflow questions](https://stackoverflow.com/questions/tagged/pytube)
