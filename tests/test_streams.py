@@ -11,13 +11,13 @@ from pytube import Stream, streams
 def test_filesize(cipher_signature, mocker):
     mocker.patch.object(request, "head")
     request.head.return_value = {"content-length": "6796391"}
-    assert cipher_signature.streams.first().filesize == 6796391
+    assert cipher_signature.streams[0].filesize == 6796391
 
 
 def test_filesize_approx(cipher_signature, mocker):
     mocker.patch.object(request, "head")
     request.head.return_value = {"content-length": "123"}
-    stream = cipher_signature.streams.first()
+    stream = cipher_signature.streams[0]
     assert stream.filesize_approx == 22350604
     stream.bitrate = None
     assert stream.filesize_approx == 123
@@ -25,7 +25,7 @@ def test_filesize_approx(cipher_signature, mocker):
 
 def test_default_filename(cipher_signature):
     expected = "PSY - GANGNAM STYLE(강남스타일) MV.mp4"
-    stream = cipher_signature.streams.first()
+    stream = cipher_signature.streams[0]
     assert stream.default_filename == expected
 
 
@@ -103,7 +103,7 @@ def test_download(cipher_signature, mocker):
     mocker.patch.object(request, "stream")
     request.stream.return_value = iter([str(random.getrandbits(8 * 1024))])
     with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
-        stream = cipher_signature.streams.first()
+        stream = cipher_signature.streams[0]
         stream.download()
 
 
@@ -114,7 +114,7 @@ def test_download_with_prefix(cipher_signature, mocker):
     request.stream.return_value = iter([str(random.getrandbits(8 * 1024))])
     streams.target_directory = MagicMock(return_value="/target")
     with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
-        stream = cipher_signature.streams.first()
+        stream = cipher_signature.streams[0]
         file_path = stream.download(filename_prefix="prefix")
         assert file_path == "/target/prefixPSY - GANGNAM STYLE(강남스타일) MV.mp4"
 
@@ -126,7 +126,7 @@ def test_download_with_filename(cipher_signature, mocker):
     request.stream.return_value = iter([str(random.getrandbits(8 * 1024))])
     streams.target_directory = MagicMock(return_value="/target")
     with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
-        stream = cipher_signature.streams.first()
+        stream = cipher_signature.streams[0]
         file_path = stream.download(filename="cool name bro")
         assert file_path == "/target/cool name bro.mp4"
 
@@ -139,7 +139,7 @@ def test_download_with_existing(cipher_signature, mocker):
     mocker.patch.object(os.path, "isfile")
     os.path.isfile.return_value = True
     with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
-        stream = cipher_signature.streams.first()
+        stream = cipher_signature.streams[0]
         mocker.patch.object(os.path, "getsize")
         os.path.getsize.return_value = stream.filesize
         file_path = stream.download()
@@ -156,7 +156,7 @@ def test_download_with_existing_no_skip(cipher_signature, mocker):
     mocker.patch.object(os.path, "isfile")
     os.path.isfile.return_value = True
     with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
-        stream = cipher_signature.streams.first()
+        stream = cipher_signature.streams[0]
         mocker.patch.object(os.path, "getsize")
         os.path.getsize.return_value = stream.filesize
         file_path = stream.download(skip_existing=False)
@@ -165,12 +165,12 @@ def test_download_with_existing_no_skip(cipher_signature, mocker):
 
 
 def test_progressive_streams_return_includes_audio_track(cipher_signature):
-    stream = cipher_signature.streams.filter(progressive=True).first()
+    stream = cipher_signature.streams.filter(progressive=True)[0]
     assert stream.includes_audio_track
 
 
 def test_progressive_streams_return_includes_video_track(cipher_signature):
-    stream = cipher_signature.streams.filter(progressive=True).first()
+    stream = cipher_signature.streams.filter(progressive=True)[0]
     assert stream.includes_video_track
 
 
@@ -184,7 +184,7 @@ def test_on_progress_hook(cipher_signature, mocker):
     request.stream.return_value = iter([str(random.getrandbits(8 * 1024))])
 
     with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
-        stream = cipher_signature.streams.first()
+        stream = cipher_signature.streams[0]
         stream.download()
     assert callback_fn.called
     args, _ = callback_fn.call_args
@@ -203,7 +203,7 @@ def test_on_complete_hook(cipher_signature, mocker):
     request.stream.return_value = iter([str(random.getrandbits(8 * 1024))])
 
     with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
-        stream = cipher_signature.streams.first()
+        stream = cipher_signature.streams[0]
         stream.download()
     assert callback_fn.called
 
@@ -233,7 +233,7 @@ def test_thumbnail_when_not_in_details(cipher_signature):
 
 
 def test_repr_for_audio_streams(cipher_signature):
-    stream = str(cipher_signature.streams.filter(only_audio=True).first())
+    stream = str(cipher_signature.streams.filter(only_audio=True)[0])
     expected = (
         '<Stream: itag="140" mime_type="audio/mp4" abr="128kbps" '
         'acodec="mp4a.40.2" progressive="False" type="audio">'
@@ -242,7 +242,7 @@ def test_repr_for_audio_streams(cipher_signature):
 
 
 def test_repr_for_video_streams(cipher_signature):
-    stream = str(cipher_signature.streams.filter(only_video=True).first())
+    stream = str(cipher_signature.streams.filter(only_video=True)[0])
     expected = (
         '<Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" '
         'vcodec="avc1.640028" progressive="False" type="video">'
@@ -251,7 +251,7 @@ def test_repr_for_video_streams(cipher_signature):
 
 
 def test_repr_for_progressive_streams(cipher_signature):
-    stream = str(cipher_signature.streams.filter(progressive=True).first())
+    stream = str(cipher_signature.streams.filter(progressive=True)[0])
     expected = (
         '<Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" '
         'vcodec="avc1.42001E" acodec="mp4a.40.2" progressive="True" type="video">'
@@ -260,7 +260,7 @@ def test_repr_for_progressive_streams(cipher_signature):
 
 
 def test_repr_for_adaptive_streams(cipher_signature):
-    stream = str(cipher_signature.streams.filter(adaptive=True).first())
+    stream = str(cipher_signature.streams.filter(adaptive=True)[0])
     expected = (
         '<Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" '
         'vcodec="avc1.640028" progressive="False" type="video">'

@@ -44,14 +44,14 @@ def test_get_last(cipher_signature):
     """Ensure :meth:`~pytube.StreamQuery.last` returns the expected
     :class:`Stream <Stream>`.
     """
-    assert cipher_signature.streams.last().itag == 251
+    assert cipher_signature.streams[-1].itag == 251
 
 
 def test_get_first(cipher_signature):
     """Ensure :meth:`~pytube.StreamQuery.first` returns the expected
     :class:`Stream <Stream>`.
     """
-    assert cipher_signature.streams.first().itag == 18
+    assert cipher_signature.streams[0].itag == 18
 
 
 def test_order_by(cipher_signature):
@@ -154,10 +154,10 @@ def test_sequence(cipher_signature):
 
 
 def test_otf(cipher_signature):
-    non_otf = cipher_signature.streams.otf().all()
+    non_otf = cipher_signature.streams.otf()
     assert len(non_otf) == 22
 
-    otf = cipher_signature.streams.otf(True).all()
+    otf = cipher_signature.streams.otf(True)
     assert len(otf) == 0
 
 
