@@ -153,12 +153,27 @@ def test_parse_args_truthy():
             "en",
             "-l",
             "--itag=10",
+            "-vvv",
         ],
     )
     assert args.url == "http://youtube.com/watch?v=9bZkp7q19f0"
     assert args.build_playback_report is True
     assert args.itag == 10
     assert args.list is True
+    assert args.verbosity == 3
+
+
+@mock.patch("pytube.cli.setup_logger", return_value=None)
+def test_main_logging_setup(setup_logger):
+    # Given
+    parser = argparse.ArgumentParser()
+    args = parse_args(parser, ["http://fakeurl", "-v"])
+    cli._parse_args = MagicMock(return_value=args)
+    # When
+    with pytest.raises(SystemExit):
+        cli.main()
+    # Then
+    setup_logger.assert_called_with(40)
 
 
 @mock.patch("pytube.cli.YouTube", return_value=None)
