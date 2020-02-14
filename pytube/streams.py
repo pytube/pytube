@@ -232,6 +232,7 @@ class Stream:
         ):
             # likely the same file, so skip it
             logger.debug("file %s already exists, skipping", file_path)
+            self.on_complete(file_path)
             return file_path
 
         bytes_remaining = self.filesize
