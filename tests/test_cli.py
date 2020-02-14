@@ -28,6 +28,7 @@ def test_download_when_itag_not_found(youtube, display_streams):
 @mock.patch("pytube.Stream")
 def test_download_when_itag_is_found(youtube, stream):
     stream.itag = 123
+    stream.exists_at_path.return_value = False
     youtube.streams = StreamQuery([stream])
     with patch.object(
         youtube.streams, "get_by_itag", wraps=youtube.streams.get_by_itag
