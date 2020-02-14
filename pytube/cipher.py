@@ -14,15 +14,15 @@ functions" (2) maps them to Python equivalents and (3) taking the ciphered
 signature and decoding it.
 
 """
-
+import logging
 import re
 from itertools import chain
 from typing import List, Tuple, Dict, Callable, Any, Optional
 
 from pytube.exceptions import RegexMatchError
-from pytube.helpers import regex_search, create_logger, cache
+from pytube.helpers import regex_search, cache
 
-logger = create_logger()
+logger = logging.getLogger(__name__)
 
 
 class Cipher:

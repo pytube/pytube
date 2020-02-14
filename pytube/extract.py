@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """This module contains all non-cipher related data extraction logic."""
 import json
+import logging
 import re
 from collections import OrderedDict
 from html.parser import HTMLParser
@@ -10,7 +11,9 @@ from urllib.parse import urlencode
 
 from pytube.cipher import Cipher
 from pytube.exceptions import RegexMatchError, HTMLParseError, LiveStreamError
-from pytube.helpers import regex_search, logger
+from pytube.helpers import regex_search
+
+logger = logging.getLogger(__name__)
 
 
 class PytubeHTMLParser(HTMLParser):

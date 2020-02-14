@@ -17,9 +17,7 @@ from typing import Any, Optional, List
 from pytube import __version__, CaptionQuery, Stream, Playlist
 from pytube import YouTube
 from pytube.exceptions import PytubeError
-from pytube.helpers import safe_filename
-
-logger = logging.getLogger(__name__)
+from pytube.helpers import safe_filename, setup_logger
 
 
 def main():
@@ -27,7 +25,9 @@ def main():
     # noinspection PyTypeChecker
     parser = argparse.ArgumentParser(description=main.__doc__)
     args = _parse_args(parser)
-    logging.getLogger().setLevel(max(3 - args.verbosity, 0) * 10)
+    if args.verbosity:
+        log_level = min(args.verbosity, 4) * 10
+        setup_logger(logging.FATAL - log_level)
 
     if not args.url or "youtu" not in args.url:
         parser.print_help()
@@ -99,7 +99,7 @@ def _parse_args(
         action="count",
         default=0,
         dest="verbosity",
-        help="Verbosity level",
+        help="Verbosity level, use up to 4 to increase logging -vvvv",
     )
     parser.add_argument(
         "--build-playback-report",

@@ -5,7 +5,7 @@ import pytest
 
 from pytube import helpers
 from pytube.exceptions import RegexMatchError
-from pytube.helpers import deprecated, cache, target_directory
+from pytube.helpers import deprecated, cache, target_directory, setup_logger
 
 
 def test_regex_search_no_match():
@@ -74,3 +74,15 @@ def test_target_directory_with_absolute_path(_, makedirs):
 def test_target_directory_with_no_path(_, makedirs):
     assert target_directory() == "/cwd"
     makedirs.assert_called()
+
+
+@mock.patch("pytube.helpers.logging")
+def test_setup_logger(logging):
+    # Given
+    logger = logging.getLogger.return_value
+    # When
+    setup_logger(20)
+    # Then
+    logging.getLogger.assert_called_with("pytube")
+    logger.addHandler.assert_called()
+    logger.setLevel.assert_called_with(20)
