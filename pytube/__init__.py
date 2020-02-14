@@ -10,13 +10,9 @@ __license__ = "MIT License"
 __copyright__ = "Copyright 2019 Nick Ficano"
 
 from pytube.version import __version__
-from pytube.helpers import create_logger
 from pytube.streams import Stream
 from pytube.captions import Caption
 from pytube.query import CaptionQuery
 from pytube.query import StreamQuery
 from pytube.__main__ import YouTube
 from pytube.contrib.playlist import Playlist
-
-logger = create_logger()
-logger.info("%s v%s", __title__, __version__)

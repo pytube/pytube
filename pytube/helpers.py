@@ -86,7 +86,7 @@ def safe_filename(s: str, max_length: int = 255) -> str:
     return filename[:max_length].rsplit(" ", 0)[0]
 
 
-def create_logger(level: int = logging.ERROR) -> logging.Logger:
+def setup_logger(level: int = logging.ERROR):
     """Create a configured instance of logger.
 
     :param int level:
@@ -103,7 +103,6 @@ def create_logger(level: int = logging.ERROR) -> logging.Logger:
     logger = logging.getLogger("pytube")
     logger.addHandler(handler)
     logger.setLevel(level)
-    return logger
 
 
 GenericType = TypeVar("GenericType")
