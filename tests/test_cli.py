@@ -6,8 +6,18 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from pytube import cli, StreamQuery, Caption, CaptionQuery
+from pytube.exceptions import PytubeError
 
 parse_args = cli._parse_args
+
+
+@mock.patch("pytube.cli._parse_args")
+def test_main_invalid_url(_parse_args):
+    parser = argparse.ArgumentParser()
+    args = parse_args(parser, ["crikey",],)
+    _parse_args.return_value = args
+    with pytest.raises(SystemExit):
+        cli.main()
 
 
 @mock.patch("pytube.cli.display_streams")
@@ -89,6 +99,22 @@ def test_download_caption_with_lang_not_found(youtube, print_available):
     cli.download_caption(youtube, "blah")
     # Then
     print_available.assert_called_with(youtube.captions)
+
+
+def test_print_available_captions(capsys):
+    # Given
+    caption1 = Caption(
+        {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
+    )
+    caption2 = Caption(
+        {"url": "url2", "name": {"simpleText": "name2"}, "languageCode": "fr"}
+    )
+    query = CaptionQuery([caption1, caption2])
+    # When
+    cli._print_available_captions(query)
+    # Then
+    captured = capsys.readouterr()
+    assert captured.out == "Available caption codes are: en, fr\n"
 
 
 def test_display_progress_bar(capsys):
@@ -192,14 +218,46 @@ def test_download_by_resolution_flag(youtube, download_by_resolution):
     download_by_resolution.assert_called()
 
 
+@mock.patch("pytube.cli.YouTube")
 @mock.patch("pytube.cli.Playlist")
-def test_download_with_playlist(playlist):
+@mock.patch("pytube.cli._perform_args_on_youtube")
+def test_download_with_playlist(perform_args_on_youtube, playlist, youtube):
+    # Given
     cli.safe_filename = MagicMock(return_value="safe_title")
     parser = argparse.ArgumentParser()
     args = parse_args(parser, ["https://www.youtube.com/playlist?list=PLyn"])
     cli._parse_args = MagicMock(return_value=args)
+    videos = [youtube]
+    playlist_instance = playlist.return_value
+    playlist_instance.videos = videos
+    # When
     cli.main()
+    # Then
     playlist.assert_called()
+    perform_args_on_youtube.assert_called_with(youtube, args)
+
+
+@mock.patch("pytube.cli.YouTube")
+@mock.patch("pytube.cli.Playlist")
+@mock.patch("pytube.cli._perform_args_on_youtube")
+def test_download_with_playlist_video_error(
+    perform_args_on_youtube, playlist, youtube, capsys
+):
+    # Given
+    cli.safe_filename = MagicMock(return_value="safe_title")
+    parser = argparse.ArgumentParser()
+    args = parse_args(parser, ["https://www.youtube.com/playlist?list=PLyn"])
+    cli._parse_args = MagicMock(return_value=args)
+    videos = [youtube]
+    playlist_instance = playlist.return_value
+    playlist_instance.videos = videos
+    perform_args_on_youtube.side_effect = PytubeError()
+    # When
+    cli.main()
+    # Then
+    playlist.assert_called()
+    captured = capsys.readouterr()
+    assert "There was an error with video" in captured.out
 
 
 @mock.patch("pytube.cli.YouTube")
@@ -227,39 +285,191 @@ def test_download_by_resolution_not_exists(youtube, stream_query):
 
 
 @mock.patch("pytube.cli.YouTube")
-@mock.patch("pytube.cli.Stream")
-def test_ffmpeg_downloader(youtube, stream):
+@mock.patch("pytube.cli.ffmpeg_process")
+def test_perform_args_should_ffmpeg_process(ffmpeg_process, youtube):
+    # Given
     parser = argparse.ArgumentParser()
     args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-f", "best"])
     cli._parse_args = MagicMock(return_value=args)
-    cli.safe_filename = MagicMock(return_value="PSY - GANGNAM STYLE(강남스타일) MV")
-    cli.subprocess.run = MagicMock()
-    cli.os.unlink = MagicMock()
-    cli.ffmpeg_downloader = MagicMock()
-    cli.main()
-    cli.ffmpeg_downloader.assert_called()
+    # When
+    cli._perform_args_on_youtube(youtube, args)
+    # Then
+    ffmpeg_process.assert_called_with(youtube=youtube, resolution="best", target=None)
 
 
+@mock.patch("pytube.cli.YouTube")
+@mock.patch("pytube.cli._ffmpeg_downloader")
+def test_ffmpeg_process_best_should_download(_ffmpeg_downloader, youtube):
+    # Given
+    target = "/target"
+    streams = MagicMock()
+    youtube.streams = streams
+    video_stream = MagicMock()
+    streams.filter.return_value.order_by.return_value.last.return_value = video_stream
+    audio_stream = MagicMock()
+    streams.get_audio_only.return_value = audio_stream
+    # When
+    cli.ffmpeg_process(youtube, "best", target)
+    # Then
+    _ffmpeg_downloader.assert_called_with(
+        audio_stream=audio_stream, video_stream=video_stream, target=target
+    )
+
+
+@mock.patch("pytube.cli.YouTube")
+@mock.patch("pytube.cli._ffmpeg_downloader")
+def test_ffmpeg_process_res_should_download(_ffmpeg_downloader, youtube):
+    # Given
+    target = "/target"
+    streams = MagicMock()
+    youtube.streams = streams
+    video_stream = MagicMock()
+    streams.filter.return_value.first.return_value = video_stream
+    audio_stream = MagicMock()
+    streams.get_audio_only.return_value = audio_stream
+    # When
+    cli.ffmpeg_process(youtube, "XYZp", target)
+    # Then
+    _ffmpeg_downloader.assert_called_with(
+        audio_stream=audio_stream, video_stream=video_stream, target=target
+    )
+
+
+@mock.patch("pytube.cli.YouTube")
+@mock.patch("pytube.cli._ffmpeg_downloader")
+def test_ffmpeg_process_res_none_should_not_download(_ffmpeg_downloader, youtube):
+    # Given
+    target = "/target"
+    streams = MagicMock()
+    youtube.streams = streams
+    streams.filter.return_value.first.return_value = None
+    audio_stream = MagicMock()
+    streams.get_audio_only.return_value = audio_stream
+    # When
+    with pytest.raises(SystemExit):
+        cli.ffmpeg_process(youtube, "XYZp", target)
+    # Then
+    _ffmpeg_downloader.assert_not_called()
+
+
+@mock.patch("pytube.cli.YouTube")
+@mock.patch("pytube.cli._ffmpeg_downloader")
+def test_ffmpeg_process_audio_none_should_fallback_download(
+    _ffmpeg_downloader, youtube
+):
+    # Given
+    target = "/target"
+    streams = MagicMock()
+    youtube.streams = streams
+    stream = MagicMock()
+    streams.filter.return_value.order_by.return_value.last.return_value = stream
+    streams.get_audio_only.return_value = None
+    # When
+    cli.ffmpeg_process(youtube, "best", target)
+    # Then
+    _ffmpeg_downloader.assert_called_with(
+        audio_stream=stream, video_stream=stream, target=target
+    )
+
+
+@mock.patch("pytube.cli.YouTube")
+@mock.patch("pytube.cli._ffmpeg_downloader")
+def test_ffmpeg_process_audio_fallback_none_should_exit(_ffmpeg_downloader, youtube):
+    # Given
+    target = "/target"
+    streams = MagicMock()
+    youtube.streams = streams
+    stream = MagicMock()
+    streams.filter.return_value.order_by.return_value.last.side_effect = [
+        stream,
+        stream,
+        None,
+    ]
+    streams.get_audio_only.return_value = None
+    # When
+    with pytest.raises(SystemExit):
+        cli.ffmpeg_process(youtube, "best", target)
+    # Then
+    _ffmpeg_downloader.assert_not_called()
+
+
+@mock.patch("pytube.cli.os.unlink", return_value=None)
+@mock.patch("pytube.cli.subprocess.run", return_value=None)
+@mock.patch("pytube.cli._download", return_value=None)
+@mock.patch("pytube.cli._unique_name", return_value=None)
+def test_ffmpeg_downloader(unique_name, download, run, unlink):
+    # Given
+    target = "target"
+    audio_stream = MagicMock()
+    video_stream = MagicMock()
+    video_stream.id = "video_id"
+    audio_stream.subtype = "audio_subtype"
+    video_stream.subtype = "video_subtype"
+    unique_name.side_effect = ["video_name", "audio_name"]
+
+    # When
+    cli._ffmpeg_downloader(
+        audio_stream=audio_stream, video_stream=video_stream, target=target
+    )
+    # Then
+    download.assert_called()
+    run.assert_called_with(
+        [
+            "ffmpeg",
+            "-i",
+            "target/video_name.video_subtype",
+            "-i",
+            "target/audio_name.audio_subtype",
+            "-codec",
+            "copy",
+            "target/safe_title.video_subtype",
+        ]
+    )
+    unlink.assert_called()
+
+
+@mock.patch("pytube.cli.download_audio")
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
-def test_download_audio(youtube):
+def test_download_audio_args(youtube, download_audio):
+    # Given
     parser = argparse.ArgumentParser()
     args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-a", "mp4"])
     cli._parse_args = MagicMock(return_value=args)
-    cli.download_audio = MagicMock()
+    # When
     cli.main()
+    # Then
     youtube.assert_called()
-    cli.download_audio.assert_called()
+    download_audio.assert_called()
 
 
-@mock.patch("pytube.cli.YouTube.__init__", return_value=None)
-def test_ffmpeg_process(youtube):
-    parser = argparse.ArgumentParser()
-    args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-f", "2160p"])
-    cli._parse_args = MagicMock(return_value=args)
-    cli.ffmpeg_process = MagicMock()
-    cli.main()
-    youtube.assert_called()
-    cli.ffmpeg_process.assert_called()
+@mock.patch("pytube.cli._download")
+@mock.patch("pytube.cli.YouTube")
+def test_download_audio(youtube, download):
+    # Given
+    youtube_instance = youtube.return_value
+    audio_stream = MagicMock()
+    youtube_instance.streams.filter.return_value.order_by.return_value.last.return_value = (
+        audio_stream
+    )
+    # When
+    cli.download_audio(youtube_instance, "filetype", "target")
+    # Then
+    download.assert_called_with(audio_stream, target="target")
+
+
+@mock.patch("pytube.cli._download")
+@mock.patch("pytube.cli.YouTube")
+def test_download_audio_none(youtube, download):
+    # Given
+    youtube_instance = youtube.return_value
+    youtube_instance.streams.filter.return_value.order_by.return_value.last.return_value = (
+        None
+    )
+    # When
+    with pytest.raises(SystemExit):
+        cli.download_audio(youtube_instance, "filetype", "target")
+    # Then
+    download.assert_not_called()
 
 
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
@@ -271,3 +481,14 @@ def test_perform_args_on_youtube(youtube):
     cli.main()
     youtube.assert_called()
     cli._perform_args_on_youtube.assert_called()
+
+
+@mock.patch("pytube.cli.os.path.exists", return_value=False)
+def test_unique_name(path_exists):
+    assert cli._unique_name("base", "subtype", "video", "target") == "base_video_0"
+
+
+@mock.patch("pytube.cli.os.path.exists")
+def test_unique_name_counter(path_exists):
+    path_exists.side_effect = [True, False]
+    assert cli._unique_name("base", "subtype", "video", "target") == "base_video_1"

@@ -26,7 +26,8 @@ def test_caption_query_sequence():
     assert caption_query["en"] == caption1
     assert caption_query["fr"] == caption2
     with pytest.raises(KeyError):
-        caption_query["nada"]
+        not_exists = caption_query["nada"]
+        assert not_exists is not None  # should never reach this
 
 
 def test_caption_query_get_by_language_code_when_exists():
@@ -37,7 +38,7 @@ def test_caption_query_get_by_language_code_when_exists():
         {"url": "url2", "name": {"simpleText": "name2"}, "languageCode": "fr"}
     )
     caption_query = CaptionQuery(captions=[caption1, caption2])
-    assert caption_query.get_by_language_code("en") == caption1
+    assert caption_query["en"] == caption1
 
 
 def test_caption_query_get_by_language_code_when_not_exists():
@@ -48,7 +49,9 @@ def test_caption_query_get_by_language_code_when_not_exists():
         {"url": "url2", "name": {"simpleText": "name2"}, "languageCode": "fr"}
     )
     caption_query = CaptionQuery(captions=[caption1, caption2])
-    assert caption_query.get_by_language_code("hello") is None
+    with pytest.raises(KeyError):
+        not_found = caption_query["hello"]
+        assert not_found is not None  # should never reach here
 
 
 @mock.patch("pytube.captions.Caption.generate_srt_captions")
@@ -118,3 +121,24 @@ def test_xml_captions(request_get):
         {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
     )
     assert caption.xml_captions == "test"
+
+
+@mock.patch("pytube.captions.request")
+def test_generate_srt_captions(request):
+    request.get.return_value = (
+        '<?xml version="1.0" encoding="utf-8" ?><transcript><text start="6.5" dur="1.7">['
+        'Herb, Software Engineer]\n本影片包含隱藏式字幕。</text><text start="8.3" dur="2.7">'
+        "如要啓動字幕，請按一下這裡的圖示。</text></transcript>"
+    )
+    caption = Caption(
+        {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
+    )
+    assert caption.generate_srt_captions() == (
+        "1\n"
+        "00:00:06,500 --> 00:00:08,200\n"
+        "[Herb, Software Engineer] 本影片包含隱藏式字幕。\n"
+        "\n"
+        "2\n"
+        "00:00:08,300 --> 00:00:11,000\n"
+        "如要啓動字幕，請按一下這裡的圖示。"
+    )

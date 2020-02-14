@@ -369,7 +369,9 @@ class CaptionQuery(Mapping):
         self.lang_code_index = {c.code: c for c in captions}
 
     @deprecated("This object can be treated as a dictionary, i.e. captions['en']")
-    def get_by_language_code(self, lang_code: str) -> Optional[Caption]:
+    def get_by_language_code(
+        self, lang_code: str
+    ) -> Optional[Caption]:  # pragma: no cover
         """Get the :class:`Caption <Caption>` for a given ``lang_code``.
 
         :param str lang_code:
@@ -397,7 +399,7 @@ class CaptionQuery(Mapping):
         return len(self.lang_code_index)
 
     def __iter__(self):
-        return iter(self.lang_code_index)
+        return iter(self.lang_code_index.values())
 
     def __repr__(self) -> str:
         return f"{self.lang_code_index}"
