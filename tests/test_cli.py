@@ -264,25 +264,40 @@ def test_download_with_playlist_video_error(
 @mock.patch("pytube.cli.YouTube")
 @mock.patch("pytube.StreamQuery")
 @mock.patch("pytube.Stream")
-def test_download_by_resolution(youtube, stream_query, stream):
+@mock.patch("pytube.cli._download")
+def test_download_by_resolution(download, stream, stream_query, youtube):
+    # Given
     stream_query.get_by_resolution.return_value = stream
     youtube.streams = stream_query
-    cli._download = MagicMock()
+    # When
     cli.download_by_resolution(youtube=youtube, resolution="320p", target="test_target")
-    cli._download.assert_called_with(stream, target="test_target")
+    # Then
+    download.assert_called_with(stream, target="test_target")
 
 
 @mock.patch("pytube.cli.YouTube")
 @mock.patch("pytube.StreamQuery")
-def test_download_by_resolution_not_exists(youtube, stream_query):
+@mock.patch("pytube.cli._download")
+def test_download_by_resolution_not_exists(download, stream_query, youtube):
     stream_query.get_by_resolution.return_value = None
     youtube.streams = stream_query
-    cli._download = MagicMock()
     with pytest.raises(SystemExit):
         cli.download_by_resolution(
             youtube=youtube, resolution="DOESNT EXIST", target="test_target"
         )
-    cli._download.assert_not_called()
+    download.assert_not_called()
+
+
+@mock.patch("pytube.Stream")
+def test_download_stream_file_exists(stream, capsys):
+    # Given
+    stream.exists_at_path.return_value = True
+    # When
+    cli._download(stream=stream)
+    # Then
+    captured = capsys.readouterr()
+    assert "Already downloaded at" in captured.out
+    stream.download.assert_not_called()
 
 
 @mock.patch("pytube.cli.YouTube")
