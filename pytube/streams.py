@@ -215,23 +215,13 @@ class Stream:
         :rtype: str
 
         """
-        if filename:
-            filename = f"{safe_filename(filename)}.{self.subtype}"
-        else:
-            filename = self.default_filename
+        file_path = self.get_file_path(
+            filename=filename, output_path=output_path, filename_prefix=filename_prefix
+        )
 
-        if filename_prefix:
-            filename = f"{safe_filename(filename_prefix)}{filename}"
-
-        file_path = os.path.join(target_directory(output_path), filename)
-
-        if (
-            skip_existing
-            and os.path.isfile(file_path)
-            and os.path.getsize(file_path) == self.filesize
-        ):
-            # likely the same file, so skip it
+        if skip_existing and self.exists_at_path(file_path):
             logger.debug("file %s already exists, skipping", file_path)
+            self.on_complete(file_path)
             return file_path
 
         bytes_remaining = self.filesize
@@ -247,6 +237,23 @@ class Stream:
                 self.on_progress(chunk, fh, bytes_remaining)
         self.on_complete(file_path)
         return file_path
+
+    def get_file_path(
+        self,
+        filename: Optional[str],
+        output_path: Optional[str],
+        filename_prefix: Optional[str] = None,
+    ) -> str:
+        if filename:
+            filename = f"{safe_filename(filename)}.{self.subtype}"
+        else:
+            filename = self.default_filename
+        if filename_prefix:
+            filename = f"{safe_filename(filename_prefix)}{filename}"
+        return os.path.join(target_directory(output_path), filename)
+
+    def exists_at_path(self, file_path: str) -> bool:
+        return os.path.isfile(file_path) and os.path.getsize(file_path) == self.filesize
 
     def stream_to_buffer(self) -> io.BytesIO:
         """Write the media stream to buffer

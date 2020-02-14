@@ -223,6 +223,11 @@ def _download(
 ) -> None:
     filesize_megabytes = stream.filesize // 1048576
     print(f"{filename or stream.default_filename} | {filesize_megabytes} MB")
+    file_path = stream.get_file_path(filename=filename, output_path=target)
+    if stream.exists_at_path(file_path):
+        print(f"Already downloaded at:\n{file_path}")
+        return
+
     stream.download(output_path=target, filename=filename)
     sys.stdout.write("\n")
 
