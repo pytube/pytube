@@ -39,7 +39,7 @@ clean-pyc:
 install: clean
 	python setup.py install
 
-package: clean-build
+package: clean
 	pipenv run python setup.py sdist bdist_wheel
 
 upload:
@@ -53,4 +53,4 @@ tag:
 check-master:
 	if [[ `git rev-parse --abbrev-ref HEAD` != "master" ]]; then exit 1; fi
 
-release: check-master clean test tag clean-pyc package upload
+release: check-master clean test tag package upload
