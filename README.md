@@ -44,6 +44,7 @@ $ pip install pytube3 --upgrade
   ... .order_by('resolution')[-1]
   ... .download()
 ```
+A GUI frontend for pytube3 is available at [YouTubeDownload](https://github.com/YouTubeDownload/YouTubeDownload)
 
 ## Features
   * Support for Both Progressive & DASH Streams
@@ -242,6 +243,7 @@ The complete set of flags are:
 ```
 usage: pytube3 [-h] [--version] [--itag ITAG] [-r RESOLUTION] [-l] [-v]
                [--build-playback-report] [-c [CAPTION_CODE]] [-t TARGET]
+               [-a [AUDIO]] [-f [FFMPEG]]
                [url]
 
 Command line application to download youtube videos.
@@ -257,7 +259,7 @@ optional arguments:
                         The resolution for the desired stream
   -l, --list            The list option causes pytube cli to return a list of
                         streams available to download
-  -v, --verbose         Verbosity level
+  -v, --verbose         Verbosity level, use up to 4 to increase logging -vvvv
   --build-playback-report
                         Save the html and js to disk
   -c [CAPTION_CODE], --caption-code [CAPTION_CODE]
@@ -266,6 +268,15 @@ optional arguments:
   -t TARGET, --target TARGET
                         The output directory for the downloaded stream.
                         Default is current working directory
+  -a [AUDIO], --audio [AUDIO]
+                        Download the audio for a given URL at the highest
+                        bitrate availableDefaults to mp4 format if none is
+                        specified
+  -f [FFMPEG], --ffmpeg [FFMPEG]
+                        Downloads the audio and video stream for resolution
+                        providedIf no resolution is provided, downloads the
+                        best resolutionRuns the command line program ffmpeg to
+                        combine the audio and video
 ```
 
 
@@ -292,7 +303,7 @@ This project is linted with [pyflakes](https://github.com/PyCQA/pyflakes), forma
 Treat other people with helpfulness, gratitude, and consideration! See the [Python Community Code of Conduct](https://www.python.org/psf/codeofconduct/).
 
 ## GUIs and other libraries
-* [youtube-python](https://github.com/rohitkhatri/youtube-python) - client for the YouTube data API
-* [YouTubeDownload](https://github.com/YouTubeDownload/YouTubeDownload) - GUI frontend for pytube3
+* [YouTubeDownload](https://github.com/YouTubeDownload/YouTubeDownload) - Featured GUI frontend for pytube3
 * [Pytube-GUI](https://github.com/GAO23/Pytube-GUI) - Simple GUI frontend for pytube3
 * [StackOverflow questions](https://stackoverflow.com/questions/tagged/pytube)
+* [PySlackers](https://pyslackers.com/web) - Python Slack group
