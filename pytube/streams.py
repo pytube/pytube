@@ -245,7 +245,7 @@ class Stream:
                 bytes_remaining -= len(chunk)
                 # send to the on_progress callback.
                 self.on_progress(chunk, fh, bytes_remaining)
-        self.on_complete(fh)
+        self.on_complete(file_path)
         return file_path
 
     def stream_to_buffer(self) -> io.BytesIO:
@@ -264,7 +264,7 @@ class Stream:
             bytes_remaining -= len(chunk)
             # send to the on_progress callback.
             self.on_progress(chunk, buffer, bytes_remaining)
-        self.on_complete(buffer)
+        self.on_complete(None)
         return buffer
 
     def on_progress(self, chunk, file_handler, bytes_remaining):
@@ -300,13 +300,12 @@ class Stream:
             logger.debug("calling on_progress callback %s", on_progress)
             on_progress(self, chunk, file_handler, bytes_remaining)
 
-    def on_complete(self, file_handle):
+    def on_complete(self, file_path: Optional[str]):
         """On download complete handler function.
 
-        :param file_handle:
+        :param file_path:
             The file handle where the media is being written to.
-        :type file_handle:
-            :py:class:`io.BufferedWriter`
+        :type file_handle: str
 
         :rtype: None
 
@@ -315,7 +314,7 @@ class Stream:
         on_complete = self._monostate.on_complete
         if on_complete:
             logger.debug("calling on_complete callback %s", on_complete)
-            on_complete(self, file_handle)
+            on_complete(self, file_path)
 
     def __repr__(self) -> str:
         """Printable object representation.

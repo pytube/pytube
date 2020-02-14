@@ -221,15 +221,16 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
     """
     cipher = Cipher(js=js)
     stream_manifest = config_args[fmt]
-    live_stream = (
-        json.loads(config_args["player_response"])
-        .get("playabilityStatus", {},)
-        .get("liveStreamability")
-    )
+
     for i, stream in enumerate(stream_manifest):
         try:
             url: str = stream["url"]
         except KeyError:
+            live_stream = (
+                json.loads(config_args["player_response"])
+                .get("playabilityStatus", {},)
+                .get("liveStreamability")
+            )
             if live_stream:
                 raise LiveStreamError("UNKNOWN")
         # 403 Forbidden fix.

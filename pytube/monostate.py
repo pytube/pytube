@@ -33,17 +33,16 @@ class OnProgress(Protocol):
 
 
 class OnComplete(Protocol):
-    def __call__(self, stream: Any, file_handler: io.BufferedWriter) -> None:
+    def __call__(self, stream: Any, file_path: Optional[str]) -> None:
         """On download complete handler function.
 
         :param stream:
             An instance of :class:`Stream <Stream>` being downloaded.
         :type stream:
             :py:class:`pytube.Stream`
-        :param file_handler:
+        :param file_path:
             The file handle where the media is being written to.
-        :type file_handler:
-            :py:class:`io.BufferedWriter`
+        :type file_path: str
 
         :rtype: None
         """
