@@ -7,9 +7,8 @@ import pytest
 from pytube import request
 
 
-@mock.patch("pytube.request.filesize", return_value=3 * 8 * 1024)
 @mock.patch("pytube.request.urlopen")
-def test_streaming(mock_urlopen, filesize):
+def test_streaming(mock_urlopen):
     # Given
     fake_stream_binary = [
         os.urandom(8 * 1024),
@@ -19,6 +18,7 @@ def test_streaming(mock_urlopen, filesize):
     ]
     response = mock.Mock()
     response.read.side_effect = fake_stream_binary
+    response.info.return_value = {"Content-Range": "bytes 200-1000/24576"}
     mock_urlopen.return_value = response
     # When
     response = request.stream("http://fakeassurl.gov")

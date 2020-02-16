@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import random
+from datetime import datetime
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -57,6 +58,10 @@ def test_title(cipher_signature):
     del cipher_signature.player_config_args["title"]
     cipher_signature.player_response = {"videoDetails": {"title": expected}}
     assert cipher_signature.title == expected
+
+
+def test_expiration(cipher_signature):
+    assert cipher_signature.streams[0].expiration == datetime(2020, 1, 16, 5, 12, 5)
 
 
 def test_caption_tracks(presigned_video):
