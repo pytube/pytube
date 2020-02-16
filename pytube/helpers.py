@@ -4,7 +4,6 @@
 import functools
 import logging
 import os
-import pprint
 import re
 import warnings
 from typing import TypeVar, Callable, Optional, Dict, List, Any
@@ -34,10 +33,7 @@ def regex_search(pattern: str, string: str, group: int) -> str:
     if not results:
         raise RegexMatchError(caller="regex_search", pattern=pattern)
 
-    logger.debug(
-        "finished regex search: %s",
-        pprint.pformat({"pattern": pattern, "results": results.group(0),}, indent=2,),
-    )
+    logger.debug("matched regex search: %s", pattern)
 
     return results.group(group)
 

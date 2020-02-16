@@ -1,18 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import io
 from typing import Any, Optional
 from typing_extensions import Protocol
 
 
 class OnProgress(Protocol):
-    def __call__(
-        self,
-        stream: bytes,
-        chunk: Any,
-        file_handler: io.BufferedWriter,
-        bytes_remaining: int,
-    ) -> None:
+    def __call__(self, stream: Any, chunk: bytes, bytes_remaining: int) -> None:
         """On download progress callback function.
 
         :param stream:
@@ -21,10 +14,6 @@ class OnProgress(Protocol):
             :py:class:`pytube.Stream`
         :param str chunk:
             Segment of media file binary data, not yet written to disk.
-        :param file_handler:
-            The file handle where the media is being written to.
-        :type file_handler:
-            :py:class:`io.BufferedWriter`
         :param int bytes_remaining:
             How many bytes have been downloaded.
 

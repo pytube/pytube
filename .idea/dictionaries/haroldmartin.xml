@@ -28,6 +28,7 @@
       <w>nosec</w>
       <w>ntfs</w>
       <w>prog</w>
+      <w>pylint</w>
       <w>pytube</w>
       <w>recompiles</w>
       <w>samp</w>

@@ -11,7 +11,6 @@ import os
 import shutil
 import sys
 import subprocess  # nosec
-from io import BufferedWriter
 from typing import Any, Optional, List
 
 from pytube import __version__, CaptionQuery, Stream, Playlist
@@ -211,8 +210,8 @@ def display_progress_bar(
 
 # noinspection PyUnusedLocal
 def on_progress(
-    stream: Any, chunk: Any, file_handler: BufferedWriter, bytes_remaining: int
-) -> None:
+    stream: Any, chunk: bytes, bytes_remaining: int
+) -> None:  # pylint: disable=W0613
     filesize = stream.filesize
     bytes_received = filesize - bytes_remaining
     display_progress_bar(bytes_received, filesize)

@@ -125,11 +125,10 @@ def test_display_progress_bar(capsys):
 
 
 @mock.patch("pytube.Stream")
-@mock.patch("io.BufferedWriter")
-def test_on_progress(stream, writer):
+def test_on_progress(stream):
     stream.filesize = 10
     cli.display_progress_bar = MagicMock()
-    cli.on_progress(stream, "", writer, 7)
+    cli.on_progress(stream, "", 7)
     cli.display_progress_bar.assert_called_once_with(3, 10)
 
 
