@@ -8,7 +8,6 @@ from typing import Iterable, Dict, Optional
 from urllib.request import Request
 from urllib.request import urlopen
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -54,7 +53,7 @@ def stream(
         response = _execute_request(url, method="GET", headers={"Range": range_header})
         if file_size == range_size:
             try:
-                content_range = response.info()['Content-Range']
+                content_range = response.info()["Content-Range"]
                 file_size = int(content_range.split("/")[1])
             except (KeyError, IndexError, ValueError) as e:
                 logger.error(e)

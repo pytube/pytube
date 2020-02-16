@@ -9,9 +9,11 @@ has been renamed to accommodate DASH (which serves the audio and video
 separately).
 """
 
+from datetime import datetime
 import logging
 import os
 from typing import Dict, Tuple, Optional, BinaryIO
+from urllib.parse import parse_qs
 
 from pytube import extract
 from pytube import request
@@ -168,6 +170,11 @@ class Stream:
             return int((self._monostate.duration * self.bitrate) / bits_in_byte)
 
         return self.filesize
+
+    @property
+    def expiration(self) -> datetime:
+        expire = parse_qs(self.url.split("?")[1])["expire"][0]
+        return datetime.fromtimestamp(int(expire))
 
     @property
     def default_filename(self) -> str:
