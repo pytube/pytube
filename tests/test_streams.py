@@ -8,6 +8,24 @@ from pytube import request
 from pytube import Stream, streams
 
 
+@mock.patch("pytube.streams.request")
+def test_stream_to_buffer(mock_request, cipher_signature):
+    # Given
+    stream_bytes = iter(
+        [
+            bytes(os.urandom(8 * 1024)),
+            bytes(os.urandom(8 * 1024)),
+            bytes(os.urandom(8 * 1024)),
+        ]
+    )
+    mock_request.stream.return_value = stream_bytes
+    buffer = MagicMock()
+    # When
+    cipher_signature.streams[0].stream_to_buffer(buffer)
+    # Then
+    assert buffer.write.call_count == 3
+
+
 def test_filesize(cipher_signature, mocker):
     mocker.patch.object(request, "head")
     request.head.return_value = {"content-length": "6796391"}

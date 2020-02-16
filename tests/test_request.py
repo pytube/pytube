@@ -10,6 +10,7 @@ from pytube import request
 @mock.patch("pytube.request.filesize", return_value=3 * 8 * 1024)
 @mock.patch("pytube.request.urlopen")
 def test_streaming(mock_urlopen, filesize):
+    # Given
     fake_stream_binary = [
         os.urandom(8 * 1024),
         os.urandom(8 * 1024),
@@ -19,9 +20,10 @@ def test_streaming(mock_urlopen, filesize):
     response = mock.Mock()
     response.read.side_effect = fake_stream_binary
     mock_urlopen.return_value = response
+    # When
     response = request.stream("http://fakeassurl.gov")
+    # Then
     call_count = len(list(response))
-
     assert call_count == 3
 
 
