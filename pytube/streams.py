@@ -174,7 +174,7 @@ class Stream:
     @property
     def expiration(self) -> datetime:
         expire = parse_qs(self.url.split("?")[1])["expire"][0]
-        return datetime.fromtimestamp(int(expire))
+        return datetime.utcfromtimestamp(int(expire))
 
     @property
     def default_filename(self) -> str:
