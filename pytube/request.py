@@ -46,18 +46,23 @@ def stream(
     while downloaded < file_size:
         stop_pos = min(downloaded + range_size, file_size) - 1
         range_header = f"bytes={downloaded}-{stop_pos}"
-        r = _execute_request(url, method="GET", headers={"Range": range_header})
+        response = _execute_request(url, method="GET", headers={"Range": range_header})
         while True:
-            chunk = r.read(chunk_size)
+            chunk = response.read(chunk_size)
             if not chunk:
                 break
             downloaded += len(chunk)
             yield chunk
-    return
+    return  # pylint: disable=R1711
 
 
 @lru_cache(maxsize=None)
 def filesize(url: str) -> int:
+    """Fetch size in bytes of file at given URL
+
+    :param str url: The URL to get the size of
+    :returns: int: size in bytes of remote file
+    """
     return int(head(url)["content-length"])
 
 

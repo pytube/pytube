@@ -209,7 +209,9 @@ def display_progress_bar(
 
 
 # noinspection PyUnusedLocal
-def on_progress(stream: Any, chunk: bytes, bytes_remaining: int) -> None:
+def on_progress(
+    stream: Any, chunk: bytes, bytes_remaining: int
+) -> None:  # pylint: disable=W0613
     filesize = stream.filesize
     bytes_received = filesize - bytes_remaining
     display_progress_bar(bytes_received, filesize)

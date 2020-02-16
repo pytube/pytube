@@ -15,6 +15,8 @@ def test_filesize(cipher_signature, mocker):
 
 
 def test_filesize_approx(cipher_signature, mocker):
+    mocker.patch.object(request, "head")
+    request.head.return_value = {"content-length": "6796391"}
     stream = cipher_signature.streams[0]
 
     assert stream.filesize_approx == 22350604
