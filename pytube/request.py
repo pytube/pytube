@@ -1,22 +1,27 @@
 # -*- coding: utf-8 -*-
 
 """Implements a simple wrapper around urlopen."""
+import logging
 from functools import lru_cache
-from typing import Any, Iterable, Dict, Optional
+from http.client import HTTPResponse
+from typing import Iterable, Dict, Optional
 from urllib.request import Request
 from urllib.request import urlopen
 
 
+logger = logging.getLogger(__name__)
+
+
 def _execute_request(
     url: str, method: Optional[str] = None, headers: Optional[Dict[str, str]] = None
-) -> Any:
+) -> HTTPResponse:
     base_headers = {"User-Agent": "Mozilla/5.0"}
     if headers:
         base_headers.update(headers)
     if url.lower().startswith("http"):
         request = Request(url, headers=base_headers, method=method)
     else:
-        raise ValueError
+        raise ValueError("Invalid URL")
     return urlopen(request)  # nosec
 
 
@@ -33,20 +38,26 @@ def get(url) -> str:
 
 
 def stream(
-    url: str, chunk_size: int = 1024, range_size: int = 10485760
+    url: str, chunk_size: int = 4096, range_size: int = 9437184
 ) -> Iterable[bytes]:
     """Read the response in chunks.
     :param str url: The URL to perform the GET request for.
-    :param int chunk_size: The size in bytes of each chunk. Defaults to 1KB
-    :param int range_size: The size in bytes of each range request. Defaults to 10MB
+    :param int chunk_size: The size in bytes of each chunk. Defaults to 4KB
+    :param int range_size: The size in bytes of each range request. Defaults to 9MB
     :rtype: Iterable[bytes]
     """
-    file_size: int = filesize(url)
+    file_size: int = range_size  # fake filesize to start
     downloaded = 0
     while downloaded < file_size:
         stop_pos = min(downloaded + range_size, file_size) - 1
         range_header = f"bytes={downloaded}-{stop_pos}"
         response = _execute_request(url, method="GET", headers={"Range": range_header})
+        if file_size == range_size:
+            try:
+                content_range = response.info()['Content-Range']
+                file_size = int(content_range.split("/")[1])
+            except (KeyError, IndexError, ValueError) as e:
+                logger.error(e)
         while True:
             chunk = response.read(chunk_size)
             if not chunk:
