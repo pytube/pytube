@@ -53,4 +53,7 @@ tag:
 check-master:
 	if [[ `git rev-parse --abbrev-ref HEAD` != "master" ]]; then exit 1; fi
 
-release: check-master clean test tag package upload
+pull:
+	git pull
+
+release: check-master pull clean test tag package upload
