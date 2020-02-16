@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """Implements a simple wrapper around urlopen."""
+from functools import lru_cache
 from typing import Any, Iterable, Dict, Optional
 from urllib.request import Request
 from urllib.request import urlopen
@@ -31,18 +32,33 @@ def get(url) -> str:
     return _execute_request(url).read().decode("utf-8")
 
 
-def stream(url: str, chunk_size: int = 8192) -> Iterable[bytes]:
+def stream(
+    url: str, chunk_size: int = 1024, range_size: int = 10485760
+) -> Iterable[bytes]:
     """Read the response in chunks.
     :param str url: The URL to perform the GET request for.
-    :param int chunk_size: The size in bytes of each chunk. Defaults to 8*1024
+    :param int chunk_size: The size in bytes of each chunk. Defaults to 1KB
+    :param int range_size: The size in bytes of each range request. Defaults to 10MB
     :rtype: Iterable[bytes]
     """
-    response = _execute_request(url, headers={"Range": "bytes=0-"})
-    while True:
-        buf = response.read(chunk_size)
-        if not buf:
-            break
-        yield buf
+    file_size: int = filesize(url)
+    downloaded = 0
+    while downloaded < file_size:
+        stop_pos = min(downloaded + range_size, file_size) - 1
+        range_header = f"bytes={downloaded}-{stop_pos}"
+        r = _execute_request(url, method="GET", headers={"Range": range_header})
+        while True:
+            chunk = r.read(chunk_size)
+            if not chunk:
+                break
+            downloaded += len(chunk)
+            yield chunk
+    return
+
+
+@lru_cache(maxsize=None)
+def filesize(url: str) -> int:
+    return int(head(url)["content-length"])
 
 
 def head(url: str) -> Dict:

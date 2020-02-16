@@ -7,12 +7,13 @@ import pytest
 from pytube import request
 
 
+@mock.patch("pytube.request.filesize", return_value=3 * 8 * 1024)
 @mock.patch("pytube.request.urlopen")
-def test_streaming(mock_urlopen):
+def test_streaming(mock_urlopen, filesize):
     fake_stream_binary = [
-        iter(os.urandom(8 * 1024)),
-        iter(os.urandom(8 * 1024)),
-        iter(os.urandom(8 * 1024)),
+        os.urandom(8 * 1024),
+        os.urandom(8 * 1024),
+        os.urandom(8 * 1024),
         None,
     ]
     response = mock.Mock()

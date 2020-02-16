@@ -9,11 +9,9 @@ has been renamed to accommodate DASH (which serves the audio and video
 separately).
 """
 
-import io
 import logging
 import os
-import pprint
-from typing import Dict, Tuple, Optional
+from typing import Dict, Tuple, Optional, BinaryIO
 
 from pytube import extract
 from pytube import request
@@ -143,8 +141,7 @@ class Stream:
             Filesize (in bytes) of the stream.
         """
         if self._filesize is None:
-            headers = request.head(self.url)
-            self._filesize = int(headers["content-length"])
+            self._filesize = request.filesize(self.url)
         return self._filesize
 
     @property
@@ -255,15 +252,14 @@ class Stream:
     def exists_at_path(self, file_path: str) -> bool:
         return os.path.isfile(file_path) and os.path.getsize(file_path) == self.filesize
 
-    def stream_to_buffer(self) -> io.BytesIO:
+    def stream_to_buffer(self, buffer: BinaryIO) -> None:
         """Write the media stream to buffer
 
         :rtype: io.BytesIO buffer
         """
-        buffer = io.BytesIO()
         bytes_remaining = self.filesize
-        logger.debug(
-            "downloading (%s total bytes) file to BytesIO buffer", self.filesize,
+        logger.info(
+            "downloading (%s total bytes) file to buffer", self.filesize,
         )
 
         for chunk in request.stream(self.url):
@@ -272,9 +268,8 @@ class Stream:
             # send to the on_progress callback.
             self.on_progress(chunk, buffer, bytes_remaining)
         self.on_complete(None)
-        return buffer
 
-    def on_progress(self, chunk, file_handler, bytes_remaining):
+    def on_progress(self, chunk: bytes, file_handler: BinaryIO, bytes_remaining: int):
         """On progress callback function.
 
         This function writes the binary data to the file, then checks if an
@@ -295,24 +290,16 @@ class Stream:
 
         """
         file_handler.write(chunk)
-        logger.debug(
-            "download progress\n%s",
-            pprint.pformat(
-                {"chunk_size": len(chunk), "bytes_remaining": bytes_remaining,},
-                indent=2,
-            ),
-        )
-        on_progress = self._monostate.on_progress
-        if on_progress:
-            logger.debug("calling on_progress callback %s", on_progress)
-            on_progress(self, chunk, file_handler, bytes_remaining)
+        logger.debug("download remaining: %s", bytes_remaining)
+        if self._monostate.on_progress:
+            self._monostate.on_progress(self, chunk, bytes_remaining)
 
     def on_complete(self, file_path: Optional[str]):
         """On download complete handler function.
 
         :param file_path:
             The file handle where the media is being written to.
-        :type file_handle: str
+        :type file_path: str
 
         :rtype: None
 

@@ -15,12 +15,11 @@ def test_filesize(cipher_signature, mocker):
 
 
 def test_filesize_approx(cipher_signature, mocker):
-    mocker.patch.object(request, "head")
-    request.head.return_value = {"content-length": "123"}
     stream = cipher_signature.streams[0]
+
     assert stream.filesize_approx == 22350604
     stream.bitrate = None
-    assert stream.filesize_approx == 123
+    assert stream.filesize_approx == 6796391
 
 
 def test_default_filename(cipher_signature):
@@ -188,8 +187,8 @@ def test_on_progress_hook(cipher_signature, mocker):
         stream.download()
     assert callback_fn.called
     args, _ = callback_fn.call_args
-    assert len(args) == 4
-    stream, _, _, _ = args
+    assert len(args) == 3
+    stream, _, _ = args
     assert isinstance(stream, Stream)
 
 
