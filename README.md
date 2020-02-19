@@ -5,10 +5,9 @@
 	  <a href="https://pypi.python.org/pypi/pytube3/"><img src="https://img.shields.io/pypi/pyversions/pytube3.svg" /></a>
 	  <a href="https://travis-ci.com/hbmartin/pytube3/"><img src="https://travis-ci.org/hbmartin/pytube3.svg?branch=master" /></a>
 	  <a href='https://pytube3.readthedocs.io/en/latest/?badge=latest'><img src='https://readthedocs.org/projects/pytube3/badge/?version=latest' alt='Documentation Status' /></a>
-	<a href="https://codecov.io/gh/hbmartin/pytube3"><img src="https://codecov.io/gh/hbmartin/pytube3/branch/master/graph/badge.svg" /></a>
+	  <a href="https://codecov.io/gh/hbmartin/pytube3"><img src="https://codecov.io/gh/hbmartin/pytube3/branch/master/graph/badge.svg" /></a>
 	  <a href="https://www.codefactor.io/repository/github/hbmartin/pytube3/overview/master"><img src="https://www.codefactor.io/repository/github/hbmartin/pytube3/badge/master" alt="CodeFactor" /></a>
-	  <a href="https://github.com/ambv/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a>
-	  <a href="https://twitter.com/hmartin"><img src="https://img.shields.io/badge/twitter-@hmartin-blue.svg?style=flat" /></a>
+	  <a href="https://gitter.im/pytube3/community"><img src="https://badges.gitter.im/pytube3.png" /></a>
   </p>
 </div>
 
@@ -284,6 +283,7 @@ optional arguments:
 
 <a href="https://deepsource.io/gh/hbmartin/pytube3/?ref=repository-badge" target="_blank"><img alt="DeepSource" title="DeepSource" src="https://static.deepsource.io/deepsource-badge-light-mini.svg"></a>
 <a href="https://www.codacy.com/manual/hbmartin/pytube3?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hbmartin/pytube3&amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/53794f06983a46829620b3284c6a5596"/></a>
+<a href="https://github.com/ambv/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a>
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
