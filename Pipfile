@@ -20,6 +20,8 @@ coveralls = "*"
 twine = "*"
 more-itertools = "==5.0.0"
 black = "*"
+pipenv-to-requirements = "*"
+wheel = "*"
 
 [requires]
 python_version = "3.6"
