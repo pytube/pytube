@@ -1,16 +1,43 @@
-help:
-	@echo "clean - remove all build, test, coverage and Python artifacts"
-	@echo "clean-build - remove build artifacts"
-	@echo "clean-pyc - remove Python file artifacts"
-	@echo "install - install the package to the active Python's site-packages"
-
-ci:
-	pip install pipenv
+dev:
 	pipenv install --dev
-	pipenv run flake8
-	pipenv run pytest --cov-report term-missing --cov=pytube --ignore=W605
+
+deploy-patch: requirements bumpversion-patch sdist bdist wheels upload clean
+
+deploy-minor: requirements bumpversion-minor sdist bdist wheels upload clean
+
+deploy-major: requirements bumpversion-major sdist bdist wheels upload clean
+
+requirements:
+	pipenv_to_requirements
+
+sdist: requirements
+	python setup.py sdist
+
+bdist: requirements
+	python setup.py bdist
+
+wheels: requirements
+	python setup.py bdist_wheel
 
 clean: clean-build clean-pyc
+
+bumpversion-patch:
+	bumpversion patch
+	git push
+	git push --tags
+
+bumpversion-minor:
+	bumpversion minor
+	git push
+	git push --tags
+
+bumpversion-major:
+	bumpversion major
+	git push
+	git push --tags
+
+upload:
+	python setup.py sdist bdist bdist_wheel upload
 
 clean-build:
 	rm -fr build/
@@ -26,6 +53,3 @@ clean-pyc:
 	find . -name '*~' -exec rm -f {} +
 	find . -name '__pycache__' -exec rm -fr {} +
 	find . -name '.pytest_cache' -exec rm -fr {} +
-
-install: clean
-	python setup.py install
