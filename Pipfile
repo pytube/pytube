@@ -19,6 +19,10 @@ bumpversion = "*"
 coveralls = "*"
 twine = "*"
 more-itertools = "==5.0.0"
+black = "*"
 
 [requires]
 python_version = "3.6"
+
+[pipenv]
+allow_prereleases = true
