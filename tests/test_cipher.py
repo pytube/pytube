@@ -7,4 +7,4 @@ from pytube.exceptions import RegexMatchError
 
 def test_map_functions():
     with pytest.raises(RegexMatchError):
-        cipher.map_functions('asdf')
+        cipher.map_functions("asdf")

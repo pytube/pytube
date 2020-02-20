@@ -17,9 +17,9 @@ class Caption:
         :param dict caption_track:
             Caption track data extracted from ``watch_html``.
         """
-        self.url = caption_track.get('baseUrl')
-        self.name = caption_track['name']['simpleText']
-        self.code = caption_track['languageCode']
+        self.url = caption_track.get("baseUrl")
+        self.name = caption_track["name"]["simpleText"]
+        self.code = caption_track["languageCode"]
 
     @property
     def xml_captions(self):
@@ -45,8 +45,8 @@ class Caption:
         '00:00:03,890'
         """
         frac, whole = math.modf(d)
-        time_fmt = time.strftime('%H:%M:%S,', time.gmtime(whole))
-        ms = '{:.3f}'.format(frac).replace('0.', '')
+        time_fmt = time.strftime("%H:%M:%S,", time.gmtime(whole))
+        ms = "{:.3f}".format(frac).replace("0.", "")
         return time_fmt + ms
 
     def xml_caption_to_srt(self, xml_captions):
@@ -58,27 +58,21 @@ class Caption:
         segments = []
         root = ElementTree.fromstring(xml_captions)
         for i, child in enumerate(root.getchildren()):
-            text = child.text or ''
-            caption = unescape(
-                text
-                .replace('\n', ' ')
-                .replace('  ', ' '),
-            )
-            duration = float(child.attrib['dur'])
-            start = float(child.attrib['start'])
+            text = child.text or ""
+            caption = unescape(text.replace("\n", " ").replace("  ", " "),)
+            duration = float(child.attrib["dur"])
+            start = float(child.attrib["start"])
             end = start + duration
             sequence_number = i + 1  # convert from 0-indexed to 1.
-            line = (
-                '{seq}\n{start} --> {end}\n{text}\n'.format(
-                    seq=sequence_number,
-                    start=self.float_to_srt_time_format(start),
-                    end=self.float_to_srt_time_format(end),
-                    text=caption,
-                )
+            line = "{seq}\n{start} --> {end}\n{text}\n".format(
+                seq=sequence_number,
+                start=self.float_to_srt_time_format(start),
+                end=self.float_to_srt_time_format(end),
+                text=caption,
             )
             segments.append(line)
-        return '\n'.join(segments).strip()
+        return "\n".join(segments).strip()
 
     def __repr__(self):
         """Printable object representation."""
-        return'<Caption lang="{s.name}" code="{s.code}">'.format(s=self)
+        return '<Caption lang="{s.name}" code="{s.code}">'.format(s=self)

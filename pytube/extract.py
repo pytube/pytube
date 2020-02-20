@@ -13,25 +13,25 @@ from pytube.helpers import regex_search
 class PytubeHTMLParser(HTMLParser):
     in_vid_descr = False
     in_vid_descr_br = False
-    vid_descr = ''
+    vid_descr = ""
 
     def handle_starttag(self, tag, attrs):
-        if tag == 'p':
+        if tag == "p":
             for attr in attrs:
-                if attr[0] == 'id' and attr[1] == 'eow-description':
+                if attr[0] == "id" and attr[1] == "eow-description":
                     self.in_vid_descr = True
 
     def handle_endtag(self, tag):
-        if self.in_vid_descr and tag == 'p':
+        if self.in_vid_descr and tag == "p":
             self.in_vid_descr = False
 
     def handle_startendtag(self, tag, attrs):
-        if self.in_vid_descr and tag == 'br':
+        if self.in_vid_descr and tag == "br":
             self.in_vid_descr_br = True
 
     def handle_data(self, data):
         if self.in_vid_descr_br:
-            self.vid_descr += '\n{}'.format(data)
+            self.vid_descr += "\n{}".format(data)
             self.in_vid_descr_br = False
         elif self.in_vid_descr:
             self.vid_descr += data
@@ -47,7 +47,7 @@ def is_age_restricted(watch_html):
         Whether or not the content is age restricted.
     """
     try:
-        regex_search(r'og:restrictions:age', watch_html, group=0)
+        regex_search(r"og:restrictions:age", watch_html, group=0)
     except RegexMatchError:
         return False
     return True
@@ -68,7 +68,7 @@ def video_id(url):
     :returns:
         YouTube video id.
     """
-    return regex_search(r'(?:v=|\/)([0-9A-Za-z_-]{11}).*', url, group=1)
+    return regex_search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url, group=1)
 
 
 def watch_url(video_id):
@@ -80,20 +80,19 @@ def watch_url(video_id):
     :returns:
         Sanitized YouTube watch url.
     """
-    return 'https://youtube.com/watch?v=' + video_id
+    return "https://youtube.com/watch?v=" + video_id
 
 
 def embed_url(video_id):
-    return 'https://www.youtube.com/embed/{}'.format(video_id)
+    return "https://www.youtube.com/embed/{}".format(video_id)
 
 
 def eurl(video_id):
-    return 'https://youtube.googleapis.com/v/{}'.format(video_id)
+    return "https://youtube.googleapis.com/v/{}".format(video_id)
 
 
 def video_info_url(
-    video_id, watch_url, watch_html, embed_html,
-    age_restricted,
+    video_id, watch_url, watch_html, embed_html, age_restricted,
 ):
     """Construct the video_info url.
 
@@ -116,20 +115,20 @@ def video_info_url(
         sts = regex_search(r'"sts"\s*:\s*(\d+)', embed_html, group=1)
         # Here we use ``OrderedDict`` so that the output is consistent between
         # Python 2.7+.
-        params = OrderedDict([
-            ('video_id', video_id),
-            ('eurl', eurl(video_id)),
-            ('sts', sts),
-        ])
+        params = OrderedDict(
+            [("video_id", video_id), ("eurl", eurl(video_id)), ("sts", sts)]
+        )
     else:
-        params = OrderedDict([
-            ('video_id', video_id),
-            ('el', '$el'),
-            ('ps', 'default'),
-            ('eurl', quote(watch_url)),
-            ('hl', 'en_US'),
-        ])
-    return 'https://youtube.com/get_video_info?' + urlencode(params)
+        params = OrderedDict(
+            [
+                ("video_id", video_id),
+                ("el", "$el"),
+                ("ps", "default"),
+                ("eurl", quote(watch_url)),
+                ("hl", "en_US"),
+            ]
+        )
+    return "https://youtube.com/get_video_info?" + urlencode(params)
 
 
 def js_url(html, age_restricted=False):
@@ -145,8 +144,8 @@ def js_url(html, age_restricted=False):
 
     """
     ytplayer_config = get_ytplayer_config(html, age_restricted)
-    base_js = ytplayer_config['assets']['js']
-    return 'https://youtube.com' + base_js
+    base_js = ytplayer_config["assets"]["js"]
+    return "https://youtube.com" + base_js
 
 
 def mime_type_codec(mime_type_codec):
@@ -168,9 +167,9 @@ def mime_type_codec(mime_type_codec):
         The mime type and a list of codecs.
 
     """
-    pattern = r'(\w+\/\w+)\;\scodecs=\"([a-zA-Z-0-9.,\s]*)\"'
+    pattern = r"(\w+\/\w+)\;\scodecs=\"([a-zA-Z-0-9.,\s]*)\""
     mime_type, codecs = regex_search(pattern, mime_type_codec, groups=True)
-    return mime_type, [c.strip() for c in codecs.split(',')]
+    return mime_type, [c.strip() for c in codecs.split(",")]
 
 
 def get_ytplayer_config(html, age_restricted=False):
@@ -191,7 +190,7 @@ def get_ytplayer_config(html, age_restricted=False):
     if age_restricted:
         pattern = r";yt\.setConfig\(\{'PLAYER_CONFIG':\s*({.*})(,'EXPERIMENT_FLAGS'|;)"  # noqa: E501
     else:
-        pattern = r';ytplayer\.config\s*=\s*({.*?});'
+        pattern = r";ytplayer\.config\s*=\s*({.*?});"
     yt_player_config = regex_search(pattern, html, group=1)
     return json.loads(yt_player_config)
 

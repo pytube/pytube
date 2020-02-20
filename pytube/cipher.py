@@ -37,20 +37,20 @@ def get_initial_function_name(js):
     # c&&d.set("signature", EE(c));
 
     pattern = [
-        r'\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(',  # noqa: E501
-        r'\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(',  # noqa: E501
+        r"\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
+        r"\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
         r'(?P<sig>[a-zA-Z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\)',  # noqa: E501
         r'(["\'])signature\1\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(',
-        r'\.sig\|\|(?P<sig>[a-zA-Z0-9$]+)\(',
-        r'yt\.akamaized\.net/\)\s*\|\|\s*.*?\s*[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?:encodeURIComponent\s*\()?\s*(?P<si$',  # noqa: E501
-        r'\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(',  # noqa: E501
-        r'\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(',  # noqa: E501
-        r'\bc\s*&&\s*a\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(',  # noqa: E501
-        r'\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(',  # noqa: E501
-        r'\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(',  # noqa: E501
+        r"\.sig\|\|(?P<sig>[a-zA-Z0-9$]+)\(",
+        r"yt\.akamaized\.net/\)\s*\|\|\s*.*?\s*[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?:encodeURIComponent\s*\()?\s*(?P<si$",  # noqa: E501
+        r"\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
+        r"\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
+        r"\bc\s*&&\s*a\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
+        r"\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
+        r"\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
     ]
 
-    logger.debug('finding initial function name')
+    logger.debug("finding initial function name")
     return regex_search(pattern, js, group=1)
 
 
@@ -76,9 +76,9 @@ def get_transform_plan(js):
     'DE.kT(a,21)']
     """
     name = re.escape(get_initial_function_name(js))
-    pattern = r'%s=function\(\w\){[a-z=\.\(\"\)]*;(.*);(?:.+)}' % name
-    logger.debug('getting transform plan')
-    return regex_search(pattern, js, group=1).split(';')
+    pattern = r"%s=function\(\w\){[a-z=\.\(\"\)]*;(.*);(?:.+)}" % name
+    logger.debug("getting transform plan")
+    return regex_search(pattern, js, group=1).split(";")
 
 
 def get_transform_object(js, var):
@@ -103,12 +103,12 @@ def get_transform_object(js, var):
     'kT:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c}']
 
     """
-    pattern = r'var %s={(.*?)};' % re.escape(var)
-    logger.debug('getting transform object')
+    pattern = r"var %s={(.*?)};" % re.escape(var)
+    logger.debug("getting transform object")
     return (
         regex_search(pattern, js, group=1, flags=re.DOTALL)
-        .replace('\n', ' ')
-        .split(', ')
+        .replace("\n", " ")
+        .split(", ")
     )
 
 
@@ -129,7 +129,7 @@ def get_transform_map(js, var):
     mapper = {}
     for obj in transform_object:
         # AJ:function(a){a.reverse()} => AJ, function(a){a.reverse()}
-        name, function = obj.split(':', 1)
+        name, function = obj.split(":", 1)
         fn = map_functions(function)
         mapper[name] = fn
     return mapper
@@ -169,7 +169,7 @@ def splice(arr, b):
     >>> splice([1, 2, 3, 4], 2)
     [1, 2]
     """
-    return arr[:b] + arr[b * 2:]
+    return arr[:b] + arr[b * 2 :]
 
 
 def swap(arr, b):
@@ -187,7 +187,7 @@ def swap(arr, b):
     [3, 2, 1, 4]
     """
     r = b % len(arr)
-    return list(chain([arr[r]], arr[1:r], [arr[0]], arr[r + 1:]))
+    return list(chain([arr[r]], arr[1:r], [arr[0]], arr[(r + 1) :]))
 
 
 def map_functions(js_func):
@@ -199,15 +199,16 @@ def map_functions(js_func):
     """
     mapper = (
         # function(a){a.reverse()}
-        ('{\w\.reverse\(\)}', reverse),
+        ("{\w\.reverse\(\)}", reverse),
         # function(a,b){a.splice(0,b)}
-        ('{\w\.splice\(0,\w\)}', splice),
+        ("{\w\.splice\(0,\w\)}", splice),
         # function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c}
-        ('{var\s\w=\w\[0\];\w\[0\]=\w\[\w\%\w.length\];\w\[\w\]=\w}', swap),
+        ("{var\s\w=\w\[0\];\w\[0\]=\w\[\w\%\w.length\];\w\[\w\]=\w}", swap),
         # function(a,b){var c=a[0];a[0]=a[b%a.length];a[b%a.length]=c}
         (
-            '{var\s\w=\w\[0\];\w\[0\]=\w\[\w\%\w.length\];'
-            '\w\[\w\%\w.length\]=\w}', swap,
+            "{var\s\w=\w\[0\];\w\[0\]=\w\[\w\%\w.length\];"
+            "\w\[\w\%\w.length\]=\w}",
+            swap,
         ),
     )
 
@@ -215,8 +216,7 @@ def map_functions(js_func):
         if re.search(pattern, js_func):
             return fn
     raise RegexMatchError(
-        'could not find python equivalent function for: ',
-        js_func,
+        "could not find python equivalent function for: ", js_func,
     )
 
 
@@ -238,8 +238,8 @@ def parse_function(js_func):
     ('AJ', 15)
 
     """
-    logger.debug('parsing transform function')
-    return regex_search(r'\w+\.(\w+)\(\w,(\d+)\)', js_func, groups=True)
+    logger.debug("parsing transform function")
+    return regex_search(r"\w+\.(\w+)\(\w,(\d+)\)", js_func, groups=True)
 
 
 def get_signature(js, ciphered_signature):
@@ -258,7 +258,7 @@ def get_signature(js, ciphered_signature):
     """
     tplan = get_transform_plan(js)
     # DE.AJ(a,15) => DE, AJ(a,15)
-    var, _ = tplan[0].split('.')
+    var, _ = tplan[0].split(".")
     tmap = get_transform_map(js, var)
     signature = [s for s in ciphered_signature]
 
@@ -266,13 +266,15 @@ def get_signature(js, ciphered_signature):
         name, argument = parse_function(js_func)
         signature = tmap[name](signature, int(argument))
         logger.debug(
-            'applied transform function\n%s', pprint.pformat(
+            "applied transform function\n%s",
+            pprint.pformat(
                 {
-                    'output': ''.join(signature),
-                    'js_function': name,
-                    'argument': int(argument),
-                    'function': tmap[name],
-                }, indent=2,
+                    "output": "".join(signature),
+                    "js_function": name,
+                    "argument": int(argument),
+                    "function": tmap[name],
+                },
+                indent=2,
             ),
         )
-    return ''.join(signature)
+    return "".join(signature)

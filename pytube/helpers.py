@@ -37,17 +37,15 @@ def regex_search(pattern, string, groups=False, group=None, flags=0):
             results = regex.search(string)
             if not results:
                 raise RegexMatchError(
-                    'regex pattern ({pattern}) had zero matches'
-                    .format(pattern=p),
+                    "regex pattern ({pattern}) had zero matches".format(
+                        pattern=p
+                    ),
                 )
             else:
                 logger.debug(
-                    'finished regex search: %s',
+                    "finished regex search: %s",
                     pprint.pformat(
-                        {
-                            'pattern': p,
-                            'results': results.group(0),
-                        }, indent=2,
+                        {"pattern": p, "results": results.group(0)}, indent=2,
                     ),
                 )
                 if groups:
@@ -61,17 +59,16 @@ def regex_search(pattern, string, groups=False, group=None, flags=0):
         results = regex.search(string)
         if not results:
             raise RegexMatchError(
-                'regex pattern ({pattern}) had zero matches'
-                .format(pattern=pattern),
+                "regex pattern ({pattern}) had zero matches".format(
+                    pattern=pattern
+                ),
             )
         else:
             logger.debug(
-                'finished regex search: %s',
+                "finished regex search: %s",
                 pprint.pformat(
-                    {
-                        'pattern': pattern,
-                        'results': results.group(0),
-                    }, indent=2,
+                    {"pattern": pattern, "results": results.group(0)},
+                    indent=2,
                 ),
             )
             if groups:
@@ -118,10 +115,28 @@ def safe_filename(s, max_length=255):
     # Characters in range 0-31 (0x00-0x1F) are not allowed in ntfs filenames.
     ntfs_chrs = [chr(i) for i in range(0, 31)]
     chrs = [
-        '\"', '\#', '\$', '\%', '\'', '\*', '\,', '\.', '\/', '\:', '"',
-        '\;', '\<', '\>', '\?', '\\', '\^', '\|', '\~', '\\\\',
+        '"',
+        "\#",
+        "\$",
+        "\%",
+        "'",
+        "\*",
+        "\,",
+        "\.",
+        "\/",
+        "\:",
+        '"',
+        "\;",
+        "\<",
+        "\>",
+        "\?",
+        "\\",
+        "\^",
+        "\|",
+        "\~",
+        "\\\\",
     ]
-    pattern = '|'.join(ntfs_chrs + chrs)
+    pattern = "|".join(ntfs_chrs + chrs)
     regex = re.compile(pattern, re.UNICODE)
-    filename = regex.sub('', s)
-    return unicode(filename[:max_length].rsplit(' ', 0)[0])
+    filename = regex.sub("", s)
+    return unicode(filename[:max_length].rsplit(" ", 0)[0])

@@ -24,7 +24,6 @@ repos:
         name: 'Check for cleartext private keys stored'
       - id: flake8
         additional_dependencies:
-          - flake8-docstrings
           - flake8-mutable
           - flake8-type-annotations
           - flake8-eradicate

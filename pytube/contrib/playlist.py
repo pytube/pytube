@@ -31,9 +31,9 @@ class Playlist(object):
         :return: playlist url
         """
 
-        if 'watch?v=' in self.playlist_url:
-            base_url = 'https://www.youtube.com/playlist?list='
-            playlist_code = self.playlist_url.split('&list=')[1]
+        if "watch?v=" in self.playlist_url:
+            base_url = "https://www.youtube.com/playlist?list="
+            playlist_code = self.playlist_url.split("&list=")[1]
             return base_url + playlist_code
 
         # url is already in the desired format, so just return it
@@ -44,12 +44,13 @@ class Playlist(object):
         and returns the "load more" url if found.
         """
         try:
-            load_more_url = 'https://www.youtube.com' + re.search(
-                r'data-uix-load-more-href=\"(/browse_ajax\?'
-                'action_continuation=.*?)\"', req,
+            load_more_url = "https://www.youtube.com" + re.search(
+                r"data-uix-load-more-href=\"(/browse_ajax\?"
+                'action_continuation=.*?)"',
+                req,
             ).group(1)
         except AttributeError:
-            load_more_url = ''
+            load_more_url = ""
         return load_more_url
 
     def parse_links(self):
@@ -62,24 +63,23 @@ class Playlist(object):
         req = request.get(url)
 
         # split the page source by line and process each line
-        content = [x for x in req.split('\n') if 'pl-video-title-link' in x]
-        link_list = [x.split('href="', 1)[1].split('&', 1)[0] for x in content]
+        content = [x for x in req.split("\n") if "pl-video-title-link" in x]
+        link_list = [x.split('href="', 1)[1].split("&", 1)[0] for x in content]
 
         # The above only returns 100 or fewer links
         # Simulating a browser request for the load more link
         load_more_url = self._load_more_url(req)
-        while len(load_more_url):   # there is an url found
-            logger.debug('load more url: %s' % load_more_url)
+        while len(load_more_url):  # there is an url found
+            logger.debug("load more url: %s" % load_more_url)
             req = request.get(load_more_url)
             load_more = json.loads(req)
             videos = re.findall(
-                r'href=\"(/watch\?v=[\w-]*)',
-                load_more['content_html'],
+                r"href=\"(/watch\?v=[\w-]*)", load_more["content_html"],
             )
             # remove duplicates
             link_list.extend(list(OrderedDict.fromkeys(videos)))
             load_more_url = self._load_more_url(
-                load_more['load_more_widget_html'],
+                load_more["load_more_widget_html"],
             )
 
         return link_list
@@ -91,7 +91,7 @@ class Playlist(object):
         :return: urls -> string
         """
 
-        base_url = 'https://www.youtube.com'
+        base_url = "https://www.youtube.com"
         link_list = self.parse_links()
 
         for video_id in link_list:
@@ -117,10 +117,7 @@ class Playlist(object):
         return (str(i).zfill(digits) for i in range(start, stop, step))
 
     def download_all(
-        self,
-        download_path=None,
-        prefix_number=True,
-        reverse_numbering=False,
+        self, download_path=None, prefix_number=True, reverse_numbering=False,
     ):
         """Download all the videos in the the playlist. Initially, download
         resolution is 720p (or highest available), later more option
@@ -144,8 +141,8 @@ class Playlist(object):
         """
 
         self.populate_video_urls()
-        logger.debug('total videos found: %d', len(self.video_urls))
-        logger.debug('starting download')
+        logger.debug("total videos found: %d", len(self.video_urls))
+        logger.debug("starting download")
 
         prefix_gen = self._path_num_prefix_generator(reverse_numbering)
 
@@ -157,22 +154,25 @@ class Playlist(object):
                 if not self.suppress_exception:
                     raise e
                 else:
-                    logger.debug('Exception suppressed')
+                    logger.debug("Exception suppressed")
             else:
                 # TODO: this should not be hardcoded to a single user's
                 # preference
-                dl_stream = yt.streams.filter(
-                    progressive=True, subtype='mp4',
-                ).order_by('resolution').desc().first()
+                dl_stream = (
+                    yt.streams.filter(progressive=True, subtype="mp4",)
+                    .order_by("resolution")
+                    .desc()
+                    .first()
+                )
 
-                logger.debug('download path: %s', download_path)
+                logger.debug("download path: %s", download_path)
                 if prefix_number:
                     prefix = next(prefix_gen)
-                    logger.debug('file prefix is: %s', prefix)
+                    logger.debug("file prefix is: %s", prefix)
                     dl_stream.download(download_path, filename_prefix=prefix)
                 else:
                     dl_stream.download(download_path)
-                logger.debug('download complete')
+                logger.debug("download complete")
 
     def title(self):
         """return playlist title (name)
@@ -180,13 +180,13 @@ class Playlist(object):
         try:
             url = self.construct_playlist_url()
             req = request.get(url)
-            open_tag = '<title>'
-            end_tag = '</title>'
-            matchresult = re.compile(open_tag + '(.+?)' + end_tag)
+            open_tag = "<title>"
+            end_tag = "</title>"
+            matchresult = re.compile(open_tag + "(.+?)" + end_tag)
             matchresult = matchresult.search(req).group()
-            matchresult = matchresult.replace(open_tag, '')
-            matchresult = matchresult.replace(end_tag, '')
-            matchresult = matchresult.replace('- YouTube', '')
+            matchresult = matchresult.replace(open_tag, "")
+            matchresult = matchresult.replace(end_tag, "")
+            matchresult = matchresult.replace("- YouTube", "")
             matchresult = matchresult.strip()
 
             return matchresult

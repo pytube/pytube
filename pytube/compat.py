@@ -11,7 +11,7 @@ PY33 = sys.version_info[0:2] >= (3, 3)
 
 if PY2:
     reload(sys)
-    sys.setdefaultencoding('utf8')
+    sys.setdefaultencoding("utf8")
     import urllib2
     from urllib import urlencode
     from urllib2 import URLError
@@ -39,7 +39,8 @@ if PY2:
 
     def unicode(s):
         """Encode a string to utf-8."""
-        return s.encode('utf-8')
+        return s.encode("utf-8")
+
 
 elif PY3:
     from urllib.error import URLError
@@ -66,5 +67,6 @@ elif PY3:
             """Strip HTML entries from a string."""
             html_parser = HTMLParser()
             return html_parser.unescape(s)
+
     else:
         from html import unescape

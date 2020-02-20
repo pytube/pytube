@@ -29,46 +29,42 @@ def apply_signature(config_args, fmt, js):
 
     """
     stream_manifest = config_args[fmt]
-    live_stream = json.loads(config_args['player_response']).get(
-        'playabilityStatus', {},
-    ).get('liveStreamability')
+    live_stream = (
+        json.loads(config_args["player_response"])
+        .get("playabilityStatus", {},)
+        .get("liveStreamability")
+    )
     for i, stream in enumerate(stream_manifest):
-        if 'url' in stream:
-            url = stream['url']
+        if "url" in stream:
+            url = stream["url"]
         elif live_stream:
-            raise LiveStreamError('Video is currently being streamed live')
+            raise LiveStreamError("Video is currently being streamed live")
         # 403 Forbidden fix.
-        if (
-            'signature' in url or (
-                's' not in stream and (
-                    '&sig=' in url or '&lsig=' in url
-                )
-            )
+        if "signature" in url or (
+            "s" not in stream and ("&sig=" in url or "&lsig=" in url)
         ):
             # For certain videos, YouTube will just provide them pre-signed, in
             # which case there's no real magic to download them and we can skip
             # the whole signature descrambling entirely.
-            logger.debug('signature found, skip decipher')
+            logger.debug("signature found, skip decipher")
             continue
 
         if js is not None:
-            signature = cipher.get_signature(js, stream['s'])
+            signature = cipher.get_signature(js, stream["s"])
         else:
             # signature not present in url (line 33), need js to descramble
             # TypeError caught in __main__
-            raise TypeError('JS is None')
+            raise TypeError("JS is None")
 
         logger.debug(
-            'finished descrambling signature for itag=%s\n%s',
-            stream['itag'], pprint.pformat(
-                {
-                    's': stream['s'],
-                    'signature': signature,
-                }, indent=2,
+            "finished descrambling signature for itag=%s\n%s",
+            stream["itag"],
+            pprint.pformat(
+                {"s": stream["s"], "signature": signature}, indent=2,
             ),
         )
         # 403 forbidden fix
-        stream_manifest[i]['url'] = url + '&sig=' + signature
+        stream_manifest[i]["url"] = url + "&sig=" + signature
 
 
 def apply_descrambler(stream_data, key):
@@ -92,31 +88,69 @@ def apply_descrambler(stream_data, key):
 
     """
     import urllib.parse
-    if key == 'url_encoded_fmt_stream_map' and not stream_data.get('url_encoded_fmt_stream_map'):
+
+    if key == "url_encoded_fmt_stream_map" and not stream_data.get(
+        "url_encoded_fmt_stream_map"
+    ):
 
         try:
-            formats = json.loads(stream_data['player_response'])['streamingData']['formats']
-            formats.extend(json.loads(stream_data['player_response'])['streamingData']['adaptiveFormats'])
-        except:
-            formats = json.loads(stream_data['player_response'])['streamingData']['adaptiveFormats']
+            formats = json.loads(stream_data["player_response"])[
+                "streamingData"
+            ]["formats"]
+            formats.extend(
+                json.loads(stream_data["player_response"])["streamingData"][
+                    "adaptiveFormats"
+                ]
+            )
+        except BaseException:
+            formats = json.loads(stream_data["player_response"])[
+                "streamingData"
+            ]["adaptiveFormats"]
         try:
-            stream_data[key] = [{u'url': format_item[u'url'],
-                                 u'type': format_item[u'mimeType'],
-                                 u'quality': format_item[u'quality'],
-                                 u'itag': format_item[u'itag']} for format_item in formats]
-        except:
-            stream_data[key] = [{u'url': urllib.parse.unquote([url_item for url_item in format_item[u'cipher'].split("&") if "url=" in url_item][0].split("=")[1]),
-                                  u'sp': urllib.parse.unquote([url_item for url_item in format_item[u'cipher'].split("&") if "sp=" in url_item][0].split("=")[1]),
-                                  u's': urllib.parse.unquote([url_item for url_item in format_item[u'cipher'].split("&") if "s=" in url_item][0].split("=")[1]),
-                                  u'type': format_item[u'mimeType'],
-                                  u'quality': format_item[u'quality'],
-                                  u'itag': format_item[u'itag']} for format_item in formats]
+            stream_data[key] = [
+                {
+                    u"url": format_item[u"url"],
+                    u"type": format_item[u"mimeType"],
+                    u"quality": format_item[u"quality"],
+                    u"itag": format_item[u"itag"],
+                }
+                for format_item in formats
+            ]
+        except BaseException:
+            stream_data[key] = [
+                {
+                    u"url": urllib.parse.unquote(
+                        [
+                            url_item
+                            for url_item in format_item[u"cipher"].split("&")
+                            if "url=" in url_item
+                        ][0].split("=")[1]
+                    ),
+                    u"sp": urllib.parse.unquote(
+                        [
+                            url_item
+                            for url_item in format_item[u"cipher"].split("&")
+                            if "sp=" in url_item
+                        ][0].split("=")[1]
+                    ),
+                    u"s": urllib.parse.unquote(
+                        [
+                            url_item
+                            for url_item in format_item[u"cipher"].split("&")
+                            if "s=" in url_item
+                        ][0].split("=")[1]
+                    ),
+                    u"type": format_item[u"mimeType"],
+                    u"quality": format_item[u"quality"],
+                    u"itag": format_item[u"itag"],
+                }
+                for format_item in formats
+            ]
     else:
         stream_data[key] = [
             {k: unquote(v) for k, v in parse_qsl(i)}
-            for i in stream_data[key].split(',')
+            for i in stream_data[key].split(",")
         ]
     logger.debug(
-        'applying descrambler\n%s',
-        pprint.pformat(stream_data[key], indent=2),
+        "applying descrambler\n%s", pprint.pformat(stream_data[key], indent=2),
     )

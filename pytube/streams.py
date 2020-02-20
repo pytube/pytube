@@ -42,18 +42,18 @@ class Stream(object):
         # (Borg pattern).
         self._monostate = monostate
 
-        self.abr = None   # average bitrate (audio streams only)
-        self.fps = None   # frames per second (video streams only)
+        self.abr = None  # average bitrate (audio streams only)
+        self.fps = None  # frames per second (video streams only)
         self.itag = None  # stream format id (youtube nomenclature)
-        self.res = None   # resolution (e.g.: 480p, 720p, 1080p)
-        self.url = None   # signed download url
+        self.res = None  # resolution (e.g.: 480p, 720p, 1080p)
+        self.url = None  # signed download url
 
         self._filesize = None  # filesize in bytes
         self.mime_type = None  # content identifier (e.g.: video/mp4)
-        self.type = None       # the part of the mime before the slash
-        self.subtype = None    # the part of the mime after the slash
+        self.type = None  # the part of the mime before the slash
+        self.subtype = None  # the part of the mime after the slash
 
-        self.codecs = []         # audio/video encoders (e.g.: vp8, mp4a)
+        self.codecs = []  # audio/video encoders (e.g.: vp8, mp4a)
         self.audio_codec = None  # audio codec of the stream (e.g.: vorbis)
         self.video_codec = None  # video codec of the stream (e.g.: vp8)
 
@@ -77,7 +77,7 @@ class Stream(object):
         self.mime_type, self.codecs = extract.mime_type_codec(self.type)
 
         # 'video/webm' -> 'video', 'webm'
-        self.type, self.subtype = self.mime_type.split('/')
+        self.type, self.subtype = self.mime_type.split("/")
 
         # ['vp8', 'vorbis'] -> video_codec: vp8, audio_codec: vorbis. DASH
         # streams return NoneType for audio/video depending.
@@ -117,7 +117,7 @@ class Stream(object):
         """
         if self.is_progressive:
             return True
-        return self.type == 'audio'
+        return self.type == "audio"
 
     @property
     def includes_video_track(self):
@@ -127,7 +127,7 @@ class Stream(object):
         """
         if self.is_progressive:
             return True
-        return self.type == 'video'
+        return self.type == "video"
 
     def parse_codecs(self):
         """Get the video/audio codecs from list of codecs.
@@ -162,7 +162,7 @@ class Stream(object):
         """
         if self._filesize is None:
             headers = request.get(self.url, headers=True)
-            self._filesize = int(headers['content-length'])
+            self._filesize = int(headers["content-length"])
         return self._filesize
 
     @property
@@ -175,17 +175,17 @@ class Stream(object):
         """
         player_config_args = self.player_config_args or {}
 
-        if 'title' in player_config_args:
-            return player_config_args['title']
+        if "title" in player_config_args:
+            return player_config_args["title"]
 
-        details = self.player_config_args.get(
-            'player_response', {},
-        ).get('videoDetails', {})
+        details = self.player_config_args.get("player_response", {},).get(
+            "videoDetails", {}
+        )
 
-        if 'title' in details:
-            return details['title']
+        if "title" in details:
+            return details["title"]
 
-        return 'Unknown YouTube Video Title'
+        return "Unknown YouTube Video Title"
 
     @property
     def default_filename(self):
@@ -197,7 +197,7 @@ class Stream(object):
         """
 
         filename = safe_filename(self.title)
-        return '{filename}.{s.subtype}'.format(filename=filename, s=self)
+        return "{filename}.{s.subtype}".format(filename=filename, s=self)
 
     def download(self, output_path=None, filename=None, filename_prefix=None):
         """Write the media stream to disk.
@@ -224,25 +224,22 @@ class Stream(object):
         output_path = output_path or os.getcwd()
         if filename:
             safe = safe_filename(filename)
-            filename = '{filename}.{s.subtype}'.format(filename=safe, s=self)
+            filename = "{filename}.{s.subtype}".format(filename=safe, s=self)
         filename = filename or self.default_filename
 
         if filename_prefix:
-            filename = '{prefix}{filename}'\
-                .format(
-                    prefix=safe_filename(filename_prefix),
-                    filename=filename,
-                )
+            filename = "{prefix}{filename}".format(
+                prefix=safe_filename(filename_prefix), filename=filename,
+            )
 
         # file path
         fp = os.path.join(output_path, filename)
         bytes_remaining = self.filesize
         logger.debug(
-            'downloading (%s total bytes) file to %s',
-            self.filesize, fp,
+            "downloading (%s total bytes) file to %s", self.filesize, fp,
         )
 
-        with open(fp, 'wb') as fh:
+        with open(fp, "wb") as fh:
             for chunk in request.get(self.url, streaming=True):
                 # reduce the (bytes) remainder by the length of the chunk.
                 bytes_remaining -= len(chunk)
@@ -259,7 +256,7 @@ class Stream(object):
         buffer = io.BytesIO()
         bytes_remaining = self.filesize
         logger.debug(
-            'downloading (%s total bytes) file to BytesIO buffer',
+            "downloading (%s total bytes) file to BytesIO buffer",
             self.filesize,
         )
 
@@ -293,17 +290,18 @@ class Stream(object):
         """
         file_handler.write(chunk)
         logger.debug(
-            'download progress\n%s',
+            "download progress\n%s",
             pprint.pformat(
                 {
-                    'chunk_size': len(chunk),
-                    'bytes_remaining': bytes_remaining,
-                }, indent=2,
+                    "chunk_size": len(chunk),
+                    "bytes_remaining": bytes_remaining,
+                },
+                indent=2,
             ),
         )
-        on_progress = self._monostate['on_progress']
+        on_progress = self._monostate["on_progress"]
         if on_progress:
-            logger.debug('calling on_progress callback %s', on_progress)
+            logger.debug("calling on_progress callback %s", on_progress)
             on_progress(self, chunk, file_handler, bytes_remaining)
 
     def on_complete(self, file_handle):
@@ -317,10 +315,10 @@ class Stream(object):
         :rtype: None
 
         """
-        logger.debug('download finished')
-        on_complete = self._monostate['on_complete']
+        logger.debug("download finished")
+        on_complete = self._monostate["on_complete"]
         if on_complete:
-            logger.debug('calling on_complete callback %s', on_complete)
+            logger.debug("calling on_complete callback %s", on_complete)
             on_complete(self, file_handle)
 
     def __repr__(self):
@@ -335,13 +333,12 @@ class Stream(object):
         if self.includes_video_track:
             parts.extend(['res="{s.resolution}"', 'fps="{s.fps}fps"'])
             if not self.is_adaptive:
-                parts.extend([
-                    'vcodec="{s.video_codec}"',
-                    'acodec="{s.audio_codec}"',
-                ])
+                parts.extend(
+                    ['vcodec="{s.video_codec}"', 'acodec="{s.audio_codec}"']
+                )
             else:
                 parts.extend(['vcodec="{s.video_codec}"'])
         else:
             parts.extend(['abr="{s.abr}"', 'acodec="{s.audio_codec}"'])
-        parts = ' '.join(parts).format(s=self)
-        return '<Stream: {parts}>'.format(parts=parts)
+        parts = " ".join(parts).format(s=self)
+        return "<Stream: {parts}>".format(parts=parts)

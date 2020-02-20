@@ -15,12 +15,23 @@ class StreamQuery:
         self.itag_index = {int(s.itag): s for s in fmt_streams}
 
     def filter(
-            self, fps=None, res=None, resolution=None, mime_type=None,
-            type=None, subtype=None, file_extension=None, abr=None,
-            bitrate=None, video_codec=None, audio_codec=None,
-            only_audio=None, only_video=None,
-            progressive=None, adaptive=None,
-            custom_filter_functions=None,
+        self,
+        fps=None,
+        res=None,
+        resolution=None,
+        mime_type=None,
+        type=None,
+        subtype=None,
+        file_extension=None,
+        abr=None,
+        bitrate=None,
+        video_codec=None,
+        audio_codec=None,
+        only_audio=None,
+        only_video=None,
+        progressive=None,
+        adaptive=None,
+        custom_filter_functions=None,
     ):
         """Apply the given filtering criterion.
 
@@ -167,21 +178,21 @@ class StreamQuery:
             attr = getattr(stream, attribute_name)
             if attr is None:
                 break
-            num = ''.join(x for x in attr if x.isdigit())
-            integer_attr_repr[attr] = int(''.join(num)) if num else None
+            num = "".join(x for x in attr if x.isdigit())
+            integer_attr_repr[attr] = int("".join(num)) if num else None
 
         # if every attribute has an integer representation
         if integer_attr_repr and all(integer_attr_repr.values()):
+
             def key(s):
                 return integer_attr_repr[getattr(s, attribute_name)]
+
         else:
+
             def key(s):
                 return getattr(s, attribute_name)
 
-        fmt_streams = sorted(
-            self.fmt_streams,
-            key=key,
-        )
+        fmt_streams = sorted(self.fmt_streams, key=key,)
         return StreamQuery(fmt_streams)
 
     def desc(self):

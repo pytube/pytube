@@ -31,8 +31,12 @@ class YouTube(object):
     """Core developer interface for pytube."""
 
     def __init__(
-        self, url=None, defer_prefetch_init=False, on_progress_callback=None,
-        on_complete_callback=None, proxies=None,
+        self,
+        url=None,
+        defer_prefetch_init=False,
+        on_progress_callback=None,
+        on_complete_callback=None,
+        proxies=None,
     ):
         """Construct a :class:`YouTube <YouTube>`.
 
@@ -48,16 +52,16 @@ class YouTube(object):
             complete events.
 
         """
-        self.js = None      # js fetched by js_url
+        self.js = None  # js fetched by js_url
         self.js_url = None  # the url to the js, parsed from watch html
 
         # note: vid_info may eventually be removed. It sounds like it once had
         # additional formats, but that doesn't appear to still be the case.
 
-        self.vid_info = None      # content fetched by vid_info_url
+        self.vid_info = None  # content fetched by vid_info_url
         self.vid_info_url = None  # the url to vid info, parsed from watch html
 
-        self.watch_html = None     # the html of /watch?v=<video_id>
+        self.watch_html = None  # the html of /watch?v=<video_id>
         self.embed_html = None
         self.player_config_args = None  # inline js in the html containing
         # streams
@@ -77,8 +81,8 @@ class YouTube(object):
         # (Borg pattern).
         self.stream_monostate = {
             # user defined callback functions.
-            'on_progress': on_progress_callback,
-            'on_complete': on_complete_callback,
+            "on_progress": on_progress_callback,
+            "on_complete": on_complete_callback,
         }
 
         if proxies:
@@ -107,7 +111,7 @@ class YouTube(object):
         :rtype: None
 
         """
-        logger.info('init started')
+        logger.info("init started")
 
         self.vid_info = {k: v for k, v in parse_qsl(self.vid_info)}
         if self.age_restricted:
@@ -115,26 +119,24 @@ class YouTube(object):
         else:
             self.player_config_args = extract.get_ytplayer_config(
                 self.watch_html,
-            )['args']
+            )["args"]
 
             # Fix for KeyError: 'title' issue #434
-            if 'title' not in self.player_config_args:
-                i_start = (
-                    self.watch_html
-                    .lower()
-                    .index('<title>') + len('<title>')
+            if "title" not in self.player_config_args:
+                i_start = self.watch_html.lower().index("<title>") + len(
+                    "<title>"
                 )
-                i_end = self.watch_html.lower().index('</title>')
+                i_end = self.watch_html.lower().index("</title>")
                 title = self.watch_html[i_start:i_end].strip()
-                index = title.lower().rfind(' - youtube')
+                index = title.lower().rfind(" - youtube")
                 title = title[:index] if index > 0 else title
-                self.player_config_args['title'] = title
+                self.player_config_args["title"] = title
 
         self.vid_descr = extract.get_vid_descr(self.watch_html)
         # https://github.com/nficano/pytube/issues/165
-        stream_maps = ['url_encoded_fmt_stream_map']
-        if 'adaptive_fmts' in self.player_config_args:
-            stream_maps.append('adaptive_fmts')
+        stream_maps = ["url_encoded_fmt_stream_map"]
+        if "adaptive_fmts" in self.player_config_args:
+            stream_maps.append("adaptive_fmts")
 
         # unscramble the progressive and adaptive stream manifests.
         for fmt in stream_maps:
@@ -155,10 +157,10 @@ class YouTube(object):
             self.initialize_stream_objects(fmt)
 
         # load the player_response object (contains subtitle information)
-        apply_mixin(self.player_config_args, 'player_response', json.loads)
+        apply_mixin(self.player_config_args, "player_response", json.loads)
 
         self.initialize_caption_objects()
-        logger.info('init finished successfully')
+        logger.info("init finished successfully")
 
     def prefetch(self):
         """Eagerly download all necessary data.
@@ -172,7 +174,7 @@ class YouTube(object):
         """
         self.watch_html = request.get(url=self.watch_url)
         if '<img class="icon meh" src="/yts/img' not in self.watch_html:
-            raise VideoUnavailable('This video is unavailable.')
+            raise VideoUnavailable("This video is unavailable.")
         self.embed_html = request.get(url=self.embed_url)
         self.age_restricted = extract.is_age_restricted(self.watch_html)
         self.vid_info_url = extract.video_info_url(
@@ -219,15 +221,14 @@ class YouTube(object):
         :rtype: None
 
         """
-        if 'captions' not in self.player_config_args['player_response']:
+        if "captions" not in self.player_config_args["player_response"]:
             return
         # https://github.com/nficano/pytube/issues/167
         caption_tracks = (
-            self.player_config_args
-            .get('player_response', {})
-            .get('captions', {})
-            .get('playerCaptionsTracklistRenderer', {})
-            .get('captionTracks', [])
+            self.player_config_args.get("player_response", {})
+            .get("captions", {})
+            .get("playerCaptionsTracklistRenderer", {})
+            .get("captionTracks", [])
         )
         for caption_track in caption_tracks:
             self.caption_tracks.append(Caption(caption_track))
@@ -255,7 +256,7 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args['thumbnail_url']
+        return self.player_config_args["thumbnail_url"]
 
     @property
     def title(self):
@@ -264,7 +265,7 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args['title']
+        return self.player_config_args["title"]
 
     @property
     def description(self):
@@ -283,10 +284,9 @@ class YouTube(object):
 
         """
         return (
-            self.player_config_args
-            .get('player_response', {})
-            .get('videoDetails', {})
-            .get('averageRating')
+            self.player_config_args.get("player_response", {})
+            .get("videoDetails", {})
+            .get("averageRating")
         )
 
     @property
@@ -296,7 +296,7 @@ class YouTube(object):
         :rtype: str
 
         """
-        return self.player_config_args['length_seconds']
+        return self.player_config_args["length_seconds"]
 
     @property
     def views(self):
@@ -306,10 +306,9 @@ class YouTube(object):
 
         """
         return (
-            self.player_config_args
-            .get('player_response', {})
-            .get('videoDetails', {})
-            .get('viewCount')
+            self.player_config_args.get("player_response", {})
+            .get("videoDetails", {})
+            .get("viewCount")
         )
 
     def register_on_progress_callback(self, func):
@@ -322,7 +321,7 @@ class YouTube(object):
         :rtype: None
 
         """
-        self.stream_monostate['on_progress'] = func
+        self.stream_monostate["on_progress"] = func
 
     def register_on_complete_callback(self, func):
         """Register a download complete callback function post initialization.
@@ -333,4 +332,4 @@ class YouTube(object):
         :rtype: None
 
         """
-        self.stream_monostate['on_complete'] = func
+        self.stream_monostate["on_complete"] = func

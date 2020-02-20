@@ -21,30 +21,34 @@ logger = logging.getLogger(__name__)
 def main():
     """Command line application to download youtube videos."""
     parser = argparse.ArgumentParser(description=main.__doc__)
-    parser.add_argument('url', help='The YouTube /watch url', nargs='?')
+    parser.add_argument("url", help="The YouTube /watch url", nargs="?")
     parser.add_argument(
-        '--version', action='version',
-        version='%(prog)s ' + __version__,
+        "--version", action="version", version="%(prog)s " + __version__,
     )
     parser.add_argument(
-        '--itag', type=int, help=(
-            'The itag for the desired stream'
+        "--itag", type=int, help=("The itag for the desired stream"),
+    )
+    parser.add_argument(
+        "-l",
+        "--list",
+        action="store_true",
+        help=(
+            "The list option causes pytube cli to return a list of streams "
+            "available to download"
         ),
     )
     parser.add_argument(
-        '-l', '--list', action='store_true', help=(
-            'The list option causes pytube cli to return a list of streams '
-            'available to download'
-        ),
+        "-v",
+        "--verbose",
+        action="count",
+        default=0,
+        dest="verbosity",
+        help="Verbosity level",
     )
     parser.add_argument(
-        '-v', '--verbose', action='count', default=0, dest='verbosity',
-        help='Verbosity level',
-    )
-    parser.add_argument(
-        '--build-playback-report', action='store_true', help=(
-            'Save the html and js to disk'
-        ),
+        "--build-playback-report",
+        action="store_true",
+        help=("Save the html and js to disk"),
     )
 
     args = parser.parse_args()
@@ -74,32 +78,33 @@ def build_playback_report(url):
     ts = int(dt.datetime.utcnow().timestamp())
     fp = os.path.join(
         os.getcwd(),
-        'yt-video-{yt.video_id}-{ts}.json.gz'.format(yt=yt, ts=ts),
+        "yt-video-{yt.video_id}-{ts}.json.gz".format(yt=yt, ts=ts),
     )
 
     js = yt.js
     watch_html = yt.watch_html
     vid_info = yt.vid_info
 
-    with gzip.open(fp, 'wb') as fh:
+    with gzip.open(fp, "wb") as fh:
         fh.write(
-            json.dumps({
-                'url': url,
-                'js': js,
-                'watch_html': watch_html,
-                'video_info': vid_info,
-            })
-            .encode('utf8'),
+            json.dumps(
+                {
+                    "url": url,
+                    "js": js,
+                    "watch_html": watch_html,
+                    "video_info": vid_info,
+                }
+            ).encode("utf8"),
         )
 
 
 def get_terminal_size():
     """Return the terminal size in rows and columns."""
-    rows, columns = os.popen('stty size', 'r').read().split()
+    rows, columns = os.popen("stty size", "r").read().split()
     return int(rows), int(columns)
 
 
-def display_progress_bar(bytes_received, filesize, ch='█', scale=0.55):
+def display_progress_bar(bytes_received, filesize, ch="█", scale=0.55):
     """Display a simple, pretty progress bar.
 
     Example:
@@ -123,9 +128,9 @@ def display_progress_bar(bytes_received, filesize, ch='█', scale=0.55):
 
     filled = int(round(max_width * bytes_received / float(filesize)))
     remaining = max_width - filled
-    bar = ch * filled + ' ' * remaining
+    bar = ch * filled + " " * remaining
     percent = round(100.0 * bytes_received / float(filesize), 1)
-    text = ' ↳ |{bar}| {percent}%\r'.format(bar=bar, percent=percent)
+    text = " ↳ |{bar}| {percent}%\r".format(bar=bar, percent=percent)
     sys.stdout.write(text)
     sys.stdout.flush()
 
@@ -161,13 +166,14 @@ def download(url, itag):
     # TODO(nficano): allow dash itags to be selected
     yt = YouTube(url, on_progress_callback=on_progress)
     stream = yt.streams.get_by_itag(itag)
-    print('\n{fn} | {fs} bytes'.format(
-        fn=stream.default_filename,
-        fs=stream.filesize,
-    ))
+    print(
+        "\n{fn} | {fs} bytes".format(
+            fn=stream.default_filename, fs=stream.filesize,
+        )
+    )
     try:
         stream.download()
-        sys.stdout.write('\n')
+        sys.stdout.write("\n")
     except KeyboardInterrupt:
         sys.exit()
 
@@ -184,5 +190,5 @@ def display_streams(url):
         print(stream)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

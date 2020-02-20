@@ -24,7 +24,7 @@ class ExtractError(PytubeError):
             A YouTube video identifier.
         """
         if video_id is not None:
-            msg = '{video_id}: {msg}'.format(video_id=video_id, msg=msg)
+            msg = "{video_id}: {msg}".format(video_id=video_id, msg=msg)
 
         super(ExtractError, self).__init__(msg)
 
