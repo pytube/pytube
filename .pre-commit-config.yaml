@@ -43,17 +43,6 @@ repos:
     hooks:
       - id: autopep8
         name: 'Pretty format Python'
-    args: ['--in-place', '--aggressive', '--aggressive', '--experimental']
-  - repo: git@github.com:humitos/mirrors-autoflake.git
-    rev: v1.3
-    hooks:
-      - id: autoflake
-        name: 'Pretty format Python'
-    args:
-      - '--in-place'
-      - '--ignore-init-module-imports'
-      - '--remove-all-unused-imports'
-      - '--remove-unused-variable'
 
   - repo: https://github.com/psf/black
     rev: stable
