@@ -47,3 +47,5 @@ _autosummary
 .idea/*
 
 .vscode/
+__pycache__
+requirements-dev.txt
