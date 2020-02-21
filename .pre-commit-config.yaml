@@ -39,7 +39,7 @@ repos:
       - id: reorder-python-imports
         name: 'Reorder Python imports'
   - repo: 'https://github.com/pre-commit/mirrors-autopep8'
-    rev: v1.4.4
+    rev: v1.5
     hooks:
       - id: autopep8
         name: 'Pretty format Python'
