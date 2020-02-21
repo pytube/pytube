@@ -43,7 +43,11 @@ repos:
     hooks:
       - id: autopep8
         name: 'Pretty format Python'
-
+    args:
+      - '--in-place'
+      - '--aggressive'
+      - '--aggressive'
+      - '--experimental'
   - repo: https://github.com/psf/black
     rev: stable
     hooks:
