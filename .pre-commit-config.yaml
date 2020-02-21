@@ -1,6 +1,6 @@
 repos:
   - repo: 'https://github.com/pre-commit/pre-commit-hooks'
-    rev: v2.4.0
+    rev: v2.5.0
     hooks:
       - id: pretty-format-json
         name: 'Pretty format JSON'
@@ -34,12 +34,12 @@ repos:
       - id: check-ast
         name: 'Check Python abstract syntax tree'
   - repo: 'https://github.com/asottile/reorder_python_imports'
-    rev: v1.8.0
+    rev: v1.9.0
     hooks:
       - id: reorder-python-imports
         name: 'Reorder Python imports'
   - repo: 'https://github.com/pre-commit/mirrors-autopep8'
-    rev: v1.4.4
+    rev: v1.5
     hooks:
       - id: autopep8
         name: 'Pretty format Python'
@@ -52,7 +52,7 @@ repos:
       - '--ignore-init-module-imports'
       - '--remove-unused-variable'
   - repo: https://github.com/psf/black
-    rev: stable
+    rev: 19.10b0
     hooks:
     - id: black
       name: 'Ruthlessly format Python'
