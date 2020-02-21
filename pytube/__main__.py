@@ -317,7 +317,7 @@ class YouTube:
 
         :param callable func:
             A callback function that takes ``stream``, ``chunk``,
-            ``file_handle``, ``bytes_remaining`` as parameters.
+             and ``bytes_remaining`` as parameters.
 
         :rtype: None
 
@@ -328,7 +328,7 @@ class YouTube:
         """Register a download complete callback function post initialization.
 
         :param callable func:
-            A callback function that takes ``stream`` and  ``file_handle``.
+            A callback function that takes ``stream`` and  ``file_path``.
 
         :rtype: None
 

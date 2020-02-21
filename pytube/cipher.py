@@ -77,7 +77,7 @@ class Cipher:
 
         **Example**:
 
-        >>> parse_function('DE.AJ(a,15)')
+        parse_function('DE.AJ(a,15)')
         ('AJ', 15)
 
         """

@@ -7,7 +7,7 @@
 	  <a href='https://pytube3.readthedocs.io/en/latest/?badge=latest'><img src='https://readthedocs.org/projects/pytube3/badge/?version=latest' alt='Documentation Status' /></a>
 	  <a href="https://codecov.io/gh/hbmartin/pytube3"><img src="https://codecov.io/gh/hbmartin/pytube3/branch/master/graph/badge.svg" /></a>
 	  <a href="https://www.codefactor.io/repository/github/hbmartin/pytube3/overview/master"><img src="https://www.codefactor.io/repository/github/hbmartin/pytube3/badge/master" alt="CodeFactor" /></a>
-	  <a href="https://gitter.im/pytube3/community"><img src="https://badges.gitter.im/pytube3.png" /></a>
+	  <a href="https://gitter.im/pytube3/community"><img src="https://img.shields.io/badge/chat-gitter-lightgrey" /></a>
   </p>
 </div>
 
@@ -207,7 +207,7 @@ Note: Using ``order_by`` on a given attribute will filter out all streams missin
 If your application requires post-processing logic, pytube allows you to specify an "on download complete" callback function:
 
 ```python
- >>> def convert_to_aac(stream, file_handler):
+ >>> def convert_to_aac(stream: Stream, file_path: str):
          return  # do work
 
  >>> yt.register_on_complete_callback(convert_to_aac)
@@ -216,7 +216,7 @@ If your application requires post-processing logic, pytube allows you to specify
 Similarly, if your application requires on-download progress logic, pytube exposes a callback for this as well:
 
 ```python
- >>> def show_progress_bar(stream, chunk, file_handler, bytes_remaining):
+ >>> def show_progress_bar(stream: Stream, chunk: bytes, bytes_remaining: int):
          return  # do work
 
  >>> yt.register_on_progress_callback(show_progress_bar)

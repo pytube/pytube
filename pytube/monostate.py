@@ -12,7 +12,7 @@ class OnProgress(Protocol):
             An instance of :class:`Stream <Stream>` being downloaded.
         :type stream:
             :py:class:`pytube.Stream`
-        :param str chunk:
+        :param bytes chunk:
             Segment of media file binary data, not yet written to disk.
         :param int bytes_remaining:
             How many bytes have been downloaded.
