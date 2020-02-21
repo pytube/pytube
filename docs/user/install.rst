@@ -7,20 +7,20 @@ This part of the documentation covers the installation of pytube.
 
 To install pytube, run the following command in your terminal::
 
-    $ pip install pytube
+    $ pip install pytube3
 
 Get the Source Code
 -------------------
 
-pytube is actively developed on GitHub, where the source is `available <https://github.com/nficano/pytube>`_.
+pytube is actively developed on GitHub, where the source is `available <https://github.com/hbmartin/pytube3>`_.
 
 You can either clone the public repository::
 
     $ git clone git://github.com/nficano/pytube.git
 
-Or, download the `tarball <https://github.com/nficano/pytube/tarball/master>`_::
+Or, download the `tarball <https://github.com/hbmartin/pytube3/tarball/master>`_::
 
-    $ curl -OL https://github.com/nficano/pytube/tarball/master
+    $ curl -OL https://github.com/hbmartin/pytube3/tarball/master
     # optionally, zipball is also available (for Windows users).
 
 Once you have a copy of the source, you can embed it in your Python package, or install it into your site-packages by running::

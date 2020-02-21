@@ -1,107 +1,44 @@
 # -*- coding: utf-8 -*-
+
 """Various helper functions implemented by pytube."""
-from __future__ import absolute_import
-
+import functools
 import logging
-import pprint
+import os
 import re
+import warnings
+from typing import TypeVar, Callable, Optional, Dict, List, Any
+from urllib import request
 
-from pytube.compat import unicode
 from pytube.exceptions import RegexMatchError
-
 
 logger = logging.getLogger(__name__)
 
 
-def regex_search(pattern, string, groups=False, group=None, flags=0):
+def regex_search(pattern: str, string: str, group: int) -> str:
     """Shortcut method to search a string for a given pattern.
 
     :param str pattern:
         A regular expression pattern.
     :param str string:
         A target string to search.
-    :param bool groups:
-        Should the return value be ``.groups()``.
     :param int group:
         Index of group to return.
-    :param int flags:
-        Expression behavior modifiers.
     :rtype:
         str or tuple
     :returns:
         Substring pattern matches.
     """
-    if type(pattern) == list:
-        for p in pattern:
-            regex = re.compile(p, flags)
-            results = regex.search(string)
-            if not results:
-                raise RegexMatchError(
-                    'regex pattern ({pattern}) had zero matches'
-                    .format(pattern=p),
-                )
-            else:
-                logger.debug(
-                    'finished regex search: %s',
-                    pprint.pformat(
-                        {
-                            'pattern': p,
-                            'results': results.group(0),
-                        }, indent=2,
-                    ),
-                )
-                if groups:
-                    return results.groups()
-                elif group is not None:
-                    return results.group(group)
-                else:
-                    return results
-    else:
-        regex = re.compile(pattern, flags)
-        results = regex.search(string)
-        if not results:
-            raise RegexMatchError(
-                'regex pattern ({pattern}) had zero matches'
-                .format(pattern=pattern),
-            )
-        else:
-            logger.debug(
-                'finished regex search: %s',
-                pprint.pformat(
-                    {
-                        'pattern': pattern,
-                        'results': results.group(0),
-                    }, indent=2,
-                ),
-            )
-            if groups:
-                return results.groups()
-            elif group is not None:
-                return results.group(group)
-            else:
-                return results
+    regex = re.compile(pattern)
+    results = regex.search(string)
+    if not results:
+        raise RegexMatchError(caller="regex_search", pattern=pattern)
+
+    logger.debug("matched regex search: %s", pattern)
+
+    return results.group(group)
 
 
-def apply_mixin(dct, key, func, *args, **kwargs):
-    r"""Apply in-place data mutation to a dictionary.
-
-    :param dict dct:
-        Dictionary to apply mixin function to.
-    :param str key:
-        Key within dictionary to apply mixin function to.
-    :param callable func:
-        Transform function to apply to ``dct[key]``.
-    :param \*args:
-        (optional) positional arguments that ``func`` takes.
-    :param \*\*kwargs:
-        (optional) keyword arguments that ``func`` takes.
-    :rtype:
-        None
-    """
-    dct[key] = func(dct[key], *args, **kwargs)
-
-
-def safe_filename(s, max_length=255):
+def safe_filename(s: str, max_length: int = 255) -> str:
     """Sanitize a string making it safe to use as a filename.
 
     This function was based off the limitations outlined here:
@@ -116,12 +53,120 @@ def safe_filename(s, max_length=255):
         A sanitized string.
     """
     # Characters in range 0-31 (0x00-0x1F) are not allowed in ntfs filenames.
-    ntfs_chrs = [chr(i) for i in range(0, 31)]
-    chrs = [
-        '\"', '\#', '\$', '\%', '\'', '\*', '\,', '\.', '\/', '\:', '"',
-        '\;', '\<', '\>', '\?', '\\', '\^', '\|', '\~', '\\\\',
+    ntfs_characters = [chr(i) for i in range(0, 31)]
+    characters = [
+        r'"',
+        r"\#",
+        r"\$",
+        r"\%",
+        r"'",
+        r"\*",
+        r"\,",
+        r"\.",
+        r"\/",
+        r"\:",
+        r'"',
+        r"\;",
+        r"\<",
+        r"\>",
+        r"\?",
+        r"\\",
+        r"\^",
+        r"\|",
+        r"\~",
+        r"\\\\",
     ]
-    pattern = '|'.join(ntfs_chrs + chrs)
+    pattern = "|".join(ntfs_characters + characters)
     regex = re.compile(pattern, re.UNICODE)
-    filename = regex.sub('', s)
-    return unicode(filename[:max_length].rsplit(' ', 0)[0])
+    filename = regex.sub("", s)
+    return filename[:max_length].rsplit(" ", 0)[0]
+
+
+def setup_logger(level: int = logging.ERROR):
+    """Create a configured instance of logger.
+
+    :param int level:
+        Describe the severity level of the logs to handle.
+    """
+    fmt = "[%(asctime)s] %(levelname)s in %(module)s: %(message)s"
+    date_fmt = "%H:%M:%S"
+    formatter = logging.Formatter(fmt, datefmt=date_fmt)
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+
+    # https://github.com/nficano/pytube/issues/163
+    logger = logging.getLogger("pytube")
+    logger.addHandler(handler)
+    logger.setLevel(level)
+
+
+GenericType = TypeVar("GenericType")
+
+
+def cache(func: Callable[..., GenericType]) -> GenericType:
+    """ mypy compatible annotation wrapper for lru_cache"""
+    return functools.lru_cache()(func)  # type: ignore
+
+
+def deprecated(reason: str) -> Callable:
+    """
+    This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emitted
+    when the function is used.
+    """
+
+    def decorator(func1):
+        message = "Call to deprecated function {name} ({reason})."
+
+        @functools.wraps(func1)
+        def new_func1(*args, **kwargs):
+            warnings.simplefilter("always", DeprecationWarning)
+            warnings.warn(
+                message.format(name=func1.__name__, reason=reason),
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
+            warnings.simplefilter("default", DeprecationWarning)
+            return func1(*args, **kwargs)
+
+        return new_func1
+
+    return decorator
+
+
+def target_directory(output_path: Optional[str] = None) -> str:
+    """
+    Function for determining target directory of a download.
+    Returns an absolute path (if relative one given) or the current
+    path (if none given). Makes directory if it does not exist.
+
+    :type output_path: str
+        :rtype: str
+    :returns:
+        An absolute directory path as a string.
+    """
+    if output_path:
+        if not os.path.isabs(output_path):
+            output_path = os.path.join(os.getcwd(), output_path)
+    else:
+        output_path = os.getcwd()
+    os.makedirs(output_path, exist_ok=True)
+    return output_path
+
+
+def install_proxy(proxy_handler: Dict[str, str]) -> None:
+    proxy_support = request.ProxyHandler(proxy_handler)
+    opener = request.build_opener(proxy_support)
+    request.install_opener(opener)
+
+
+def uniqueify(duped_list: List) -> List:
+    seen: Dict[Any, bool] = {}
+    result = []
+    for item in duped_list:
+        if item in seen:
+            continue
+        seen[item] = True
+        result.append(item)
+    return result

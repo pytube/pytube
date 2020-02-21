@@ -1,2 +1,2 @@
-include README.rst LICENSE NOTICE HISTORY.rst pytest.ini
+include README.md LICENSE
 recursive-include tests *.py

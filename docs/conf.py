@@ -34,9 +34,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'pytube'
+project = 'pytube3'
 copyright = '2019, Nick Ficano'
-author = 'Nick Ficano'
+author = 'Nick Ficano, Harold Martin'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -108,7 +108,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'pytubedoc'
+htmlhelp_basename = 'pytube3doc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -120,7 +120,7 @@ latex_elements = {}
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (
-        master_doc, 'pytube.tex', 'pytube Documentation',
+        master_doc, 'pytube3.tex', 'pytube3 Documentation',
         'Nick Ficano', 'manual',
     ),
 ]
@@ -132,7 +132,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (
-        master_doc, 'pytube', 'pytube Documentation',
+        master_doc, 'pytube3', 'pytube3 Documentation',
         [author], 1,
     ),
 ]
@@ -145,8 +145,8 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (
-        master_doc, 'pytube', 'pytube Documentation',
-        author, 'pytube', 'One line description of project.',
+        master_doc, 'pytube3', 'pytube3 Documentation',
+        author, 'pytube3', 'One line description of project.',
         'Miscellaneous',
     ),
 ]

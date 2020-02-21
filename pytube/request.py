@@ -1,47 +1,89 @@
 # -*- coding: utf-8 -*-
+
 """Implements a simple wrapper around urlopen."""
-import urllib.request
+import logging
+from functools import lru_cache
+from http.client import HTTPResponse
+from typing import Iterable, Dict, Optional
+from urllib.request import Request
+from urllib.request import urlopen
 
-from pytube.compat import urlopen
-# 403 forbidden fix
+logger = logging.getLogger(__name__)
 
 
-def get(
-    url=None, headers=False,
-    streaming=False, chunk_size=8 * 1024,
-):
+def _execute_request(
+    url: str, method: Optional[str] = None, headers: Optional[Dict[str, str]] = None
+) -> HTTPResponse:
+    base_headers = {"User-Agent": "Mozilla/5.0"}
+    if headers:
+        base_headers.update(headers)
+    if url.lower().startswith("http"):
+        request = Request(url, headers=base_headers, method=method)
+    else:
+        raise ValueError("Invalid URL")
+    return urlopen(request)  # nosec
+
+
+def get(url) -> str:
     """Send an http GET request.
 
     :param str url:
         The URL to perform the GET request for.
-    :param bool headers:
-        Only return the http headers.
-    :param bool streaming:
-        Returns the response body in chunks via a generator.
-    :param int chunk_size:
-        The size in bytes of each chunk.
+    :rtype: str
+    :returns:
+        UTF-8 encoded string of response
     """
-
-    # https://github.com/nficano/pytube/pull/465
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    response = urlopen(req)
-
-    if streaming:
-        return stream_response(response, chunk_size)
-    elif headers:
-        # https://github.com/nficano/pytube/issues/160
-        return {k.lower(): v for k, v in response.info().items()}
-    return (
-        response
-        .read()
-        .decode('utf-8')
-    )
+    return _execute_request(url).read().decode("utf-8")
 
 
-def stream_response(response, chunk_size=8 * 1024):
-    """Read the response in chunks."""
-    while True:
-        buf = response.read(chunk_size)
-        if not buf:
-            break
-        yield buf
+def stream(
+    url: str, chunk_size: int = 4096, range_size: int = 9437184
+) -> Iterable[bytes]:
+    """Read the response in chunks.
+    :param str url: The URL to perform the GET request for.
+    :param int chunk_size: The size in bytes of each chunk. Defaults to 4KB
+    :param int range_size: The size in bytes of each range request. Defaults to 9MB
+    :rtype: Iterable[bytes]
+    """
+    file_size: int = range_size  # fake filesize to start
+    downloaded = 0
+    while downloaded < file_size:
+        stop_pos = min(downloaded + range_size, file_size) - 1
+        range_header = f"bytes={downloaded}-{stop_pos}"
+        response = _execute_request(url, method="GET", headers={"Range": range_header})
+        if file_size == range_size:
+            try:
+                content_range = response.info()["Content-Range"]
+                file_size = int(content_range.split("/")[1])
+            except (KeyError, IndexError, ValueError) as e:
+                logger.error(e)
+        while True:
+            chunk = response.read(chunk_size)
+            if not chunk:
+                break
+            downloaded += len(chunk)
+            yield chunk
+    return  # pylint: disable=R1711
+
+
+@lru_cache(maxsize=None)
+def filesize(url: str) -> int:
+    """Fetch size in bytes of file at given URL
+
+    :param str url: The URL to get the size of
+    :returns: int: size in bytes of remote file
+    """
+    return int(head(url)["content-length"])
+
+
+def head(url: str) -> Dict:
+    """Fetch headers returned http GET request.
+
+    :param str url:
+        The URL to perform the GET request for.
+    :rtype: dict
+    :returns:
+        dictionary of lowercase headers
+    """
+    response_headers = _execute_request(url, method="HEAD").info()
+    return {k.lower(): v for k, v in response_headers.items()}

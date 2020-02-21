@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
+
 """This module provides a query interface for media streams and captions."""
+from typing import Callable, List, Optional, Union
+from collections.abc import Mapping, Sequence
+
+from pytube import Stream, Caption
+from pytube.helpers import deprecated
 
 
-class StreamQuery:
+class StreamQuery(Sequence):
     """Interface for querying the available media streams."""
 
     def __init__(self, fmt_streams):
@@ -15,12 +21,24 @@ class StreamQuery:
         self.itag_index = {int(s.itag): s for s in fmt_streams}
 
     def filter(
-            self, fps=None, res=None, resolution=None, mime_type=None,
-            type=None, subtype=None, file_extension=None, abr=None,
-            bitrate=None, video_codec=None, audio_codec=None,
-            only_audio=None, only_video=None,
-            progressive=None, adaptive=None,
-            custom_filter_functions=None,
+        self,
+        fps=None,
+        res=None,
+        resolution=None,
+        mime_type=None,
+        type=None,
+        subtype=None,
+        file_extension=None,
+        abr=None,
+        bitrate=None,
+        video_codec=None,
+        audio_codec=None,
+        only_audio=None,
+        only_video=None,
+        progressive=None,
+        adaptive=None,
+        is_dash=None,
+        custom_filter_functions=None,
     ):
         """Apply the given filtering criterion.
 
@@ -89,6 +107,9 @@ class StreamQuery:
             Excludes progressive streams (audio and video are on separate
             tracks).
 
+        :param bool is_dash:
+            Include/exclude dash streams.
+
         :param bool only_audio:
             Excludes streams with video tracks.
 
@@ -129,16 +150,12 @@ class StreamQuery:
 
         if only_audio:
             filters.append(
-                lambda s: (
-                    s.includes_audio_track and not s.includes_video_track
-                ),
+                lambda s: (s.includes_audio_track and not s.includes_video_track),
             )
 
         if only_video:
             filters.append(
-                lambda s: (
-                    s.includes_video_track and not s.includes_audio_track
-                ),
+                lambda s: (s.includes_video_track and not s.includes_audio_track),
             )
 
         if progressive:
@@ -148,43 +165,49 @@ class StreamQuery:
             filters.append(lambda s: s.is_adaptive)
 
         if custom_filter_functions:
-            for fn in custom_filter_functions:
-                filters.append(fn)
+            filters.extend(custom_filter_functions)
 
+        if is_dash is not None:
+            filters.append(lambda s: s.is_dash == is_dash)
+
+        return self._filter(filters)
+
+    def _filter(self, filters: List[Callable]) -> "StreamQuery":
         fmt_streams = self.fmt_streams
-        for fn in filters:
-            fmt_streams = list(filter(fn, fmt_streams))
-        return StreamQuery(fmt_streams)
+        for filter_lambda in filters:
+            fmt_streams = filter(filter_lambda, fmt_streams)
+        return StreamQuery(list(fmt_streams))
 
-    def order_by(self, attribute_name):
-        """Apply a sort order to a resultset.
+    def order_by(self, attribute_name: str) -> "StreamQuery":
+        """Apply a sort order. Filters out stream the do not have the attribute.
 
         :param str attribute_name:
             The name of the attribute to sort by.
         """
-        integer_attr_repr = {}
-        for stream in self.fmt_streams:
-            attr = getattr(stream, attribute_name)
-            if attr is None:
-                break
-            num = ''.join(x for x in attr if x.isdigit())
-            integer_attr_repr[attr] = int(''.join(num)) if num else None
+        has_attribute = [
+            s for s in self.fmt_streams if getattr(s, attribute_name) is not None
+        ]
+        # Check that the attributes have string values.
+        if has_attribute and isinstance(getattr(has_attribute[0], attribute_name), str):
+            # Try to return a StreamQuery sorted by the integer representations
+            # of the values.
+            try:
+                return StreamQuery(
+                    sorted(
+                        has_attribute,
+                        key=lambda s: int(
+                            "".join(filter(str.isdigit, getattr(s, attribute_name)))
+                        ),  # type: ignore  # noqa: E501
+                    )
+                )
+            except ValueError:
+                pass
 
-        # if every attribute has an integer representation
-        if integer_attr_repr and all(integer_attr_repr.values()):
-            def key(s):
-                return integer_attr_repr[getattr(s, attribute_name)]
-        else:
-            def key(s):
-                return getattr(s, attribute_name)
-
-        fmt_streams = sorted(
-            self.fmt_streams,
-            key=key,
+        return StreamQuery(
+            sorted(has_attribute, key=lambda s: getattr(s, attribute_name))
         )
-        return StreamQuery(fmt_streams)
 
-    def desc(self):
+    def desc(self) -> "StreamQuery":
         """Sort streams in descending order.
 
         :rtype: :class:`StreamQuery <StreamQuery>`
@@ -192,7 +215,7 @@ class StreamQuery:
         """
         return StreamQuery(self.fmt_streams[::-1])
 
-    def asc(self):
+    def asc(self) -> "StreamQuery":
         """Sort streams in ascending order.
 
         :rtype: :class:`StreamQuery <StreamQuery>`
@@ -200,10 +223,10 @@ class StreamQuery:
         """
         return self
 
-    def get_by_itag(self, itag):
+    def get_by_itag(self, itag: int) -> Optional[Stream]:
         """Get the corresponding :class:`Stream <Stream>` for a given itag.
 
-        :param str int itag:
+        :param int itag:
             YouTube format identifier code.
         :rtype: :class:`Stream <Stream>` or None
         :returns:
@@ -211,12 +234,71 @@ class StreamQuery:
             not found.
 
         """
-        try:
-            return self.itag_index[int(itag)]
-        except KeyError:
-            pass
+        return self.itag_index.get(int(itag))
 
-    def first(self):
+    def get_by_resolution(self, resolution: str) -> Optional[Stream]:
+        """Get the corresponding :class:`Stream <Stream>` for a given resolution.
+
+        Stream must be a progressive mp4.
+
+        :param str resolution:
+            Video resolution i.e. "720p", "480p", "360p", "240p", "144p"
+        :rtype: :class:`Stream <Stream>` or None
+        :returns:
+            The :class:`Stream <Stream>` matching the given itag or None if
+            not found.
+
+        """
+        return self.filter(
+            progressive=True, subtype="mp4", resolution=resolution
+        ).first()
+
+    def get_lowest_resolution(self) -> Optional[Stream]:
+        """Get lowest resolution stream that is a progressive mp4.
+
+        :rtype: :class:`Stream <Stream>` or None
+        :returns:
+            The :class:`Stream <Stream>` matching the given itag or None if
+            not found.
+
+        """
+        return (
+            self.filter(progressive=True, subtype="mp4").order_by("resolution").first()
+        )
+
+    def get_highest_resolution(self) -> Optional[Stream]:
+        """Get highest resolution stream that is a progressive video.
+
+        :rtype: :class:`Stream <Stream>` or None
+        :returns:
+            The :class:`Stream <Stream>` matching the given itag or None if
+            not found.
+
+        """
+        return self.filter(progressive=True).order_by("resolution").last()
+
+    def get_audio_only(self, subtype: str = "mp4") -> Optional[Stream]:
+        """Get highest bitrate audio stream for given codec (defaults to mp4)
+
+        :param str subtype:
+            Audio subtype, defaults to mp4
+        :rtype: :class:`Stream <Stream>` or None
+        :returns:
+            The :class:`Stream <Stream>` matching the given itag or None if
+            not found.
+        """
+        return self.filter(only_audio=True, subtype=subtype).order_by("abr").last()
+
+    def otf(self, is_otf: bool = False) -> "StreamQuery":
+        """Filter stream by OTF, useful if some streams have 404 URLs
+
+        :param bool is_otf: Set to False to retrieve only non-OTF streams
+        :rtype: :class:`StreamQuery <StreamQuery>`
+        :returns: A StreamQuery object with otf filtered streams
+        """
+        return self._filter([lambda s: s.is_otf == is_otf])
+
+    def first(self) -> Optional[Stream]:
         """Get the first :class:`Stream <Stream>` in the results.
 
         :rtype: :class:`Stream <Stream>` or None
@@ -228,7 +310,7 @@ class StreamQuery:
         try:
             return self.fmt_streams[0]
         except IndexError:
-            pass
+            return None
 
     def last(self):
         """Get the last :class:`Stream <Stream>` in the results.
@@ -244,15 +326,19 @@ class StreamQuery:
         except IndexError:
             pass
 
-    def count(self):
-        """Get the count the query would return.
+    @deprecated("Get the size of this list directly using len()")
+    def count(self, value: Optional[str] = None) -> int:  # pragma: no cover
+        """Get the count of items in the list.
 
         :rtype: int
-
         """
-        return len(self.fmt_streams)
+        if value:
+            return self.fmt_streams.count(value)
 
-    def all(self):
+        return len(self)
+
+    @deprecated("This object can be treated as a list, all() is useless")
+    def all(self) -> List[Stream]:  # pragma: no cover
         """Get all the results represented by this query as a list.
 
         :rtype: list
@@ -260,21 +346,32 @@ class StreamQuery:
         """
         return self.fmt_streams
 
+    def __getitem__(self, i: Union[slice, int]):
+        return self.fmt_streams[i]
 
-class CaptionQuery:
+    def __len__(self) -> int:
+        return len(self.fmt_streams)
+
+    def __repr__(self) -> str:
+        return f"{self.fmt_streams}"
+
+
+class CaptionQuery(Mapping):
     """Interface for querying the available captions."""
 
-    def __init__(self, captions):
+    def __init__(self, captions: List[Caption]):
         """Construct a :class:`Caption <Caption>`.
 
         param list captions:
             list of :class:`Caption <Caption>` instances.
 
         """
-        self.captions = captions
         self.lang_code_index = {c.code: c for c in captions}
 
-    def get_by_language_code(self, lang_code):
+    @deprecated("This object can be treated as a dictionary, i.e. captions['en']")
+    def get_by_language_code(
+        self, lang_code: str
+    ) -> Optional[Caption]:  # pragma: no cover
         """Get the :class:`Caption <Caption>` for a given ``lang_code``.
 
         :param str lang_code:
@@ -286,10 +383,23 @@ class CaptionQuery:
         """
         return self.lang_code_index.get(lang_code)
 
-    def all(self):
+    @deprecated("This object can be treated as a dictionary")
+    def all(self) -> List[Caption]:  # pragma: no cover
         """Get all the results represented by this query as a list.
 
         :rtype: list
 
         """
-        return self.captions
+        return list(self.lang_code_index.values())
+
+    def __getitem__(self, i: str):
+        return self.lang_code_index[i]
+
+    def __len__(self) -> int:
+        return len(self.lang_code_index)
+
+    def __iter__(self):
+        return iter(self.lang_code_index.values())
+
+    def __repr__(self) -> str:
+        return f"{self.lang_code_index}"

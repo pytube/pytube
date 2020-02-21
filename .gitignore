@@ -1,4 +1,10 @@
-*.py[oc]
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
 
 # Temp files
 *~
@@ -7,18 +13,52 @@
 \#*
 .#*
 *#
-dist
-.DS_Store
 
-# Build files
-build
-dist
-pkg
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
 *.egg
-*.egg-info
+MANIFEST
 
-# Test files
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
 .pytest_cache/
+*.mp4
+
+# Performance profiling
+prof/
+*.cprof
 
 # Debian Files
 debian/files
@@ -30,8 +70,6 @@ doc/_build
 # Generated man page
 doc/aws_hostname.1
 
-.coverage
-.cache
 _run.py
 _devfiles/*
 
@@ -41,9 +79,54 @@ _templates
 _autosummary
 .pytest_cache*
 
-# IDE Files
-.idea/
-#Pycharm stuff
-.idea/*
-
 .vscode/
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+
+# Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon?
+Icon
+
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+.dropbox
+
+# Generated
+test/**/*.xml
+/*.gv
+/*.dot
+/*.xml
+
+# PyCharm
+.idea/workspace.xml
+.idea/usage.statistics.xml
+.idea/tasks.xml
+.idea/modules.xml
+.idea/*.iml

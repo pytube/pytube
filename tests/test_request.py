@@ -1,42 +1,50 @@
 # -*- coding: utf-8 -*-
 import os
+from unittest import mock
 
-import mock
+import pytest
 
 from pytube import request
 
 
-@mock.patch('pytube.request.urlopen')
-def test_get_streaming(mock_urlopen):
+@mock.patch("pytube.request.urlopen")
+def test_streaming(mock_urlopen):
+    # Given
     fake_stream_binary = [
-        iter(os.urandom(8 * 1024)),
-        iter(os.urandom(8 * 1024)),
-        iter(os.urandom(8 * 1024)),
+        os.urandom(8 * 1024),
+        os.urandom(8 * 1024),
+        os.urandom(8 * 1024),
         None,
     ]
     response = mock.Mock()
     response.read.side_effect = fake_stream_binary
+    response.info.return_value = {"Content-Range": "bytes 200-1000/24576"}
     mock_urlopen.return_value = response
-    response = request.get('fakeassurl.gov', streaming=True)
-    call_count = 0
-    for i in response:
-        call_count += 1
+    # When
+    response = request.stream("http://fakeassurl.gov")
+    # Then
+    call_count = len(list(response))
     assert call_count == 3
 
 
-@mock.patch('pytube.request.urlopen')
-def test_get_headers(mock_urlopen):
+@mock.patch("pytube.request.urlopen")
+def test_headers(mock_urlopen):
     response = mock.Mock()
-    response.info.return_value = {'content-length': '16384'}
+    response.info.return_value = {"content-length": "16384"}
     mock_urlopen.return_value = response
-    response = request.get('fakeassurl.gov', headers=True)
-    assert response == {'content-length': '16384'}
+    response = request.head("http://fakeassurl.gov")
+    assert response == {"content-length": "16384"}
 
 
-@mock.patch('pytube.request.urlopen')
+@mock.patch("pytube.request.urlopen")
 def test_get(mock_urlopen):
     response = mock.Mock()
-    response.read.return_value = '<html></html>'.encode('utf-8')
+    response.read.return_value = "<html></html>".encode("utf-8")
     mock_urlopen.return_value = response
-    response = request.get('fakeassurl.gov')
-    assert response == '<html></html>'
+    response = request.get("http://fakeassurl.gov")
+    assert response == "<html></html>"
+
+
+def test_get_non_http():
+    with pytest.raises(ValueError):
+        request.get("file://bad")

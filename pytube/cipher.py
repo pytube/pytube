@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+
 """
-This module countains all logic necessary to decipher the signature.
+This module contains all logic necessary to decipher the signature.
 
 YouTube's strategy to restrict downloading videos is to send a ciphered version
 of the signature to the client, along with the decryption algorithm obfuscated
@@ -13,48 +14,116 @@ functions" (2) maps them to Python equivalents and (3) taking the ciphered
 signature and decoding it.
 
 """
-from __future__ import absolute_import
-
 import logging
-import pprint
 import re
 from itertools import chain
+from typing import List, Tuple, Dict, Callable, Any, Optional
 
 from pytube.exceptions import RegexMatchError
-from pytube.helpers import regex_search
-
+from pytube.helpers import regex_search, cache
 
 logger = logging.getLogger(__name__)
 
 
-def get_initial_function_name(js):
-    """Extract the name of the function responsible for computing the signature.
+class Cipher:
+    def __init__(self, js: str):
+        self.transform_plan: List[str] = get_transform_plan(js)
+        var, _ = self.transform_plan[0].split(".")
+        self.transform_map = get_transform_map(js, var)
+        self.js_func_regex = re.compile(r"\w+\.(\w+)\(\w,(\d+)\)")
 
+    def get_signature(self, ciphered_signature: str) -> str:
+        """Decipher the signature.
+
+        Taking the ciphered signature, applies the transform functions.
+
+        :param str ciphered_signature:
+            The ciphered signature sent in the ``player_config``.
+        :rtype: str
+        :returns:
+           Decrypted signature required to download the media content.
+        """
+        signature = list(ciphered_signature)
+
+        for js_func in self.transform_plan:
+            name, argument = self.parse_function(js_func)  # type: ignore
+            signature = self.transform_map[name](signature, argument)
+            logger.debug(
+                "applied transform function\n"
+                "output: %s\n"
+                "js_function: %s\n"
+                "argument: %d\n"
+                "function: %s",
+                "".join(signature),
+                name,
+                argument,
+                self.transform_map[name],
+            )
+
+        return "".join(signature)
+
+    @cache
+    def parse_function(self, js_func: str) -> Tuple[str, int]:
+        """Parse the Javascript transform function.
+
+        Break a JavaScript transform function down into a two element ``tuple``
+        containing the function name and some integer-based argument.
+
+        :param str js_func:
+            The JavaScript version of the transform function.
+        :rtype: tuple
+        :returns:
+            two element tuple containing the function name and an argument.
+
+        **Example**:
+
+        parse_function('DE.AJ(a,15)')
+        ('AJ', 15)
+
+        """
+        logger.debug("parsing transform function")
+        parse_match = self.js_func_regex.search(js_func)
+        if not parse_match:
+            raise RegexMatchError(caller="parse_function", pattern="js_func_regex")
+        fn_name, fn_arg = parse_match.groups()
+        return fn_name, int(fn_arg)
+
+
+def get_initial_function_name(js: str) -> str:
+    """Extract the name of the function responsible for computing the signature.
     :param str js:
         The contents of the base.js asset file.
-
+    :rtype: str
+    :returns:
+       Function name from regex match
     """
-    # c&&d.set("signature", EE(c));
 
-    pattern = [
-        r'\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(',  # noqa: E501
-        r'\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(',  # noqa: E501
+    function_patterns = [
+        r"\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
+        r"\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
+        r'\b(?P<sig>[a-zA-Z0-9$]{2})\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\)',  # noqa: E501
         r'(?P<sig>[a-zA-Z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\)',  # noqa: E501
         r'(["\'])signature\1\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(',
-        r'\.sig\|\|(?P<sig>[a-zA-Z0-9$]+)\(',
-        r'yt\.akamaized\.net/\)\s*\|\|\s*.*?\s*[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?:encodeURIComponent\s*\()?\s*(?P<si$',  # noqa: E501
-        r'\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(',  # noqa: E501
-        r'\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(',  # noqa: E501
-        r'\bc\s*&&\s*a\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(',  # noqa: E501
-        r'\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(',  # noqa: E501
-        r'\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(',  # noqa: E501
+        r"\.sig\|\|(?P<sig>[a-zA-Z0-9$]+)\(",
+        r"yt\.akamaized\.net/\)\s*\|\|\s*.*?\s*[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?:encodeURIComponent\s*\()?\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
+        r"\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
+        r"\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
+        r"\bc\s*&&\s*a\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
+        r"\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
+        r"\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
     ]
+    logger.debug("finding initial function name")
+    for pattern in function_patterns:
+        regex = re.compile(pattern)
+        function_match = regex.search(js)
+        if function_match:
+            logger.debug("finished regex search, matched: %s", pattern)
+            return function_match.group(1)
 
-    logger.debug('finding initial function name')
-    return regex_search(pattern, js, group=1)
+    raise RegexMatchError(caller="get_initial_function_name", pattern="multiple")
 
 
-def get_transform_plan(js):
+def get_transform_plan(js: str) -> List[str]:
     """Extract the "transform plan".
 
     The "transform plan" is the functions that the ciphered signature is
@@ -65,7 +134,6 @@ def get_transform_plan(js):
 
     **Example**:
 
-    >>> get_transform_plan(js)
     ['DE.AJ(a,15)',
     'DE.VR(a,3)',
     'DE.AJ(a,51)',
@@ -76,12 +144,12 @@ def get_transform_plan(js):
     'DE.kT(a,21)']
     """
     name = re.escape(get_initial_function_name(js))
-    pattern = r'%s=function\(\w\){[a-z=\.\(\"\)]*;(.*);(?:.+)}' % name
-    logger.debug('getting transform plan')
-    return regex_search(pattern, js, group=1).split(';')
+    pattern = r"%s=function\(\w\){[a-z=\.\(\"\)]*;(.*);(?:.+)}" % name
+    logger.debug("getting transform plan")
+    return regex_search(pattern, js, group=1).split(";")
 
 
-def get_transform_object(js, var):
+def get_transform_object(js: str, var: str) -> List[str]:
     """Extract the "transform object".
 
     The "transform object" contains the function definitions referenced in the
@@ -103,16 +171,17 @@ def get_transform_object(js, var):
     'kT:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c}']
 
     """
-    pattern = r'var %s={(.*?)};' % re.escape(var)
-    logger.debug('getting transform object')
-    return (
-        regex_search(pattern, js, group=1, flags=re.DOTALL)
-        .replace('\n', ' ')
-        .split(', ')
-    )
+    pattern = r"var %s={(.*?)};" % re.escape(var)
+    logger.debug("getting transform object")
+    regex = re.compile(pattern, flags=re.DOTALL)
+    transform_match = regex.search(js)
+    if not transform_match:
+        raise RegexMatchError(caller="get_transform_object", pattern=pattern)
+
+    return transform_match.group(1).replace("\n", " ").split(", ")
 
 
-def get_transform_map(js, var):
+def get_transform_map(js: str, var: str) -> Dict:
     """Build a transform function lookup.
 
     Build a lookup table of obfuscated JavaScript function names to the
@@ -129,13 +198,13 @@ def get_transform_map(js, var):
     mapper = {}
     for obj in transform_object:
         # AJ:function(a){a.reverse()} => AJ, function(a){a.reverse()}
-        name, function = obj.split(':', 1)
+        name, function = obj.split(":", 1)
         fn = map_functions(function)
         mapper[name] = fn
     return mapper
 
 
-def reverse(arr, b):
+def reverse(arr: List, _: Optional[Any]):
     """Reverse elements in a list.
 
     This function is equivalent to:
@@ -155,7 +224,7 @@ def reverse(arr, b):
     return arr[::-1]
 
 
-def splice(arr, b):
+def splice(arr: List, b: int):
     """Add/remove items to/from a list.
 
     This function is equivalent to:
@@ -169,10 +238,10 @@ def splice(arr, b):
     >>> splice([1, 2, 3, 4], 2)
     [1, 2]
     """
-    return arr[:b] + arr[b * 2:]
+    return arr[:b] + arr[b * 2 :]
 
 
-def swap(arr, b):
+def swap(arr: List, b: int):
     """Swap positions at b modulus the list length.
 
     This function is equivalent to:
@@ -187,10 +256,10 @@ def swap(arr, b):
     [3, 2, 1, 4]
     """
     r = b % len(arr)
-    return list(chain([arr[r]], arr[1:r], [arr[0]], arr[r + 1:]))
+    return list(chain([arr[r]], arr[1:r], [arr[0]], arr[r + 1 :]))
 
 
-def map_functions(js_func):
+def map_functions(js_func: str) -> Callable:
     """For a given JavaScript transform function, return the Python equivalent.
 
     :param str js_func:
@@ -199,80 +268,19 @@ def map_functions(js_func):
     """
     mapper = (
         # function(a){a.reverse()}
-        ('{\w\.reverse\(\)}', reverse),
+        (r"{\w\.reverse\(\)}", reverse),
         # function(a,b){a.splice(0,b)}
-        ('{\w\.splice\(0,\w\)}', splice),
+        (r"{\w\.splice\(0,\w\)}", splice),
         # function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c}
-        ('{var\s\w=\w\[0\];\w\[0\]=\w\[\w\%\w.length\];\w\[\w\]=\w}', swap),
+        (r"{var\s\w=\w\[0\];\w\[0\]=\w\[\w\%\w.length\];\w\[\w\]=\w}", swap),
         # function(a,b){var c=a[0];a[0]=a[b%a.length];a[b%a.length]=c}
         (
-            '{var\s\w=\w\[0\];\w\[0\]=\w\[\w\%\w.length\];'
-            '\w\[\w\%\w.length\]=\w}', swap,
+            r"{var\s\w=\w\[0\];\w\[0\]=\w\[\w\%\w.length\];\w\[\w\%\w.length\]=\w}",
+            swap,
         ),
     )
 
     for pattern, fn in mapper:
         if re.search(pattern, js_func):
             return fn
-    raise RegexMatchError(
-        'could not find python equivalent function for: ',
-        js_func,
-    )
-
-
-def parse_function(js_func):
-    """Parse the Javascript transform function.
-
-    Break a JavaScript transform function down into a two element ``tuple``
-    containing the function name and some integer-based argument.
-
-    :param str js_func:
-        The JavaScript version of the transform function.
-    :rtype: tuple
-    :returns:
-        two element tuple containing the function name and an argument.
-
-    **Example**:
-
-    >>> parse_function('DE.AJ(a,15)')
-    ('AJ', 15)
-
-    """
-    logger.debug('parsing transform function')
-    return regex_search(r'\w+\.(\w+)\(\w,(\d+)\)', js_func, groups=True)
-
-
-def get_signature(js, ciphered_signature):
-    """Decipher the signature.
-
-    Taking the ciphered signature, applies the transform functions.
-
-    :param str js:
-        The contents of the base.js asset file.
-    :param str ciphered_signature:
-        The ciphered signature sent in the ``player_config``.
-    :rtype: str
-    :returns:
-       Decrypted signature required to download the media content.
-
-    """
-    tplan = get_transform_plan(js)
-    # DE.AJ(a,15) => DE, AJ(a,15)
-    var, _ = tplan[0].split('.')
-    tmap = get_transform_map(js, var)
-    signature = [s for s in ciphered_signature]
-
-    for js_func in tplan:
-        name, argument = parse_function(js_func)
-        signature = tmap[name](signature, int(argument))
-        logger.debug(
-            'applied transform function\n%s', pprint.pformat(
-                {
-                    'output': ''.join(signature),
-                    'js_function': name,
-                    'argument': int(argument),
-                    'function': tmap[name],
-                }, indent=2,
-            ),
-        )
-    return ''.join(signature)
+    raise RegexMatchError(caller="map_functions", pattern="multiple")
