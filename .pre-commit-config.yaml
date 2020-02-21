@@ -49,6 +49,7 @@ repos:
       - '--aggressive'
       - '--experimental'
       - '--remove-all-unused-imports'
+      - '--ignore-init-module-imports'
       - '--remove-unused-variable'
   - repo: https://github.com/psf/black
     rev: 19.10b0
