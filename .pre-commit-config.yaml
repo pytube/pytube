@@ -45,7 +45,6 @@ repos:
         name: 'Pretty format Python'
     args:
       - '--aggressive'
-      - '--aggressive'
       - '--experimental'
   - repo: https://github.com/psf/black
     rev: stable
