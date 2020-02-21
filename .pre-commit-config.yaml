@@ -48,9 +48,6 @@ repos:
       - '--aggressive'
       - '--aggressive'
       - '--experimental'
-      - '--remove-all-unused-imports'
-      - '--ignore-init-module-imports'
-      - '--remove-unused-variable'
 
   - repo: git@github.com:humitos/mirrors-autoflake.git
     rev: v1.3
@@ -60,7 +57,6 @@ repos:
     args:
       - '--in-place'
       - '--remove-all-unused-imports'
-      - '--ignore-init-module-imports'
       - '--remove-unused-variable'
 
   - repo: https://github.com/psf/black
