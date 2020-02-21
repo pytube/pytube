@@ -43,12 +43,7 @@ repos:
     hooks:
       - id: autopep8
         name: 'Pretty format Python'
-    args:
-      - '--in-place'
-      - '--aggressive'
-      - '--aggressive'
-      - '--experimental'
-
+    args: ['--in-place', '--aggressive', '--aggressive', '--experimental']
   - repo: git@github.com:humitos/mirrors-autoflake.git
     rev: v1.3
     hooks:
