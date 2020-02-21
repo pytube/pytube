@@ -13,7 +13,6 @@ if PY2:
     reload(sys)
     sys.setdefaultencoding("utf8")
     import urllib2
-    from urllib import urlencode
     from urllib2 import URLError
     from urllib2 import quote
     from urllib2 import unquote
@@ -43,12 +42,6 @@ if PY2:
 
 
 elif PY3:
-    from urllib.error import URLError
-    from urllib.parse import parse_qsl
-    from urllib.parse import quote
-    from urllib.parse import unquote
-    from urllib.parse import urlencode
-    from urllib.request import urlopen
     from urllib import request
 
     def install_proxy(proxy_handler):
@@ -69,4 +62,4 @@ elif PY3:
             return html_parser.unescape(s)
 
     else:
-        from html import unescape
+        pass

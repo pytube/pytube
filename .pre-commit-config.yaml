@@ -38,10 +38,10 @@ repos:
     hooks:
       - id: reorder-python-imports
         name: 'Reorder Python imports'
-  - repo: 'https://github.com/pre-commit/mirrors-autopep8'
-    rev: v1.5
+  - repo: git@github.com:humitos/mirrors-autoflake.git
+    rev: v1.3
     hooks:
-      - id: autopep8
+      - id: autoflake
         name: 'Pretty format Python'
     args:
       - '--in-place'
