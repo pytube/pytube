@@ -22,6 +22,7 @@ more-itertools = "==5.0.0"
 black = "*"
 pipenv-to-requirements = "*"
 wheel = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.6"
