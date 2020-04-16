@@ -5,7 +5,7 @@ import logging
 import re
 from collections import OrderedDict
 from html.parser import HTMLParser
-from typing import Any, Optional, Tuple, List, Dict
+from typing import Any, Optional, Tuple, List, Dict, Union
 from urllib.parse import quote, parse_qs, unquote, parse_qsl
 from urllib.parse import urlencode
 
@@ -278,8 +278,9 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
     if key == "url_encoded_fmt_stream_map" and not stream_data.get(
         "url_encoded_fmt_stream_map"
     ):
-        formats = []
-        player_response = json.loads(stream_data["player_response"])
+        formats: List[Dict[str, Union[str, int, float]]] = []
+        player_response: Dict[str, Union[Dict[str, dict], List[dict], str]] = \
+            json.loads(stream_data["player_response"])
         if "formats" in player_response["streamingData"]:
             formats.extend(player_response["streamingData"]["formats"])
         if "adaptiveFormats" in player_response["streamingData"]:
