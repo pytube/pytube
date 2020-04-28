@@ -54,7 +54,7 @@ A GUI frontend for pytube3 is available at [YouTubeDownload](https://github.com/
   * Outputs Caption Tracks to .srt format (SubRip Subtitle)
   * Ability to Capture Thumbnail URL.
   * Extensively Documented Source Code
-  * No Third-Party Dependencies
+  * Few Third-Party Dependencies
 
 ## Usage
 
