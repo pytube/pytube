@@ -126,7 +126,7 @@ class YouTube:
                         end_found = True
                     curr_i += 1
                 title = self.watch_html[i_start:i_end].strip()
-                self.player_config_args["title"] = unescape(title) 
+                self.player_config_args["title"] = unescape(title)
 
         # https://github.com/nficano/pytube/issues/165
         stream_maps = ["url_encoded_fmt_stream_map"]
