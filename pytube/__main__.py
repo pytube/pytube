@@ -84,8 +84,6 @@ class YouTube:
             on_progress=on_progress_callback, on_complete=on_complete_callback
         )
 
-        self.defer_prefetch_init = defer_prefetch_init
-
         if proxies:
             install_proxy(proxies)
 
@@ -118,7 +116,7 @@ class YouTube:
                 i_start = self.watch_html.lower().index("<title>") + len("<title>")
                 i_end = self.watch_html.lower().index("</title>")
                 title = self.watch_html[i_start:i_end].strip()
-                while title == "YouTube" and not self.defer_prefetch_init:
+                while title == "YouTube":
                     self.prefetch()
                     i_start = self.watch_html.lower().index("<title>") + len("<title>")
                     i_end = self.watch_html.lower().index("</title>")
