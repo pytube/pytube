@@ -84,6 +84,8 @@ class YouTube:
             on_progress=on_progress_callback, on_complete=on_complete_callback
         )
 
+        self.defer_prefetch_init = defer_prefetch_init
+
         if proxies:
             install_proxy(proxies)
 
@@ -113,19 +115,17 @@ class YouTube:
 
             # Fix for KeyError: 'title' issue #434
             if "title" not in self.player_config_args:  # type: ignore
-                html_lower = self.watch_html.lower()
-                i_start = html_lower.index('<meta property="og:title" content="') + len(
-                    '<meta property="og:title" content="'
-                )
-                curr_i = i_start
-                end_found = False
-                while not end_found:
-                    # search for the end tag: ">
-                    if html_lower[curr_i] == '"' and html_lower[curr_i + 1] == ">":
-                        i_end = curr_i
-                        end_found = True
-                    curr_i += 1
+                i_start = self.watch_html.lower().index("<title>") + len("<title>")
+                i_end = self.watch_html.lower().index("</title>")
                 title = self.watch_html[i_start:i_end].strip()
+                while title == "YouTube" and not self.defer_prefetch_init:
+                    self.prefetch()
+                    i_start = self.watch_html.lower().index("<title>") + len("<title>")
+                    i_end = self.watch_html.lower().index("</title>")
+                    title = self.watch_html[i_start:i_end].strip()
+
+                index = title.lower().rfind(" - youtube")
+                title = title[:index] if index > 0 else title
                 self.player_config_args["title"] = unescape(title)
 
         # https://github.com/nficano/pytube/issues/165
