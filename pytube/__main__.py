@@ -34,10 +34,10 @@ class YouTube:
     def __init__(
         self,
         url: str,
-        defer_prefetch_init: bool = False,
-        on_progress_callback: Optional[OnProgress] = None,
-        on_complete_callback: Optional[OnComplete] = None,
-        proxies: Dict[str, str] = None,
+        defer_prefetch_init = False,
+        on_progress_callback = None,
+        on_complete_callback = None,
+        proxies = None,
     ):
         """Construct a :class:`YouTube <YouTube>`.
 

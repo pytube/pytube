@@ -43,8 +43,8 @@ class Monostate:
         self,
         on_progress: Optional[OnProgress],
         on_complete: Optional[OnComplete],
-        title: Optional[str] = None,
-        duration: Optional[int] = None,
+        title = None,
+        duration = None,
     ):
         self.on_progress = on_progress
         self.on_complete = on_complete

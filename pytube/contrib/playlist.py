@@ -186,10 +186,10 @@ class Playlist(Sequence):
     )
     def download_all(
         self,
-        download_path: Optional[str] = None,
-        prefix_number: bool = True,
-        reverse_numbering: bool = False,
-        resolution: str = "720p",
+        download_path = None,
+        prefix_number = True,
+        reverse_numbering = False,
+        resolution = "720p",
     ) -> None:  # pragma: no cover
         """Download all the videos in the the playlist.
 

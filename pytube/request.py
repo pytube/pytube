@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def _execute_request(
-    url: str, method: Optional[str] = None, headers: Optional[Dict[str, str]] = None
+    url: str, method: Optional[str] = None, headers = None
 ) -> HTTPResponse:
     base_headers = {"User-Agent": "Mozilla/5.0"}
     if headers:
@@ -37,7 +37,7 @@ def get(url) -> str:
 
 
 def stream(
-    url: str, chunk_size: int = 4096, range_size: int = 9437184
+    url: str, chunk_size: int = 4096, range_size = 9437184
 ) -> Iterable[bytes]:
     """Read the response in chunks.
     :param str url: The URL to perform the GET request for.
@@ -45,7 +45,7 @@ def stream(
     :param int range_size: The size in bytes of each range request. Defaults to 9MB
     :rtype: Iterable[bytes]
     """
-    file_size: int = range_size  # fake filesize to start
+    file_size = range_size  # fake filesize to start
     downloaded = 0
     while downloaded < file_size:
         stop_pos = min(downloaded + range_size, file_size) - 1

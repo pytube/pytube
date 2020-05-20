@@ -77,9 +77,9 @@ class Caption:
     def download(
         self,
         title: str,
-        srt: bool = True,
-        output_path: Optional[str] = None,
-        filename_prefix: Optional[str] = None,
+        srt = True,
+        output_path = None,
+        filename_prefix = None,
     ) -> str:
         """Write the media stream to disk.
 

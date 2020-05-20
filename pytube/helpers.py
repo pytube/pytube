@@ -162,7 +162,7 @@ def install_proxy(proxy_handler: Dict[str, str]) -> None:
 
 
 def uniqueify(duped_list: List) -> List:
-    seen: Dict[Any, bool] = {}
+    seen = {}
     result = []
     for item in duped_list:
         if item in seen:

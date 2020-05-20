@@ -227,7 +227,7 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
 
     for i, stream in enumerate(stream_manifest):
         try:
-            url: str = stream["url"]
+            url = stream["url"]
         except KeyError:
             live_stream = (
                 json.loads(config_args["player_response"])

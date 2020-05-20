@@ -71,7 +71,7 @@ def _perform_args_on_youtube(youtube: YouTube, args: argparse.Namespace) -> None
 
 
 def _parse_args(
-    parser: argparse.ArgumentParser, args: Optional[List] = None
+    parser: argparse.ArgumentParser, args = None
 ) -> argparse.Namespace:
     parser.add_argument("url", help="The YouTube /watch or /playlist url", nargs="?")
     parser.add_argument(
@@ -176,7 +176,7 @@ def build_playback_report(youtube: YouTube) -> None:
 
 
 def display_progress_bar(
-    bytes_received: int, filesize: int, ch: str = "█", scale: float = 0.55
+    bytes_received: int, filesize: int, ch: str = "█", scale = 0.55
 ) -> None:
     """Display a simple, pretty progress bar.
 
@@ -218,7 +218,7 @@ def on_progress(
 
 
 def _download(
-    stream: Stream, target: Optional[str] = None, filename: Optional[str] = None
+    stream: Stream, target: Optional[str] = None, filename = None
 ) -> None:
     filesize_megabytes = stream.filesize // 1048576
     print("{} | {} MB".format(filename or stream.default_filename, filesize_megabytes))
@@ -254,7 +254,7 @@ def _unique_name(base: str, subtype: str, media_type: str, target: str) -> str:
 
 
 def ffmpeg_process(
-    youtube: YouTube, resolution: str, target: Optional[str] = None
+    youtube: YouTube, resolution: str, target = None
 ) -> None:
     """
     Decides the correct video stream to download, then calls _ffmpeg_downloader.
@@ -370,7 +370,7 @@ def download_by_itag(youtube: YouTube, itag: int, target: Optional[str] = None) 
 
 
 def download_by_resolution(
-    youtube: YouTube, resolution: str, target: Optional[str] = None
+    youtube: YouTube, resolution: str, target = None
 ) -> None:
     """Start downloading a YouTube video.
 
@@ -413,7 +413,7 @@ def _print_available_captions(captions: CaptionQuery) -> None:
 
 
 def download_caption(
-    youtube: YouTube, lang_code: Optional[str], target: Optional[str] = None
+    youtube: YouTube, lang_code: Optional[str], target = None
 ) -> None:
     """Download a caption for the YouTube video.
 
@@ -440,7 +440,7 @@ def download_caption(
 
 
 def download_audio(
-    youtube: YouTube, filetype: str, target: Optional[str] = None
+    youtube: YouTube, filetype: str, target = None
 ) -> None:
     """
     Given a filetype, downloads the highest quality available audio stream for a

@@ -189,10 +189,10 @@ class Stream:
 
     def download(
         self,
-        output_path: Optional[str] = None,
-        filename: Optional[str] = None,
-        filename_prefix: Optional[str] = None,
-        skip_existing: bool = True,
+        output_path = None,
+        filename = None,
+        filename_prefix = None,
+        skip_existing = True,
     ) -> str:
         """Write the media stream to disk.
 
@@ -246,7 +246,7 @@ class Stream:
         self,
         filename: Optional[str],
         output_path: Optional[str],
-        filename_prefix: Optional[str] = None,
+        filename_prefix = None,
     ) -> str:
         if filename:
             filename = "{}.{}".format(safe_filename(filename), self.subtype)
