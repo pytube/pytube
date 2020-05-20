@@ -185,7 +185,7 @@ class Stream:
             An os file system compatible filename.
         """
         filename = safe_filename(self.title)
-        return f"{filename}.{self.subtype}"
+        return "{}.{}".format(filename, self.subtype)
 
     def download(
         self,
@@ -249,11 +249,11 @@ class Stream:
         filename_prefix: Optional[str] = None,
     ) -> str:
         if filename:
-            filename = f"{safe_filename(filename)}.{self.subtype}"
+            filename = "{}.{}".format(safe_filename(filename), self.subtype)
         else:
             filename = self.default_filename
         if filename_prefix:
-            filename = f"{safe_filename(filename_prefix)}{filename}"
+            filename = "{}{}".format(safe_filename(filename_prefix), filename)
         return os.path.join(target_directory(output_path), filename)
 
     def exists_at_path(self, file_path: str) -> bool:
@@ -336,4 +336,4 @@ class Stream:
         else:
             parts.extend(['abr="{s.abr}"', 'acodec="{s.audio_codec}"'])
         parts.extend(['progressive="{s.is_progressive}"', 'type="{s.type}"'])
-        return f"<Stream: {' '.join(parts).format(s=self)}>"
+        return "<Stream: {}>".format(' '.join(parts).format(s=self))

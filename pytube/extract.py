@@ -37,7 +37,7 @@ class PytubeHTMLParser(HTMLParser):
 
     def handle_data(self, data):
         if self.in_vid_descr_br:
-            self.vid_descr += f"\n{data}"
+            self.vid_descr += "\n{}".format(data)
             self.in_vid_descr_br = False
         elif self.in_vid_descr:
             self.vid_descr += data
@@ -122,7 +122,7 @@ def video_info_url_age_restricted(video_id: str, embed_html: str) -> str:
         sts = ""
     # Here we use ``OrderedDict`` so that the output is consistent between
     # Python 2.7+.
-    eurl = f"https://youtube.googleapis.com/v/{video_id}"
+    eurl = "https://youtube.googleapis.com/v/{}".format(video_id)
     params = OrderedDict([("video_id", video_id), ("eurl", eurl), ("sts", sts),])
     return _video_info_url(params)
 

@@ -28,7 +28,7 @@ class Playlist(Sequence):
         except IndexError:  # assume that url is just the id
             self.playlist_id = url
 
-        self.playlist_url = f"https://www.youtube.com/playlist?list={self.playlist_id}"
+        self.playlist_url = "https://www.youtube.com/playlist?list={}".format(self.playlist_id)
         self.html = request.get(self.playlist_url)
 
         # Needs testing with non-English
@@ -39,7 +39,7 @@ class Playlist(Sequence):
         if date_match:
             month, day, year = date_match.groups()
             self.last_update = datetime.strptime(
-                f"{month} {day:0>2} {year}", "%b %d %Y"
+                "{month} {day:0>2} {year}", "%b %d %Y"
             ).date()
 
         self._video_regex = re.compile(r"href=\"(/watch\?v=[\w-]*)")
@@ -52,7 +52,7 @@ class Playlist(Sequence):
             req,
         )
         if match:
-            return f"https://www.youtube.com{match.group(1)}"
+            return "https://www.youtube.com{}".format(match.group(1))
 
         return None
 
@@ -71,7 +71,7 @@ class Playlist(Sequence):
         videos_urls = self._extract_videos(req)
         if until_watch_id:
             try:
-                trim_index = videos_urls.index(f"/watch?v={until_watch_id}")
+                trim_index = videos_urls.index("/watch?v={}".format(until_watch_id))
                 yield videos_urls[:trim_index]
                 return
             except ValueError:
@@ -94,7 +94,7 @@ class Playlist(Sequence):
             videos_urls = self._extract_videos(html)
             if until_watch_id:
                 try:
-                    trim_index = videos_urls.index(f"/watch?v={until_watch_id}")
+                    trim_index = videos_urls.index("/watch?v={}".format(until_watch_id))
                     yield videos_urls[:trim_index]
                     return
                 except ValueError:
@@ -150,7 +150,7 @@ class Playlist(Sequence):
         return len(self.video_urls)
 
     def __repr__(self) -> str:
-        return f"{self.video_urls}"
+        return repr(self.video_urls)
 
     @deprecated(
         "This call is unnecessary, you can directly access .video_urls or .videos"
@@ -249,4 +249,4 @@ class Playlist(Sequence):
 
     @staticmethod
     def _video_url(watch_path: str):
-        return f"https://www.youtube.com{watch_path}"
+        return "https://www.youtube.com{}".format(watch_path)

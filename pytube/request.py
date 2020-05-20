@@ -49,7 +49,7 @@ def stream(
     downloaded = 0
     while downloaded < file_size:
         stop_pos = min(downloaded + range_size, file_size) - 1
-        range_header = f"bytes={downloaded}-{stop_pos}"
+        range_header = "bytes={}-{}".format(downloaded, stop_pos)
         response = _execute_request(url, method="GET", headers={"Range": range_header})
         if file_size == range_size:
             try:

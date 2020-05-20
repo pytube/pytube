@@ -27,7 +27,7 @@ class RegexMatchError(ExtractError):
         :param str pattern:
             Pattern that failed to match
         """
-        super().__init__(f"{caller}: could not find match for {pattern}")
+        super().__init__("{}: could not find match for {}".format(caller, pattern))
         self.caller = caller
         self.pattern = pattern
 
@@ -40,7 +40,7 @@ class LiveStreamError(ExtractError):
         :param str video_id:
             A YouTube video identifier.
         """
-        super().__init__(f"{video_id} is streaming live and cannot be loaded")
+        super().__init__("{} is streaming live and cannot be loaded".format(video_id))
 
         self.video_id = video_id
 
@@ -53,7 +53,7 @@ class VideoUnavailable(PytubeError):
         :param str video_id:
             A YouTube video identifier.
         """
-        super().__init__(f"{video_id} is unavailable")
+        super().__init__("{} is unavailable".format(video_id))
 
         self.video_id = video_id
 

@@ -353,7 +353,7 @@ class StreamQuery(Sequence):
         return len(self.fmt_streams)
 
     def __repr__(self) -> str:
-        return f"{self.fmt_streams}"
+        return "{}".format(self.fmt_streams)
 
 
 class CaptionQuery(Mapping):
@@ -402,4 +402,4 @@ class CaptionQuery(Mapping):
         return iter(self.lang_code_index.values())
 
     def __repr__(self) -> str:
-        return f"{self.lang_code_index}"
+        return "{}".format(self.lang_code_index)
