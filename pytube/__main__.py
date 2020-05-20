@@ -53,25 +53,25 @@ class YouTube:
             complete events.
 
         """
-        self.js: Optional[str] = None  # js fetched by js_url
-        self.js_url: Optional[str] = None  # the url to the js, parsed from watch html
+        self.js = None  # js fetched by js_url
+        self.js_url = None  # the url to the js, parsed from watch html
 
         # note: vid_info may eventually be removed. It sounds like it once had
         # additional formats, but that doesn't appear to still be the case.
 
         # the url to vid info, parsed from watch html
-        self.vid_info_url: Optional[str] = None
-        self.vid_info_raw: Optional[str] = None  # content fetched by vid_info_url
-        self.vid_info: Optional[Dict] = None  # parsed content of vid_info_raw
+        self.vid_info_url = None
+        self.vid_info_raw = None  # content fetched by vid_info_url
+        self.vid_info = None  # parsed content of vid_info_raw
 
-        self.watch_html: Optional[str] = None  # the html of /watch?v=<video_id>
-        self.embed_html: Optional[str] = None
-        self.player_config_args: Dict = {}  # inline js in the html containing
-        self.player_response: Dict = {}
+        self.watch_html = None  # the html of /watch?v=<video_id>
+        self.embed_html = None
+        self.player_config_args = {}  # inline js in the html containing
+        self.player_response = {}
         # streams
-        self.age_restricted: Optional[bool] = None
+        self.age_restricted = None
 
-        self.fmt_streams: List[Stream] = []
+        self.fmt_streams = []
 
         # video_id part of /watch?v=<video_id>
         self.video_id = extract.video_id(url)

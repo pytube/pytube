@@ -24,7 +24,7 @@ class Playlist(Sequence):
             install_proxy(proxies)
 
         try:
-            self.playlist_id: str = parse_qs(url.split("?")[1])["list"][0]
+            self.playlist_id = parse_qs(url.split("?")[1])["list"][0]
         except IndexError:  # assume that url is just the id
             self.playlist_id = url
 
@@ -32,7 +32,7 @@ class Playlist(Sequence):
         self.html = request.get(self.playlist_url)
 
         # Needs testing with non-English
-        self.last_update: Optional[date] = None
+        self.last_update = None
         date_match = re.search(
             r"<li>Last updated on (\w{3}) (\d{1,2}), (\d{4})</li>", self.html
         )

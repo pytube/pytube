@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 class Cipher:
     def __init__(self, js: str):
-        self.transform_plan: List[str] = get_transform_plan(js)
+        self.transform_plan = get_transform_plan(js)
         var, _ = self.transform_plan[0].split(".")
         self.transform_map = get_transform_map(js, var)
         self.js_func_regex = re.compile(r"\w+\.(\w+)\(\w,(\d+)\)")

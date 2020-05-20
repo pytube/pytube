@@ -58,10 +58,10 @@ class Stream:
         # streams return NoneType for audio/video depending.
         self.video_codec, self.audio_codec = self.parse_codecs()
 
-        self.is_otf: bool = stream["is_otf"]
-        self.bitrate: Optional[int] = stream["bitrate"]
+        self.is_otf = stream["is_otf"]
+        self.bitrate = stream["bitrate"]
 
-        self._filesize: Optional[int] = None  # filesize in bytes
+        self._filesize = None  # filesize in bytes
 
         # Additional information about the stream format, such as resolution,
         # frame rate, and whether the stream is live (HLS) or 3D.
