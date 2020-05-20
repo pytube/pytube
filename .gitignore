@@ -130,3 +130,5 @@ test/**/*.xml
 .idea/tasks.xml
 .idea/modules.xml
 .idea/*.iml
+venv/
+.python-version
