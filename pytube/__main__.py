@@ -130,9 +130,6 @@ class YouTube:
             # Fix for KeyError: 'title' issue #434
             if "title" not in self.player_config_args:  # type: ignore
                 title = self.extract_title()
-                while title == "YouTube":
-                    self.prefetch()
-                    title = self.extract_title()
                 self.player_config_args["title"] = unescape(title)
 
         # https://github.com/nficano/pytube/issues/165
