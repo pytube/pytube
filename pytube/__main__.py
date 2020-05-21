@@ -91,6 +91,22 @@ class YouTube:
             self.prefetch()
             self.descramble()
 
+    def extract_title(self):
+        html_lower = self.watch_html.lower()
+        i_start = html_lower.index('<meta property="og:title" content="') + len(
+            '<meta property="og:title" content="'
+        )
+        curr_i = i_start
+        end_found = False
+        while not end_found:
+            # search for the end of the tag: ">
+            if html_lower[curr_i] == '"' and html_lower[curr_i + 1] == ">":
+                i_end = curr_i
+                end_found = True
+            curr_i += 1
+
+        return self.watch_html[i_start:i_end].strip()
+
     def descramble(self) -> None:
         """Descramble the stream data and build Stream instances.
 
@@ -113,17 +129,10 @@ class YouTube:
 
             # Fix for KeyError: 'title' issue #434
             if "title" not in self.player_config_args:  # type: ignore
-                i_start = self.watch_html.lower().index("<title>") + len("<title>")
-                i_end = self.watch_html.lower().index("</title>")
-                title = self.watch_html[i_start:i_end].strip()
+                title = self.extract_title()
                 while title == "YouTube":
                     self.prefetch()
-                    i_start = self.watch_html.lower().index("<title>") + len("<title>")
-                    i_end = self.watch_html.lower().index("</title>")
-                    title = self.watch_html[i_start:i_end].strip()
-
-                index = title.lower().rfind(" - youtube")
-                title = title[:index] if index > 0 else title
+                    title = self.extract_title()
                 self.player_config_args["title"] = unescape(title)
 
         # https://github.com/nficano/pytube/issues/165
