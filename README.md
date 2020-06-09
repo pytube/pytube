@@ -11,7 +11,8 @@
   </p>
 </div>
 
-# pytube3
+# Call for Successor
+Hello, I am unable to maintain and contribute to this project much these days. If you would like to it become the successor, please email me at nficano(at)gmail.com.
 
 ## Table of Contents
   * [Installation](#installation)
