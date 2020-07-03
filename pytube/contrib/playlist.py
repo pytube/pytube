@@ -42,7 +42,7 @@ class Playlist(Sequence):
                 f"{month} {day:0>2} {year}", "%b %d %Y"
             ).date()
 
-        self._video_regex = re.compile(r"href=\"(/watch\?v=[\w-]*)")
+        self._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
 
     @staticmethod
     def _find_load_more_url(req: str) -> Optional[str]:
