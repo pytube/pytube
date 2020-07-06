@@ -261,9 +261,11 @@ class YouTube:
         :rtype: str
 
         """
-        return re.search(
-            r"<meta itemprop=\"name\" content=\".*\">", self.watch_html
-        ).group(0).split("\"")[3]
+        return (
+            re.search(r"<meta itemprop=\"name\" content=\".*?\">", self.watch_html)
+            .group(0)
+            .split('"')[3]
+        )
 
     @property
     def description(self) -> str:

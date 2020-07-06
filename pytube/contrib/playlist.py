@@ -239,13 +239,8 @@ class Playlist(Sequence):
         :return: playlist title (name)
         :rtype: Optional[str]
         """
-        pattern = re.compile("<title>(.+?)</title>")
-        match = pattern.search(self.html)
-
-        if match is None:
-            return None
-
-        return match.group(1).replace("- YouTube", "").strip()
+        title_match = re.search(r"<title>(.*?)</title>", self.html).group(1)
+        return title_match.replace("- YouTube", "").strip() if title_match else None
 
     @staticmethod
     def _video_url(watch_path: str):
