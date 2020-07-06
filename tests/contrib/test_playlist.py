@@ -8,10 +8,6 @@ from pytube import Playlist
 
 @mock.patch("pytube.contrib.playlist.request.get")
 def test_title(request_get):
-    request_get.html = (
-        "<title>YouTube</title> <title>(149) Python Tutorial for Beginners "
-        "(For Absolute Beginners) - YouTube</title>"
-    )
     request_get.return_value = (
         "<title>(149) Python Tutorial for Beginners "
         "(For Absolute Beginners) - YouTube</title>"
