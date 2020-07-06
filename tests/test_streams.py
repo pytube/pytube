@@ -50,14 +50,7 @@ def test_default_filename(cipher_signature):
 
 
 def test_title(cipher_signature):
-    expected = "title"
-    cipher_signature.player_config_args["title"] = expected
-    assert cipher_signature.title == expected
-
-    expected = "title2"
-    del cipher_signature.player_config_args["title"]
-    cipher_signature.player_response = {"videoDetails": {"title": expected}}
-    assert cipher_signature.title == expected
+    assert cipher_signature.title == "PSY - GANGNAM STYLE(강남스타일) M/V"
 
 
 def test_expiration(cipher_signature):

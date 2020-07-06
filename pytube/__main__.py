@@ -8,6 +8,7 @@ smaller peripheral modules and functions.
 
 """
 
+import re
 import json
 import logging
 from typing import Optional, Dict, List
@@ -260,9 +261,9 @@ class YouTube:
         :rtype: str
 
         """
-        return self.player_config_args.get("title") or (
-            self.player_response.get("videoDetails", {}).get("title")
-        )
+        return re.search(
+            r"<meta itemprop=\"name\" content=\".*\">", self.watch_html
+        ).group(0).split("\"")[3]
 
     @property
     def description(self) -> str:
