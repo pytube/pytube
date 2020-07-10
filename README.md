@@ -13,7 +13,9 @@
 
 Pytube is being sponsored by the following tool; please help to support us by taking a look and signing up to a free trial
 
-<!--<a href="https://tracking.gitads.io/?repo=pytube"> <img src="https://images.gitads.io/pytube" alt="GitAds"/> </a>-->
+<a href="https://tracking.gitads.io/?repo=pytube">
+	<img src="https://images.gitads.io/pytube" alt="GitAds" />
+</a>
 
 ## Table of Contents
   * [Installation](#installation)
