@@ -11,8 +11,8 @@
   </p>
 </div>
 
-# Call for Successor
-Hello, I am unable to maintain and contribute to this project much these days. If you would like to it become the successor, please email me at nficano(at)gmail.com.
+Pytube is being sponsored by the following tool; please help to support us by taking a look and signing up to a free trial
+<a href="https://tracking.gitads.io/?repo=pytube"> <img src="https://images.gitads.io/pytube" alt="GitAds"/> </a>
 
 ## Table of Contents
   * [Installation](#installation)
@@ -308,3 +308,4 @@ Treat other people with helpfulness, gratitude, and consideration! See the [Pyth
 * [Pytube-GUI](https://github.com/GAO23/Pytube-GUI) - Simple GUI frontend for pytube3
 * [StackOverflow questions](https://stackoverflow.com/questions/tagged/pytube)
 * [PySlackers](https://pyslackers.com/web) - Python Slack group
+
