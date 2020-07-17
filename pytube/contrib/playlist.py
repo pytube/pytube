@@ -1,17 +1,24 @@
 # -*- coding: utf-8 -*-
-
 """Module to download a complete playlist from a youtube channel."""
-
 import json
 import logging
 import re
-from datetime import date, datetime
-from typing import List, Optional, Iterable, Dict, Union
-from urllib.parse import parse_qs
 from collections.abc import Sequence
+from datetime import date
+from datetime import datetime
+from typing import Dict
+from typing import Iterable
+from typing import List
+from typing import Optional
+from typing import Union
+from urllib.parse import parse_qs
 
-from pytube import request, YouTube
-from pytube.helpers import cache, deprecated, install_proxy, uniqueify
+from pytube import request
+from pytube import YouTube
+from pytube.helpers import cache
+from pytube.helpers import deprecated
+from pytube.helpers import install_proxy
+from pytube.helpers import uniqueify
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +35,9 @@ class Playlist(Sequence):
         except IndexError:  # assume that url is just the id
             self.playlist_id = url
 
-        self.playlist_url = f"https://www.youtube.com/playlist?list={self.playlist_id}"
+        self.playlist_url = (
+            f"https://www.youtube.com/playlist?list={self.playlist_id}"
+        )
         self.html = request.get(self.playlist_url)
 
         # Needs testing with non-English
@@ -48,7 +57,8 @@ class Playlist(Sequence):
     def _find_load_more_url(req: str) -> Optional[str]:
         """Given an html page or fragment, returns the "load more" url if found."""
         match = re.search(
-            r"data-uix-load-more-href=\"(/browse_ajax\?" 'action_continuation=.*?)"',
+            r"data-uix-load-more-href=\"(/browse_ajax\?"
+            'action_continuation=.*?)"',
             req,
         )
         if match:
@@ -56,7 +66,9 @@ class Playlist(Sequence):
 
         return None
 
-    @deprecated("This function will be removed in the future, please use .video_urls")
+    @deprecated(
+        "This function will be removed in the future, please use .video_urls"
+    )
     def parse_links(self) -> List[str]:  # pragma: no cover
         """ Deprecated function for returning list of URLs
 
@@ -64,7 +76,9 @@ class Playlist(Sequence):
         """
         return self.video_urls
 
-    def _paginate(self, until_watch_id: Optional[str] = None) -> Iterable[List[str]]:
+    def _paginate(
+        self, until_watch_id: Optional[str] = None
+    ) -> Iterable[List[str]]:
         """Parse the video links from the page source, yields the /watch?v= part from video link
         """
         req = self.html
@@ -94,7 +108,9 @@ class Playlist(Sequence):
             videos_urls = self._extract_videos(html)
             if until_watch_id:
                 try:
-                    trim_index = videos_urls.index(f"/watch?v={until_watch_id}")
+                    trim_index = videos_urls.index(
+                        f"/watch?v={until_watch_id}"
+                    )
                     yield videos_urls[:trim_index]
                     return
                 except ValueError:
@@ -132,7 +148,9 @@ class Playlist(Sequence):
         :returns: List of video URLs
         """
         return [
-            self._video_url(video) for page in list(self._paginate()) for video in page
+            self._video_url(video)
+            for page in list(self._paginate())
+            for video in page
         ]
 
     @property

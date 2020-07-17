@@ -15,7 +15,10 @@ def test_title(request_get):
     url = "https://www.fakeurl.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n"
     pl = Playlist(url)
     pl_title = pl.title()
-    assert pl_title == "(149) Python Tutorial for Beginners (For Absolute Beginners)"
+    assert (
+        pl_title
+        == "(149) Python Tutorial for Beginners (For Absolute Beginners)"
+    )
 
 
 @mock.patch("pytube.contrib.playlist.request.get")
@@ -208,7 +211,9 @@ def test_trimmed_pagination(request_get, playlist_html, playlist_long_html):
 
 
 @mock.patch("pytube.contrib.playlist.request.get")
-def test_trimmed_pagination_not_found(request_get, playlist_html, playlist_long_html):
+def test_trimmed_pagination_not_found(
+    request_get, playlist_html, playlist_long_html
+):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.side_effect = [
         playlist_long_html,

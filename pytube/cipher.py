@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """
 This module contains all logic necessary to decipher the signature.
 
@@ -17,10 +16,16 @@ signature and decoding it.
 import logging
 import re
 from itertools import chain
-from typing import List, Tuple, Dict, Callable, Any, Optional
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
 
 from pytube.exceptions import RegexMatchError
-from pytube.helpers import regex_search, cache
+from pytube.helpers import cache
+from pytube.helpers import regex_search
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +89,9 @@ class Cipher:
         logger.debug("parsing transform function")
         parse_match = self.js_func_regex.search(js_func)
         if not parse_match:
-            raise RegexMatchError(caller="parse_function", pattern="js_func_regex")
+            raise RegexMatchError(
+                caller="parse_function", pattern="js_func_regex"
+            )
         fn_name, fn_arg = parse_match.groups()
         return fn_name, int(fn_arg)
 
@@ -120,7 +127,9 @@ def get_initial_function_name(js: str) -> str:
             logger.debug("finished regex search, matched: %s", pattern)
             return function_match.group(1)
 
-    raise RegexMatchError(caller="get_initial_function_name", pattern="multiple")
+    raise RegexMatchError(
+        caller="get_initial_function_name", pattern="multiple"
+    )
 
 
 def get_transform_plan(js: str) -> List[str]:

@@ -6,7 +6,8 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 from pytube import request
-from pytube import Stream, streams
+from pytube import Stream
+from pytube import streams
 
 
 @mock.patch("pytube.streams.request")
@@ -61,7 +62,9 @@ def test_title(cipher_signature):
 
 
 def test_expiration(cipher_signature):
-    assert cipher_signature.streams[0].expiration == datetime(2020, 1, 16, 5, 12, 5)
+    assert cipher_signature.streams[0].expiration == datetime(
+        2020, 1, 16, 5, 12, 5
+    )
 
 
 def test_caption_tracks(presigned_video):

@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 from unittest import mock
-from unittest.mock import patch, mock_open, MagicMock
+from unittest.mock import MagicMock
+from unittest.mock import mock_open
+from unittest.mock import patch
 
 import pytest
 
-from pytube import Caption, CaptionQuery, captions
+from pytube import Caption
+from pytube import CaptionQuery
+from pytube import captions
 
 
 def test_float_to_srt_time_format():
@@ -60,10 +64,17 @@ def test_download(srt):
     with patch("builtins.open", open_mock):
         srt.return_value = ""
         caption = Caption(
-            {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
+            {
+                "url": "url1",
+                "name": {"simpleText": "name1"},
+                "languageCode": "en",
+            }
         )
         caption.download("title")
-        assert open_mock.call_args_list[0][0][0].split("/")[-1] == "title (en).srt"
+        assert (
+            open_mock.call_args_list[0][0][0].split("/")[-1]
+            == "title (en).srt"
+        )
 
 
 @mock.patch("pytube.captions.Caption.generate_srt_captions")
@@ -72,10 +83,17 @@ def test_download_with_prefix(srt):
     with patch("builtins.open", open_mock):
         srt.return_value = ""
         caption = Caption(
-            {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
+            {
+                "url": "url1",
+                "name": {"simpleText": "name1"},
+                "languageCode": "en",
+            }
         )
         caption.download("title", filename_prefix="1 ")
-        assert open_mock.call_args_list[0][0][0].split("/")[-1] == "1 title (en).srt"
+        assert (
+            open_mock.call_args_list[0][0][0].split("/")[-1]
+            == "1 title (en).srt"
+        )
 
 
 @mock.patch("pytube.captions.Caption.generate_srt_captions")
@@ -85,7 +103,11 @@ def test_download_with_output_path(srt):
     with patch("builtins.open", open_mock):
         srt.return_value = ""
         caption = Caption(
-            {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
+            {
+                "url": "url1",
+                "name": {"simpleText": "name1"},
+                "languageCode": "en",
+            }
         )
         file_path = caption.download("title", output_path="blah")
         assert file_path == "/target/title (en).srt"
@@ -98,10 +120,17 @@ def test_download_xml_and_trim_extension(xml):
     with patch("builtins.open", open_mock):
         xml.return_value = ""
         caption = Caption(
-            {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en"}
+            {
+                "url": "url1",
+                "name": {"simpleText": "name1"},
+                "languageCode": "en",
+            }
         )
         caption.download("title.xml", srt=False)
-        assert open_mock.call_args_list[0][0][0].split("/")[-1] == "title (en).xml"
+        assert (
+            open_mock.call_args_list[0][0][0].split("/")[-1]
+            == "title (en).xml"
+        )
 
 
 def test_repr():

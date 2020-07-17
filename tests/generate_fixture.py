@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
-
 # flake8: noqa: E402
-
-from os import path
-import sys
 import json
+import sys
+from os import path
+
+from pytube import YouTube
 
 currentdir = path.dirname(path.realpath(__file__))
 parentdir = path.dirname(currentdir)
 sys.path.append(parentdir)
 
-from pytube import YouTube
 
 yt = YouTube(sys.argv[1], defer_prefetch_init=True)
 yt.prefetch()
