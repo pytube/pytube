@@ -337,3 +337,16 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
         ]
 
     logger.debug("applying descrambler")
+
+
+def initial_data(watch_html: str) -> str:
+    """
+    Extracts the initial_data json from the watch_html page.
+    This is used for extraction of copyright notices located at the bottom
+    of the video description
+    @param watch_html: Html of the watch page
+    @return:
+    """
+    return regex_search(
+        r"window\[\"ytInitialData\"] = ([^\n]+)", watch_html, 1
+    )[0:-1]

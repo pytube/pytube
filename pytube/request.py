@@ -17,7 +17,7 @@ def _execute_request(
     method: Optional[str] = None,
     headers: Optional[Dict[str, str]] = None,
 ) -> HTTPResponse:
-    base_headers = {"User-Agent": "Mozilla/5.0"}
+    base_headers = {"User-Agent": "Mozilla/5.0", "accept-language": "en-US,en"}
     if headers:
         base_headers.update(headers)
     if url.lower().startswith("http"):

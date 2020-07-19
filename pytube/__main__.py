@@ -7,6 +7,7 @@ exclusively on the developer interface. Pytube offloads the heavy lifting to
 smaller peripheral modules and functions.
 
 """
+import functools
 import json
 import logging
 from html import unescape
@@ -31,6 +32,40 @@ from pytube.monostate import OnComplete
 from pytube.monostate import OnProgress
 
 logger = logging.getLogger(__name__)
+
+
+# Maybe move to another file?
+class YoutubeMusicLicensing:
+    def __init__(
+        self, title: str, artist: str, licence_text: str, watch_id: str,
+    ):
+        self._title: Optional[str] = title
+        self._artist: Optional[str] = artist
+        self._license_text: Optional[str] = licence_text
+        self._watch_id: Optional[str] = watch_id
+
+    @property
+    def title(self) -> Optional[str]:
+        return self._title
+
+    @property
+    def artist(self) -> Optional[str]:
+        return self._artist
+
+    @property
+    def licence_text(self) -> Optional[str]:
+        return self._license_text
+
+    @property
+    def watch_id(self) -> Optional[str]:
+        return self._watch_id
+
+    def __repr__(self):
+        return (
+            f"<{self.title}: "
+            f"{self.__class__.__module__}.{self.__class__.__name__} "
+            f"object at {hex(id(self))}>"
+        )
 
 
 class YouTube:
@@ -73,9 +108,7 @@ class YouTube:
         ] = None  # content fetched by vid_info_url
         self.vid_info: Optional[Dict] = None  # parsed content of vid_info_raw
 
-        self.watch_html: Optional[
-            str
-        ] = None  # the html of /watch?v=<video_id>
+        self.watch_html: Optional[str] = None  # the html of /watch?v=<video_id>
         self.embed_html: Optional[str] = None
         self.player_config_args: Dict = {}  # inline js in the html containing
         self.player_response: Dict = {}
@@ -83,6 +116,9 @@ class YouTube:
         self.age_restricted: Optional[bool] = None
 
         self.fmt_streams: List[Stream] = []
+
+        self.initial_data_raw: Optional[str] = None
+        self.initial_data: Dict = {}
 
         # video_id part of /watch?v=<video_id>
         self.video_id = extract.video_id(url)
@@ -198,6 +234,9 @@ class YouTube:
                 video_id=self.video_id, watch_url=self.watch_url
             )
 
+        self.initial_data_raw = extract.initial_data(self.watch_html)
+        self.initial_data = json.loads(self.initial_data_raw)
+
         self.vid_info_raw = request.get(self.vid_info_url)
         if not self.age_restricted:
             self.js_url = extract.js_url(self.watch_html)
@@ -302,9 +341,7 @@ class YouTube:
         :rtype: float
 
         """
-        return self.player_response.get("videoDetails", {}).get(
-            "averageRating"
-        )
+        return self.player_response.get("videoDetails", {}).get("averageRating")
 
     @property
     def length(self) -> int:
@@ -341,6 +378,121 @@ class YouTube:
         return self.player_response.get("videoDetails", {}).get(
             "author", "unknown"
         )
+
+    # This is currently executed very clumsily, maybe a rewrite is required
+    # before merging.
+    @functools.cached_property
+    def music_licensing(self) -> List[YoutubeMusicLicensing]:
+        """Get the used music detected by YouTube
+        :rtype: List[YoutubeMusicLicensing]
+        """
+        metadata_rows: List = self.initial_data["contents"][
+            "twoColumnWatchNextResults"
+        ]["results"]["results"]["contents"][1]["videoSecondaryInfoRenderer"][
+            "metadataRowContainer"
+        ][
+            "metadataRowContainerRenderer"
+        ][
+            "rows"
+        ]
+        licenses: List[YoutubeMusicLicensing] = []
+        try:
+            metadata_rows = list(
+                filter(
+                    lambda arg1: "metadataRowRenderer" in arg1.keys(),
+                    metadata_rows,
+                )
+            )
+        except AttributeError:
+            return []
+        grouped_rows = []
+
+        song_rows = []
+        for row in metadata_rows:
+            title = row["metadataRowRenderer"]["title"]["simpleText"]
+            if title == "Song" and len(song_rows) > 0:
+                grouped_rows.append(song_rows)
+                song_rows = []
+            song_rows.append(row)
+        grouped_rows.append(song_rows)
+
+        for song_data in grouped_rows:
+            try:
+                title = list(
+                    filter(
+                        lambda arg1: arg1["metadataRowRenderer"]["title"][
+                            "simpleText"
+                        ]
+                        == "Song",
+                        song_data,
+                    )
+                )[0]["metadataRowRenderer"]["contents"][0]["simpleText"]
+            except (IndexError, KeyError):
+                try:
+                    title = list(
+                        filter(
+                            lambda arg1: arg1["metadataRowRenderer"]["title"][
+                                "simpleText"
+                            ]
+                            == "Song",
+                            song_data,
+                        )
+                    )[0]["metadataRowRenderer"]["contents"][0]["runs"][0][
+                        "text"
+                    ]
+                except (IndexError, KeyError):
+                    title = None
+
+            try:
+                artist = list(
+                    filter(
+                        lambda arg1: arg1["metadataRowRenderer"]["title"][
+                            "simpleText"
+                        ]
+                        == "Artist",
+                        song_data,
+                    )
+                )[0]["metadataRowRenderer"]["contents"][0]["simpleText"]
+            except (IndexError, KeyError):
+                artist = None
+
+            try:
+                license_text = list(
+                    filter(
+                        lambda arg1: arg1["metadataRowRenderer"]["title"][
+                            "simpleText"
+                        ]
+                        == "Licensed to YouTube by",
+                        song_data,
+                    )
+                )[0]["metadataRowRenderer"]["contents"][0]["simpleText"]
+            except (IndexError, KeyError):
+                license_text = None
+
+            try:
+                watch_id = list(
+                    filter(
+                        lambda arg1: arg1["metadataRowRenderer"]["title"][
+                            "simpleText"
+                        ]
+                        == "Song",
+                        song_data,
+                    )
+                )[0]["metadataRowRenderer"]["contents"][0]["runs"][0][
+                    "navigationEndpoint"
+                ][
+                    "watchEndpoint"
+                ][
+                    "videoId"
+                ]
+            except (IndexError, KeyError):
+                watch_id = None
+
+            if title or artist or license_text or watch_id:
+                licenses.append(
+                    YoutubeMusicLicensing(title, artist, license_text, watch_id)
+                )
+        return licenses
 
     def register_on_progress_callback(self, func: OnProgress):
         """Register a download progress callback function post initialization.
