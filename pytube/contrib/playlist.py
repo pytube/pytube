@@ -75,14 +75,32 @@ class Playlist(Sequence):
     ) -> Iterable[List[str]]:
         """Parse the video links from the page source, yields the /watch?v=
         part from video link
+
+        :param until_watch_id Optional[str]: YouTube Video watch id until
+            which the playlist should be read.
+
+        :rtype: Iterable[List[str]]
+        :returns: Iterable of lists of YouTube watch ids
         """
         req = self.html
         videos_urls, continuation = self._extract_videos(
-            self._extract_json(req))
+            # extract the json located inside the window["ytInitialData"] js
+            # variable of the playlist html page
+            self._extract_json(req)
+        )
+        if until_watch_id:
+            try:
+                trim_index = videos_urls.index(f"/watch?v={until_watch_id}")
+                yield videos_urls[:trim_index]
+                return
+            except ValueError:
+                pass
         yield videos_urls
 
-        # The above only returns 100 or fewer links
-        # Simulating a browser request for the load more link
+        # Extraction from a playlist only returns 100 videos at a time
+        # if self._extract_videos returns a continuation there are more
+        # than 100 songs inside a playlist, so we need to add further requests
+        # to gather all of them
         if continuation:
             load_more_url, headers = self._build_continuation_url(
                 continuation)
@@ -91,8 +109,19 @@ class Playlist(Sequence):
 
         while load_more_url and headers:  # there is an url found
             logger.debug("load more url: %s", load_more_url)
+            # requesting the next page of videos with the url generated from the
+            # previous page
             req = request.get(load_more_url, extra_headers=headers)
+            # extract up to 100 songs from the page loaded
+            # returns another continuation if more videos are available
             videos_urls, continuation = self._extract_videos(req)
+            if until_watch_id:
+                try:
+                    trim_index = videos_urls.index(f"/watch?v={until_watch_id}")
+                    yield videos_urls[:trim_index]
+                    return
+                except ValueError:
+                    pass
             yield videos_urls
 
             if continuation:
@@ -101,12 +130,16 @@ class Playlist(Sequence):
             else:
                 load_more_url, headers = None, None
 
-        return
-
     @staticmethod
     def _build_continuation_url(continuation: str) -> Tuple[str, dict]:
-        """
-        Returns url, headers
+        """Helper method to build the url and headers required to request
+        the next page of videos
+
+        :param str continuation: Continuation extracted from the json response
+            of the last page
+        :rtype: Tuple[str, dict]
+        :returns: Tuple of an url and required headers for the next http
+            request
         """
         return f"https://www.youtube.com/browse_ajax?ctoken=" \
                f"{continuation}&continuation={continuation}", \
@@ -117,11 +150,18 @@ class Playlist(Sequence):
 
     @staticmethod
     def _extract_videos(raw_json: str) -> Tuple[List[str], Optional[str]]:
-        """
-        @returns: List[endpoint], Continuation[Optional]]
+        """Extracts videos from a raw json page
+
+        :param str raw_json: Input json extracted from the page or the last
+            server response
+        :rtype: Tuple[List[str], Optional[str]]
+        :returns: Tuple containing a list of up to 100 video watch ids and
+            a continuation token, if more videos are available
         """
         initial_data = json.loads(raw_json)
         try:
+            # this is the json tree structure, if the json was extracted from
+            # html
             important_content = \
                 initial_data["contents"]["twoColumnBrowseResultsRenderer"][
                     "tabs"][
@@ -132,6 +172,8 @@ class Playlist(Sequence):
                     "playlistVideoListRenderer"]
         except (KeyError, IndexError, TypeError):
             try:
+                # this is the json tree structure, if the json was directly sent
+                # by the server in a continuation response
                 important_content = \
                     initial_data[1]["response"][
                         "continuationContents"][
@@ -145,10 +187,13 @@ class Playlist(Sequence):
                 important_content["continuations"][0]["nextContinuationData"][
                     "continuation"]
         except (KeyError, IndexError):
+            # if there is an error, no continuation is available
             continuation = None
 
+        # remove duplicates
         return uniqueify(
             list(
+                # only extract the video ids from the video data
                 map(
                     lambda x: (
                         f"/watch?id={x['playlistVideoRenderer']['videoId']}"),
