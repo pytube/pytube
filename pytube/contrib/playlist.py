@@ -196,7 +196,7 @@ class Playlist(Sequence):
                 # only extract the video ids from the video data
                 map(
                     lambda x: (
-                        f"/watch?id={x['playlistVideoRenderer']['videoId']}"),
+                        f"/watch?v={x['playlistVideoRenderer']['videoId']}"),
                     videos
                 )
             )
