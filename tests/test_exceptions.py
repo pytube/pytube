@@ -8,7 +8,7 @@ def test_video_unavailable():
     try:
         raise VideoUnavailable(video_id="YLnZklYFe7E")
     except VideoUnavailable as e:
-        assert e.video_id == "YLnZklYFe7E"
+        assert e.video_id == "YLnZklYFe7E"  # noqa: PT017
         assert str(e) == "YLnZklYFe7E is unavailable"
 
 
@@ -23,5 +23,5 @@ def test_live_stream_error():
     try:
         raise LiveStreamError(video_id="YLnZklYFe7E")
     except LiveStreamError as e:
-        assert e.video_id == "YLnZklYFe7E"
+        assert e.video_id == "YLnZklYFe7E"  # noqa: PT017
         assert str(e) == "YLnZklYFe7E is streaming live and cannot be loaded"

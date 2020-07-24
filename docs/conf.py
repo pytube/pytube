@@ -28,7 +28,7 @@ templates_path = ["_templates"]
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
+# source_suffix = ['.rst', '.md'] # noqa: E800
 source_suffix = ".rst"
 
 # The master toctree document.
@@ -36,7 +36,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "pytube3"
-copyright = "2019, Nick Ficano"
+copyright = "2019, Nick Ficano"  # noqa: A001
 author = "Nick Ficano, Harold Martin"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -70,7 +70,6 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
 }
 
-
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -83,7 +82,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+# html_theme_options = {} # noqa: E800
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -105,12 +104,10 @@ html_sidebars = {
     ],
 }
 
-
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "pytube3doc"
-
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -129,7 +126,6 @@ latex_documents = [
     ),
 ]
 
-
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
@@ -137,7 +133,6 @@ latex_documents = [
 man_pages = [
     (master_doc, "pytube3", "pytube3 Documentation", [author], 1,),
 ]
-
 
 # -- Options for Texinfo output -------------------------------------------
 
