@@ -6,7 +6,7 @@ import re
 from collections.abc import Sequence
 from datetime import date
 from datetime import datetime
-from typing import Dict
+from typing import Dict, Tuple
 from typing import Iterable
 from typing import List
 from typing import Optional
@@ -51,20 +51,11 @@ class Playlist(Sequence):
                 f"{month} {day:0>2} {year}", "%b %d %Y"
             ).date()
 
-        self._video_regex = re.compile(r"href=\"(/watch\?v=[\w-]*)")
-
-    @staticmethod
-    def _find_load_more_url(req: str) -> Optional[str]:
-        """Given an html page or fragment, returns the "load more" url if found."""
-        match = re.search(
-            r"data-uix-load-more-href=\"(/browse_ajax\?"
-            'action_continuation=.*?)"',
-            req,
+        self._js_regex = re.compile(
+            r"window\[\"ytInitialData\"] = ([^\n]+)"
         )
-        if match:
-            return f"https://www.youtube.com{match.group(1)}"
 
-        return None
+        self._video_regex = re.compile(r"href=\"(/watch\?v=[\w-]*)")
 
     @deprecated(
         "This function will be removed in the future, please use .video_urls"
@@ -76,13 +67,27 @@ class Playlist(Sequence):
         """
         return self.video_urls
 
+    def _extract_json(self, html: str) -> str:
+        return self._js_regex.search(html).group(1)[0:-1]
+
     def _paginate(
-        self, until_watch_id: Optional[str] = None
+            self, until_watch_id: Optional[str] = None
     ) -> Iterable[List[str]]:
-        """Parse the video links from the page source, yields the /watch?v= part from video link
+        """Parse the video links from the page source, yields the /watch?v=
+        part from video link
+
+        :param until_watch_id Optional[str]: YouTube Video watch id until
+            which the playlist should be read.
+
+        :rtype: Iterable[List[str]]
+        :returns: Iterable of lists of YouTube watch ids
         """
         req = self.html
-        videos_urls = self._extract_videos(req)
+        videos_urls, continuation = self._extract_videos(
+            # extract the json located inside the window["ytInitialData"] js
+            # variable of the playlist html page
+            self._extract_json(req)
+        )
         if until_watch_id:
             try:
                 trim_index = videos_urls.index(f"/watch?v={until_watch_id}")
@@ -92,44 +97,116 @@ class Playlist(Sequence):
                 pass
         yield videos_urls
 
-        # The above only returns 100 or fewer links
-        # Simulating a browser request for the load more link
-        load_more_url = self._find_load_more_url(req)
+        # Extraction from a playlist only returns 100 videos at a time
+        # if self._extract_videos returns a continuation there are more
+        # than 100 songs inside a playlist, so we need to add further requests
+        # to gather all of them
+        if continuation:
+            load_more_url, headers = self._build_continuation_url(
+                continuation)
+        else:
+            load_more_url, headers = None, None
 
-        while load_more_url:  # there is an url found
+        while load_more_url and headers:  # there is an url found
             logger.debug("load more url: %s", load_more_url)
-            req = request.get(load_more_url)
-            load_more = json.loads(req)
-            try:
-                html = load_more["content_html"]
-            except KeyError:
-                logger.debug("Could not find content_html")
-                return
-            videos_urls = self._extract_videos(html)
+            # requesting the next page of videos with the url generated from the
+            # previous page
+            req = request.get(load_more_url, extra_headers=headers)
+            # extract up to 100 songs from the page loaded
+            # returns another continuation if more videos are available
+            videos_urls, continuation = self._extract_videos(req)
             if until_watch_id:
                 try:
-                    trim_index = videos_urls.index(
-                        f"/watch?v={until_watch_id}"
-                    )
+                    trim_index = videos_urls.index(f"/watch?v={until_watch_id}")
                     yield videos_urls[:trim_index]
                     return
                 except ValueError:
                     pass
             yield videos_urls
 
-            load_more_url = self._find_load_more_url(
-                load_more["load_more_widget_html"],
+            if continuation:
+                load_more_url, headers = self._build_continuation_url(
+                    continuation)
+            else:
+                load_more_url, headers = None, None
+
+    @staticmethod
+    def _build_continuation_url(continuation: str) -> Tuple[str, dict]:
+        """Helper method to build the url and headers required to request
+        the next page of videos
+
+        :param str continuation: Continuation extracted from the json response
+            of the last page
+        :rtype: Tuple[str, dict]
+        :returns: Tuple of an url and required headers for the next http
+            request
+        """
+        return f"https://www.youtube.com/browse_ajax?ctoken=" \
+               f"{continuation}&continuation={continuation}", \
+               {
+                   "X-YouTube-Client-Name": "1",
+                   "X-YouTube-Client-Version": "2.20200720.00.02",
+               }
+
+    @staticmethod
+    def _extract_videos(raw_json: str) -> Tuple[List[str], Optional[str]]:
+        """Extracts videos from a raw json page
+
+        :param str raw_json: Input json extracted from the page or the last
+            server response
+        :rtype: Tuple[List[str], Optional[str]]
+        :returns: Tuple containing a list of up to 100 video watch ids and
+            a continuation token, if more videos are available
+        """
+        initial_data = json.loads(raw_json)
+        try:
+            # this is the json tree structure, if the json was extracted from
+            # html
+            important_content = \
+                initial_data["contents"]["twoColumnBrowseResultsRenderer"][
+                    "tabs"][
+                    0][
+                    "tabRenderer"]["content"]["sectionListRenderer"][
+                    "contents"][0][
+                    "itemSectionRenderer"]["contents"][0][
+                    "playlistVideoListRenderer"]
+        except (KeyError, IndexError, TypeError):
+            try:
+                # this is the json tree structure, if the json was directly sent
+                # by the server in a continuation response
+                important_content = \
+                    initial_data[1]["response"][
+                        "continuationContents"][
+                        "playlistVideoListContinuation"]
+            except (KeyError, IndexError, TypeError) as p:
+                print(p)
+                return [], None
+        videos = important_content["contents"]
+        try:
+            continuation = \
+                important_content["continuations"][0]["nextContinuationData"][
+                    "continuation"]
+        except (KeyError, IndexError):
+            # if there is an error, no continuation is available
+            continuation = None
+
+        # remove duplicates
+        return uniqueify(
+            list(
+                # only extract the video ids from the video data
+                map(
+                    lambda x: (
+                        f"/watch?id={x['playlistVideoRenderer']['videoId']}"),
+                    videos
+                )
             )
-
-        return
-
-    def _extract_videos(self, html: str) -> List[str]:
-        return uniqueify(self._video_regex.findall(html))
+        ), continuation
 
     def trimmed(self, video_id: str) -> Iterable[str]:
         """Retrieve a list of YouTube video URLs trimmed at the given video ID
 
-        i.e. if the playlist has video IDs 1,2,3,4 calling trimmed(3) returns [1,2]
+        i.e. if the playlist has video IDs 1,2,3,4 calling trimmed(3) returns
+        [1,2]
         :type video_id: str
             video ID to trim the returned list of playlist URLs at
         :rtype: List[str]
@@ -171,7 +248,8 @@ class Playlist(Sequence):
         return f"{self.video_urls}"
 
     @deprecated(
-        "This call is unnecessary, you can directly access .video_urls or .videos"
+        "This call is unnecessary, you can directly access .video_urls or "
+        ".videos"
     )
     def populate_video_urls(self) -> List[str]:  # pragma: no cover
         """Complete links of all the videos in playlist
@@ -200,14 +278,15 @@ class Playlist(Sequence):
         return (str(i).zfill(digits) for i in range(start, stop, step))
 
     @deprecated(
-        "This function will be removed in the future. Please iterate through .videos"
+        "This function will be removed in the future. Please iterate through "
+        ".videos"
     )
     def download_all(
-        self,
-        download_path: Optional[str] = None,
-        prefix_number: bool = True,
-        reverse_numbering: bool = False,
-        resolution: str = "720p",
+            self,
+            download_path: Optional[str] = None,
+            prefix_number: bool = True,
+            reverse_numbering: bool = False,
+            resolution: str = "720p",
     ) -> None:  # pragma: no cover
         """Download all the videos in the the playlist.
 
@@ -236,8 +315,8 @@ class Playlist(Sequence):
         for link in self.video_urls:
             youtube = YouTube(link)
             dl_stream = (
-                youtube.streams.get_by_resolution(resolution=resolution)
-                or youtube.streams.get_lowest_resolution()
+                    youtube.streams.get_by_resolution(resolution=resolution)
+                    or youtube.streams.get_lowest_resolution()
             )
             assert dl_stream is not None
 

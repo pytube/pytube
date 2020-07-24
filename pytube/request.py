@@ -13,9 +13,9 @@ logger = logging.getLogger(__name__)
 
 
 def _execute_request(
-    url: str,
-    method: Optional[str] = None,
-    headers: Optional[Dict[str, str]] = None,
+        url: str,
+        method: Optional[str] = None,
+        headers: Optional[Dict[str, str]] = None,
 ) -> HTTPResponse:
     base_headers = {"User-Agent": "Mozilla/5.0"}
     if headers:
@@ -27,25 +27,30 @@ def _execute_request(
     return urlopen(request)  # nosec
 
 
-def get(url) -> str:
+def get(url, extra_headers=None) -> str:
     """Send an http GET request.
 
     :param str url:
         The URL to perform the GET request for.
+    :param dict extra_headers:
+        Extra headers to add to the request
     :rtype: str
     :returns:
         UTF-8 encoded string of response
     """
-    return _execute_request(url).read().decode("utf-8")
+    if extra_headers is None:
+        extra_headers = {}
+    return _execute_request(url, headers=extra_headers).read().decode("utf-8")
 
 
 def stream(
-    url: str, chunk_size: int = 4096, range_size: int = 9437184
+        url: str, chunk_size: int = 4096, range_size: int = 9437184
 ) -> Iterable[bytes]:
     """Read the response in chunks.
     :param str url: The URL to perform the GET request for.
     :param int chunk_size: The size in bytes of each chunk. Defaults to 4KB
-    :param int range_size: The size in bytes of each range request. Defaults to 9MB
+    :param int range_size: The size in bytes of each range request. Defaults
+    to 9MB
     :rtype: Iterable[bytes]
     """
     file_size: int = range_size  # fake filesize to start
