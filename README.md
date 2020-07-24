@@ -59,7 +59,7 @@ Finally *pytube* also includes a command-line utility, allowing you to quickly d
 Download using pip via pypi.
 
 ```bash
-$ pip install pytube
+$ pip install pytube3
 ```
 
 ## Getting started
