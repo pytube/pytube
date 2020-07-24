@@ -1,4 +1,7 @@
 
+#  (24 JULY 2020) Note: Actively soliciting contributions!
+Ping @ronncc if you would like to help out 
+
 <div align="center">
   <p>
   <img src="https://github.com/nficano/pytube/blob/master/images/pytube.png?raw=true" width="350" height="328" alt="pytube logo" />
