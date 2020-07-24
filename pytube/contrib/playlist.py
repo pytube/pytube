@@ -199,14 +199,18 @@ class Playlist(Sequence):
             continuation = None
 
         # remove duplicates
-        return uniqueify(
-            list(
-                # only extract the video ids from the video data
-                map(
-                    lambda x: (
-                        f"/watch?v={x['playlistVideoRenderer']['videoId']}"),
-                    videos
-                )
+        return (
+            uniqueify(
+                list(
+                    # only extract the video ids from the video data
+                    map(
+                        lambda x: (
+                            f"/watch?v="
+                            f"{x['playlistVideoRenderer']['videoId']}"
+                        ),
+                        videos
+                    )
+                ),
             ),
             continuation,
         )
