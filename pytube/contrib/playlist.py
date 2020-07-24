@@ -43,7 +43,7 @@ class Playlist(Sequence):
         # Needs testing with non-English
         self.last_update: Optional[date] = None
         date_match = re.search(
-            r"<li>Last updated on (\w{3}) (\d{1,2}), (\d{4})</li>", self.html
+            r"Last updated on (\w{3}) (\d{1,2}), (\d{4})", self.html
         )
         if date_match:
             month, day, year = date_match.groups()
@@ -205,7 +205,7 @@ class Playlist(Sequence):
                     # only extract the video ids from the video data
                     map(
                         lambda x: (
-                            f"/watch?id={x['playlistVideoRenderer']['videoId']}"
+                            f"/watch?v={x['playlistVideoRenderer']['videoId']}"
                         ),
                         videos,
                     )

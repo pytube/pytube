@@ -71,8 +71,7 @@ def test_download(srt):
         )
         caption.download("title")
         assert (
-            open_mock.call_args_list[0][0][0].split("/")[-1]
-            == "title (en).srt"
+            open_mock.call_args_list[0][0][0].split("/")[-1] == "title (en).srt"
         )
 
 
@@ -127,8 +126,7 @@ def test_download_xml_and_trim_extension(xml):
         )
         caption.download("title.xml", srt=False)
         assert (
-            open_mock.call_args_list[0][0][0].split("/")[-1]
-            == "title (en).xml"
+            open_mock.call_args_list[0][0][0].split("/")[-1] == "title (en).xml"
         )
 
 
