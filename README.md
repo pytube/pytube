@@ -65,6 +65,13 @@ Download using pip via pypi.
 $ pip install pytube
 ```
 
+For python 3:
+
+```bash
+$ pip install pytube3
+```
+
+
 ## Getting started
 
 Let's begin with showing how easy it is to download a video with pytube:
@@ -226,7 +233,7 @@ Similarly, if your application requires on-download progress logic, pytube expos
 
 ## Command-line interface
 
-pytube also ships with a tiny cli interface for downloading and probing videos.
+pytube also ships with a tiny cli interface for downloading and probing videos (use `pytube3` if using python3 version).
 
 Let's start with downloading:
 
