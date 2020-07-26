@@ -16,7 +16,7 @@ parse_args = cli._parse_args
 
 
 @mock.patch("pytube.cli._parse_args")
-def test_main_invalid_url(_parse_args):
+def test_main_invalid_url(_parse_args):  # noqa: PT019
     parser = argparse.ArgumentParser()
     args = parse_args(parser, ["crikey",],)
     _parse_args.return_value = args
@@ -344,7 +344,9 @@ def test_perform_args_should_ffmpeg_process(ffmpeg_process, youtube):
 
 @mock.patch("pytube.cli.YouTube")
 @mock.patch("pytube.cli._ffmpeg_downloader")
-def test_ffmpeg_process_best_should_download(_ffmpeg_downloader, youtube):
+def test_ffmpeg_process_best_should_download(  # noqa: PT019
+    _ffmpeg_downloader, youtube
+):
     # Given
     target = "/target"
     streams = MagicMock()
@@ -365,7 +367,9 @@ def test_ffmpeg_process_best_should_download(_ffmpeg_downloader, youtube):
 
 @mock.patch("pytube.cli.YouTube")
 @mock.patch("pytube.cli._ffmpeg_downloader")
-def test_ffmpeg_process_res_should_download(_ffmpeg_downloader, youtube):
+def test_ffmpeg_process_res_should_download(  # noqa: PT019
+    _ffmpeg_downloader, youtube
+):
     # Given
     target = "/target"
     streams = MagicMock()
@@ -384,7 +388,7 @@ def test_ffmpeg_process_res_should_download(_ffmpeg_downloader, youtube):
 
 @mock.patch("pytube.cli.YouTube")
 @mock.patch("pytube.cli._ffmpeg_downloader")
-def test_ffmpeg_process_res_none_should_not_download(
+def test_ffmpeg_process_res_none_should_not_download(  # noqa: PT019
     _ffmpeg_downloader, youtube
 ):
     # Given
@@ -403,7 +407,7 @@ def test_ffmpeg_process_res_none_should_not_download(
 
 @mock.patch("pytube.cli.YouTube")
 @mock.patch("pytube.cli._ffmpeg_downloader")
-def test_ffmpeg_process_audio_none_should_fallback_download(
+def test_ffmpeg_process_audio_none_should_fallback_download(  # noqa: PT019
     _ffmpeg_downloader, youtube
 ):
     # Given
@@ -411,9 +415,7 @@ def test_ffmpeg_process_audio_none_should_fallback_download(
     streams = MagicMock()
     youtube.streams = streams
     stream = MagicMock()
-    streams.filter.return_value.order_by.return_value.last.return_value = (
-        stream
-    )
+    streams.filter.return_value.order_by.return_value.last.return_value = stream
     streams.get_audio_only.return_value = None
     # When
     cli.ffmpeg_process(youtube, "best", target)
@@ -425,7 +427,7 @@ def test_ffmpeg_process_audio_none_should_fallback_download(
 
 @mock.patch("pytube.cli.YouTube")
 @mock.patch("pytube.cli._ffmpeg_downloader")
-def test_ffmpeg_process_audio_fallback_none_should_exit(
+def test_ffmpeg_process_audio_fallback_none_should_exit(  # noqa: PT019
     _ffmpeg_downloader, youtube
 ):
     # Given
@@ -541,8 +543,7 @@ def test_perform_args_on_youtube(youtube):
 @mock.patch("pytube.cli.os.path.exists", return_value=False)
 def test_unique_name(path_exists):
     assert (
-        cli._unique_name("base", "subtype", "video", "target")
-        == "base_video_0"
+        cli._unique_name("base", "subtype", "video", "target") == "base_video_0"
     )
 
 
@@ -550,6 +551,5 @@ def test_unique_name(path_exists):
 def test_unique_name_counter(path_exists):
     path_exists.side_effect = [True, False]
     assert (
-        cli._unique_name("base", "subtype", "video", "target")
-        == "base_video_1"
+        cli._unique_name("base", "subtype", "video", "target") == "base_video_1"
     )

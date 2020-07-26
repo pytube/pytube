@@ -43,7 +43,7 @@ class Playlist(Sequence):
         # Needs testing with non-English
         self.last_update: Optional[date] = None
         date_match = re.search(
-            r"<li>Last updated on (\w{3}) (\d{1,2}), (\d{4})</li>", self.html
+            r"Last updated on (\w{3}) (\d{1,2}), (\d{4})", self.html
         )
         if date_match:
             month, day, year = date_match.groups()
@@ -51,9 +51,7 @@ class Playlist(Sequence):
                 f"{month} {day:0>2} {year}", "%b %d %Y"
             ).date()
 
-        self._js_regex = re.compile(
-            r"window\[\"ytInitialData\"] = ([^\n]+)"
-        )
+        self._js_regex = re.compile(r"window\[\"ytInitialData\"] = ([^\n]+)")
 
         self._video_regex = re.compile(r"href=\"(/watch\?v=[\w-]*)")
 
@@ -71,7 +69,7 @@ class Playlist(Sequence):
         return self._js_regex.search(html).group(1)[0:-1]
 
     def _paginate(
-            self, until_watch_id: Optional[str] = None
+        self, until_watch_id: Optional[str] = None
     ) -> Iterable[List[str]]:
         """Parse the video links from the page source, yields the /watch?v=
         part from video link
@@ -102,8 +100,7 @@ class Playlist(Sequence):
         # than 100 songs inside a playlist, so we need to add further requests
         # to gather all of them
         if continuation:
-            load_more_url, headers = self._build_continuation_url(
-                continuation)
+            load_more_url, headers = self._build_continuation_url(continuation)
         else:
             load_more_url, headers = None, None
 
@@ -126,7 +123,8 @@ class Playlist(Sequence):
 
             if continuation:
                 load_more_url, headers = self._build_continuation_url(
-                    continuation)
+                    continuation
+                )
             else:
                 load_more_url, headers = None, None
 
@@ -141,12 +139,16 @@ class Playlist(Sequence):
         :returns: Tuple of an url and required headers for the next http
             request
         """
-        return f"https://www.youtube.com/browse_ajax?ctoken=" \
-               f"{continuation}&continuation={continuation}", \
-               {
-                   "X-YouTube-Client-Name": "1",
-                   "X-YouTube-Client-Version": "2.20200720.00.02",
-               }
+        return (
+            (
+                f"https://www.youtube.com/browse_ajax?ctoken="
+                f"{continuation}&continuation={continuation}"
+            ),
+            {
+                "X-YouTube-Client-Name": "1",
+                "X-YouTube-Client-Version": "2.20200720.00.02",
+            },
+        )
 
     @staticmethod
     def _extract_videos(raw_json: str) -> Tuple[List[str], Optional[str]]:
@@ -162,45 +164,56 @@ class Playlist(Sequence):
         try:
             # this is the json tree structure, if the json was extracted from
             # html
-            important_content = \
-                initial_data["contents"]["twoColumnBrowseResultsRenderer"][
-                    "tabs"][
-                    0][
-                    "tabRenderer"]["content"]["sectionListRenderer"][
-                    "contents"][0][
-                    "itemSectionRenderer"]["contents"][0][
-                    "playlistVideoListRenderer"]
+            important_content = initial_data["contents"][
+                "twoColumnBrowseResultsRenderer"
+            ]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"][
+                "contents"
+            ][
+                0
+            ][
+                "itemSectionRenderer"
+            ][
+                "contents"
+            ][
+                0
+            ][
+                "playlistVideoListRenderer"
+            ]
         except (KeyError, IndexError, TypeError):
             try:
                 # this is the json tree structure, if the json was directly sent
                 # by the server in a continuation response
-                important_content = \
-                    initial_data[1]["response"][
-                        "continuationContents"][
-                        "playlistVideoListContinuation"]
+                important_content = initial_data[1]["response"][
+                    "continuationContents"
+                ]["playlistVideoListContinuation"]
             except (KeyError, IndexError, TypeError) as p:
                 print(p)
                 return [], None
         videos = important_content["contents"]
         try:
-            continuation = \
-                important_content["continuations"][0]["nextContinuationData"][
-                    "continuation"]
+            continuation = important_content["continuations"][0][
+                "nextContinuationData"
+            ]["continuation"]
         except (KeyError, IndexError):
             # if there is an error, no continuation is available
             continuation = None
 
         # remove duplicates
-        return uniqueify(
-            list(
-                # only extract the video ids from the video data
-                map(
-                    lambda x: (
-                        f"/watch?v={x['playlistVideoRenderer']['videoId']}"),
-                    videos
-                )
-            )
-        ), continuation
+        return (
+            uniqueify(
+                list(
+                    # only extract the video ids from the video data
+                    map(
+                        lambda x: (
+                            f"/watch?v="
+                            f"{x['playlistVideoRenderer']['videoId']}"
+                        ),
+                        videos
+                    )
+                ),
+            ),
+            continuation,
+        )
 
     def trimmed(self, video_id: str) -> Iterable[str]:
         """Retrieve a list of YouTube video URLs trimmed at the given video ID
@@ -282,11 +295,11 @@ class Playlist(Sequence):
         ".videos"
     )
     def download_all(
-            self,
-            download_path: Optional[str] = None,
-            prefix_number: bool = True,
-            reverse_numbering: bool = False,
-            resolution: str = "720p",
+        self,
+        download_path: Optional[str] = None,
+        prefix_number: bool = True,
+        reverse_numbering: bool = False,
+        resolution: str = "720p",
     ) -> None:  # pragma: no cover
         """Download all the videos in the the playlist.
 
@@ -315,8 +328,8 @@ class Playlist(Sequence):
         for link in self.video_urls:
             youtube = YouTube(link)
             dl_stream = (
-                    youtube.streams.get_by_resolution(resolution=resolution)
-                    or youtube.streams.get_lowest_resolution()
+                youtube.streams.get_by_resolution(resolution=resolution)
+                or youtube.streams.get_lowest_resolution()
             )
             assert dl_stream is not None
 

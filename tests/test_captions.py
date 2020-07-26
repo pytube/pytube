@@ -30,8 +30,7 @@ def test_caption_query_sequence():
     assert caption_query["en"] == caption1
     assert caption_query["fr"] == caption2
     with pytest.raises(KeyError):
-        not_exists = caption_query["nada"]
-        assert not_exists is not None  # should never reach this
+        assert caption_query["nada"] is not None
 
 
 def test_caption_query_get_by_language_code_when_exists():
@@ -54,8 +53,8 @@ def test_caption_query_get_by_language_code_when_not_exists():
     )
     caption_query = CaptionQuery(captions=[caption1, caption2])
     with pytest.raises(KeyError):
-        not_found = caption_query["hello"]
-        assert not_found is not None  # should never reach here
+        assert caption_query["hello"] is not None
+        # assert not_found is not None  # should never reach here
 
 
 @mock.patch("pytube.captions.Caption.generate_srt_captions")
@@ -72,8 +71,7 @@ def test_download(srt):
         )
         caption.download("title")
         assert (
-            open_mock.call_args_list[0][0][0].split("/")[-1]
-            == "title (en).srt"
+            open_mock.call_args_list[0][0][0].split("/")[-1] == "title (en).srt"
         )
 
 
@@ -128,8 +126,7 @@ def test_download_xml_and_trim_extension(xml):
         )
         caption.download("title.xml", srt=False)
         assert (
-            open_mock.call_args_list[0][0][0].split("/")[-1]
-            == "title (en).xml"
+            open_mock.call_args_list[0][0][0].split("/")[-1] == "title (en).xml"
         )
 
 
