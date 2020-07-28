@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
 
 class Cipher:
     def __init__(self, js: str):
+        #PR as requested from @RONNCC
         self.transform_plan: List[str] = get_transform_plan(js)
         var, _ = self.transform_plan[0].split(".")
         self.transform_map = get_transform_map(js, var)
