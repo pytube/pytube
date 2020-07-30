@@ -72,3 +72,16 @@ def playlist_long_html():
     )
     with gzip.open(file_path, "rb") as f:
         return f.read().decode("utf-8")
+
+
+@pytest.fixture
+def stream_dict():
+    """Youtube instance initialized with video id WXxV9g7lsFE."""
+    file_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "mocks",
+        "yt-video-WXxV9g7lsFE.json.gz",
+    )
+    with gzip.open(file_path, "rb") as f:
+        content = f.read().decode("utf-8")
+        return json.loads(content)
