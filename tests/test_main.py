@@ -34,3 +34,8 @@ def test_video_unavailable(get):
     )
     with pytest.raises(VideoUnavailable):
         youtube.prefetch()
+
+
+def test_video_title_extraction():
+    youtube = YouTube("https://www.youtube.com/watch?v=qhbuKbxJsk8")
+    assert youtube.title == "Times Tables, Mandelbrot and the Heart of Mathematics"
