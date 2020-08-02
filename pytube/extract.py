@@ -104,7 +104,7 @@ def video_info_url(video_id: str, watch_url: str) -> str:
     params = OrderedDict(
         [
             ("video_id", video_id),
-            ("el", "$el"),
+            # ("el", "$el"),  # this is an invalid parameter
             ("ps", "default"),
             ("eurl", quote(watch_url)),
             ("hl", "en_US"),
