@@ -70,10 +70,10 @@
         },
         "cfgv": {
             "hashes": [
-                "sha256:1ccf53320421aeeb915275a196e23b3b8ae87dea8ac6698b1638001d4a486d53",
-                "sha256:c8e8f552ffcc6194f4e18dd4f68d9aef0c0d58ae7e7be8c82bee3c5e9edfa513"
+                "sha256:32e43d604bbe7896fe7c248a9c2276447dbef840feb28fe20494f62af110211d",
+                "sha256:cf22deb93d4bcf92f345a5c3cd39d3d41d6340adc60c78bbbd6588c384fda6a1"
             ],
-            "version": "==3.1.0"
+            "version": "==3.2.0"
         },
         "chardet": {
             "hashes": [
@@ -289,10 +289,10 @@
         },
         "flake8-plugin-utils": {
             "hashes": [
-                "sha256:305461c4fbf94877bcc9ccf435771b135d72a40eefd92e70a4b5f761ca43b1c8",
-                "sha256:965931e7c17a760915e38bb10dc60516b414ef8210e987252a8d73dcb196a5f5"
+                "sha256:6e996bc24ebe327558f24efd106f1be5f0c033c8cbb6eed815631f73d487f1c9",
+                "sha256:efdbf9d15b18f72b7c348dd360f30e7cf3e73aa67ff832d5343eb5aa1115f250"
             ],
-            "version": "==1.3.0"
+            "version": "==1.3.1"
         },
         "flake8-polyfill": {
             "hashes": [
@@ -318,11 +318,11 @@
         },
         "flake8-pytest-style": {
             "hashes": [
-                "sha256:63e93d10b9cca6c73309319e89e7b1a8d316c7d1f12407faca975c498192fde3",
-                "sha256:93830b18d961613a012061867b15b1434e433662197ec3a7594db8389637d5f9"
+                "sha256:48e5ed79ab33846112331bbf51353c568d8a5f515de49c6cd9dfe5fecdcaa6f3",
+                "sha256:fa6e8706b814b1eedf8f7aa62e26bfc03d0e5178a25d828218165be6c8e52570"
             ],
             "index": "pypi",
-            "version": "==1.2.2"
+            "version": "==1.2.3"
         },
         "flake8-quotes": {
             "hashes": [
@@ -384,9 +384,10 @@
         },
         "iniconfig": {
             "hashes": [
-                "sha256:aa0b40f50a00e72323cb5d41302f9c6165728fd764ac8822aa3fff00a40d56b4"
+                "sha256:80cf40c597eb564e86346103f609d74efce0f6b4d4f30ec8ce9e2c26411ba437",
+                "sha256:e5f92f89355a67de0595932a6c6c02ab4afddc6fcdc0bfc5becd0d60884d3f69"
             ],
-            "version": "==1.0.0"
+            "version": "==1.0.1"
         },
         "isort": {
             "extras": [
@@ -801,10 +802,10 @@
         },
         "virtualenv": {
             "hashes": [
-                "sha256:688a61d7976d82b92f7906c367e83bb4b3f0af96f8f75bfcd3da95608fe8ac6c",
-                "sha256:8f582a030156282a9ee9d319984b759a232b07f86048c1d6a9e394afa44e78c8"
+                "sha256:7b54fd606a1b85f83de49ad8d80dbec08e983a2d2f96685045b262ebc7481ee5",
+                "sha256:8cd7b2a4850b003a11be2fc213e206419efab41115cc14bca20e69654f2ac08e"
             ],
-            "version": "==20.0.28"
+            "version": "==20.0.30"
         },
         "virtualenv-clone": {
             "hashes": [
