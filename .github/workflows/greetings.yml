@@ -1,0 +1,13 @@
+name: Greetings
+
+on: [pull_request, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: 'Thank you for contributing to PyTube. Please remember to reference [Contributing.md](https://github.com/nficano/pytube/blob/master/Contributing.md)'
+        pr-message: 'Thank you for contributing to PyTube. Please remember to reference [Contributing.md](https://github.com/nficano/pytube/blob/master/Contributing.md)'
