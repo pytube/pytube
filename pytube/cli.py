@@ -12,7 +12,6 @@ import subprocess  # nosec
 import sys
 from typing import List
 from typing import Optional
-
 from pytube import __version__
 from pytube import CaptionQuery
 from pytube import Playlist
@@ -53,9 +52,7 @@ def main():
         _perform_args_on_youtube(youtube, args)
 
 
-def _perform_args_on_youtube(
-    youtube: YouTube, args: argparse.Namespace
-) -> None:
+def _perform_args_on_youtube(youtube: YouTube, args: argparse.Namespace) -> None:
     if args.list:
         display_streams(youtube)
     if args.build_playback_report:
@@ -71,21 +68,15 @@ def _perform_args_on_youtube(
             youtube=youtube, resolution=args.resolution, target=args.target
         )
     if args.audio:
-        download_audio(
-            youtube=youtube, filetype=args.audio, target=args.target
-        )
+        download_audio(youtube=youtube, filetype=args.audio, target=args.target)
     if args.ffmpeg:
-        ffmpeg_process(
-            youtube=youtube, resolution=args.ffmpeg, target=args.target
-        )
+        ffmpeg_process(youtube=youtube, resolution=args.ffmpeg, target=args.target)
 
 
 def _parse_args(
     parser: argparse.ArgumentParser, args: Optional[List] = None
 ) -> argparse.Namespace:
-    parser.add_argument(
-        "url", help="The YouTube /watch or /playlist url", nargs="?"
-    )
+    parser.add_argument("url", help="The YouTube /watch or /playlist url", nargs="?")
     parser.add_argument(
         "--version", action="version", version="%(prog)s " + __version__,
     )
@@ -93,10 +84,7 @@ def _parse_args(
         "--itag", type=int, help="The itag for the desired stream",
     )
     parser.add_argument(
-        "-r",
-        "--resolution",
-        type=str,
-        help="The resolution for the desired stream",
+        "-r", "--resolution", type=str, help="The resolution for the desired stream",
     )
     parser.add_argument(
         "-l",
@@ -233,9 +221,7 @@ def on_progress(
 
 
 def _download(
-    stream: Stream,
-    target: Optional[str] = None,
-    filename: Optional[str] = None,
+    stream: Stream, target: Optional[str] = None, filename: Optional[str] = None,
 ) -> None:
     filesize_megabytes = stream.filesize // 1048576
     print(f"{filename or stream.default_filename} | {filesize_megabytes} MB")
@@ -288,9 +274,7 @@ def ffmpeg_process(
 
     if resolution == "best":
         highest_quality_stream = (
-            youtube.streams.filter(progressive=False)
-            .order_by("resolution")
-            .last()
+            youtube.streams.filter(progressive=False).order_by("resolution").last()
         )
         mp4_stream = (
             youtube.streams.filter(progressive=False, subtype="mp4")
@@ -317,9 +301,7 @@ def ffmpeg_process(
 
     audio_stream = youtube.streams.get_audio_only(video_stream.subtype)
     if not audio_stream:
-        audio_stream = (
-            youtube.streams.filter(only_audio=True).order_by("abr").last()
-        )
+        audio_stream = youtube.streams.filter(only_audio=True).order_by("abr").last()
     if not audio_stream:
         print("Could not find an audio only stream")
         sys.exit()
@@ -328,9 +310,7 @@ def ffmpeg_process(
     )
 
 
-def _ffmpeg_downloader(
-    audio_stream: Stream, video_stream: Stream, target: str
-) -> None:
+def _ffmpeg_downloader(audio_stream: Stream, video_stream: Stream, target: str) -> None:
     """
     Given a YouTube Stream object, finds the correct audio stream, downloads them both
     giving them a unique name, them uses ffmpeg to create a new file with the audio
@@ -345,50 +325,29 @@ def _ffmpeg_downloader(
         A valid Path object
     """
     video_unique_name = _unique_name(
-        safe_filename(video_stream.title),
-        video_stream.subtype,
-        "video",
-        target=target,
+        safe_filename(video_stream.title), video_stream.subtype, "video", target=target,
     )
     audio_unique_name = _unique_name(
-        safe_filename(video_stream.title),
-        audio_stream.subtype,
-        "audio",
-        target=target,
+        safe_filename(video_stream.title), audio_stream.subtype, "audio", target=target,
     )
     _download(stream=video_stream, target=target, filename=video_unique_name)
     print("Loading audio...")
     _download(stream=audio_stream, target=target, filename=audio_unique_name)
 
-    video_path = os.path.join(
-        target, f"{video_unique_name}.{video_stream.subtype}"
-    )
-    audio_path = os.path.join(
-        target, f"{audio_unique_name}.{audio_stream.subtype}"
-    )
+    video_path = os.path.join(target, f"{video_unique_name}.{video_stream.subtype}")
+    audio_path = os.path.join(target, f"{audio_unique_name}.{audio_stream.subtype}")
     final_path = os.path.join(
         target, f"{safe_filename(video_stream.title)}.{video_stream.subtype}"
     )
 
     subprocess.run(  # nosec
-        [
-            "ffmpeg",
-            "-i",
-            video_path,
-            "-i",
-            audio_path,
-            "-codec",
-            "copy",
-            final_path,
-        ]
+        ["ffmpeg", "-i", video_path, "-i", audio_path, "-codec", "copy", final_path,]
     )
     os.unlink(video_path)
     os.unlink(audio_path)
 
 
-def download_by_itag(
-    youtube: YouTube, itag: int, target: Optional[str] = None
-) -> None:
+def download_by_itag(youtube: YouTube, itag: int, target: Optional[str] = None) -> None:
     """Start downloading a YouTube video.
 
     :param YouTube youtube:
@@ -453,9 +412,7 @@ def display_streams(youtube: YouTube) -> None:
 
 
 def _print_available_captions(captions: CaptionQuery) -> None:
-    print(
-        f"Available caption codes are: {', '.join(c.code for c in captions)}"
-    )
+    print(f"Available caption codes are: {', '.join(c.code for c in captions)}")
 
 
 def download_caption(
@@ -478,9 +435,7 @@ def download_caption(
 
     try:
         caption = youtube.captions[lang_code]
-        downloaded_path = caption.download(
-            title=youtube.title, output_path=target
-        )
+        downloaded_path = caption.download(title=youtube.title, output_path=target)
         print(f"Saved caption file to: {downloaded_path}")
     except KeyError:
         print(f"Unable to find caption with code: {lang_code}")
@@ -502,9 +457,7 @@ def download_audio(
         Target directory for download
     """
     audio = (
-        youtube.streams.filter(only_audio=True, subtype=filetype)
-        .order_by("abr")
-        .last()
+        youtube.streams.filter(only_audio=True, subtype=filetype).order_by("abr").last()
     )
 
     if audio is None:

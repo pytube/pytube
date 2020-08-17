@@ -6,9 +6,7 @@ from typing_extensions import Protocol
 
 
 class OnProgress(Protocol):
-    def __call__(
-        self, stream: Any, chunk: bytes, bytes_remaining: int
-    ) -> None:
+    def __call__(self, stream: Any, chunk: bytes, bytes_remaining: int) -> None:
         """On download progress callback function.
 
         :param stream:

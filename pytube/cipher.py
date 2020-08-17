@@ -89,9 +89,7 @@ class Cipher:
         logger.debug("parsing transform function")
         parse_match = self.js_func_regex.search(js_func)
         if not parse_match:
-            raise RegexMatchError(
-                caller="parse_function", pattern="js_func_regex"
-            )
+            raise RegexMatchError(caller="parse_function", pattern="js_func_regex")
         fn_name, fn_arg = parse_match.groups()
         return fn_name, int(fn_arg)
 
@@ -108,14 +106,14 @@ def get_initial_function_name(js: str) -> str:
     function_patterns = [
         r"\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
         r"\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
-        r'(?:\b|[^a-zA-Z0-9$])(?P<sig>[a-zA-Z0-9$]{2})\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\)', # noqa: E501
+        r'(?:\b|[^a-zA-Z0-9$])(?P<sig>[a-zA-Z0-9$]{2})\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\)',  # noqa: E501
         r'(?P<sig>[a-zA-Z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\)',  # noqa: E501
         r'(["\'])signature\1\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(',
         r"\.sig\|\|(?P<sig>[a-zA-Z0-9$]+)\(",
         r"yt\.akamaized\.net/\)\s*\|\|\s*.*?\s*[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?:encodeURIComponent\s*\()?\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
         r"\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
         r"\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
-        r"\bc\s*&&\s*a\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",   # noqa: E501
+        r"\bc\s*&&\s*a\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
         r"\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
         r"\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
     ]
@@ -127,9 +125,7 @@ def get_initial_function_name(js: str) -> str:
             logger.debug("finished regex search, matched: %s", pattern)
             return function_match.group(1)
 
-    raise RegexMatchError(
-        caller="get_initial_function_name", pattern="multiple"
-    )
+    raise RegexMatchError(caller="get_initial_function_name", pattern="multiple")
 
 
 def get_transform_plan(js: str) -> List[str]:

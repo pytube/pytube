@@ -132,9 +132,7 @@ def video_info_url_age_restricted(video_id: str, embed_html: str) -> str:
     # Here we use ``OrderedDict`` so that the output is consistent between
     # Python 2.7+.
     eurl = f"https://youtube.googleapis.com/v/{video_id}"
-    params = OrderedDict(
-        [("video_id", video_id), ("eurl", eurl), ("sts", sts),]
-    )
+    params = OrderedDict([("video_id", video_id), ("eurl", eurl), ("sts", sts),])
     return _video_info_url(params)
 
 
@@ -210,9 +208,7 @@ def get_ytplayer_config(html: str) -> Any:
             yt_player_config = function_match.group(1)
             return json.loads(yt_player_config)
 
-    raise RegexMatchError(
-        caller="get_ytplayer_config", pattern="config_patterns"
-    )
+    raise RegexMatchError(caller="get_ytplayer_config", pattern="config_patterns")
 
 
 def _get_vid_descr(html: Optional[str]) -> str:
@@ -261,9 +257,7 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
 
         signature = cipher.get_signature(ciphered_signature=stream["s"])
 
-        logger.debug(
-            "finished descrambling signature for itag=%s", stream["itag"]
-        )
+        logger.debug("finished descrambling signature for itag=%s", stream["itag"])
         # 403 forbidden fix
         stream_manifest[i]["url"] = url + "&sig=" + signature
 
@@ -293,9 +287,7 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
     if key == "url_encoded_fmt_stream_map" and not stream_data.get(
         "url_encoded_fmt_stream_map"
     ):
-        formats = json.loads(stream_data["player_response"])["streamingData"][
-            "formats"
-        ]
+        formats = json.loads(stream_data["player_response"])["streamingData"]["formats"]
         formats.extend(
             json.loads(stream_data["player_response"])["streamingData"][
                 "adaptiveFormats"

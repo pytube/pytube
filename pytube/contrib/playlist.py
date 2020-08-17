@@ -35,16 +35,12 @@ class Playlist(Sequence):
         except IndexError:  # assume that url is just the id
             self.playlist_id = url
 
-        self.playlist_url = (
-            f"https://www.youtube.com/playlist?list={self.playlist_id}"
-        )
+        self.playlist_url = f"https://www.youtube.com/playlist?list={self.playlist_id}"
         self.html = request.get(self.playlist_url)
 
         # Needs testing with non-English
         self.last_update: Optional[date] = None
-        date_match = re.search(
-            r"Last updated on (\w{3}) (\d{1,2}), (\d{4})", self.html
-        )
+        date_match = re.search(r"Last updated on (\w{3}) (\d{1,2}), (\d{4})", self.html)
         if date_match:
             month, day, year = date_match.groups()
             self.last_update = datetime.strptime(
@@ -55,9 +51,7 @@ class Playlist(Sequence):
 
         self._video_regex = re.compile(r"href=\"(/watch\?v=[\w-]*)")
 
-    @deprecated(
-        "This function will be removed in the future, please use .video_urls"
-    )
+    @deprecated("This function will be removed in the future, please use .video_urls")
     def parse_links(self) -> List[str]:  # pragma: no cover
         """ Deprecated function for returning list of URLs
 
@@ -68,9 +62,7 @@ class Playlist(Sequence):
     def _extract_json(self, html: str) -> str:
         return self._js_regex.search(html).group(1)[0:-1]
 
-    def _paginate(
-        self, until_watch_id: Optional[str] = None
-    ) -> Iterable[List[str]]:
+    def _paginate(self, until_watch_id: Optional[str] = None) -> Iterable[List[str]]:
         """Parse the video links from the page source, yields the /watch?v=
         part from video link
 
@@ -122,9 +114,7 @@ class Playlist(Sequence):
             yield videos_urls
 
             if continuation:
-                load_more_url, headers = self._build_continuation_url(
-                    continuation
-                )
+                load_more_url, headers = self._build_continuation_url(continuation)
             else:
                 load_more_url, headers = None, None
 
@@ -166,9 +156,7 @@ class Playlist(Sequence):
             # html
             important_content = initial_data["contents"][
                 "twoColumnBrowseResultsRenderer"
-            ]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"][
-                "contents"
-            ][
+            ]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][
                 0
             ][
                 "itemSectionRenderer"
@@ -183,9 +171,9 @@ class Playlist(Sequence):
             try:
                 # this is the json tree structure, if the json was directly sent
                 # by the server in a continuation response
-                important_content = initial_data[1]["response"][
-                    "continuationContents"
-                ]["playlistVideoListContinuation"]
+                important_content = initial_data[1]["response"]["continuationContents"][
+                    "playlistVideoListContinuation"
+                ]
             except (KeyError, IndexError, TypeError) as p:
                 print(p)
                 return [], None
@@ -205,10 +193,9 @@ class Playlist(Sequence):
                     # only extract the video ids from the video data
                     map(
                         lambda x: (
-                            f"/watch?v="
-                            f"{x['playlistVideoRenderer']['videoId']}"
+                            f"/watch?v=" f"{x['playlistVideoRenderer']['videoId']}"
                         ),
-                        videos
+                        videos,
                     )
                 ),
             ),
@@ -238,9 +225,7 @@ class Playlist(Sequence):
         :returns: List of video URLs
         """
         return [
-            self._video_url(video)
-            for page in list(self._paginate())
-            for video in page
+            self._video_url(video) for page in list(self._paginate()) for video in page
         ]
 
     @property
@@ -261,8 +246,7 @@ class Playlist(Sequence):
         return f"{self.video_urls}"
 
     @deprecated(
-        "This call is unnecessary, you can directly access .video_urls or "
-        ".videos"
+        "This call is unnecessary, you can directly access .video_urls or " ".videos"
     )
     def populate_video_urls(self) -> List[str]:  # pragma: no cover
         """Complete links of all the videos in playlist
@@ -291,8 +275,7 @@ class Playlist(Sequence):
         return (str(i).zfill(digits) for i in range(start, stop, step))
 
     @deprecated(
-        "This function will be removed in the future. Please iterate through "
-        ".videos"
+        "This function will be removed in the future. Please iterate through " ".videos"
     )
     def download_all(
         self,
