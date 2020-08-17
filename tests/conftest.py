@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Reusable dependency injected testing components."""
-
 import gzip
 import json
 import os
@@ -57,7 +56,9 @@ def playlist_html():
     """Youtube playlist HTML loaded on 2020-01-25 from
     https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr"""
     file_path = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), "mocks", "playlist.html.gz"
+        os.path.dirname(os.path.realpath(__file__)),
+        "mocks",
+        "playlist.html.gz",
     )
     with gzip.open(file_path, "rb") as f:
         return f.read().decode("utf-8")
@@ -68,7 +69,22 @@ def playlist_long_html():
     """Youtube playlist HTML loaded on 2020-01-25 from
     https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr"""
     file_path = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), "mocks", "playlist_long.html.gz"
+        os.path.dirname(os.path.realpath(__file__)),
+        "mocks",
+        "playlist_long.html.gz",
     )
     with gzip.open(file_path, "rb") as f:
         return f.read().decode("utf-8")
+
+
+@pytest.fixture
+def stream_dict():
+    """Youtube instance initialized with video id WXxV9g7lsFE."""
+    file_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "mocks",
+        "yt-video-WXxV9g7lsFE.json.gz",
+    )
+    with gzip.open(file_path, "rb") as f:
+        content = f.read().decode("utf-8")
+        return json.loads(content)

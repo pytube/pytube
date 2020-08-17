@@ -7,12 +7,13 @@ exclusively on the developer interface. Pytube offloads the heavy lifting to
 smaller peripheral modules and functions.
 
 """
-
 import json
 import logging
-from typing import Optional, Dict, List
-from urllib.parse import parse_qsl
 from html import unescape
+from typing import Dict
+from typing import List
+from typing import Optional
+from urllib.parse import parse_qsl
 
 from pytube import Caption
 from pytube import CaptionQuery
@@ -20,10 +21,14 @@ from pytube import extract
 from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
-from pytube.extract import apply_descrambler, apply_signature, get_ytplayer_config
-from pytube.helpers import install_proxy
 from pytube.exceptions import VideoUnavailable
-from pytube.monostate import OnProgress, OnComplete, Monostate
+from pytube.extract import apply_descrambler
+from pytube.extract import apply_signature
+from pytube.extract import get_ytplayer_config
+from pytube.helpers import install_proxy
+from pytube.monostate import Monostate
+from pytube.monostate import OnComplete
+from pytube.monostate import OnProgress
 
 logger = logging.getLogger(__name__)
 
@@ -91,22 +96,6 @@ class YouTube:
             self.prefetch()
             self.descramble()
 
-    def extract_title(self):
-        html_lower = self.watch_html.lower()
-        i_start = html_lower.index('<meta property="og:title" content="') + len(
-            '<meta property="og:title" content="'
-        )
-        curr_i = i_start
-        end_found = False
-        while not end_found:
-            # search for the end of the tag: ">
-            if html_lower[curr_i] == '"' and html_lower[curr_i + 1] == ">":
-                i_end = curr_i
-                end_found = True
-            curr_i += 1
-
-        return self.watch_html[i_start:i_end].strip()
-
     def descramble(self) -> None:
         """Descramble the stream data and build Stream instances.
 
@@ -129,7 +118,11 @@ class YouTube:
 
             # Fix for KeyError: 'title' issue #434
             if "title" not in self.player_config_args:  # type: ignore
-                title = self.extract_title()
+                i_start = self.watch_html.lower().index("<title>") + len("<title>")
+                i_end = self.watch_html.lower().index("</title>")
+                title = self.watch_html[i_start:i_end].strip()
+                index = title.lower().rfind(" - youtube")
+                title = title[:index] if index > 0 else title
                 self.player_config_args["title"] = unescape(title)
 
         # https://github.com/nficano/pytube/issues/165

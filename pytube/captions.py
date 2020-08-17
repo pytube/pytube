@@ -3,10 +3,13 @@ import math
 import os
 import time
 import xml.etree.ElementTree as ElementTree
-from typing import Dict, Optional
-from pytube import request
 from html import unescape
-from pytube.helpers import safe_filename, target_directory
+from typing import Dict
+from typing import Optional
+
+from pytube import request
+from pytube.helpers import safe_filename
+from pytube.helpers import target_directory
 
 
 class Caption:

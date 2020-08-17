@@ -1,27 +1,54 @@
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    sha: v0.9.5
+repos:
+  - repo: 'https://github.com/pre-commit/pre-commit-hooks'
+    rev: v3.1.0
     hooks:
-    -   id: autopep8-wrapper
-    -   id: check-ast
-    -   id: check-case-conflict
-    -   id: check-merge-conflict
-    -   id: double-quote-string-fixer
-    -   id: end-of-file-fixer
-    -   id: flake8
-    -   id: requirements-txt-fixer
-    -   id: trailing-whitespace
-    -   id: fix-encoding-pragma
-    -   id: debug-statements
--   repo: https://github.com/asottile/reorder_python_imports
-    sha: v0.3.5
+      - id: pretty-format-json
+        name: 'Pretty format JSON'
+        args:
+          - '--no-sort-keys'
+          - '--autofix'
+          - '--indent=2'
+      - id: trailing-whitespace
+        name: 'Fix trailing whitespace'
+        exclude: setup.cfg
+      - id: end-of-file-fixer
+        name: 'Fix missing EOF'
+        exclude: setup.cfg
+      - id: check-executables-have-shebangs
+        name: 'Check exeutables for shebangs'
+      - id: check-merge-conflict
+        name: 'Check for merge conflict fragments'
+      - id: check-case-conflict
+        name: 'Check for filesystem character case conflicts'
+      - id: detect-private-key
+        name: 'Check for cleartext private keys stored'
+      - id: check-json
+        name: 'Validate JSON'
+      - id: check-ast
+        name: 'Check Python abstract syntax tree'
+  - repo: 'https://github.com/asottile/reorder_python_imports'
+    rev: v1.8.0
     hooks:
-    -   id: reorder-python-imports
-        language_version: python3.7
--   repo: https://github.com/Lucas-C/pre-commit-hooks-safety
-    sha: v1.1.0
+      - id: reorder-python-imports
+        name: 'Reorder Python imports'
+  - repo: 'https://github.com/pre-commit/mirrors-autopep8'
+    rev: ''
     hooks:
-    -   id: python-safety-dependencies-check
--   repo: https://github.com/asottile/add-trailing-comma
-    sha: v0.6.4
+      - id: autopep8
+        name: 'Pretty format Python'
+    args:
+      - '--in-place'
+      - '--aggressive'
+      - '--aggressive'
+      - '--experimental'
+      - '--remove-all-unused-imports'
+      - '--ignore-init-module-imports'
+      - '--remove-unused-variable'
+  - repo: https://github.com/psf/black
+    rev: stable
     hooks:
-    -   id: add-trailing-comma
+    - id: black
+      name: 'Ruthlessly format Python'
+      language_version: python3.7
+      args:
+        - '--line-length=79'
