@@ -6,7 +6,6 @@ from typing import Callable
 from typing import List
 from typing import Optional
 from typing import Union
-
 from pytube import Caption
 from pytube import Stream
 from pytube.helpers import deprecated

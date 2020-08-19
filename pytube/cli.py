@@ -12,7 +12,6 @@ import subprocess  # nosec
 import sys
 from typing import List
 from typing import Optional
-
 from pytube import __version__
 from pytube import CaptionQuery
 from pytube import Playlist
