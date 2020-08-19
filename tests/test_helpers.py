@@ -5,7 +5,10 @@ import pytest
 
 from pytube import helpers
 from pytube.exceptions import RegexMatchError
-from pytube.helpers import deprecated, cache, target_directory, setup_logger
+from pytube.helpers import cache
+from pytube.helpers import deprecated
+from pytube.helpers import setup_logger
+from pytube.helpers import target_directory
 
 
 def test_regex_search_no_match():
@@ -57,21 +60,21 @@ def test_cache():
 @mock.patch("os.path.isabs", return_value=False)
 @mock.patch("os.getcwd", return_value="/cwd")
 @mock.patch("os.makedirs")
-def test_target_directory_with_relative_path(_, __, makedirs):
+def test_target_directory_with_relative_path(_, __, makedirs):  # noqa: PT019
     assert target_directory("test") == "/cwd/test"
     makedirs.assert_called()
 
 
 @mock.patch("os.path.isabs", return_value=True)
 @mock.patch("os.makedirs")
-def test_target_directory_with_absolute_path(_, makedirs):
+def test_target_directory_with_absolute_path(_, makedirs):  # noqa: PT019
     assert target_directory("/test") == "/test"
     makedirs.assert_called()
 
 
 @mock.patch("os.getcwd", return_value="/cwd")
 @mock.patch("os.makedirs")
-def test_target_directory_with_no_path(_, makedirs):
+def test_target_directory_with_no_path(_, makedirs):  # noqa: PT019
     assert target_directory() == "/cwd"
     makedirs.assert_called()
 

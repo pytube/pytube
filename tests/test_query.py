@@ -59,7 +59,8 @@ def test_order_by(cipher_signature):
     :class:`Stream <Stream>` instances in the expected order.
     """
     itags = [
-        s.itag for s in cipher_signature.streams.filter(type="audio").order_by("itag")
+        s.itag
+        for s in cipher_signature.streams.filter(type="audio").order_by("itag")
     ]
     assert itags == [140, 249, 250, 251]
 
@@ -71,7 +72,9 @@ def test_order_by_descending(cipher_signature):
     # numerical values
     itags = [
         s.itag
-        for s in cipher_signature.streams.filter(type="audio").order_by("itag").desc()
+        for s in cipher_signature.streams.filter(type="audio")
+        .order_by("itag")
+        .desc()
     ]
     assert itags == [251, 250, 249, 140]
 
@@ -93,7 +96,9 @@ def test_order_by_ascending(cipher_signature):
     # numerical values
     itags = [
         s.itag
-        for s in cipher_signature.streams.filter(type="audio").order_by("itag").asc()
+        for s in cipher_signature.streams.filter(type="audio")
+        .order_by("itag")
+        .asc()
     ]
     assert itags == [140, 249, 250, 251]
 
@@ -101,7 +106,9 @@ def test_order_by_ascending(cipher_signature):
 def test_order_by_non_numerical_ascending(cipher_signature):
     mime_types = [
         s.mime_type
-        for s in cipher_signature.streams.filter(res="360p").order_by("mime_type").asc()
+        for s in cipher_signature.streams.filter(res="360p")
+        .order_by("mime_type")
+        .asc()
     ]
     assert mime_types == ["video/mp4", "video/mp4", "video/webm"]
 

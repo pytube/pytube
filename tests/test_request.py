@@ -46,5 +46,5 @@ def test_get(mock_urlopen):
 
 
 def test_get_non_http():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         request.get("file://bad")

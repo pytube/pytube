@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
 """Library specific exception definitions."""
-from typing import Union, Pattern
+from typing import Pattern
+from typing import Union
 
 
 class PytubeError(Exception):
