@@ -17,10 +17,6 @@ Ping @ronncc if you would like to help out
   </p>
 </div>
 
-### pytube is sponsored by:	
-<a href="https://tracking.gitads.io/?repo=pytube/"><img src="https://images.gitads.io/pytube/" alt="GitAds"/></a>	
-</p>
-
 # pytube
 *pytube* is a very serious, lightweight, dependency-free Python library (and command-line utility) for downloading YouTube Videos.
 
