@@ -9,6 +9,7 @@ smaller peripheral modules and functions.
 """
 import json
 import logging
+from datetime import datetime
 from html import unescape
 from typing import Dict
 from typing import List
@@ -80,7 +81,7 @@ class YouTube:
         self.player_config_args: Dict = {}  # inline js in the html containing
         self.player_response: Dict = {}
         # streams
-        self.publish_date: Optional[str] = None
+        self.publish_date: Optional[datetime] = None
         self.age_restricted: Optional[bool] = None
 
         self.fmt_streams: List[Stream] = []

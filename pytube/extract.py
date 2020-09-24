@@ -56,7 +56,7 @@ class PytubeHTMLParser(HTMLParser):
         raise HTMLParseError(message)
 
 
-def publish_date(watch_html: str) -> datetime:
+def publish_date(watch_html: str) -> Optional[datetime]:
     """Extract publish date
     :param str watch_html:
         The html contents of the watch page.
@@ -64,12 +64,11 @@ def publish_date(watch_html: str) -> datetime:
     :returns:
         Publish date of the video.
     """
-    pattern = r"(?<=itemprop=\"datePublished\" content=\")\d{4}-\d{2}-\d{2}"
-    regex = re.compile(pattern)
-    results = regex.search(watch_html)
-    if not results:
-        raise RegexMatchError(caller="publish_date", pattern=pattern)
-    return datetime.strptime(results.group(), '%Y-%m-%d')
+    try:
+        result = regex_search(r"(?<=itemprop=\"datePublished\" content=\")\d{4}-\d{2}-\d{2}", watch_html, group=0)
+    except RegexMatchError:
+        return None
+    return datetime.strptime(result, '%Y-%m-%d')
 
 
 def is_age_restricted(watch_html: str) -> bool:
