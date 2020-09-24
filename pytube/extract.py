@@ -4,6 +4,7 @@ import json
 import logging
 import re
 from collections import OrderedDict
+from datetime import datetime
 from html.parser import HTMLParser
 from typing import Any
 from typing import Dict
@@ -55,7 +56,7 @@ class PytubeHTMLParser(HTMLParser):
         raise HTMLParseError(message)
 
 
-def publish_date(watch_html: str) -> str:
+def publish_date(watch_html: str) -> datetime:
     """Extract publish date
     :param str watch_html:
         The html contents of the watch page.
@@ -68,7 +69,7 @@ def publish_date(watch_html: str) -> str:
     results = regex.search(watch_html)
     if not results:
         raise RegexMatchError(caller="publish_date", pattern=pattern)
-    return results.group()
+    return datetime.strptime(results.group(), '%Y-%m-%d')
 
 
 def is_age_restricted(watch_html: str) -> bool:
