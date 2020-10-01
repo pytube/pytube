@@ -44,7 +44,7 @@ Finally *pytube* also includes a command-line utility, allowing you to quickly d
 
 ## Features
 - Support for Both Progressive & DASH Streams
-- Support for downloading complete playlist
+- Support for downloading complete playlist and zip the playlist
 - Easily Register ``on_download_progress`` & ``on_download_complete`` callbacks
 - Command-line Interfaced Included
 - Caption Track Support
@@ -150,6 +150,18 @@ You can also download a complete Youtube playlist:
 ```
 This will download the highest progressive stream available (generally 720p) from the given playlist. Later more options would be given for user's flexibility
 to choose video resolution.
+
+You can convert the downloaded playlist into a zip file:
+```python
+>>> from pytube.contrib.playlist import Playlist
+>>> pl = Playlist("https://www.youtube.com/playlist?list=PLvuQMv3MKWGfEs724YFcjqpoZCbhITdmG")
+>>> pl.download_all(should_zip=True)
+>>> # or if you want to download in a specific directory
+>>> pl.download_all('/path/to/directory/', should_zip=True)
+```
+If the optional paramter `should_zip` is set to `True` then the downloaded playlist will be
+converted to a zip file in the current directory if `download_path` is not mentioned or in the `download_path` directory.
+The original downloaded playlist will be deleted.
 
 Pytube allows you to filter on every property available (see the documentation for the complete list), let's take a look at some of the most useful ones.
 

@@ -2,6 +2,7 @@
 """Module to download a complete playlist from a youtube channel."""
 import json
 import logging
+import os
 import re
 from collections.abc import Sequence
 from datetime import date
@@ -12,10 +13,11 @@ from typing import List
 from typing import Optional
 from typing import Union
 from urllib.parse import parse_qs
+from zipfile import ZipFile, ZIP_DEFLATED
 
 from pytube import request
 from pytube import YouTube
-from pytube.helpers import cache
+from pytube.helpers import cache, safe_filename
 from pytube.helpers import deprecated
 from pytube.helpers import install_proxy
 from pytube.helpers import uniqueify
@@ -300,6 +302,7 @@ class Playlist(Sequence):
         prefix_number: bool = True,
         reverse_numbering: bool = False,
         resolution: str = "720p",
+        should_zip: Optional[bool] = False,
     ) -> None:  # pragma: no cover
         """Download all the videos in the the playlist.
 
@@ -319,11 +322,16 @@ class Playlist(Sequence):
         :param resolution:
             Video resolution i.e. "720p", "480p", "360p", "240p", "144p"
         :type resolution: str
+        :param should_zip:
+            (optional) Lets you convert a playlist to a zip file of videos
+        :type should_zip: bool
         """
         logger.debug("total videos found: %d", len(self.video_urls))
         logger.debug("starting download")
 
         prefix_gen = self._path_num_prefix_generator(reverse_numbering)
+
+        _downloaded_files = []
 
         for link in self.video_urls:
             youtube = YouTube(link)
@@ -337,10 +345,30 @@ class Playlist(Sequence):
             if prefix_number:
                 prefix = next(prefix_gen)
                 logger.debug("file prefix is: %s", prefix)
-                dl_stream.download(download_path, filename_prefix=prefix)
+                downloaded_path = dl_stream.download(download_path, filename_prefix=prefix)
             else:
-                dl_stream.download(download_path)
+                downloaded_path = dl_stream.download(download_path)
+
+            _downloaded_files.append(downloaded_path)
+
             logger.debug("download complete")
+
+        if should_zip:
+            self._zip_videos(_downloaded_files)
+
+    @staticmethod
+    def _zip_videos(_downloaded_files: List) -> None:
+        """Convert the playlist to a zip file of videos.
+        The compression is ZIP_DEFLATED
+        """
+        zip_file_name = f"{_downloaded_files[0]}.zip"
+
+        with ZipFile(zip_file_name, 'w', compression=ZIP_DEFLATED) as zip_file:
+            for file in _downloaded_files:
+                zip_file.write(file)
+                os.remove(file)
+
+        logger.debug("zip complete")
 
     @cache
     def title(self) -> Optional[str]:
