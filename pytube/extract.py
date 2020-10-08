@@ -217,7 +217,6 @@ def get_ytplayer_config(html: str) -> Any:
         Substring of the html containing the encoded manifest data.
     """
     config_patterns = [
-        r";ytplayer\.config\s*=\s*({.+?});ytplayer",
         r";ytplayer\.config\s*=\s*({.*?});\(function"
         r";ytplayer\.config\s*=\s*({.*?});",
         r";yt\.setConfig\(\{'PLAYER_CONFIG':\s*(\{.*})}\);",
