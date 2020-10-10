@@ -336,7 +336,7 @@ class Stream:
         on_complete = self._monostate.on_complete
         if on_complete:
             logger.debug("calling on_complete callback %s", on_complete)
-            on_complete(self, file_path)
+            on_complete(file_path)
 
     def __repr__(self) -> str:
         """Printable object representation.
