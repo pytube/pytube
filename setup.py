@@ -23,7 +23,8 @@ setup(
     package_data={"": ["LICENSE"],},
     url="https://github.com/nficano/pytube",
     license="MIT",
-    entry_points={"console_scripts": ["pytube = pytube.cli:main", "pytube3 = pytube.cli:main"],},
+    entry_points={"console_scripts": [
+        "pytube = pytube.cli:main", "pytube3 = pytube.cli:main"],},
     install_requires=["typing_extensions"],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
