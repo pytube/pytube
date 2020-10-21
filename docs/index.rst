@@ -1,24 +1,24 @@
-.. pytube3 documentation master file, created by sphinx-quickstart on Mon Oct  9 02:11:41 2017.
+.. pytube documentation master file, created by sphinx-quickstart on Mon Oct  9 02:11:41 2017.
 
-pytube3
+pytube
 ======
 Release v\ |version|. (:ref:`Installation <install>`)
 
-.. image:: https://img.shields.io/pypi/v/pytube3.svg
+.. image:: https://img.shields.io/pypi/v/pytube.svg
   :alt: Pypi
-  :target: https://pypi.python.org/pypi/pytube3/
+  :target: https://pypi.python.org/pypi/pytube/
 
-.. image:: https://travis-ci.org/hbmartin/pytube3.svg?branch=master
+.. image:: https://travis-ci.org/nficano/pytube.svg?branch=master
    :alt: Build status
-   :target: https://travis-ci.org/hbmartin/pytube3
+   :target: https://travis-ci.org/nficano/pytube
 
 .. image:: https://coveralls.io/repos/github/nficano/pytube/badge.svg?branch=master
   :alt: Coverage
   :target: https://coveralls.io/github/nficano/pytube?branch=master
 
-.. image:: https://img.shields.io/pypi/pyversions/pytube3.svg
+.. image:: https://img.shields.io/pypi/pyversions/pytube.svg
   :alt: Python Versions
-  :target: https://pypi.python.org/pypi/pytube3/
+  :target: https://pypi.python.org/pypi/pytube/
 
 **pytube** is a lightweight, Pythonic, dependency-free, library (and command-line utility) for downloading YouTube Videos.
 
