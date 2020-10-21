@@ -59,12 +59,6 @@ Exceptions
 .. automodule:: pytube.exceptions
     :members:
 
-Mixins
-------
-
-.. automodule:: pytube.mixins
-    :members:
-
 
 Helpers
 -------
