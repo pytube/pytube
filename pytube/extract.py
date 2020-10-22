@@ -5,11 +5,21 @@ import logging
 import re
 from collections import OrderedDict
 from html.parser import HTMLParser
-from typing import Any, Dict, List, Optional, Tuple
-from urllib.parse import parse_qs, parse_qsl, quote, unquote, urlencode
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
+from urllib.parse import parse_qs
+from urllib.parse import parse_qsl
+from urllib.parse import quote
+from urllib.parse import unquote
+from urllib.parse import urlencode
 
 from pytube.cipher import Cipher
-from pytube.exceptions import HTMLParseError, LiveStreamError, RegexMatchError
+from pytube.exceptions import HTMLParseError
+from pytube.exceptions import LiveStreamError
+from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search
 
 logger = logging.getLogger(__name__)

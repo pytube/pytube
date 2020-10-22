@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from pytube.exceptions import (LiveStreamError, RegexMatchError,
-                               VideoUnavailable)
+from pytube.exceptions import LiveStreamError
+from pytube.exceptions import RegexMatchError
+from pytube.exceptions import VideoUnavailable
 
 
 def test_video_unavailable():

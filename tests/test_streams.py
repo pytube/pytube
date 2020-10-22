@@ -5,7 +5,8 @@ from datetime import datetime
 from unittest import mock
 from unittest.mock import MagicMock, Mock
 
-from pytube import Stream, request
+from pytube import request
+from pytube import Stream
 
 
 @mock.patch("pytube.streams.request")

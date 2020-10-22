@@ -10,11 +10,17 @@ import os
 import shutil
 import subprocess  # nosec
 import sys
-from typing import List, Optional
+from typing import List
+from typing import Optional
 
-from pytube import CaptionQuery, Playlist, Stream, YouTube, __version__
+from pytube import __version__
+from pytube import CaptionQuery
+from pytube import Playlist
+from pytube import Stream
+from pytube import YouTube
 from pytube.exceptions import PytubeError
-from pytube.helpers import safe_filename, setup_logger
+from pytube.helpers import safe_filename
+from pytube.helpers import setup_logger
 
 
 def main():

@@ -10,11 +10,16 @@ separately).
 import logging
 import os
 from datetime import datetime
-from typing import BinaryIO, Dict, Optional, Tuple
+from typing import BinaryIO
+from typing import Dict
+from typing import Optional
+from typing import Tuple
 from urllib.parse import parse_qs
 
-from pytube import extract, request
-from pytube.helpers import safe_filename, target_directory
+from pytube import extract
+from pytube import request
+from pytube.helpers import safe_filename
+from pytube.helpers import target_directory
 from pytube.itags import get_format_profile
 from pytube.monostate import Monostate
 

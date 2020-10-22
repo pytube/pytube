@@ -3,8 +3,11 @@
 import logging
 from functools import lru_cache
 from http.client import HTTPResponse
-from typing import Dict, Iterable, Optional
-from urllib.request import Request, urlopen
+from typing import Dict
+from typing import Iterable
+from typing import Optional
+from urllib.request import Request
+from urllib.request import urlopen
 
 logger = logging.getLogger(__name__)
 

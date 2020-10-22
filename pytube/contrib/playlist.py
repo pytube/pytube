@@ -4,12 +4,21 @@ import json
 import logging
 import re
 from collections.abc import Sequence
-from datetime import date, datetime
-from typing import Dict, Iterable, List, Optional, Tuple, Union
+from datetime import date
+from datetime import datetime
+from typing import Dict, Tuple
+from typing import Iterable
+from typing import List
+from typing import Optional
+from typing import Union
 from urllib.parse import parse_qs
 
-from pytube import YouTube, request
-from pytube.helpers import cache, deprecated, install_proxy, uniqueify
+from pytube import request
+from pytube import YouTube
+from pytube.helpers import cache
+from pytube.helpers import deprecated
+from pytube.helpers import install_proxy
+from pytube.helpers import uniqueify
 
 logger = logging.getLogger(__name__)
 

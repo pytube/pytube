@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 import argparse
 from unittest import mock
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pytest
 
-from pytube import Caption, CaptionQuery, StreamQuery, cli
+from pytube import Caption
+from pytube import CaptionQuery
+from pytube import cli
+from pytube import StreamQuery
 from pytube.exceptions import PytubeError
 
 parse_args = cli._parse_args

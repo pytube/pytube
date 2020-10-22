@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 import os
+
 from unittest import mock
-from unittest.mock import MagicMock, mock_open, patch
+from unittest.mock import MagicMock
+from unittest.mock import mock_open
+from unittest.mock import patch
 
 import pytest
 
-from pytube import Caption, CaptionQuery, captions
+from pytube import Caption
+from pytube import CaptionQuery
+from pytube import captions
 
 
 def test_float_to_srt_time_format():
