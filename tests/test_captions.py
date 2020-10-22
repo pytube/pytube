@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-
 from unittest import mock
 from unittest.mock import MagicMock
 from unittest.mock import mock_open
