@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import Any
-from typing import Optional
+from typing import Any, Optional
 
 from typing_extensions import Protocol
 

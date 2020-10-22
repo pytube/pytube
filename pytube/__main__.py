@@ -10,25 +10,15 @@ smaller peripheral modules and functions.
 import json
 import logging
 from html import unescape
-from typing import Dict
-from typing import List
-from typing import Optional
+from typing import Dict, List, Optional
 from urllib.parse import parse_qsl
 
-from pytube import Caption
-from pytube import CaptionQuery
-from pytube import extract
-from pytube import request
-from pytube import Stream
-from pytube import StreamQuery
+from pytube import Caption, CaptionQuery, Stream, StreamQuery, extract, request
 from pytube.exceptions import VideoUnavailable
-from pytube.extract import apply_descrambler
-from pytube.extract import apply_signature
-from pytube.extract import get_ytplayer_config
+from pytube.extract import (apply_descrambler, apply_signature,
+                            get_ytplayer_config)
 from pytube.helpers import install_proxy
-from pytube.monostate import Monostate
-from pytube.monostate import OnComplete
-from pytube.monostate import OnProgress
+from pytube.monostate import Monostate, OnComplete, OnProgress
 
 logger = logging.getLogger(__name__)
 

@@ -6,10 +6,7 @@ import pytest
 
 from pytube import helpers
 from pytube.exceptions import RegexMatchError
-from pytube.helpers import cache
-from pytube.helpers import deprecated
-from pytube.helpers import setup_logger
-from pytube.helpers import target_directory
+from pytube.helpers import cache, deprecated, setup_logger, target_directory
 
 
 def test_regex_search_no_match():

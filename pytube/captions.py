@@ -4,12 +4,10 @@ import os
 import time
 import xml.etree.ElementTree as ElementTree
 from html import unescape
-from typing import Dict
-from typing import Optional
+from typing import Dict, Optional
 
 from pytube import request
-from pytube.helpers import safe_filename
-from pytube.helpers import target_directory
+from pytube.helpers import safe_filename, target_directory
 
 
 class Caption:
