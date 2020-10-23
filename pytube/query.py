@@ -387,6 +387,21 @@ class CaptionQuery(Mapping):
 
         """
         self.lang_code_index = {c.code: c for c in captions}
+        self.lang_name_index = {c.name: c for c in captions}
+
+    def get_by_language_name(
+        self, lang_name: str
+    ) -> Optional[Caption]:  # pragma: no cover
+        """Get the :class:`Caption <Caption>` for a given ``lang_name``.
+
+        :param str lang_name:
+            The name that identifies the caption language.
+        :rtype: :class:`Caption <Caption>` or None
+        :returns:
+            The :class:`Caption <Caption>` matching the given ``lang_name`` or
+            None if it does not exist.
+        """
+        return self.lang_name_index.get(lang_name)
 
     @deprecated(
         "This object can be treated as a dictionary, i.e. captions['en']"
