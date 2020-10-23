@@ -151,7 +151,7 @@ def js_url(html: str) -> str:
     :param str html:
         The html contents of the watch page.
     """
-    base_js = get_ytplayer_config(html)["assets"]["js"]
+    base_js = get_ytplayer_js(html)
     return "https://youtube.com" + base_js
 
 
@@ -180,6 +180,32 @@ def mime_type_codec(mime_type_codec: str) -> Tuple[str, List[str]]:
         raise RegexMatchError(caller="mime_type_codec", pattern=pattern)
     mime_type, codecs = results.groups()
     return mime_type, [c.strip() for c in codecs.split(",")]
+
+
+def get_ytplayer_js(html: str) -> Any:
+    """Get the YouTube player base JavaScript path.
+
+    :param str html
+        The html contents of the watch page.
+    :rtype: str
+    :returns:
+        Path to YouTube's base.js file.
+    """
+    js_url_patterns = [
+        r"\"jsUrl\":\"([^\"]*)\"",
+    ]
+    for pattern in js_url_patterns:
+        regex = re.compile(pattern)
+        function_match = regex.search(html)
+        if function_match:
+            logger.debug("finished regex search, matched: %s", pattern)
+            yt_player_js = function_match.group(1)
+            return yt_player_js
+
+    raise RegexMatchError(
+        caller="get_ytplayer_js", pattern="js_url_patterns"
+    )
+
 
 
 def get_ytplayer_config(html: str) -> Any:
@@ -316,11 +342,11 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
         except KeyError:
             cipher_url = [
                 parse_qs(
-                    formats[i][
+                    data[
                         "cipher" if "cipher" in data.keys() else "signatureCipher"
                     ]
                 )
-                for i, data in enumerate(formats)
+                for data in formats
             ]
             stream_data[key] = [
                 {
