@@ -207,7 +207,6 @@ def get_ytplayer_js(html: str) -> Any:
     )
 
 
-
 def get_ytplayer_config(html: str) -> Any:
     """Get the YouTube player configuration data from the watch html.
 
