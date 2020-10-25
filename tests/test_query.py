@@ -144,7 +144,7 @@ def test_get_highest_resolution(cipher_signature):
 def test_filter_is_dash(cipher_signature):
     streams = cipher_signature.streams.filter(is_dash=False)
     itags = [s.itag for s in streams]
-    assert itags == [18, 398, 397, 396, 395, 394]
+    assert itags == [18, 399, 398, 397, 396, 395, 394]
 
 
 def test_get_audio_only(cipher_signature):
@@ -156,13 +156,13 @@ def test_get_audio_only_with_subtype(cipher_signature):
 
 
 def test_sequence(cipher_signature):
-    assert len(cipher_signature.streams) == 22
+    assert len(cipher_signature.streams) == 23
     assert cipher_signature.streams[0] is not None
 
 
 def test_otf(cipher_signature):
     non_otf = cipher_signature.streams.otf()
-    assert len(non_otf) == 22
+    assert len(non_otf) == 23
 
     otf = cipher_signature.streams.otf(True)
     assert len(otf) == 0

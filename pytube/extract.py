@@ -25,36 +25,6 @@ from pytube.helpers import regex_search
 logger = logging.getLogger(__name__)
 
 
-class PytubeHTMLParser(HTMLParser):
-    in_vid_descr = False
-    in_vid_descr_br = False
-    vid_descr = ""
-
-    def handle_starttag(self, tag, attrs):
-        if tag == "p":
-            for attr in attrs:
-                if attr[0] == "id" and attr[1] == "eow-description":
-                    self.in_vid_descr = True
-
-    def handle_endtag(self, tag):
-        if self.in_vid_descr and tag == "p":
-            self.in_vid_descr = False
-
-    def handle_startendtag(self, tag, attrs):
-        if self.in_vid_descr and tag == "br":
-            self.in_vid_descr_br = True
-
-    def handle_data(self, data):
-        if self.in_vid_descr_br:
-            self.vid_descr += f"\n{data}"
-            self.in_vid_descr_br = False
-        elif self.in_vid_descr:
-            self.vid_descr += data
-
-    def error(self, message):
-        raise HTMLParseError(message)
-
-
 def is_age_restricted(watch_html: str) -> bool:
     """Check if content is age restricted.
 
@@ -238,13 +208,6 @@ def get_ytplayer_config(html: str) -> Any:
     raise RegexMatchError(
         caller="get_ytplayer_config", pattern="config_patterns"
     )
-
-
-def _get_vid_descr(html: Optional[str]) -> str:
-    html_parser = PytubeHTMLParser()
-    if html:
-        html_parser.feed(html)
-    return html_parser.vid_descr
 
 
 def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
