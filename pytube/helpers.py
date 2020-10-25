@@ -16,8 +16,6 @@ from typing import Optional
 from typing import TypeVar
 from urllib import request
 
-import pytube.extract
-import pytube.request
 from pytube.exceptions import RegexMatchError
 
 logger = logging.getLogger(__name__)
@@ -192,7 +190,7 @@ def create_mock_video_gz(vid_id) -> None:
 
     yt = YouTube(
         'https://www.youtube.com/watch?v=%s' % vid_id,
-        defer_prefetch_init = True
+        defer_prefetch_init=True
     )
     yt.prefetch()
 
