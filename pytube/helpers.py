@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 """Various helper functions implemented by pytube."""
 import functools
+import gzip
+import json
 import logging
 import os
 import re
+import urllib.parse
 import warnings
 from typing import Any
 from typing import Callable
@@ -13,6 +16,8 @@ from typing import Optional
 from typing import TypeVar
 from urllib import request
 
+import pytube.extract
+import pytube.request
 from pytube.exceptions import RegexMatchError
 
 logger = logging.getLogger(__name__)
@@ -174,3 +179,32 @@ def uniqueify(duped_list: List) -> List:
         seen[item] = True
         result.append(item)
     return result
+
+
+def create_mock_video_gz(vid_id) -> None:
+    """Generate the mock json.gz file for unit tests.
+
+    :param str vid_id
+        YouTube video id
+    """
+    from pytube import YouTube
+    gzip_filename = 'yt-video-%s.json.gz' % vid_id
+
+    yt = YouTube(
+        'https://www.youtube.com/watch?v=%s' % vid_id,
+        defer_prefetch_init = True
+    )
+    yt.prefetch()
+
+    data = {
+        'url': yt.watch_url,
+        'watch_html': yt.watch_html,
+        'js': yt.js,
+    }
+
+    # For some reason, yt.vid_info doesn't exist until after descramble
+    yt.descramble()
+    data['video_info'] = urllib.parse.urlencode(yt.vid_info)
+
+    with gzip.open(gzip_filename, 'wb') as f:
+        f.write(json.dumps(data).encode('utf-8'))
