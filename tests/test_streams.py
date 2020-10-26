@@ -63,7 +63,7 @@ def test_title(cipher_signature):
 
 
 def test_expiration(cipher_signature):
-    assert cipher_signature.streams[0].expiration == datetime(2020, 1, 16, 5, 12, 5)
+    assert cipher_signature.streams[0].expiration == datetime(2020, 10, 24, 11, 7, 41)
 
 
 def test_caption_tracks(presigned_video):
@@ -93,27 +93,9 @@ def test_description(cipher_signature):
     )
     assert cipher_signature.description == expected
 
-    cipher_signature.player_response = {}
-    expected = (
-        "PSY - ‘I LUV IT’ M/V @ https://youtu.be/Xvjnoagk6GU\n"
-        "PSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\n"
-        "PSY - 8TH ALBUM '4X2=8' on iTunes @\n"
-        "https://smarturl.it/PSY_8thAlbum\n"
-        "PSY - GANGNAM STYLE(강남스타일) on iTunes @ http://smarturl.it/PsyGangnam\n"
-        "#PSY #싸이 #GANGNAMSTYLE #강남스타일\n"
-        "More about PSY@\nhttp://www.youtube.com/officialpsy\n"
-        "http://www.facebook.com/officialpsy\n"
-        "http://twitter.com/psy_oppa\n"
-        "https://www.instagram.com/42psy42\n"
-        "http://iTunes.com/PSY\n"
-        "http://sptfy.com/PSY\n"
-        "http://weibo.com/psyoppa"
-    )
-    assert cipher_signature.description == expected
-
 
 def test_rating(cipher_signature):
-    assert cipher_signature.rating == 4.522203
+    assert cipher_signature.rating == 4.5375643
 
 
 def test_length(cipher_signature):
@@ -121,7 +103,7 @@ def test_length(cipher_signature):
 
 
 def test_views(cipher_signature):
-    assert cipher_signature.views == 3494704859
+    assert cipher_signature.views == 3830838693
 
 
 @mock.patch(
@@ -149,7 +131,10 @@ def test_download_with_prefix(cipher_signature):
     with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
         stream = cipher_signature.streams[0]
         file_path = stream.download(filename_prefix="prefix")
-        assert file_path == "/target/prefixPSY - GANGNAM STYLE(강남스타일) MV.mp4"
+        assert file_path == os.path.join(
+            "/target",
+            "prefixPSY - GANGNAM STYLE(강남스타일) MV.mp4"
+        )
 
 
 @mock.patch(
@@ -164,7 +149,10 @@ def test_download_with_filename(cipher_signature):
     with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
         stream = cipher_signature.streams[0]
         file_path = stream.download(filename="cool name bro")
-        assert file_path == "/target/cool name bro.mp4"
+        assert file_path == os.path.join(
+            "/target",
+            "cool name bro.mp4"
+        )
 
 
 @mock.patch(
@@ -181,7 +169,10 @@ def test_download_with_existing(cipher_signature):
         stream = cipher_signature.streams[0]
         os.path.getsize = Mock(return_value=stream.filesize)
         file_path = stream.download()
-        assert file_path == "/target/PSY - GANGNAM STYLE(강남스타일) MV.mp4"
+        assert file_path == os.path.join(
+            "/target",
+            "PSY - GANGNAM STYLE(강남스타일) MV.mp4"
+        )
         assert not request.stream.called
 
 
@@ -199,7 +190,10 @@ def test_download_with_existing_no_skip(cipher_signature):
         stream = cipher_signature.streams[0]
         os.path.getsize = Mock(return_value=stream.filesize)
         file_path = stream.download(skip_existing=False)
-        assert file_path == "/target/PSY - GANGNAM STYLE(강남스타일) MV.mp4"
+        assert file_path == os.path.join(
+            "/target",
+            "PSY - GANGNAM STYLE(강남스타일) MV.mp4"
+        )
         assert request.stream.called
 
 

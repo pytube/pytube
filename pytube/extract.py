@@ -4,11 +4,9 @@ import json
 import logging
 import re
 from collections import OrderedDict
-from html.parser import HTMLParser
 from typing import Any
 from typing import Dict
 from typing import List
-from typing import Optional
 from typing import Tuple
 from urllib.parse import parse_qs
 from urllib.parse import parse_qsl
@@ -17,42 +15,11 @@ from urllib.parse import unquote
 from urllib.parse import urlencode
 
 from pytube.cipher import Cipher
-from pytube.exceptions import HTMLParseError
 from pytube.exceptions import LiveStreamError
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search
 
 logger = logging.getLogger(__name__)
-
-
-class PytubeHTMLParser(HTMLParser):
-    in_vid_descr = False
-    in_vid_descr_br = False
-    vid_descr = ""
-
-    def handle_starttag(self, tag, attrs):
-        if tag == "p":
-            for attr in attrs:
-                if attr[0] == "id" and attr[1] == "eow-description":
-                    self.in_vid_descr = True
-
-    def handle_endtag(self, tag):
-        if self.in_vid_descr and tag == "p":
-            self.in_vid_descr = False
-
-    def handle_startendtag(self, tag, attrs):
-        if self.in_vid_descr and tag == "br":
-            self.in_vid_descr_br = True
-
-    def handle_data(self, data):
-        if self.in_vid_descr_br:
-            self.vid_descr += f"\n{data}"
-            self.in_vid_descr_br = False
-        elif self.in_vid_descr:
-            self.vid_descr += data
-
-    def error(self, message):
-        raise HTMLParseError(message)
 
 
 def is_age_restricted(watch_html: str) -> bool:
@@ -151,7 +118,7 @@ def js_url(html: str) -> str:
     :param str html:
         The html contents of the watch page.
     """
-    base_js = get_ytplayer_config(html)["assets"]["js"]
+    base_js = get_ytplayer_js(html)
     return "https://youtube.com" + base_js
 
 
@@ -180,6 +147,31 @@ def mime_type_codec(mime_type_codec: str) -> Tuple[str, List[str]]:
         raise RegexMatchError(caller="mime_type_codec", pattern=pattern)
     mime_type, codecs = results.groups()
     return mime_type, [c.strip() for c in codecs.split(",")]
+
+
+def get_ytplayer_js(html: str) -> Any:
+    """Get the YouTube player base JavaScript path.
+
+    :param str html
+        The html contents of the watch page.
+    :rtype: str
+    :returns:
+        Path to YouTube's base.js file.
+    """
+    js_url_patterns = [
+        r"\"jsUrl\":\"([^\"]*)\"",
+    ]
+    for pattern in js_url_patterns:
+        regex = re.compile(pattern)
+        function_match = regex.search(html)
+        if function_match:
+            logger.debug("finished regex search, matched: %s", pattern)
+            yt_player_js = function_match.group(1)
+            return yt_player_js
+
+    raise RegexMatchError(
+        caller="get_ytplayer_js", pattern="js_url_patterns"
+    )
 
 
 def get_ytplayer_config(html: str) -> Any:
@@ -213,13 +205,6 @@ def get_ytplayer_config(html: str) -> Any:
     raise RegexMatchError(
         caller="get_ytplayer_config", pattern="config_patterns"
     )
-
-
-def _get_vid_descr(html: Optional[str]) -> str:
-    html_parser = PytubeHTMLParser()
-    if html:
-        html_parser.feed(html)
-    return html_parser.vid_descr
 
 
 def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
@@ -316,11 +301,11 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
         except KeyError:
             cipher_url = [
                 parse_qs(
-                    formats[i][
+                    data[
                         "cipher" if "cipher" in data.keys() else "signatureCipher"
                     ]
                 )
-                for i, data in enumerate(formats)
+                for data in formats
             ]
             stream_data[key] = [
                 {
