@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
+import os
 from unittest import mock
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -472,12 +473,12 @@ def test_ffmpeg_downloader(unique_name, download, run, unlink):
         [
             "ffmpeg",
             "-i",
-            "target/video_name.video_subtype",
+            os.path.join("target", "video_name.video_subtype"),
             "-i",
-            "target/audio_name.audio_subtype",
+            os.path.join("target", "audio_name.audio_subtype"),
             "-codec",
             "copy",
-            "target/safe_title.video_subtype",
+            os.path.join("target", "safe_title.video_subtype"),
         ]
     )
     unlink.assert_called()
