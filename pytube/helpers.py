@@ -179,11 +179,14 @@ def uniqueify(duped_list: List) -> List:
     return result
 
 
-def create_mock_video_gz(vid_id) -> None:
+def create_mock_video_gz(vid_id) -> Dict[str, Any]:
     """Generate the mock json.gz file for unit tests.
 
     :param str vid_id
         YouTube video id
+
+    :return dict data
+        Dict used to generate the json.gz file
     """
     from pytube import YouTube
     gzip_filename = 'yt-video-%s.json.gz' % vid_id
@@ -206,3 +209,5 @@ def create_mock_video_gz(vid_id) -> None:
 
     with gzip.open(gzip_filename, 'wb') as f:
         f.write(json.dumps(data).encode('utf-8'))
+
+    return data
