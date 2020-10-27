@@ -99,24 +99,6 @@ def test_description(cipher_signature):
         "To see the full list of featured channels in Rewind 2019, "
         "visit: https://rewind.youtube/about"
     )
-    """
-    expected = (
-        "PSY - ‘I LUV IT’ M/V @ https://youtu.be/Xvjnoagk6GU\n"
-        "PSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\n\n"
-        "PSY - 8TH ALBUM '4X2=8' on iTunes @\n"
-        "https://smarturl.it/PSY_8thAlbum\n\n"
-        "PSY - GANGNAM STYLE(강남스타일) on iTunes @ "
-        "http://smarturl.it/PsyGangnam\n\n"
-        "#PSY #싸이 #GANGNAMSTYLE #강남스타일\n\n"
-        "More about PSY@\nhttp://www.youtube.com/officialpsy\n"
-        "http://www.facebook.com/officialpsy\n"
-        "http://twitter.com/psy_oppa\n"
-        "https://www.instagram.com/42psy42\n"
-        "http://iTunes.com/PSY\n"
-        "http://sptfy.com/PSY\n"
-        "http://weibo.com/psyoppa"
-    )
-    """
     assert cipher_signature.description == expected
 
 
