@@ -98,14 +98,26 @@ def test_setup_logger(logging):
 
 @mock.patch('builtins.open', new_callable=mock.mock_open)
 def test_create_mock_video_gz(mock_open):
-    video_id = '9bZkp7q19f0'
-    gzip_filename = 'yt-video-%s.json.gz' % video_id
-
+    video_id = '2lAe1cqCOXo'
     # Generate the mock video.json.gz file from a video id
     result_data = create_mock_video_gz(video_id)
 
+    gzip_filename = 'yt-video-%s.json.gz' % video_id
+
+    # Get the pytube directory in order to navigate to /tests/mocks
+    pytube_dir_path = os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            os.path.pardir
+        )
+    )
+    pytube_mocks_path = os.path.join(pytube_dir_path, 'tests', 'mocks')
+    gzip_filepath = os.path.join(pytube_mocks_path, gzip_filename)
+
+
+
     # Assert that a write was only made once
-    mock_open.assert_called_once_with(gzip_filename, 'wb')
+    mock_open.assert_called_once_with(gzip_filepath, 'wb')
 
     # The result data should look like this:
     gzip_file = io.BytesIO()
@@ -124,4 +136,10 @@ def test_create_mock_video_gz(mock_open):
         for arg in args:
             full_content += arg
 
-    assert gzip_data == full_content
+    # The file header includes time metadata, so *occasionally* a single
+    #  byte will be off at the very beginning. In theory, this difference
+    #  should only affect bytes 5-8 (or [4:8] because of zero-indexing),
+    #  but I've excluded the 10-byte metadata header altogether from the
+    #  check, just to be safe.
+    # Source: https://en.wikipedia.org/wiki/Gzip#File_format
+    assert gzip_data[10:] == full_content[10:]
