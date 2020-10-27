@@ -10,10 +10,11 @@ import pytest
 from pytube import helpers
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import cache
+from pytube.helpers import create_mock_video_gz
 from pytube.helpers import deprecated
 from pytube.helpers import setup_logger
 from pytube.helpers import target_directory
-from pytube.helpers import create_mock_video_gz
+from pytube.helpers import uniqueify
 
 
 def test_regex_search_no_match():
@@ -141,3 +142,13 @@ def test_create_mock_video_gz(mock_open):
     #  check, just to be safe.
     # Source: https://en.wikipedia.org/wiki/Gzip#File_format
     assert gzip_data[10:] == full_content[10:]
+
+
+def test_uniqueify():
+    non_unique_list = [1, 2, 3, 3, 4, 5]
+    expected = [1, 2, 3, 4, 5]
+    result = uniqueify(non_unique_list)
+    assert len(expected) == len(result)
+
+    for i in range(len(expected)):
+        assert expected[i] == result[i]
