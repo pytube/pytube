@@ -70,6 +70,11 @@ def test_get_ytplayer_config_with_no_match_should_error():
         extract.get_ytplayer_config("")
 
 
+def test_get_ytplayer_js_with_no_match_should_error():
+    with pytest.raises(RegexMatchError):
+        extract.get_ytplayer_js("")
+
+
 def test_signature_cipher_does_not_error(stream_dict):
     extract.apply_descrambler(stream_dict, "url_encoded_fmt_stream_map")
     assert "s" in stream_dict["url_encoded_fmt_stream_map"][0].keys()
