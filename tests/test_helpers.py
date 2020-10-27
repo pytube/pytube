@@ -114,8 +114,6 @@ def test_create_mock_video_gz(mock_open):
     pytube_mocks_path = os.path.join(pytube_dir_path, 'tests', 'mocks')
     gzip_filepath = os.path.join(pytube_mocks_path, gzip_filename)
 
-
-
     # Assert that a write was only made once
     mock_open.assert_called_once_with(gzip_filepath, 'wb')
 
