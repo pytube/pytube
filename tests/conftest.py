@@ -33,7 +33,7 @@ def load_and_init_from_playback_file(filename):
 @pytest.fixture
 def cipher_signature():
     """Youtube instance initialized with video id 9bZkp7q19f0."""
-    filename = "yt-video-9bZkp7q19f0.json.gz"
+    filename = "yt-video-2lAe1cqCOXo.json.gz"
     return load_and_init_from_playback_file(filename)
 
 

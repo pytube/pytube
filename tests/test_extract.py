@@ -7,9 +7,9 @@ from pytube.exceptions import RegexMatchError
 
 
 def test_extract_video_id():
-    url = "https://www.youtube.com/watch?v=9bZkp7q19f0"
+    url = "https://www.youtube.com/watch?v=2lAe1cqCOXo"
     video_id = extract.video_id(url)
-    assert video_id == "9bZkp7q19f0"
+    assert video_id == "2lAe1cqCOXo"
 
 
 def test_info_url(age_restricted):
@@ -29,16 +29,16 @@ def test_info_url_age_restricted(cipher_signature):
         watch_url=cipher_signature.watch_url,
     )
     expected = (
-        "https://youtube.com/get_video_info?video_id=9bZkp7q19f0&el=%24el"
+        "https://youtube.com/get_video_info?video_id=2lAe1cqCOXo&el=%24el"
         "&ps=default&eurl=https%253A%2F%2Fyoutube.com%2Fwatch%253Fv%"
-        "253D9bZkp7q19f0&hl=en_US"
+        "253D2lAe1cqCOXo&hl=en_US"
     )
     assert video_info_url == expected
 
 
 def test_js_url(cipher_signature):
     expected = (
-        "https://youtube.com/s/player/4a1799bd/player_ias.vflset/en_US/base.js"
+        "https://youtube.com/s/player/9b65e980/player_ias.vflset/en_US/base.js"
     )
     result = extract.js_url(cipher_signature.watch_html)
     assert expected == result

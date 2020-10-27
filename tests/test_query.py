@@ -6,9 +6,9 @@ import pytest
 @pytest.mark.parametrize(
     ("test_input", "expected"),
     [
-        ({"progressive": True}, [18]),
-        ({"resolution": "720p"}, [136, 247]),
-        ({"res": "720p"}, [136, 247]),
+        ({"progressive": True}, [18, 22]),
+        ({"resolution": "720p"}, [22, 136, 247]),
+        ({"res": "720p"}, [22, 136, 247]),
         ({"fps": 30, "resolution": "480p"}, [135, 244]),
         ({"mime_type": "audio/mp4"}, [140]),
         ({"type": "audio"}, [140, 249, 250, 251]),
@@ -115,7 +115,7 @@ def test_order_by_non_numerical_ascending(cipher_signature):
 
 def test_order_by_with_none_values(cipher_signature):
     abrs = [s.abr for s in cipher_signature.streams.order_by("abr").asc()]
-    assert abrs == ["50kbps", "70kbps", "96kbps", "128kbps", "160kbps"]
+    assert abrs == ["50kbps", "70kbps", "96kbps", "128kbps", "160kbps", "192kbps"]
 
 
 def test_get_by_itag(cipher_signature):
@@ -138,13 +138,13 @@ def test_get_lowest_resolution(cipher_signature):
 
 
 def test_get_highest_resolution(cipher_signature):
-    assert cipher_signature.streams.get_highest_resolution().itag == 18
+    assert cipher_signature.streams.get_highest_resolution().itag == 22
 
 
 def test_filter_is_dash(cipher_signature):
     streams = cipher_signature.streams.filter(is_dash=False)
     itags = [s.itag for s in streams]
-    assert itags == [18, 399, 398, 397, 396, 395, 394]
+    assert itags == [18, 22, 399, 398, 397, 396, 395, 394]
 
 
 def test_get_audio_only(cipher_signature):
@@ -156,13 +156,13 @@ def test_get_audio_only_with_subtype(cipher_signature):
 
 
 def test_sequence(cipher_signature):
-    assert len(cipher_signature.streams) == 23
+    assert len(cipher_signature.streams) == 24
     assert cipher_signature.streams[0] is not None
 
 
 def test_otf(cipher_signature):
     non_otf = cipher_signature.streams.otf()
-    assert len(non_otf) == 23
+    assert len(non_otf) == 24
 
     otf = cipher_signature.streams.otf(True)
     assert len(otf) == 0
