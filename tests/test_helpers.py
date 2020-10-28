@@ -142,9 +142,11 @@ def test_create_mock_video_gz(mock_url_open):
 
         # The result data should look like this:
         gzip_file = io.BytesIO()
-        with gzip.GzipFile(filename=gzip_json_filename,
-                           fileobj=gzip_file,
-                           mode='wb') as f:
+        with gzip.GzipFile(
+            filename=gzip_json_filename,
+            fileobj=gzip_file,
+            mode='wb'
+        ) as f:
             f.write(json.dumps(result_data).encode('utf-8'))
         gzip_data = gzip_file.getvalue()
 
@@ -201,9 +203,11 @@ def test_create_mock_html_json(mock_url_open, mock_open):
 
     # The result data should look like this:
     gzip_file = io.BytesIO()
-    with gzip.GzipFile(filename=gzip_html_filename,
-                       fileobj=gzip_file,
-                       mode='wb') as f:
+    with gzip.GzipFile(
+        filename=gzip_html_filename,
+        fileobj=gzip_file,
+        mode='wb'
+    ) as f:
         f.write(json.dumps(result_data).encode('utf-8'))
     gzip_data = gzip_file.getvalue()
 
