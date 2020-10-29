@@ -29,7 +29,7 @@ def test_info_url_age_restricted(cipher_signature):
         watch_url=cipher_signature.watch_url,
     )
     expected = (
-        "https://youtube.com/get_video_info?video_id=2lAe1cqCOXo&el=%24el"
+        "https://youtube.com/get_video_info?video_id=2lAe1cqCOXo"
         "&ps=default&eurl=https%253A%2F%2Fyoutube.com%2Fwatch%253Fv%"
         "253D2lAe1cqCOXo&hl=en_US"
     )
