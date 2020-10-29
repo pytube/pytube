@@ -71,7 +71,6 @@ def video_info_url(video_id: str, watch_url: str) -> str:
     params = OrderedDict(
         [
             ("video_id", video_id),
-            ("el", "$el"),
             ("ps", "default"),
             ("eurl", quote(watch_url)),
             ("hl", "en_US"),
