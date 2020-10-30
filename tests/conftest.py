@@ -34,8 +34,7 @@ def load_and_init_from_playback_file(filename, mock_urlopen):
     ]
     mock_urlopen.return_value = mock_url_open_object
 
-    yt = YouTube(pb["url"])
-    return yt
+    return YouTube(pb["url"])
 
 
 @pytest.fixture
