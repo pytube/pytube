@@ -76,5 +76,6 @@ def test_get_ytplayer_js_with_no_match_should_error():
 
 
 def test_signature_cipher_does_not_error(stream_dict):
-    extract.apply_descrambler(stream_dict, "url_encoded_fmt_stream_map")
-    assert "s" in stream_dict["url_encoded_fmt_stream_map"][0].keys()
+    config_args = extract.get_ytplayer_config(stream_dict)['args']
+    extract.apply_descrambler(config_args, "url_encoded_fmt_stream_map")
+    assert "s" in config_args["url_encoded_fmt_stream_map"][0].keys()
