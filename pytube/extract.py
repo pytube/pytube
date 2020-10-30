@@ -159,6 +159,7 @@ def get_ytplayer_js(html: str) -> Any:
     """
     js_url_patterns = [
         r"\"jsUrl\":\"([^\"]*)\"",
+        r"\"js\":\"([^\"]*base\.js)\""
     ]
     for pattern in js_url_patterns:
         regex = re.compile(pattern)
