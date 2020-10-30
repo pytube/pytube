@@ -6,7 +6,6 @@ import json
 import logging
 import os
 import re
-import urllib.parse
 import warnings
 from typing import Any
 from typing import Callable
@@ -179,50 +178,6 @@ def uniqueify(duped_list: List) -> List:
     return result
 
 
-def create_mock_video_gz(vid_id) -> Dict[str, Any]:
-    """Generate the mock json.gz file for unit tests.
-
-    :param str vid_id
-        YouTube video id
-
-    :return dict data
-        Dict used to generate the json.gz file
-    """
-    from pytube import YouTube
-    gzip_filename = 'yt-video-%s.json.gz' % vid_id
-
-    # Get the pytube directory in order to navigate to /tests/mocks
-    pytube_dir_path = os.path.abspath(
-        os.path.join(
-            os.path.dirname(__file__),
-            os.path.pardir
-        )
-    )
-    pytube_mocks_path = os.path.join(pytube_dir_path, 'tests', 'mocks')
-    gzip_filepath = os.path.join(pytube_mocks_path, gzip_filename)
-
-    yt = YouTube(
-        'https://www.youtube.com/watch?v=%s' % vid_id,
-        defer_prefetch_init=True
-    )
-    yt.prefetch()
-
-    data = {
-        'url': yt.watch_url,
-        'watch_html': yt.watch_html,
-        'js': yt.js,
-    }
-
-    # For some reason, yt.vid_info doesn't exist until after descramble
-    yt.descramble()
-    data['video_info'] = urllib.parse.urlencode(yt.vid_info)
-
-    with gzip.open(gzip_filepath, 'wb') as f:
-        f.write(json.dumps(data).encode('utf-8'))
-
-    return data
-
-
 def create_mock_html_json(vid_id) -> Dict[str, Any]:
     """Generate a json.gz file with sample html responses.
 
@@ -245,8 +200,13 @@ def create_mock_html_json(vid_id) -> Dict[str, Any]:
     pytube_mocks_path = os.path.join(pytube_dir_path, 'tests', 'mocks')
     gzip_filepath = os.path.join(pytube_mocks_path, gzip_filename)
 
-    yt = YouTube('https://www.youtube.com/watch?v=%s' % vid_id)
+    yt = YouTube(
+        'https://www.youtube.com/watch?v=%s' % vid_id,
+        defer_prefetch_init=True
+    )
+    yt.prefetch()
     html_data = {
+        'url': yt.watch_url,
         'js': yt.js,
         'embed_html': yt.embed_html,
         'watch_html': yt.watch_html,
