@@ -10,7 +10,6 @@ import pytest
 from pytube import helpers
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import cache
-from pytube.helpers import create_mock_video_gz
 from pytube.helpers import create_mock_html_json
 from pytube.helpers import deprecated
 from pytube.helpers import setup_logger
@@ -98,80 +97,8 @@ def test_setup_logger(logging):
     logger.setLevel.assert_called_with(20)
 
 
-@mock.patch('urllib.request.urlopen')
-def test_create_mock_video_gz(mock_url_open):
-    video_id = '2lAe1cqCOXo'
-
-    # Cached YouTube object attributes
-    gzip_json_filename = 'yt-video-%s.json.gz' % video_id
-
-    # Cached web responses to various URLs
-    gzip_html_filename = 'yt-video-%s-html.json.gz' % video_id
-
-    # Get the pytube directory in order to navigate to /tests/mocks
-    pytube_dir_path = os.path.abspath(
-        os.path.join(
-            os.path.dirname(__file__),
-            os.path.pardir
-        )
-    )
-    pytube_mocks_path = os.path.join(pytube_dir_path, 'tests', 'mocks')
-    gzip_json_filepath = os.path.join(pytube_mocks_path, gzip_json_filename)
-    gzip_html_filepath = os.path.join(pytube_mocks_path, gzip_html_filename)
-
-    # Generate response order from video html cache
-    mock_url_open_responses = []
-    with gzip.open(gzip_html_filepath, 'rb') as f:
-        data = json.loads(f.read().decode('utf-8'))
-        mock_url_open_responses.append(data['watch_html'])
-        mock_url_open_responses.append(data['vid_info_raw'])
-        mock_url_open_responses.append(data['js'])
-    mock_url_open_object = mock.Mock()
-    mock_url_open_object.read.side_effect = mock_url_open_responses
-
-    mock_url_open.return_value = mock_url_open_object
-
-    # Patch builtins.open AFTER reading the cached web responses
-    #  so that we can mock urllib.request.urlopen responses from the file.
-    with mock.patch('builtins.open', new_callable=mock.mock_open) as mock_open:
-        # Generate the mock video.json.gz file from a video id
-        result_data = create_mock_video_gz(video_id)
-
-        # Assert that a write was only made once
-        mock_open.assert_called_once_with(gzip_json_filepath, 'wb')
-
-        # The result data should look like this:
-        gzip_file = io.BytesIO()
-        with gzip.GzipFile(
-            filename=gzip_json_filename,
-            fileobj=gzip_file,
-            mode='wb'
-        ) as f:
-            f.write(json.dumps(result_data).encode('utf-8'))
-        gzip_data = gzip_file.getvalue()
-
-        file_handle = mock_open.return_value.__enter__.return_value
-
-        # For some reason, write gets called multiple times, so we have to
-        #  concatenate all the write calls to get the full data before we compare
-        #  it to the BytesIO object value.
-        full_content = b''
-        for call in file_handle.write.call_args_list:
-            args, kwargs = call
-            for arg in args:
-                full_content += arg
-
-        # The file header includes time metadata, so *occasionally* a single
-        #  byte will be off at the very beginning. In theory, this difference
-        #  should only affect bytes 5-8 (or [4:8] because of zero-indexing),
-        #  but I've excluded the 10-byte metadata header altogether from the
-        #  check, just to be safe.
-        # Source: https://en.wikipedia.org/wiki/Gzip#File_format
-        assert gzip_data[10:] == full_content[10:]
-
-
 @mock.patch('builtins.open', new_callable=mock.mock_open)
-@mock.patch('urllib.request.urlopen')
+@mock.patch('pytube.request.urlopen')
 def test_create_mock_html_json(mock_url_open, mock_open):
     video_id = '2lAe1cqCOXo'
     gzip_html_filename = 'yt-video-%s-html.json.gz' % video_id
@@ -188,10 +115,15 @@ def test_create_mock_html_json(mock_url_open, mock_open):
 
     # Mock the responses to YouTube
     mock_url_open_object = mock.Mock()
+
+    # Order is:
+    # 1. watch_html -- must have js match
+    # 2. vid_info_raw
+    # 3. js
     mock_url_open_object.read.side_effect = [
-        "<!DOCTYPE><html><body>doc1</body></html>",
-        "<!DOCTYPE><html><body>doc2</body></html>",
-        "<!DOCTYPE><html><body>doc3</body></html>",
+        b'"jsUrl":"base.js"',
+        b'vid_info_raw',
+        b'js_result',
     ]
     mock_url_open.return_value = mock_url_open_object
 
