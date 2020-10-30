@@ -53,17 +53,12 @@ def test_default_filename(cipher_signature):
 
 def test_title(cipher_signature):
     expected = "title"
-    cipher_signature.player_config_args["title"] = expected
-    assert cipher_signature.title == expected
-
-    expected = "title2"
-    del cipher_signature.player_config_args["title"]
     cipher_signature.player_response = {"videoDetails": {"title": expected}}
     assert cipher_signature.title == expected
 
 
 def test_expiration(cipher_signature):
-    assert cipher_signature.streams[0].expiration == datetime(2020, 10, 27, 6, 30, 42)
+    assert cipher_signature.streams[0].expiration == datetime(2020, 10, 30, 5, 39, 41)
 
 
 def test_caption_tracks(presigned_video):
@@ -103,7 +98,7 @@ def test_description(cipher_signature):
 
 
 def test_rating(cipher_signature):
-    assert cipher_signature.rating == 2.0862598
+    assert cipher_signature.rating == 2.0860765
 
 
 def test_length(cipher_signature):
