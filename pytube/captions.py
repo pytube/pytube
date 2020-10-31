@@ -23,7 +23,12 @@ class Caption:
         """
         self.url = caption_track.get("baseUrl")
         self.name = caption_track["name"]["simpleText"]
-        self.code = caption_track["languageCode"]
+        # Use "vssId" instead of "languageCode", fix issue #779
+        self.code = caption_track["vssId"]
+        # Remove preceding '.' for backwards compatibility, e.g.:
+        # English -> vssId: .en, languageCode: en
+        # English (auto-generated) -> vssId: a.en, languageCode: en
+        self.code = self.code.strip('.')
 
     @property
     def xml_captions(self) -> str:
