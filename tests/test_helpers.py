@@ -151,8 +151,7 @@ def test_create_mock_html_json(mock_url_open, mock_open):
     full_content = b''
     for call in file_handle.write.call_args_list:
         args, kwargs = call
-        for arg in args:
-            full_content += arg
+        full_content += b''.join(args)
 
     # The file header includes time metadata, so *occasionally* a single
     #  byte will be off at the very beginning. In theory, this difference
@@ -167,7 +166,4 @@ def test_uniqueify():
     non_unique_list = [1, 2, 3, 3, 4, 5]
     expected = [1, 2, 3, 4, 5]
     result = uniqueify(non_unique_list)
-    assert len(expected) == len(result)
-
-    for i in range(len(expected)):
-        assert expected[i] == result[i]
+    assert result == expected
