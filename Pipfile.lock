@@ -203,11 +203,11 @@
         },
         "flake8-broken-line": {
             "hashes": [
-                "sha256:414477070231a5aa05468d48db2742a594b53fbc1ecba28044646706a11fb861",
-                "sha256:75858359e3ccd4f1d92a9e7582aa5c9e4485cbc920dd05954703900cf907667e"
+                "sha256:611f79c7f27118e7e5d3dc098ef7681c40aeadf23783700c5dbee840d2baf3af",
+                "sha256:f74e052833324a9e5f0055032f7ccc54b23faabafe5a26241c2f977e70b10b50"
             ],
             "index": "pypi",
-            "version": "==0.2.1"
+            "version": "==0.3.0"
         },
         "flake8-bugbear": {
             "hashes": [
