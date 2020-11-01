@@ -40,30 +40,25 @@ def test_filesize(cipher_signature):
 def test_filesize_approx(cipher_signature):
     stream = cipher_signature.streams[0]
 
-    assert stream.filesize_approx == 22350604
+    assert stream.filesize_approx == 28309811
     stream.bitrate = None
     assert stream.filesize_approx == 6796391
 
 
 def test_default_filename(cipher_signature):
-    expected = "PSY - GANGNAM STYLE(강남스타일) MV.mp4"
+    expected = "YouTube Rewind 2019 For the Record  YouTubeRewind.mp4"
     stream = cipher_signature.streams[0]
     assert stream.default_filename == expected
 
 
 def test_title(cipher_signature):
     expected = "title"
-    cipher_signature.player_config_args["title"] = expected
-    assert cipher_signature.title == expected
-
-    expected = "title2"
-    del cipher_signature.player_config_args["title"]
     cipher_signature.player_response = {"videoDetails": {"title": expected}}
     assert cipher_signature.title == expected
 
 
 def test_expiration(cipher_signature):
-    assert cipher_signature.streams[0].expiration == datetime(2020, 10, 24, 11, 7, 41)
+    assert cipher_signature.streams[0].expiration == datetime(2020, 10, 30, 5, 39, 41)
 
 
 def test_caption_tracks(presigned_video):
@@ -76,34 +71,42 @@ def test_captions(presigned_video):
 
 def test_description(cipher_signature):
     expected = (
-        "PSY - ‘I LUV IT’ M/V @ https://youtu.be/Xvjnoagk6GU\n"
-        "PSY - ‘New Face’ M/V @https://youtu.be/OwJPPaEyqhI\n\n"
-        "PSY - 8TH ALBUM '4X2=8' on iTunes @\n"
-        "https://smarturl.it/PSY_8thAlbum\n\n"
-        "PSY - GANGNAM STYLE(강남스타일) on iTunes @ "
-        "http://smarturl.it/PsyGangnam\n\n"
-        "#PSY #싸이 #GANGNAMSTYLE #강남스타일\n\n"
-        "More about PSY@\nhttp://www.youtube.com/officialpsy\n"
-        "http://www.facebook.com/officialpsy\n"
-        "http://twitter.com/psy_oppa\n"
-        "https://www.instagram.com/42psy42\n"
-        "http://iTunes.com/PSY\n"
-        "http://sptfy.com/PSY\n"
-        "http://weibo.com/psyoppa"
+        "In 2018, we made something you didn’t like. "
+        "For Rewind 2019, let’s see what you DID like.\n\n"
+        "Celebrating the creators, music and moments "
+        "that mattered most to you in 2019. \n\n"
+        "To learn how the top lists in Rewind were generated: "
+        "https://rewind.youtube/about\n\n"
+        "Top lists featured the following channels:\n\n"
+        "@1MILLION Dance Studio \n@A4 \n@Anaysa \n"
+        "@Andymation \n@Ariana Grande \n@Awez Darbar \n"
+        "@AzzyLand \n@Billie Eilish \n@Black Gryph0n \n"
+        "@BLACKPINK \n@ChapkisDanceUSA \n@Daddy Yankee \n"
+        "@David Dobrik \n@Dude Perfect \n@Felipe Neto \n"
+        "@Fischer's-フィッシャーズ- \n@Galen Hooks \n@ibighit \n"
+        "@James Charles \n@jeffreestar \n@Jelly \n@Kylie Jenner \n"
+        "@LazarBeam \n@Lil Dicky \n@Lil Nas X \n@LOUD \n@LOUD Babi \n"
+        "@LOUD Coringa \n@Magnet World \n@MrBeast \n"
+        "@Nilson Izaias Papinho Oficial \n@Noah Schnapp\n"
+        "@백종원의 요리비책 Paik's Cuisine \n@Pencilmation \n@PewDiePie \n"
+        "@SethEverman \n@shane \n@Shawn Mendes \n@Team Naach \n"
+        "@whinderssonnunes \n@워크맨-Workman \n@하루한끼 one meal a day \n\n"
+        "To see the full list of featured channels in Rewind 2019, "
+        "visit: https://rewind.youtube/about"
     )
     assert cipher_signature.description == expected
 
 
 def test_rating(cipher_signature):
-    assert cipher_signature.rating == 4.5375643
+    assert cipher_signature.rating == 2.0860765
 
 
 def test_length(cipher_signature):
-    assert cipher_signature.length == 252
+    assert cipher_signature.length == 337
 
 
 def test_views(cipher_signature):
-    assert cipher_signature.views == 3830838693
+    assert cipher_signature.views >= 108531745
 
 
 @mock.patch(
@@ -133,7 +136,7 @@ def test_download_with_prefix(cipher_signature):
         file_path = stream.download(filename_prefix="prefix")
         assert file_path == os.path.join(
             "/target",
-            "prefixPSY - GANGNAM STYLE(강남스타일) MV.mp4"
+            "prefixYouTube Rewind 2019 For the Record  YouTubeRewind.mp4"
         )
 
 
@@ -171,7 +174,7 @@ def test_download_with_existing(cipher_signature):
         file_path = stream.download()
         assert file_path == os.path.join(
             "/target",
-            "PSY - GANGNAM STYLE(강남스타일) MV.mp4"
+            "YouTube Rewind 2019 For the Record  YouTubeRewind.mp4"
         )
         assert not request.stream.called
 
@@ -192,7 +195,7 @@ def test_download_with_existing_no_skip(cipher_signature):
         file_path = stream.download(skip_existing=False)
         assert file_path == os.path.join(
             "/target",
-            "PSY - GANGNAM STYLE(강남스타일) MV.mp4"
+            "YouTube Rewind 2019 For the Record  YouTubeRewind.mp4"
         )
         assert request.stream.called
 
@@ -264,7 +267,7 @@ def test_thumbnail_when_in_details(cipher_signature):
 
 
 def test_thumbnail_when_not_in_details(cipher_signature):
-    expected = "https://img.youtube.com/vi/9bZkp7q19f0/maxresdefault.jpg"
+    expected = "https://img.youtube.com/vi/2lAe1cqCOXo/maxresdefault.jpg"
     cipher_signature.player_response = {}
     assert cipher_signature.thumbnail_url == expected
 

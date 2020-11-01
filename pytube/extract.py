@@ -71,7 +71,6 @@ def video_info_url(video_id: str, watch_url: str) -> str:
     params = OrderedDict(
         [
             ("video_id", video_id),
-            ("el", "$el"),
             ("ps", "default"),
             ("eurl", quote(watch_url)),
             ("hl", "en_US"),
@@ -160,6 +159,7 @@ def get_ytplayer_js(html: str) -> Any:
     """
     js_url_patterns = [
         r"\"jsUrl\":\"([^\"]*)\"",
+        r"\"js\":\"([^\"]*base\.js)\""
     ]
     for pattern in js_url_patterns:
         regex = re.compile(pattern)

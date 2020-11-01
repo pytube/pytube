@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Various helper functions implemented by pytube."""
 import functools
+import gzip
+import json
 import logging
 import os
 import re
@@ -174,3 +176,44 @@ def uniqueify(duped_list: List) -> List:
         seen[item] = True
         result.append(item)
     return result
+
+
+def create_mock_html_json(vid_id) -> Dict[str, Any]:
+    """Generate a json.gz file with sample html responses.
+
+    :param str vid_id
+        YouTube video id
+
+    :return dict data
+        Dict used to generate the json.gz file
+    """
+    from pytube import YouTube
+    gzip_filename = 'yt-video-%s-html.json.gz' % vid_id
+
+    # Get the pytube directory in order to navigate to /tests/mocks
+    pytube_dir_path = os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            os.path.pardir
+        )
+    )
+    pytube_mocks_path = os.path.join(pytube_dir_path, 'tests', 'mocks')
+    gzip_filepath = os.path.join(pytube_mocks_path, gzip_filename)
+
+    yt = YouTube(
+        'https://www.youtube.com/watch?v=%s' % vid_id,
+        defer_prefetch_init=True
+    )
+    yt.prefetch()
+    html_data = {
+        'url': yt.watch_url,
+        'js': yt.js,
+        'embed_html': yt.embed_html,
+        'watch_html': yt.watch_html,
+        'vid_info_raw': yt.vid_info_raw
+    }
+
+    with gzip.open(gzip_filepath, 'wb') as f:
+        f.write(json.dumps(html_data).encode('utf-8'))
+
+    return html_data
