@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+import gzip
+import io
+import json
+import os
 from unittest import mock
 
 import pytest
@@ -6,9 +10,11 @@ import pytest
 from pytube import helpers
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import cache
+from pytube.helpers import create_mock_html_json
 from pytube.helpers import deprecated
 from pytube.helpers import setup_logger
 from pytube.helpers import target_directory
+from pytube.helpers import uniqueify
 
 
 def test_regex_search_no_match():
@@ -61,7 +67,7 @@ def test_cache():
 @mock.patch("os.getcwd", return_value="/cwd")
 @mock.patch("os.makedirs")
 def test_target_directory_with_relative_path(_, __, makedirs):  # noqa: PT019
-    assert target_directory("test") == "/cwd/test"
+    assert target_directory("test") == os.path.join("/cwd", "test")
     makedirs.assert_called()
 
 
@@ -89,3 +95,75 @@ def test_setup_logger(logging):
     logging.getLogger.assert_called_with("pytube")
     logger.addHandler.assert_called()
     logger.setLevel.assert_called_with(20)
+
+
+@mock.patch('builtins.open', new_callable=mock.mock_open)
+@mock.patch('pytube.request.urlopen')
+def test_create_mock_html_json(mock_url_open, mock_open):
+    video_id = '2lAe1cqCOXo'
+    gzip_html_filename = 'yt-video-%s-html.json.gz' % video_id
+
+    # Get the pytube directory in order to navigate to /tests/mocks
+    pytube_dir_path = os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            os.path.pardir
+        )
+    )
+    pytube_mocks_path = os.path.join(pytube_dir_path, 'tests', 'mocks')
+    gzip_html_filepath = os.path.join(pytube_mocks_path, gzip_html_filename)
+
+    # Mock the responses to YouTube
+    mock_url_open_object = mock.Mock()
+
+    # Order is:
+    # 1. watch_html -- must have js match
+    # 2. vid_info_raw
+    # 3. js
+    mock_url_open_object.read.side_effect = [
+        b'"jsUrl":"base.js"',
+        b'vid_info_raw',
+        b'js_result',
+    ]
+    mock_url_open.return_value = mock_url_open_object
+
+    # Generate a json with sample html json
+    result_data = create_mock_html_json(video_id)
+
+    # Assert that a write was only made once
+    mock_open.assert_called_once_with(gzip_html_filepath, 'wb')
+
+    # The result data should look like this:
+    gzip_file = io.BytesIO()
+    with gzip.GzipFile(
+        filename=gzip_html_filename,
+        fileobj=gzip_file,
+        mode='wb'
+    ) as f:
+        f.write(json.dumps(result_data).encode('utf-8'))
+    gzip_data = gzip_file.getvalue()
+
+    file_handle = mock_open.return_value.__enter__.return_value
+
+    # For some reason, write gets called multiple times, so we have to
+    #  concatenate all the write calls to get the full data before we compare
+    #  it to the BytesIO object value.
+    full_content = b''
+    for call in file_handle.write.call_args_list:
+        args, kwargs = call
+        full_content += b''.join(args)
+
+    # The file header includes time metadata, so *occasionally* a single
+    #  byte will be off at the very beginning. In theory, this difference
+    #  should only affect bytes 5-8 (or [4:8] because of zero-indexing),
+    #  but I've excluded the 10-byte metadata header altogether from the
+    #  check, just to be safe.
+    # Source: https://en.wikipedia.org/wiki/Gzip#File_format
+    assert gzip_data[10:] == full_content[10:]
+
+
+def test_uniqueify():
+    non_unique_list = [1, 2, 3, 3, 4, 5]
+    expected = [1, 2, 3, 4, 5]
+    result = uniqueify(non_unique_list)
+    assert result == expected
