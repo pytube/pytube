@@ -58,5 +58,11 @@ class VideoUnavailable(PytubeError):
         self.video_id = video_id
 
 
+class VideoPrivate(PytubeError):
+    def __init__(self, video_id: str):
+        super().__init__('{} is a private video'.format(video_id))
+        self.video_id = video_id
+
+
 class HTMLParseError(PytubeError):
     """HTML could not be parsed"""
