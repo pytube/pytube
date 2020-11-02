@@ -66,6 +66,13 @@ def private():
 
 
 @pytest.fixture
+def missing_recording():
+    """Youtube instance initialized with video id 5YceQ8YqYMc."""
+    filename = "yt-video-5YceQ8YqYMc-html.json.gz"
+    return load_playback_file(filename)
+
+
+@pytest.fixture
 def playlist_html():
     """Youtube playlist HTML loaded on 2020-01-25 from
     https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr"""
