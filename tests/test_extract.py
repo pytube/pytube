@@ -52,6 +52,14 @@ def test_non_age_restricted(cipher_signature):
     assert not extract.is_age_restricted(cipher_signature.watch_html)
 
 
+def test_is_private(private):
+    assert extract.is_private(private['watch_html'])
+
+
+def test_not_is_private(cipher_signature):
+    assert not extract.is_private(cipher_signature.watch_html)
+
+
 def test_mime_type_codec():
     mime_type, mime_subtype = extract.mime_type_codec(
         'audio/webm; codecs="opus"'
