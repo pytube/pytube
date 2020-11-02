@@ -60,6 +60,14 @@ def test_not_is_private(cipher_signature):
     assert not extract.is_private(cipher_signature.watch_html)
 
 
+def test_recording_available(cipher_signature):
+    assert extract.recording_available(cipher_signature.watch_html)
+
+
+def test_not_recording_available(missing_recording):
+    assert not extract.recording_available(missing_recording['watch_html'])
+
+
 def test_mime_type_codec():
     mime_type, mime_subtype = extract.mime_type_codec(
         'audio/webm; codecs="opus"'
