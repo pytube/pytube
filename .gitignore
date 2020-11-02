@@ -125,8 +125,16 @@ test/**/*.xml
 /*.xml
 
 # PyCharm
+.idea/
 .idea/workspace.xml
 .idea/usage.statistics.xml
 .idea/tasks.xml
 .idea/modules.xml
 .idea/*.iml
+
+# Additional IDE files
+*.sublime-project
+
+# Common virtual environments
+venv/
+env/
