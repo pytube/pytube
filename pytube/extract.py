@@ -22,6 +22,24 @@ from pytube.helpers import regex_search
 logger = logging.getLogger(__name__)
 
 
+def recording_available(watch_html: str) -> bool:
+    """Check if live stream recording is available.
+
+    :param str watch_html:
+        The html contents of the watch page.
+    :rtype: bool
+    :returns:
+        Whether or not the content is private.
+    """
+    unavailable_strings = [
+        'This live stream recording is not available.'
+    ]
+    for string in unavailable_strings:
+        if string in watch_html:
+            return False
+    return True
+
+
 def is_private(watch_html: str) -> bool:
     """Check if content is private.
 
