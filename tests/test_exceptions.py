@@ -49,4 +49,4 @@ def test_raises_video_private(private):
         ]
         mock_url_open.return_value = mock_url_open_object
         with pytest.raises(VideoPrivate):
-                YouTube('https://youtube.com/watch?v=mRe-514tGMg')
+            YouTube('https://youtube.com/watch?v=mRe-514tGMg')
