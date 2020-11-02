@@ -60,7 +60,7 @@ class VideoUnavailable(PytubeError):
 
 class VideoPrivate(PytubeError):
     def __init__(self, video_id: str):
-        super().__init__('{} is a private video'.format(video_id))
+        super().__init__('%s is a private video' % video_id)
         self.video_id = video_id
 
 
