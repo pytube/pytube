@@ -22,7 +22,7 @@ from pytube.helpers import regex_search
 logger = logging.getLogger(__name__)
 
 
-def recording_available(watch_html: str) -> bool:
+def recording_available(watch_html):
     """Check if live stream recording is available.
 
     :param str watch_html:
@@ -40,7 +40,7 @@ def recording_available(watch_html: str) -> bool:
     return True
 
 
-def is_private(watch_html: str) -> bool:
+def is_private(watch_html):
     """Check if content is private.
 
     :param str watch_html:
