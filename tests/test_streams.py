@@ -52,8 +52,7 @@ def test_default_filename(cipher_signature):
 
 
 def test_title(cipher_signature):
-    expected = "title"
-    cipher_signature.player_response = {"videoDetails": {"title": expected}}
+    expected = "YouTube Rewind 2019: For the Record | #YouTubeRewind"
     assert cipher_signature.title == expected
 
 
