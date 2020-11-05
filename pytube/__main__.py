@@ -9,6 +9,7 @@ smaller peripheral modules and functions.
 """
 import json
 import logging
+from datetime import datetime
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -79,6 +80,7 @@ class YouTube:
         self.player_config_args: Dict = {}  # inline js in the html containing
         self.player_response: Dict = {}
         # streams
+        self.publish_date: Optional[datetime] = None
         self.age_restricted: Optional[bool] = None
 
         self.fmt_streams: List[Stream] = []
@@ -166,6 +168,7 @@ class YouTube:
         self.watch_html = request.get(url=self.watch_url)
         if self.watch_html is None:
             raise VideoUnavailable(video_id=self.video_id)
+        self.publish_date = extract.publish_date(self.watch_html)
         self.age_restricted = extract.is_age_restricted(self.watch_html)
 
         if (
