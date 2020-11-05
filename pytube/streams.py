@@ -156,7 +156,9 @@ class Stream:
         if self._filesize is None:
             try:
                 self._filesize = request.filesize(self.url)
-            except HTTPError:
+            except HTTPError as e:
+                if e.code != 404:
+                    raise
                 self._filesize = request.seq_filesize(self.url)
         return self._filesize
 
@@ -260,7 +262,9 @@ class Stream:
                     bytes_remaining -= len(chunk)
                     # send to the on_progress callback.
                     self.on_progress(chunk, fh, bytes_remaining)
-            except HTTPError:
+            except HTTPError as e:
+                if e.code != 404:
+                    raise
                 # Some adaptive streams need to be requested with sequence numbers
                 for chunk in request.seq_stream(self.url):
                     # reduce the (bytes) remainder by the length of the chunk.
