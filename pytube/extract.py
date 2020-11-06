@@ -8,7 +8,6 @@ from datetime import datetime
 from typing import Any
 from typing import Dict
 from typing import List
-from typing import Optional
 from typing import Tuple
 from urllib.parse import parse_qs
 from urllib.parse import parse_qsl
@@ -24,7 +23,7 @@ from pytube.helpers import regex_search
 logger = logging.getLogger(__name__)
 
 
-def publish_date(watch_html: str) -> Optional[datetime]:
+def publish_date(watch_html: str):
     """Extract publish date
     :param str watch_html:
         The html contents of the watch page.
