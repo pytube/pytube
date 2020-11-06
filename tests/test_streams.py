@@ -56,6 +56,11 @@ def test_title(cipher_signature):
     assert cipher_signature.title == expected
 
 
+def test_publish_date(cipher_signature):
+    expected = datetime(2019,12,5)
+    assert cipher_signature.publish_date == expected
+
+
 def test_expiration(cipher_signature):
     assert cipher_signature.streams[0].expiration == datetime(2020, 10, 30, 5, 39, 41)
 
