@@ -20,7 +20,9 @@ from pytube import extract
 from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
+from pytube.exceptions import RecordingUnavailable
 from pytube.exceptions import VideoUnavailable
+from pytube.exceptions import VideoPrivate
 from pytube.extract import apply_descrambler
 from pytube.extract import apply_signature
 from pytube.extract import get_ytplayer_config
@@ -168,11 +170,11 @@ class YouTube:
             raise VideoUnavailable(video_id=self.video_id)
         self.age_restricted = extract.is_age_restricted(self.watch_html)
 
-        if (
-            not self.age_restricted
-            and "This video is private" in self.watch_html
-        ):
-            raise VideoUnavailable(video_id=self.video_id)
+        if extract.is_private(self.watch_html):
+            raise VideoPrivate(video_id=self.video_id)
+
+        if not extract.recording_available(self.watch_html):
+            raise RecordingUnavailable(video_id=self.video_id)
 
         if self.age_restricted:
             if not self.embed_html:
