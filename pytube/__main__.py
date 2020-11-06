@@ -9,7 +9,6 @@ smaller peripheral modules and functions.
 """
 import json
 import logging
-from datetime import datetime
 from typing import Dict
 from typing import List
 from typing import Optional

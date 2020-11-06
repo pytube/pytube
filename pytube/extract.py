@@ -32,8 +32,10 @@ def publish_date(watch_html: str):
         Publish date of the video.
     """
     try:
-        result = regex_search(r"(?<=itemprop=\"datePublished\" content=\")\d{4}-\d{2}-\d{2}",
-                              watch_html, group=0)  # noqa: E501
+        result = regex_search(
+            r"(?<=itemprop=\"datePublished\" content=\")\d{4}-\d{2}-\d{2}",
+            watch_html, group=0
+        )  # noqa: E501
     except RegexMatchError:
         return None
     return datetime.strptime(result, '%Y-%m-%d')
