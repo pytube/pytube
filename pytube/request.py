@@ -2,11 +2,7 @@
 """Implements a simple wrapper around urlopen."""
 import logging
 from functools import lru_cache
-from http.client import HTTPResponse
 import re
-from typing import Dict
-from typing import Iterable
-from typing import Optional
 from urllib import parse
 from urllib.request import Request
 from urllib.request import urlopen
@@ -17,6 +13,7 @@ from pytube.helpers import regex_search
 logger = logging.getLogger(__name__)
 default_chunk_size = 4096  # 4kb
 default_range_size = 9437184  # 9MB
+
 
 def _execute_request(url, method=None, headers=None):
     base_headers = {"User-Agent": "Mozilla/5.0"}
