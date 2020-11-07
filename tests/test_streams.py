@@ -384,7 +384,7 @@ def test_segmented_stream_on_404(cipher_signature):
 
 
 def test_segmented_only_catches_404(cipher_signature):
-    stream  = cipher_signature.streams.filter(adaptive=True)[0]
+    stream = cipher_signature.streams.filter(adaptive=True)[0]
     with mock.patch('pytube.request.head') as mock_head:
         mock_head.side_effect = HTTPError('', 403, 'Forbidden', '', '')
         with pytest.raises(HTTPError):
