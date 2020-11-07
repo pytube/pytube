@@ -15,13 +15,10 @@ from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search
 
 logger = logging.getLogger(__name__)
+default_chunk_size = 4096  # 4kb
+default_range_size = 9437184  # 9MB
 
-
-def _execute_request(
-        url: str,
-        method: Optional[str] = None,
-        headers: Optional[Dict[str, str]] = None,
-) -> HTTPResponse:
+def _execute_request(url, method=None, headers=None):
     base_headers = {"User-Agent": "Mozilla/5.0"}
     if headers:
         base_headers.update(headers)
@@ -32,7 +29,7 @@ def _execute_request(
     return urlopen(request)  # nosec
 
 
-def get(url, extra_headers=None) -> str:
+def get(url, extra_headers=None):
     """Send an http GET request.
 
     :param str url:
@@ -48,7 +45,7 @@ def get(url, extra_headers=None) -> str:
     return _execute_request(url, headers=extra_headers).read().decode("utf-8")
 
 
-def seq_stream(url, chunk_size=4096, range_size=9437184):
+def seq_stream(url, chunk_size=default_chunk_size, range_size=default_range_size):
     """Read the response in sequence.
     :param str url: The URL to perform the GET request for.
     :param int chunk_size: The size in bytes of each chunk. Defaults to 4KB
@@ -92,9 +89,7 @@ def seq_stream(url, chunk_size=4096, range_size=9437184):
     return  # pylint: disable=R1711
 
 
-def stream(
-        url: str, chunk_size: int = 4096, range_size: int = 9437184
-) -> Iterable[bytes]:
+def stream(url, chunk_size=default_chunk_size, range_size=default_range_size):
     """Read the response in chunks.
     :param str url: The URL to perform the GET request for.
     :param int chunk_size: The size in bytes of each chunk. Defaults to 4KB
@@ -125,8 +120,8 @@ def stream(
     return  # pylint: disable=R1711
 
 
-@lru_cache(maxsize=None)
-def filesize(url: str) -> int:
+@lru_cache()
+def filesize(url):
     """Fetch size in bytes of file at given URL
 
     :param str url: The URL to get the size of
@@ -135,7 +130,7 @@ def filesize(url: str) -> int:
     return int(head(url)["content-length"])
 
 
-@lru_cache(maxsize=None)
+@lru_cache()
 def seq_filesize(url):
     """Fetch size in bytes of file at given URL from sequential requests
 
@@ -165,6 +160,8 @@ def seq_filesize(url):
     stream_info = response_value.split(b'\r\n')
     segment_regex = b'Segment-Count: (\\d+)'
     for line in stream_info:
+        # One of the lines should contain the segment count, but we don't know
+        #  which, so we need to iterate through the lines to find it
         try:
             segment_count = int(regex_search(segment_regex, line, 1))
         except RegexMatchError:
@@ -185,7 +182,7 @@ def seq_filesize(url):
     return total_filesize
 
 
-def head(url: str) -> Dict:
+def head(url):
     """Fetch headers returned http GET request.
 
     :param str url:
