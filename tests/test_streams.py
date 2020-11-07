@@ -320,7 +320,7 @@ def test_segmented_stream_on_404(cipher_signature):
             # The first explains how many pieces there are, and
             # the rest are those pieces
             responses = [
-                b'Segment-Count: 3',
+                b'Raw_data\r\nSegment-Count: 3',
                 b'a',
                 b'b',
                 b'c',
