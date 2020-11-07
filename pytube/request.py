@@ -145,7 +145,7 @@ def seq_filesize(url):
     total_filesize = 0
     # YouTube expects a request sequence number as part of the parameters.
     split_url = parse.urlsplit(url)
-    base_url = '{}://{}/{}?'.format(split_url.scheme, split_url.netloc, split_url.path)
+    base_url = '%s://%s/%s?' % (split_url.scheme, split_url.netloc, split_url.path)
     querys = dict(parse.parse_qsl(split_url.query))
 
     # The 0th sequential request provides the file headers, which tell us
