@@ -11,6 +11,9 @@ from urllib import parse
 from urllib.request import Request
 from urllib.request import urlopen
 
+from pytube.exceptions import RegexMatchError
+from pytube.helpers import regex_search
+
 logger = logging.getLogger(__name__)
 
 
@@ -62,16 +65,14 @@ def seq_stream(url, chunk_size=4096, range_size=9437184):
     #  information about how the file is segmented.
     querys['sq'] = 0
     url = base_url + parse.urlencode(querys)
-    response = _execute_request(
-        url, method="GET"
-    )
 
-    # We need to yield this first in order to create a valid file
-    response_value = response.read()
-    yield response_value
+    segment_data = b''
+    for chunk in stream(url):
+        yield chunk
+        segment_data += chunk
 
     # We can then parse the header to find the number of segments
-    stream_info = response_value.split(b'\r\n')
+    stream_info = segment_data.split(b'\r\n')
     segment_count_pattern = re.compile(b'Segment-Count: (\\d+)')
     for line in stream_info:
         match = segment_count_pattern.search(line)
@@ -85,9 +86,7 @@ def seq_stream(url, chunk_size=4096, range_size=9437184):
         querys['sq'] = seq_num
         url = base_url + parse.urlencode(querys)
 
-        file_size = int(head(url)['content-length'])
-        for chunk in stream(url, range_size=file_size):
-            yield chunk
+        yield from stream(url)
         seq_num += 1
     return  # pylint: disable=R1711
 
@@ -161,12 +160,17 @@ def seq_filesize(url):
     total_filesize += len(response_value)
 
     # We can then parse the header to find the number of segments
+    segment_count = 0
     stream_info = response_value.split(b'\r\n')
-    segment_count_pattern = re.compile(b'Segment-Count: (\\d+)')
+    segment_regex = b'Segment-Count: (\\d+)'
     for line in stream_info:
-        match = segment_count_pattern.search(line)
-        if match:
-            segment_count = int(match.group(1).decode('utf-8'))
+        try:
+            segment_count = int(regex_search(segment_regex, line, 1))
+        except RegexMatchError:
+            pass
+
+    if segment_count == 0:
+        raise RegexMatchError('seq_filesize', segment_regex)
 
     # We make HEAD requests to the segments sequentially to find the total filesize.
     seq_num = 1
