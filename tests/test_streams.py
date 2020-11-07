@@ -2,6 +2,7 @@
 import os
 import random
 from datetime import datetime
+import pytest
 from unittest import mock
 from unittest.mock import MagicMock, Mock
 from urllib.error import HTTPError
@@ -380,3 +381,11 @@ def test_segmented_stream_on_404(cipher_signature):
 
                 assert full_content == joined_responses
                 mock_open.assert_called_once_with(fp, 'wb')
+
+
+def test_segmented_only_catches_404(cipher_signature):
+    stream  = cipher_signature.streams.filter(adaptive=True)[0]
+    with mock.patch('pytube.request.head') as mock_head:
+        mock_head.side_effect = HTTPError('', 403, 'Forbidden', '', '')
+        with pytest.raises(HTTPError):
+            stream.download()
