@@ -263,6 +263,15 @@ class YouTube:
         return f"https://img.youtube.com/vi/{self.video_id}/maxresdefault.jpg"
 
     @property
+    def publish_date(self):
+        """Get the publish date.
+
+        :rtype: datetime
+
+        """
+        return extract.publish_date(self.watch_html)
+
+    @property
     def title(self) -> str:
         """Get the video title.
 

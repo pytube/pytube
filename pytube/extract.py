@@ -4,6 +4,7 @@ import json
 import logging
 import re
 from collections import OrderedDict
+from datetime import datetime
 from typing import Any
 from typing import Dict
 from typing import List
@@ -20,6 +21,24 @@ from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search
 
 logger = logging.getLogger(__name__)
+
+
+def publish_date(watch_html: str):
+    """Extract publish date
+    :param str watch_html:
+        The html contents of the watch page.
+    :rtype: str
+    :returns:
+        Publish date of the video.
+    """
+    try:
+        result = regex_search(
+            r"(?<=itemprop=\"datePublished\" content=\")\d{4}-\d{2}-\d{2}",
+            watch_html, group=0
+        )
+    except RegexMatchError:
+        return None
+    return datetime.strptime(result, '%Y-%m-%d')
 
 
 def recording_available(watch_html):
