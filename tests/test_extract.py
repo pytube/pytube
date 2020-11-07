@@ -68,7 +68,7 @@ def test_recording_available(cipher_signature):
 def test_publish_date(cipher_signature):
     expected = datetime(2019, 12, 5)
     assert cipher_signature.publish_date == expected
-    assert extract.publish_date('') == None
+    assert extract.publish_date('') is None
 
 
 def test_not_recording_available(missing_recording):
