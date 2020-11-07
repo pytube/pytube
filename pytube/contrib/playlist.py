@@ -319,11 +319,16 @@ class Playlist(Sequence):
         :param resolution:
             Video resolution i.e. "720p", "480p", "360p", "240p", "144p"
         :type resolution: str
+        :rtype: List[str]
+        :returns:
+            List of filepaths for downloaded videos.
         """
         logger.debug("total videos found: %d", len(self.video_urls))
         logger.debug("starting download")
 
         prefix_gen = self._path_num_prefix_generator(reverse_numbering)
+
+        downloaded_filepaths = []
 
         for link in self.video_urls:
             youtube = YouTube(link)
@@ -337,10 +342,13 @@ class Playlist(Sequence):
             if prefix_number:
                 prefix = next(prefix_gen)
                 logger.debug("file prefix is: %s", prefix)
-                dl_stream.download(download_path, filename_prefix=prefix)
+                dl_path = dl_stream.download(download_path, filename_prefix=prefix)
             else:
-                dl_stream.download(download_path)
+                dl_path = dl_stream.download(download_path)
+            downloaded_filepaths.append(dl_path)
             logger.debug("download complete")
+
+        return downloaded_filepaths
 
     @cache
     def title(self) -> Optional[str]:

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Unit tests for the :module:`extract <extract>` module."""
+from datetime import datetime
 import pytest
 
 from pytube import extract
@@ -50,6 +51,28 @@ def test_age_restricted(age_restricted):
 
 def test_non_age_restricted(cipher_signature):
     assert not extract.is_age_restricted(cipher_signature.watch_html)
+
+
+def test_is_private(private):
+    assert extract.is_private(private['watch_html'])
+
+
+def test_not_is_private(cipher_signature):
+    assert not extract.is_private(cipher_signature.watch_html)
+
+
+def test_recording_available(cipher_signature):
+    assert extract.recording_available(cipher_signature.watch_html)
+
+
+def test_publish_date(cipher_signature):
+    expected = datetime(2019, 12, 5)
+    assert cipher_signature.publish_date == expected
+    assert extract.publish_date('') is None
+
+
+def test_not_recording_available(missing_recording):
+    assert not extract.recording_available(missing_recording['watch_html'])
 
 
 def test_mime_type_codec():
