@@ -10,7 +10,7 @@ Ping @ronncc if you would like to help out
 	  <img src="https://img.shields.io/pypi/v/pytube.svg" alt="pypi">
 	  <a href="https://travis-ci.org/nficano/pytube"><img src="https://travis-ci.org/nficano/pytube.svg?branch=master" /></a>
 	  <a href="http://python-pytube.readthedocs.io/en/latest/?badge=latest"><img src="https://readthedocs.org/projects/python-pytube/badge/?version=latest" /></a>
-	  <a href="https://coveralls.io/github/nficano/pytube?branch=master"><img src="https://coveralls.io/repos/github/nficano/pytube/badge.svg?branch=master#23e6f7ac56dd3bde" /></a>
+	  <a href="https://codecov.io/gh/nficano/pytube"><img src="https://codecov.io/gh/nficano/pytube/branch/master/graph/badge.svg" /></a>
       <a href="https://pypi.org/project/pytube/"><img src="https://img.shields.io/pypi/dm/pytube.svg" alt="pypi"></a>
 	  <a href="https://pypi.python.org/pypi/pytube/"><img src="https://img.shields.io/pypi/pyversions/pytube.svg" /></a>
     <p>
