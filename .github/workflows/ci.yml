@@ -3,9 +3,9 @@ name: CI testing
 on:
   pull_request:
     branches: [ master ]
-    paths:
-      - 'pytube/**'
-      - 'tests/**'
+    paths-ignore:
+      - '**/README.md'
+      - 'docs/**'
 
 jobs:
   ci:
