@@ -23,3 +23,8 @@ def test_get_transform_object_with_no_match_should_error():
 def test_reverse():
     reversed_array = cipher.reverse([1, 2, 3, 4], None)
     assert reversed_array == [4, 3, 2, 1]
+
+
+def test_splice():
+    assert cipher.splice([1, 2, 3, 4], 2) == [1, 2]
+    assert cipher.splice([1, 2, 3, 4], 1) == [1]
