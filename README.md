@@ -29,6 +29,8 @@ YouTube is the most popular video-sharing platform in the world and as a hacker 
 
 Finally *pytube* also includes a command-line utility, allowing you to quickly download videos right from terminal.
 
+Requires: Python >=3.6 
+
 ### Behold, a perfect balance of simplicity versus flexibility:
 
 ```python
