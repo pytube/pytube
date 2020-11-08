@@ -274,7 +274,6 @@ def get_ytplayer_config(html: str) -> Any:
             yt_config = function_match.group(1)
             return json.loads(yt_config)['PLAYER_CONFIG']
 
-
     raise RegexMatchError(
         caller="get_ytplayer_config", pattern="config_patterns, setconfig_patterns"
     )
