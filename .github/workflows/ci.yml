@@ -36,10 +36,4 @@ jobs:
         with:
           file: .coverage
           fail_ci_if_error: true
-
-      # https://github.com/marketplace/actions/coveralls-github-action
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: .coverage
+          
