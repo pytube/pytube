@@ -174,7 +174,10 @@ def js_url(html: str) -> str:
     :param str html:
         The html contents of the watch page.
     """
-    base_js = get_ytplayer_js(html)
+    try:
+        base_js = get_ytplayer_config(html)['assets']['js']
+    except KeyError:
+        base_js = get_ytplayer_js(html)
     return "https://youtube.com" + base_js
 
 
@@ -215,8 +218,7 @@ def get_ytplayer_js(html: str) -> Any:
         Path to YouTube's base.js file.
     """
     js_url_patterns = [
-        r"\"jsUrl\":\"([^\"]*)\"",
-        r"\"js\":\"([^\"]*base\.js)\""
+        r"(/s/player/[\w\d]+/[\w\d_/.]+/base\.js)"
     ]
     for pattern in js_url_patterns:
         regex = re.compile(pattern)
@@ -244,11 +246,10 @@ def get_ytplayer_config(html: str) -> Any:
     :returns:
         Substring of the html containing the encoded manifest data.
     """
+    logger.debug("finding initial function name")
     config_patterns = [
         r";ytplayer\.config\s*=\s*({.*?});",
-        r"yt\.setConfig\(.*'PLAYER_CONFIG':\s*({.+?})"
     ]
-    logger.debug("finding initial function name")
     for pattern in config_patterns:
         regex = re.compile(pattern)
         function_match = regex.search(html)
@@ -257,8 +258,25 @@ def get_ytplayer_config(html: str) -> Any:
             yt_player_config = function_match.group(1)
             return json.loads(yt_player_config)
 
+    # setConfig() needs to be handled a little differently.
+    # We want to parse the entire argument to setConfig()
+    #  and use then load that as json to find PLAYER_CONFIG
+    #  inside of it.
+    setconfig_patterns = [
+        r"yt\.setConfig\((.*'PLAYER_CONFIG':\s*{.+?})\);",
+        r"yt\.setConfig\((.*\"PLAYER_CONFIG\":\s*{.+?})\);"
+    ]
+    for pattern in setconfig_patterns:
+        regex = re.compile(pattern)
+        function_match = regex.search(html)
+        if function_match:
+            logger.debug("finished regex search, matched: %s", pattern)
+            yt_config = function_match.group(1)
+            return json.loads(yt_config)['PLAYER_CONFIG']
+
+
     raise RegexMatchError(
-        caller="get_ytplayer_config", pattern="config_patterns"
+        caller="get_ytplayer_config", pattern="config_patterns, setconfig_patterns"
     )
 
 
