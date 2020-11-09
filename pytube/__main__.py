@@ -121,9 +121,7 @@ class YouTube:
         # On pre-signed videos, we need to use get_ytplayer_config to fix
         #  the player_response item
         if 'streamingData' not in self.player_config_args['player_response']:
-            config_response = get_ytplayer_config(
-                self.watch_html
-            )
+            config_response = get_ytplayer_config(self.watch_html)
             if 'args' in config_response:
                 self.player_config_args['player_response'] = config_response['args']['player_response']  # noqa: E501
             else:
