@@ -121,7 +121,8 @@ def test_create_mock_html_json(mock_url_open, mock_open):
     # 2. vid_info_raw
     # 3. js
     mock_url_open_object.read.side_effect = [
-        b'"jsUrl":"base.js"',
+        (b'yt.setConfig({"PLAYER_CONFIG":{"args":[]}});'
+         b'"jsUrl":"/s/player/13371337/player_ias.vflset/en_US/base.js"'),
         b'vid_info_raw',
         b'js_result',
     ]
