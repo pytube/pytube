@@ -184,15 +184,18 @@ class Playlist(Sequence):
             try:
                 # this is the json tree structure, if the json was directly sent
                 # by the server in a continuation response
-                important_content = initial_data[1]['response']['onResponseReceivedActions']\
-                    [0]['appendContinuationItemsAction']['continuationItems']
+                important_content = initial_data[1]['response']['onResponseReceivedActions'][
+                    0
+                ]['appendContinuationItemsAction']['continuationItems']
                 videos = important_content
             except (KeyError, IndexError, TypeError) as p:
                 print(p)
                 return [], None
         
         try:
-            continuation = videos[-1]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']
+            continuation = videos[-1]['continuationItemRenderer'][
+                'continuationEndpoint'
+            ]['continuationCommand']['token']
             videos = videos[:-1]
         except (KeyError, IndexError):
             # if there is an error, no continuation is available
