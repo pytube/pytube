@@ -125,7 +125,7 @@ class YouTube:
                 self.watch_html
             )
             if 'args' in config_response:
-                self.player_config_args['player_response'] = config_response['args']['player_response']
+                self.player_config_args['player_response'] = config_response['args']['player_response']  # noqa: E501
             else:
                 self.player_config_args['player_response'] = config_response
 
