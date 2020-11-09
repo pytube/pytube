@@ -1,0 +1,39 @@
+name: CI testing
+
+on:
+  pull_request:
+    branches: [ master ]
+    paths-ignore:
+      - '**/README.md'
+      - 'docs/**'
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: [3.5, 3.6, 3.7, 3.8]
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Upgrade pip
+        run: pip install --upgrade pipenv
+
+      - name: Run make ci
+        run: make ci
+
+      # https://github.com/codecov/codecov-action
+      - name: Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          file: .coverage
+          fail_ci_if_error: true
+          
