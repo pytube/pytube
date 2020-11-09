@@ -247,7 +247,7 @@ def splice(arr: List, b: int):
     >>> splice([1, 2, 3, 4], 2)
     [1, 2]
     """
-    return arr[:b]
+    return arr[b:]
 
 
 def swap(arr: List, b: int):
