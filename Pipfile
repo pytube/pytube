@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-typing_extensions = "*"
 
 [dev-packages]
 black = "==19.10b0"
