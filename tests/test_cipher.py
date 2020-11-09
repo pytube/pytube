@@ -26,5 +26,5 @@ def test_reverse():
 
 
 def test_splice():
-    assert cipher.splice([1, 2, 3, 4], 2) == [1, 2]
-    assert cipher.splice([1, 2, 3, 4], 1) == [1]
+    assert cipher.splice([1, 2, 3, 4], 2) == [3, 4]
+    assert cipher.splice([1, 2, 3, 4], 1) == [2, 3, 4]
