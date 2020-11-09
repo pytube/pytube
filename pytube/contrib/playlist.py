@@ -191,7 +191,7 @@ class Playlist(Sequence):
             except (KeyError, IndexError, TypeError) as p:
                 print(p)
                 return [], None
-        
+
         try:
             continuation = videos[-1]['continuationItemRenderer'][
                 'continuationEndpoint'
