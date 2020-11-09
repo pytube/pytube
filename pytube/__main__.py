@@ -123,8 +123,11 @@ class YouTube:
         if 'streamingData' not in self.player_config_args['player_response']:
             config_response = get_ytplayer_config(
                 self.watch_html
-            )['args']['player_response']
-            self.player_config_args['player_response'] = config_response
+            )
+            if 'args' in config_response:
+                self.player_config_args['player_response'] = config_response['args']['player_response']
+            else:
+                self.player_config_args['player_response'] = config_response
 
         # https://github.com/nficano/pytube/issues/165
         stream_maps = ["url_encoded_fmt_stream_map"]

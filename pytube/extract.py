@@ -248,7 +248,8 @@ def get_ytplayer_config(html: str) -> Any:
     """
     logger.debug("finding initial function name")
     config_patterns = [
-        r";ytplayer\.config\s*=\s*({.*?});",
+        r";ytplayer\.config\s*=\s*({.*?(?<!gdpr)});",
+        r"ytInitialPlayerResponse\s+?=\s+?({.+?});"
     ]
     for pattern in config_patterns:
         regex = re.compile(pattern)
@@ -263,8 +264,7 @@ def get_ytplayer_config(html: str) -> Any:
     #  and use then load that as json to find PLAYER_CONFIG
     #  inside of it.
     setconfig_patterns = [
-        r"yt\.setConfig\((.*'PLAYER_CONFIG':\s*{.+?})\);",
-        r"yt\.setConfig\((.*\"PLAYER_CONFIG\":\s*{.+?})\);"
+        r"yt\.setConfig\((.*['\"]PLAYER_CONFIG['\"]:\s*{.+?})\);"
     ]
     for pattern in setconfig_patterns:
         regex = re.compile(pattern)
