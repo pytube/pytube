@@ -7,7 +7,6 @@ exclusively on the developer interface. Pytube offloads the heavy lifting to
 smaller peripheral modules and functions.
 
 """
-import functools
 import json
 import logging
 from typing import Dict
@@ -83,6 +82,7 @@ class YouTube:
 
         self.initial_data_raw = None
         self.initial_data = {}
+        self._metadata: Optional[YouTubeMetadata] = None
 
         # video_id part of /watch?v=<video_id>
         self.video_id = extract.video_id(url)
@@ -336,13 +336,17 @@ class YouTube:
             "author", "unknown"
         )
 
-    @functools.cached_property
+    @property
     def metadata(self) -> Optional[YouTubeMetadata]:
         """Get the metadata for the video.
 
         :rtype: YouTubeMetadata
         """
-        return extract.metadata(self.initial_data)
+        if self._metadata:
+            return self._metadata
+        else:
+            self._metadata = extract.metadata(self.initial_data)
+            return self._metadata
 
     def register_on_progress_callback(self, func: OnProgress):
         """Register a download progress callback function post initialization.
