@@ -426,7 +426,7 @@ def metadata(initial_data) -> Optional[YouTubeMetadata]:
         metadata_rows: List = initial_data["contents"]["twoColumnWatchNextResults"][
             "results"]["results"]["contents"][1]["videoSecondaryInfoRenderer"][
             "metadataRowContainer"]["metadataRowContainerRenderer"]["rows"]
-    except (KeyError, IndexError) as e:
+    except (KeyError, IndexError):
         # If there's an exception accessing this data, it probably doesn't exist.
         return None
 
@@ -438,7 +438,8 @@ def metadata(initial_data) -> Optional[YouTubeMetadata]:
             metadata_rows
         )
     )
-    # We then access the metadataRowRenderer key in each element, and build a license from that list
+    # We then access the metadataRowRenderer key in each element
+    #  and build a metadata object from this new list
     metadata_rows = [x["metadataRowRenderer"] for x in metadata_rows]
 
     ytmd = YouTubeMetadata(metadata_rows)
