@@ -442,5 +442,4 @@ def metadata(initial_data) -> Optional[YouTubeMetadata]:
     #  and build a metadata object from this new list
     metadata_rows = [x["metadataRowRenderer"] for x in metadata_rows]
 
-    ytmd = YouTubeMetadata(metadata_rows)
-    return ytmd
+    return YouTubeMetadata(metadata_rows)
