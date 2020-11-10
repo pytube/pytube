@@ -150,9 +150,12 @@ class YouTube:
             self.initialize_stream_objects(fmt)
 
         # load the player_response object (contains subtitle information)
-        self.player_response = json.loads(
-            self.player_config_args["player_response"]
-        )
+        if isinstance(self.player_config_args["player_response"], str):
+            self.player_response = json.loads(
+                self.player_config_args["player_response"]
+            )
+        else:
+            self.player_response = self.player_config_args["player_response"]
         del self.player_config_args["player_response"]
         self.stream_monostate.title = self.title
         self.stream_monostate.duration = self.length
