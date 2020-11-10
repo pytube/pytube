@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import Any
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Tuple
 from urllib.parse import parse_qs
 from urllib.parse import parse_qsl
@@ -19,6 +20,7 @@ from pytube.cipher import Cipher
 from pytube.exceptions import LiveStreamError
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search
+from pytube.metadata import YouTubeMetadata
 
 logger = logging.getLogger(__name__)
 
@@ -406,6 +408,40 @@ def initial_data(watch_html: str) -> str:
     @param watch_html: Html of the watch page
     @return:
     """
-    return regex_search(
-        r"window\[\"ytInitialData\"] = ([^\n]+)", watch_html, 1
-    )[:-1]
+    initial_data_pattern = r"window\[['\"]ytInitialData['\"]]\s*=\s*([^\n]+)"
+    try:
+        match = regex_search(initial_data_pattern, watch_html, 1)
+    except RegexMatchError:
+        return "{}"
+    else:
+        return match[:-1]
+
+
+def metadata(initial_data) -> Optional[YouTubeMetadata]:
+    """Get the metadata for the video.
+
+    :rtype: YouTubeMetadata
+    """
+    try:
+        metadata_rows: List = initial_data["contents"]["twoColumnWatchNextResults"][
+            "results"]["results"]["contents"][1]["videoSecondaryInfoRenderer"][
+            "metadataRowContainer"]["metadataRowContainerRenderer"]["rows"]
+    except (KeyError, IndexError) as e:
+        # If there's an exception accessing this data, it probably doesn't exist.
+        return None
+
+    # Rows appear to only have "metadataRowRenderer" or "metadataRowHeaderRenderer"
+    #  and we only care about the former, so we filter the others
+    metadata_rows = list(
+        filter(
+            lambda x: "metadataRowRenderer" in x.keys(),
+            metadata_rows
+        )
+    )
+    # We then access the metadataRowRenderer key in each element, and build a license from that list
+    metadata_rows = [x["metadataRowRenderer"] for x in metadata_rows]
+
+    ytmd = YouTubeMetadata(metadata_rows)
+    if len(ytmd) > 0:
+        return ytmd
+    return None
