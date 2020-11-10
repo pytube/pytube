@@ -7,6 +7,7 @@ exclusively on the developer interface. Pytube offloads the heavy lifting to
 smaller peripheral modules and functions.
 
 """
+import functools
 import json
 import logging
 from typing import Dict
@@ -27,6 +28,7 @@ from pytube.extract import apply_descrambler
 from pytube.extract import apply_signature
 from pytube.extract import get_ytplayer_config
 from pytube.helpers import install_proxy
+from pytube.metadata import YouTubeMetadata
 from pytube.monostate import Monostate
 from pytube.monostate import OnComplete
 from pytube.monostate import OnProgress
@@ -60,23 +62,17 @@ class YouTube:
 
         """
         self.js: Optional[str] = None  # js fetched by js_url
-        self.js_url: Optional[
-            str
-        ] = None  # the url to the js, parsed from watch html
+        self.js_url: Optional[str] = None  # the url to the js, parsed from watch html
 
         # note: vid_info may eventually be removed. It sounds like it once had
         # additional formats, but that doesn't appear to still be the case.
 
         # the url to vid info, parsed from watch html
         self.vid_info_url: Optional[str] = None
-        self.vid_info_raw: Optional[
-            str
-        ] = None  # content fetched by vid_info_url
+        self.vid_info_raw: Optional[str] = None  # content fetched by vid_info_url
         self.vid_info: Optional[Dict] = None  # parsed content of vid_info_raw
 
-        self.watch_html: Optional[
-            str
-        ] = None  # the html of /watch?v=<video_id>
+        self.watch_html: Optional[str] = None  # the html of /watch?v=<video_id>
         self.embed_html: Optional[str] = None
         self.player_config_args: Dict = {}  # inline js in the html containing
         self.player_response: Dict = {}
@@ -84,6 +80,9 @@ class YouTube:
         self.age_restricted: Optional[bool] = None
 
         self.fmt_streams: List[Stream] = []
+
+        self.initial_data_raw = None
+        self.initial_data = {}
 
         # video_id part of /watch?v=<video_id>
         self.video_id = extract.video_id(url)
@@ -187,6 +186,9 @@ class YouTube:
                 video_id=self.video_id, watch_url=self.watch_url
             )
 
+        self.initial_data_raw = extract.initial_data(self.watch_html)
+        self.initial_data = json.loads(self.initial_data_raw)
+
         self.vid_info_raw = request.get(self.vid_info_url)
         if not self.age_restricted:
             self.js_url = extract.js_url(self.watch_html)
@@ -287,9 +289,7 @@ class YouTube:
         :rtype: str
 
         """
-        return self.player_response.get("videoDetails", {}).get(
-            "shortDescription"
-        )
+        return self.player_response.get("videoDetails", {}).get("shortDescription")
 
     @property
     def rating(self) -> float:
@@ -298,9 +298,7 @@ class YouTube:
         :rtype: float
 
         """
-        return self.player_response.get("videoDetails", {}).get(
-            "averageRating"
-        )
+        return self.player_response.get("videoDetails", {}).get("averageRating")
 
     @property
     def length(self) -> int:
@@ -337,6 +335,14 @@ class YouTube:
         return self.player_response.get("videoDetails", {}).get(
             "author", "unknown"
         )
+
+    @functools.cached_property
+    def metadata(self) -> Optional[YouTubeMetadata]:
+        """Get the metadata for the video.
+
+        :rtype: YouTubeMetadata
+        """
+        return extract.metadata(self.initial_data)
 
     def register_on_progress_callback(self, func: OnProgress):
         """Register a download progress callback function post initialization.
