@@ -428,7 +428,7 @@ def metadata(initial_data) -> Optional[YouTubeMetadata]:
             "metadataRowContainer"]["metadataRowContainerRenderer"]["rows"]
     except (KeyError, IndexError):
         # If there's an exception accessing this data, it probably doesn't exist.
-        return None
+        return YouTubeMetadata([])
 
     # Rows appear to only have "metadataRowRenderer" or "metadataRowHeaderRenderer"
     #  and we only care about the former, so we filter the others
