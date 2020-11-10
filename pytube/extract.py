@@ -443,6 +443,4 @@ def metadata(initial_data) -> Optional[YouTubeMetadata]:
     metadata_rows = [x["metadataRowRenderer"] for x in metadata_rows]
 
     ytmd = YouTubeMetadata(metadata_rows)
-    if len(ytmd) > 0:
-        return ytmd
-    return None
+    return ytmd
