@@ -42,17 +42,5 @@ class YouTubeMetadata:
         return len(self._dict_repr)
 
     @property
-    def title(self) -> Optional[str]:
-        return self._dict_repr['Song']
-
-    @property
-    def artist(self) -> Optional[str]:
-        return self._dict_repr['Artist']
-
-    @property
-    def licence_text(self) -> Optional[str]:
-        return self._dict_repr['Licensed to YouTube by']
-
-    @property
     def metadata(self) -> Optional[Dict]:
         return self._metadata
