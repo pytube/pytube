@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """This module contains the YouTubeMetadata class."""
+import json
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -7,8 +8,10 @@ from typing import Optional
 
 class YouTubeMetadata:
     def __init__(self, metadata: List):
-        self._metadata: List = metadata
+        self._raw_metadata: List = metadata
+        self._metadata = [{}]
         self._dict_repr = {}
+
         for el in metadata:
             # We only add metadata to the dict if it has a simpleText title.
             if 'title' in el and 'simpleText' in el['title']:
@@ -16,31 +19,32 @@ class YouTubeMetadata:
             else:
                 continue
 
-            metadata_contents = el['contents'][0]
-            if 'simpleText' in metadata_contents:
-                self._dict_repr[metadata_title] = metadata_contents['simpleText']
-            elif 'runs' in metadata_contents:
-                self._dict_repr[metadata_title] = metadata_contents['runs'][0]['text']
+            contents = el['contents'][0]
+            if 'simpleText' in contents:
+                self._metadata[-1][metadata_title] = contents['simpleText']
+            elif 'runs' in contents:
+                self._metadata[-1][metadata_title] = contents['runs'][0]['text']
+
+            # Upon reaching a dividing line, create a new grouping
+            if el.get('hasDividerLine', False):
+                self._metadata.append({})
+
+        # If we happen to create an empty dict at the end, drop it
+        if self._metadata[-1] == {}:
+            self._metadata = self._metadata[:-1]
 
     def __iter__(self):
-        for key in self._dict_repr:
-            yield (key, self._dict_repr[key])
-
-    def __getitem__(self, key):
-        return self._dict_repr[key]
-
-    def __setitem__(self, key, value):
-        self._dict_repr[key] = value
-
-    def __delitem__(self, key):
-        del self._dict_repr[key]
+        for el in self._metadata:
+            yield el
 
     def __contains__(self, key):
-        return key in self._dict_repr
+        for el in self._metadata:
+            if key in el:
+                return True
 
-    def __len__(self):
-        return len(self._dict_repr)
+    def __str__(self):
+        return json.dumps(self._metadata)
 
     @property
-    def metadata(self) -> Optional[Dict]:
-        return self._metadata
+    def raw_metadata(self) -> Optional[Dict]:
+        return self._raw_metadata
