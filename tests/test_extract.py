@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for the :module:`extract <extract>` module."""
 from datetime import datetime
+import json
 import pytest
 
 from pytube import extract
@@ -102,3 +103,18 @@ def test_signature_cipher_does_not_error(stream_dict):
     config_args = extract.get_ytplayer_config(stream_dict)['args']
     extract.apply_descrambler(config_args, "url_encoded_fmt_stream_map")
     assert "s" in config_args["url_encoded_fmt_stream_map"][0].keys()
+
+
+def test_initial_data_missing():
+    initial_data = extract.initial_data('')
+    assert initial_data == "{}"
+
+
+def test_initial_data(stream_dict):
+    initial_data = extract.initial_data(stream_dict)
+    assert 'contents' in initial_data
+
+
+def test_extract_metadata_empty():
+    ytmd = extract.metadata({})
+    assert ytmd._raw_metadata == []
