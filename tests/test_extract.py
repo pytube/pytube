@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Unit tests for the :module:`extract <extract>` module."""
 from datetime import datetime
-import json
 import pytest
 
 from pytube import extract
@@ -113,8 +112,3 @@ def test_initial_data_missing():
 def test_initial_data(stream_dict):
     initial_data = extract.initial_data(stream_dict)
     assert 'contents' in initial_data
-
-
-def test_extract_metadata_empty():
-    ytmd = extract.metadata({})
-    assert ytmd._raw_metadata == []

@@ -16,4 +16,3 @@ def test_metadata_from_initial_data(stream_dict):
     assert 'contents' in ytmd.raw_metadata[0]
     assert len(ytmd.metadata) > 0
     assert 'Song' in ytmd.metadata[0]
-    

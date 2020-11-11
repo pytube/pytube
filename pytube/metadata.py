@@ -46,4 +46,3 @@ class YouTubeMetadata:
     @property
     def metadata(self):
         return self._metadata
-    
