@@ -41,6 +41,7 @@ class YouTubeMetadata:
         for el in self._metadata:
             if key in el:
                 return True
+        return False
 
     def __str__(self):
         return json.dumps(self._metadata)
