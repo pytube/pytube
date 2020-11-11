@@ -224,7 +224,7 @@ def test_trimmed_pagination(request_get, playlist_html, playlist_long_html):
         "{}",
     ]
     playlist = Playlist(url)
-    assert len(list(playlist.trimmed("Gj6fv4pvUwM"))) == 3
+    assert len(list(playlist.trimmed("GTpl5yq3bvk"))) == 3
     assert request_get.call_count == 1
 
 
