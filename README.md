@@ -25,7 +25,7 @@ Ping @ronncc if you would like to help out
 To install from pypi with pip:
 
 ```bash
-$ pip install pytube
+$ python -m pip install pytube
 ```
 
 Sometime, the pypi release becomes slightly outdated. To install from the source with pip:
