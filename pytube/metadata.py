@@ -10,7 +10,6 @@ class YouTubeMetadata:
     def __init__(self, metadata: List):
         self._raw_metadata: List = metadata
         self._metadata = [{}]
-        self._dict_repr = {}
 
         for el in metadata:
             # We only add metadata to the dict if it has a simpleText title.
@@ -37,15 +36,14 @@ class YouTubeMetadata:
         for el in self._metadata:
             yield el
 
-    def __contains__(self, key):
-        for el in self._metadata:
-            if key in el:
-                return True
-        return False
-
     def __str__(self):
         return json.dumps(self._metadata)
 
     @property
     def raw_metadata(self) -> Optional[Dict]:
         return self._raw_metadata
+
+    @property
+    def metadata(self):
+        return self._metadata
+    
