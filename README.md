@@ -20,6 +20,20 @@ Ping @ronncc if you would like to help out
 # pytube
 *pytube* is a very serious, lightweight, dependency-free Python library (and command-line utility) for downloading YouTube Videos.
 
+## Installation
+
+To install from pypi with pip:
+
+```bash
+$ python -m pip install pytube
+```
+
+Sometime, the pypi release becomes slightly outdated. To install from the source with pip:
+
+```bash
+$ python -m pip install git+https://github.com/nficano/pytube
+```
+
 ## Description
 YouTube is the most popular video-sharing platform in the world and as a hacker you may encounter a situation where you want to script something to download videos.  For this I present to you *pytube*.
 
@@ -52,14 +66,6 @@ Finally *pytube* also includes a command-line utility, allowing you to quickly d
 - Ability to Capture Thumbnail URL.
 - Extensively Documented Source Code
 - No Third-Party Dependencies
-
-## Installation
-
-Download using pip via pypi.
-
-```bash
-$ pip install pytube
-```
 
 ## Getting started
 
