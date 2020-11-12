@@ -401,10 +401,11 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
 
 
 def initial_data(watch_html: str) -> str:
-    """
-    Extracts the initial_data json from the watch_html page.
-    This is used for extraction of copyright notices located at the bottom
-    of the video description
+    """Extract the ytInitialData json from the watch_html page.
+
+    This mostly contains metadata necessary for rendering the page on-load,
+    such as video information, copyright notices, etc.
+
     @param watch_html: Html of the watch page
     @return:
     """
@@ -418,7 +419,17 @@ def initial_data(watch_html: str) -> str:
 
 
 def metadata(initial_data) -> Optional[YouTubeMetadata]:
-    """Get the metadata for the video.
+    """Get the informational metadata for the video.
+
+    e.g.:
+    [
+        {
+            'Song': '강남스타일(Gangnam Style)',
+            'Artist': 'PSY',
+            'Album': 'PSY SIX RULES Pt.1',
+            'Licensed to YouTube by': 'YG Entertainment Inc. [...]'
+        }
+    ]
 
     :rtype: YouTubeMetadata
     """
@@ -432,12 +443,11 @@ def metadata(initial_data) -> Optional[YouTubeMetadata]:
 
     # Rows appear to only have "metadataRowRenderer" or "metadataRowHeaderRenderer"
     #  and we only care about the former, so we filter the others
-    metadata_rows = list(
-        filter(
-            lambda x: "metadataRowRenderer" in x.keys(),
-            metadata_rows
-        )
+    metadata_rows = filter(
+        lambda x: "metadataRowRenderer" in x.keys(),
+        metadata_rows
     )
+
     # We then access the metadataRowRenderer key in each element
     #  and build a metadata object from this new list
     metadata_rows = [x["metadataRowRenderer"] for x in metadata_rows]
