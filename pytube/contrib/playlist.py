@@ -37,17 +37,6 @@ class Playlist(Sequence):
         )
         self.html = request.get(self.playlist_url)
 
-        # Needs testing with non-English
-        self.last_update: Optional[date] = None
-        date_match = re.search(
-            r"Last updated on (\w{3}) (\d{1,2}), (\d{4})", self.html
-        )
-        if date_match:
-            month, day, year = date_match.groups()
-            self.last_update = datetime.strptime(
-                f"{month} {day:0>2} {year}", "%b %d %Y"
-            ).date()
-
     def _paginate(
         self, until_watch_id: Optional[str] = None
     ) -> Iterable[List[str]]:
@@ -240,6 +229,20 @@ class Playlist(Sequence):
 
     def __repr__(self) -> str:
         return f"{self.video_urls}"
+
+    @property
+    @cache
+    def last_updated(self):
+        date_match = re.search(
+            r"Last updated on (\w{3}) (\d{1,2}), (\d{4})", self.html
+        )
+        if date_match:
+            month, day, year = date_match.groups()
+            return datetime.strptime(
+                f"{month} {day:0>2} {year}", "%b %d %Y"
+            ).date()
+        return None
+    
 
     @property
     @cache
