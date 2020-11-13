@@ -13,6 +13,7 @@ from typing import Optional
 from typing import Union
 from urllib.parse import parse_qs
 
+from pytube import extract
 from pytube import request
 from pytube import YouTube
 from pytube.helpers import cache
@@ -24,16 +25,13 @@ logger = logging.getLogger(__name__)
 
 
 class Playlist(Sequence):
-    """Load a YouTube playlist with URL or ID"""
+    """Load a YouTube playlist with URL"""
 
     def __init__(self, url: str, proxies: Optional[Dict[str, str]] = None):
         if proxies:
             install_proxy(proxies)
 
-        try:
-            self.playlist_id: str = parse_qs(url.split("?")[1])["list"][0]
-        except IndexError:  # assume that url is just the id
-            self.playlist_id = url
+        self.playlist_id = extract.playlist_id(url)
 
         self.playlist_url = (
             f"https://www.youtube.com/playlist?list={self.playlist_id}"
