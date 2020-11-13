@@ -17,7 +17,7 @@ def test_title(request_get):
         "-ghgoSH6n"
     )
     pl = Playlist(url)
-    pl_title = pl.title()
+    pl_title = pl.title
     assert (
         pl_title
         == "(149) Python Tutorial for Beginners (For Absolute Beginners)"
