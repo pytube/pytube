@@ -428,13 +428,13 @@ def initial_data(watch_html: str) -> str:
     @param watch_html: Html of the watch page
     @return:
     """
-    initial_data_pattern = r"window\[['\"]ytInitialData['\"]]\s*=\s*([^\n]+)"
+    initial_data_pattern = r"window\[['\"]ytInitialData['\"]]\s*=\s*([^\n]+);"
     try:
         match = regex_search(initial_data_pattern, watch_html, 1)
     except RegexMatchError:
         return "{}"
     else:
-        return match[:-1]
+        return match
 
 
 def metadata(initial_data) -> Optional[YouTubeMetadata]:
