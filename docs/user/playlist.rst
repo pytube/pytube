@@ -36,6 +36,7 @@ If, for example, we wanted to download all of the videos in a playlist, we would
     >>>     video.streams.first().download()
 
 Or, if we're only interested in the URLs for the videos, we can look at those as well::
+
     >>> for url in p.video_urls[:3]:
     >>>     print(url)
     Python Tutorial for Beginers 1 - Getting Started and Installing Python (For Absolute Beginners)
