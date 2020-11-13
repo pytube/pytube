@@ -338,6 +338,13 @@ class YouTube:
             "author", "unknown"
         )
 
+    @property
+    def keywords(self) -> List[str]:
+        """Get the video keywords.
+        :rtype: List[str]
+        """
+        return self.player_response['videoDetails']['keywords']
+
     def register_on_progress_callback(self, func: OnProgress):
         """Register a download progress callback function post initialization.
 
