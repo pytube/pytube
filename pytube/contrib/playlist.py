@@ -253,10 +253,6 @@ class Playlist(Sequence):
         :rtype: Optional[str]
         """
         pattern = r"<title>(.+?)</title>"
-        match = pattern.search(self.html)
-
-        if match is None:
-            return None
         return regex_search(pattern, self.html, 1).replace("- YouTube", "").strip()
 
     @staticmethod
