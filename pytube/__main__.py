@@ -337,6 +337,13 @@ class YouTube:
         )
 
     @property
+    def keywords(self) -> List[str]:
+        """Get the video keywords.
+        :rtype: List[str]
+        """
+        return self.player_response.get('videoDetails', {}).get('keywords', [])
+
+    @property
     def metadata(self) -> Optional[YouTubeMetadata]:
         """Get the metadata for the video.
 
