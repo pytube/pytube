@@ -34,3 +34,23 @@ def test_video_unavailable(get):
     )
     with pytest.raises(VideoUnavailable):
         youtube.prefetch()
+
+
+def test_video_keywords(cipher_signature):
+    expected = [
+        'Rewind', 'Rewind 2019',
+        'youtube rewind 2019', '#YouTubeRewind',
+        'MrBeast', 'PewDiePie', 'James Charles',
+        'Shane Dawson', 'CaseyNeistat', 'RiceGum',
+        'Simone Giertz', 'JennaMarbles', 'Lilly Singh',
+        'emma chamberlain', 'The Try Guys', 'Fortnite',
+        'Minecraft', 'Roblox', 'Marshmello',
+        'Garena Free Fire', 'GTA V', 'Lachlan',
+        'Anaysa', 'jeffreestar', 'Noah Schnapp',
+        'Jennelle Eliana', 'T-Series', 'Azzyland',
+        'LazarBeam', 'Dude Perfect', 'David Dobrik',
+        'KSI', 'NikkieTutorials', 'Kurzgesagt',
+        'Jelly', 'Ariana Grande', 'Billie Eilish',
+        'BLACKPINK', 'Year in Review'
+    ]
+    assert cipher_signature.keywords == expected
