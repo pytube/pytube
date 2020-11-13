@@ -128,9 +128,7 @@ def playlist_id(url: str) -> str:
     :returns:
         YouTube playlist id.
     """
-    print(url)
     parsed = urllib.parse.urlparse(url)
-    print(parse_qs(parsed.query))
     return parse_qs(parsed.query)['list'][0]
 
 
