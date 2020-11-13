@@ -17,6 +17,7 @@ from pytube import request
 from pytube import YouTube
 from pytube.helpers import cache
 from pytube.helpers import install_proxy
+from pytube.helpers import regex_search
 from pytube.helpers import uniqueify
 
 logger = logging.getLogger(__name__)
@@ -47,13 +48,6 @@ class Playlist(Sequence):
                 f"{month} {day:0>2} {year}", "%b %d %Y"
             ).date()
 
-        self._js_regex = re.compile(r"window\[\"ytInitialData\"] = ([^\n]+)")
-
-        self._video_regex = re.compile(r"href=\"(/watch\?v=[\w-]*)")
-
-    def _extract_json(self, html: str) -> str:
-        return self._js_regex.search(html).group(1)[0:-1]
-
     def _paginate(
         self, until_watch_id: Optional[str] = None
     ) -> Iterable[List[str]]:
@@ -68,9 +62,7 @@ class Playlist(Sequence):
         """
         req = self.html
         videos_urls, continuation = self._extract_videos(
-            # extract the json located inside the window["ytInitialData"] js
-            # variable of the playlist html page
-            self._extract_json(req)
+            extract.initial_data(self.html)
         )
         if until_watch_id:
             try:
@@ -257,13 +249,12 @@ class Playlist(Sequence):
         :return: playlist title (name)
         :rtype: Optional[str]
         """
-        pattern = re.compile("<title>(.+?)</title>")
+        pattern = r"<title>(.+?)</title>"
         match = pattern.search(self.html)
 
         if match is None:
             return None
-
-        return match.group(1).replace("- YouTube", "").strip()
+        return regex_search(pattern, self.html, 1).replace("- YouTube", "").strip()
 
     @staticmethod
     def _video_url(watch_path: str):
