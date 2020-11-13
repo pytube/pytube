@@ -53,18 +53,11 @@ def test_init_with_watch_url(request_get):
 def test_last_update(request_get, playlist_html):
     expected = datetime.date(2020, 3, 11)
     request_get.return_value = playlist_html
-    playlist = Playlist("url")
-    assert playlist.last_update == expected
-
-
-@mock.patch("pytube.contrib.playlist.request.get")
-def test_init_with_watch_id(request_get):
-    request_get.return_value = ""
-    playlist = Playlist("PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n")
-    assert (
-        playlist.playlist_url == "https://www.youtube.com/playlist?list"
+    playlist = Playlist(
+        "https://www.youtube.com/playlist?list"
         "=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n"
     )
+    assert playlist.last_update == expected
 
 
 @mock.patch("pytube.contrib.playlist.request.get")
