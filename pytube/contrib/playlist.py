@@ -11,7 +11,6 @@ from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import Union
-from urllib.parse import parse_qs
 
 from pytube import extract
 from pytube import request
