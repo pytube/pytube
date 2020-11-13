@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import Any
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Tuple
 from urllib.parse import parse_qs
 from urllib.parse import parse_qsl
@@ -19,6 +20,7 @@ from pytube.cipher import Cipher
 from pytube.exceptions import LiveStreamError
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search
+from pytube.metadata import YouTubeMetadata
 
 logger = logging.getLogger(__name__)
 
@@ -396,3 +398,58 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
         ]
 
     logger.debug("applying descrambler")
+
+
+def initial_data(watch_html: str) -> str:
+    """Extract the ytInitialData json from the watch_html page.
+
+    This mostly contains metadata necessary for rendering the page on-load,
+    such as video information, copyright notices, etc.
+
+    @param watch_html: Html of the watch page
+    @return:
+    """
+    initial_data_pattern = r"window\[['\"]ytInitialData['\"]]\s*=\s*([^\n]+)"
+    try:
+        match = regex_search(initial_data_pattern, watch_html, 1)
+    except RegexMatchError:
+        return "{}"
+    else:
+        return match[:-1]
+
+
+def metadata(initial_data) -> Optional[YouTubeMetadata]:
+    """Get the informational metadata for the video.
+
+    e.g.:
+    [
+        {
+            'Song': '강남스타일(Gangnam Style)',
+            'Artist': 'PSY',
+            'Album': 'PSY SIX RULES Pt.1',
+            'Licensed to YouTube by': 'YG Entertainment Inc. [...]'
+        }
+    ]
+
+    :rtype: YouTubeMetadata
+    """
+    try:
+        metadata_rows: List = initial_data["contents"]["twoColumnWatchNextResults"][
+            "results"]["results"]["contents"][1]["videoSecondaryInfoRenderer"][
+            "metadataRowContainer"]["metadataRowContainerRenderer"]["rows"]
+    except (KeyError, IndexError):
+        # If there's an exception accessing this data, it probably doesn't exist.
+        return YouTubeMetadata([])
+
+    # Rows appear to only have "metadataRowRenderer" or "metadataRowHeaderRenderer"
+    #  and we only care about the former, so we filter the others
+    metadata_rows = filter(
+        lambda x: "metadataRowRenderer" in x.keys(),
+        metadata_rows
+    )
+
+    # We then access the metadataRowRenderer key in each element
+    #  and build a metadata object from this new list
+    metadata_rows = [x["metadataRowRenderer"] for x in metadata_rows]
+
+    return YouTubeMetadata(metadata_rows)
