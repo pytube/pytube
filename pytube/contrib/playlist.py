@@ -55,16 +55,6 @@ class Playlist(Sequence):
 
         self._video_regex = re.compile(r"href=\"(/watch\?v=[\w-]*)")
 
-    @deprecated(
-        "This function will be removed in the future, please use .video_urls"
-    )
-    def parse_links(self) -> List[str]:  # pragma: no cover
-        """ Deprecated function for returning list of URLs
-
-        :return: List[str]
-        """
-        return self.video_urls
-
     def _extract_json(self, html: str) -> str:
         return self._js_regex.search(html).group(1)[0:-1]
 
@@ -263,96 +253,7 @@ class Playlist(Sequence):
     def __repr__(self) -> str:
         return f"{self.video_urls}"
 
-    @deprecated(
-        "This call is unnecessary, you can directly access .video_urls or "
-        ".videos"
-    )
-    def populate_video_urls(self) -> List[str]:  # pragma: no cover
-        """Complete links of all the videos in playlist
-
-        :rtype: List[str]
-        :returns: List of video URLs
-        """
-        return self.video_urls
-
-    @deprecated("This function will be removed in the future.")
-    def _path_num_prefix_generator(self, reverse=False):  # pragma: no cover
-        """Generate number prefixes for the items in the playlist.
-
-        If the number of digits required to name a file,is less than is
-        required to name the last file,it prepends 0s.
-        So if you have a playlist of 100 videos it will number them like:
-        001, 002, 003 ect, up to 100.
-        It also adds a space after the number.
-        :return: prefix string generator : generator
-        """
-        digits = len(str(len(self.video_urls)))
-        if reverse:
-            start, stop, step = (len(self.video_urls), 0, -1)
-        else:
-            start, stop, step = (1, len(self.video_urls) + 1, 1)
-        return (str(i).zfill(digits) for i in range(start, stop, step))
-
-    @deprecated(
-        "This function will be removed in the future. Please iterate through "
-        ".videos"
-    )
-    def download_all(
-        self,
-        download_path: Optional[str] = None,
-        prefix_number: bool = True,
-        reverse_numbering: bool = False,
-        resolution: str = "720p",
-    ) -> None:  # pragma: no cover
-        """Download all the videos in the the playlist.
-
-        :param download_path:
-            (optional) Output path for the playlist If one is not
-            specified, defaults to the current working directory.
-            This is passed along to the Stream objects.
-        :type download_path: str or None
-        :param prefix_number:
-            (optional) Automatically numbers playlists using the
-            _path_num_prefix_generator function.
-        :type prefix_number: bool
-        :param reverse_numbering:
-            (optional) Lets you number playlists in reverse, since some
-            playlists are ordered newest -> oldest.
-        :type reverse_numbering: bool
-        :param resolution:
-            Video resolution i.e. "720p", "480p", "360p", "240p", "144p"
-        :type resolution: str
-        :rtype: List[str]
-        :returns:
-            List of filepaths for downloaded videos.
-        """
-        logger.debug("total videos found: %d", len(self.video_urls))
-        logger.debug("starting download")
-
-        prefix_gen = self._path_num_prefix_generator(reverse_numbering)
-
-        downloaded_filepaths = []
-
-        for link in self.video_urls:
-            youtube = YouTube(link)
-            dl_stream = (
-                youtube.streams.get_by_resolution(resolution=resolution)
-                or youtube.streams.get_lowest_resolution()
-            )
-            assert dl_stream is not None
-
-            logger.debug("download path: %s", download_path)
-            if prefix_number:
-                prefix = next(prefix_gen)
-                logger.debug("file prefix is: %s", prefix)
-                dl_path = dl_stream.download(download_path, filename_prefix=prefix)
-            else:
-                dl_path = dl_stream.download(download_path)
-            downloaded_filepaths.append(dl_path)
-            logger.debug("download complete")
-
-        return downloaded_filepaths
-
+    @property
     @cache
     def title(self) -> Optional[str]:
         """Extract playlist title
