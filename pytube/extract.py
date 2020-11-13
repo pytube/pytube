@@ -430,11 +430,9 @@ def initial_data(watch_html: str) -> str:
     """
     initial_data_pattern = r"window\[['\"]ytInitialData['\"]]\s*=\s*([^\n]+);"
     try:
-        match = regex_search(initial_data_pattern, watch_html, 1)
+        return regex_search(initial_data_pattern, watch_html, 1)
     except RegexMatchError:
         return "{}"
-    else:
-        return match
 
 
 def metadata(initial_data) -> Optional[YouTubeMetadata]:
