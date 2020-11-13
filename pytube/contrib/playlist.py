@@ -17,7 +17,6 @@ from pytube import extract
 from pytube import request
 from pytube import YouTube
 from pytube.helpers import cache
-from pytube.helpers import deprecated
 from pytube.helpers import install_proxy
 from pytube.helpers import uniqueify
 
