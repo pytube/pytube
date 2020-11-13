@@ -232,7 +232,7 @@ class Playlist(Sequence):
 
     @property
     @cache
-    def last_updated(self):
+    def last_updated(self) -> Optional[date]:
         date_match = re.search(
             r"Last updated on (\w{3}) (\d{1,2}), (\d{4})", self.html
         )
@@ -242,7 +242,6 @@ class Playlist(Sequence):
                 f"{month} {day:0>2} {year}", "%b %d %Y"
             ).date()
         return None
-    
 
     @property
     @cache
