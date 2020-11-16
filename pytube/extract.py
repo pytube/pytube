@@ -248,7 +248,7 @@ def get_ytplayer_config(html: str) -> Any:
     """
     logger.debug("finding initial function name")
     config_patterns = [
-        r"ytplayer\.config\s*=\s*({.+?});ytplayer",
+        r"ytplayer\.config\s*=\s*({.+?(?<!gdpr)});",
         r"ytInitialPlayerResponse\s*=\s*({.+?(?<!gdpr)});"
     ]
     for pattern in config_patterns:
