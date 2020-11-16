@@ -97,6 +97,23 @@ def is_age_restricted(watch_html: str) -> bool:
     return True
 
 
+def playability_status(watch_html: str) -> (str, str):
+    """Return the playability status and reason of a video.
+
+    :param str watch_html:
+        The html contents of the watch page.
+    :rtype: bool
+    :returns:
+        Playability status and reason of the video.
+    """
+    player_response = json.loads(initial_player_response(watch_html))
+    status_dict = player_response.get('playabilityStatus', {})
+    if 'status' in status_dict and 'reason' in status_dict:
+        return status_dict['status'], status_dict['reason']
+    else:
+        return None, None
+
+
 def video_id(url: str) -> str:
     """Extract the ``video_id`` from a YouTube url.
 
@@ -416,6 +433,24 @@ def initial_data(watch_html: str) -> str:
         return "{}"
     else:
         return match[:-1]
+
+
+def initial_player_response(watch_html: str) -> str:
+    """Extract the ytInitialPlayerResponse json from the watch_html page.
+
+    This mostly contains metadata necessary for rendering the page on-load,
+    such as video information, copyright notices, etc.
+
+    @param watch_html: Html of the watch page
+    @return:
+    """
+    initial_player_response_pattern = r"window\[['\"]ytInitialData['\"]]\s*=\s*({[^\n]+});"
+    try:
+        match = regex_search(initial_player_response_pattern, watch_html, 1)
+    except RegexMatchError:
+        return "{}"
+    else:
+        return match
 
 
 def metadata(initial_data) -> Optional[YouTubeMetadata]:
