@@ -176,7 +176,7 @@ def js_url(html: str) -> str:
     """
     try:
         base_js = get_ytplayer_config(html)['assets']['js']
-    except KeyError:
+    except (KeyError, RegexMatchError):
         base_js = get_ytplayer_js(html)
     return "https://youtube.com" + base_js
 
