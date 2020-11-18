@@ -2,6 +2,7 @@
 """This module contains all non-cipher related data extraction logic."""
 import json
 import logging
+import urllib.parse
 import re
 from collections import OrderedDict
 from datetime import datetime
@@ -113,6 +114,24 @@ def video_id(url: str) -> str:
         YouTube video id.
     """
     return regex_search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url, group=1)
+
+
+def playlist_id(url: str) -> str:
+    """Extract the ``playlist_id`` from a YouTube url.
+
+    This function supports the following patterns:
+
+    - :samp:`https://youtube.com/playlist?list={playlist_id}`
+    - :samp:`https://youtube.com/watch?v={video_id}&list={playlist_id}`
+
+    :param str url:
+        A YouTube url containing a playlist id.
+    :rtype: str
+    :returns:
+        YouTube playlist id.
+    """
+    parsed = urllib.parse.urlparse(url)
+    return parse_qs(parsed.query)['list'][0]
 
 
 def video_info_url(video_id: str, watch_url: str) -> str:
@@ -412,13 +431,11 @@ def initial_data(watch_html: str) -> str:
     @param watch_html: Html of the watch page
     @return:
     """
-    initial_data_pattern = r"window\[['\"]ytInitialData['\"]]\s*=\s*([^\n]+)"
+    initial_data_pattern = r"window\[['\"]ytInitialData['\"]]\s*=\s*([^\n]+);"
     try:
-        match = regex_search(initial_data_pattern, watch_html, 1)
+        return regex_search(initial_data_pattern, watch_html, 1)
     except RegexMatchError:
         return "{}"
-    else:
-        return match[:-1]
 
 
 def metadata(initial_data) -> Optional[YouTubeMetadata]:

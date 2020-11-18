@@ -13,6 +13,13 @@ YouTube Object
    :members:
    :inherited-members:
 
+Playlist Object
+---------------
+
+.. autoclass:: pytube.contrib.playlist.Playlist
+   :members:
+   :inherited-members:
+
 Stream Object
 -------------
 
