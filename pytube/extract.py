@@ -178,7 +178,7 @@ def js_url(html: str) -> str:
     """
     try:
         base_js = get_ytplayer_config(html)['assets']['js']
-    except KeyError:
+    except (KeyError, RegexMatchError):
         base_js = get_ytplayer_js(html)
     return "https://youtube.com" + base_js
 
@@ -250,7 +250,8 @@ def get_ytplayer_config(html: str) -> Any:
     """
     logger.debug("finding initial function name")
     config_patterns = [
-        r";ytplayer\.config\s*=\s*({.*?});",
+        r"ytplayer\.config\s*=\s*({.+?});ytplayer",
+        r"ytInitialPlayerResponse\s*=\s*({.+?(?<!gdpr)});"
     ]
     for pattern in config_patterns:
         regex = re.compile(pattern)
@@ -265,8 +266,7 @@ def get_ytplayer_config(html: str) -> Any:
     #  and use then load that as json to find PLAYER_CONFIG
     #  inside of it.
     setconfig_patterns = [
-        r"yt\.setConfig\((.*'PLAYER_CONFIG':\s*{.+?})\);",
-        r"yt\.setConfig\((.*\"PLAYER_CONFIG\":\s*{.+?})\);"
+        r"yt\.setConfig\((.*['\"]PLAYER_CONFIG['\"]:\s*{.+?})\);"
     ]
     for pattern in setconfig_patterns:
         regex = re.compile(pattern)
@@ -352,7 +352,10 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
     if key == "url_encoded_fmt_stream_map" and not stream_data.get(
         "url_encoded_fmt_stream_map"
     ):
-        streaming_data = json.loads(stream_data["player_response"])["streamingData"]
+        if isinstance(stream_data["player_response"], str):
+            streaming_data = json.loads(stream_data["player_response"])["streamingData"]
+        else:
+            streaming_data = stream_data["player_response"]
         formats = []
         if 'formats' in streaming_data.keys():
             formats.extend(streaming_data['formats'])
