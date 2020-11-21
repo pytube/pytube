@@ -1,3 +1,4 @@
+import json
 import pytest
 from unittest import mock
 
@@ -44,4 +45,15 @@ def test_parse_context_closer_in_string_value():
     result = parse_for_object(test_html, r'test\s*=\s*')
     assert result == {
         'foo': '};'
+    }
+
+
+def test_parse_object_requiring_ast():
+    invalid_json = '{"foo": "bar",}'
+    test_html = f'test = {invalid_json}'
+    with pytest.raises(json.decoder.JSONDecodeError):
+        json.loads(invalid_json)
+    result = parse_for_object(test_html, r'test\s*=\s*')
+    assert result == {
+        'foo': 'bar'
     }
