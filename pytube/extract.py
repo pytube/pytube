@@ -109,10 +109,12 @@ def playability_status(watch_html: str) -> (str, str):
     """
     player_response = json.loads(initial_player_response(watch_html))
     status_dict = player_response.get('playabilityStatus', {})
-    if 'status' in status_dict and 'reason' in status_dict:
-        return status_dict['status'], status_dict['reason']
-    else:
-        return None, None
+    if 'status' in status_dict:
+        if 'reason' in status_dict:
+            return status_dict['status'], [status_dict['reason']]
+        if 'messages' in status_dict:
+            return status_dict['status'], status_dict['messages']
+    return None, [None]
 
 
 def video_id(url: str) -> str:

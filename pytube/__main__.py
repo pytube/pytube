@@ -112,23 +112,24 @@ class YouTube:
         if self.watch_html is None:
             raise VideoUnavailable(video_id=self.video_id)
 
-        status, reason = extract.playability_status(self.watch_html)
-        if status == 'UNPLAYABLE':
-            if reason == (
-                'Join this channel to get access to members-only content '
-                'like this video, and other exclusive perks.'
-            ):
-                raise MembersOnly(video_id=self.video_id)
-            elif reason == 'This live stream recording is not available.':
-                raise RecordingUnavailable(video_id=self.video_id)
-            else:
-                raise VideoUnavailable(video_id=self.video_id)
-        elif status == 'LOGIN_REQUIRED':
-            if reason == (
-                'This is a private video. '
-                'Please sign in to verify that you may see it.'
-            ):
-                raise VideoPrivate(video_id=self.video_id)
+        status, messages = extract.playability_status(self.watch_html)
+        for reason in messages:
+            if status == 'UNPLAYABLE':
+                if reason == (
+                    'Join this channel to get access to members-only content '
+                    'like this video, and other exclusive perks.'
+                ):
+                    raise MembersOnly(video_id=self.video_id)
+                elif reason == 'This live stream recording is not available.':
+                    raise RecordingUnavailable(video_id=self.video_id)
+                else:
+                    raise VideoUnavailable(video_id=self.video_id)
+            elif status == 'LOGIN_REQUIRED':
+                if reason == (
+                    'This is a private video. '
+                    'Please sign in to verify that you may see it.'
+                ):
+                    raise VideoPrivate(video_id=self.video_id)
 
 
     def descramble(self) -> None:
