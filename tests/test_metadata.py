@@ -11,7 +11,7 @@ def test_extract_metadata_empty():
 
 def test_metadata_from_initial_data(stream_dict):
     initial_data = extract.initial_data(stream_dict)
-    ytmd = extract.metadata(json.loads(initial_data))
+    ytmd = extract.metadata(initial_data)
     assert len(ytmd.raw_metadata) > 0
     assert 'contents' in ytmd.raw_metadata[0]
     assert len(ytmd.metadata) > 0
