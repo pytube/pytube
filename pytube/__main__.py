@@ -80,7 +80,6 @@ class YouTube:
 
         self.fmt_streams: List[Stream] = []
 
-        self.initial_data_raw = None
         self.initial_data = {}
         self._metadata: Optional[YouTubeMetadata] = None
 
@@ -190,8 +189,7 @@ class YouTube:
                 video_id=self.video_id, watch_url=self.watch_url
             )
 
-        self.initial_data_raw = extract.initial_data(self.watch_html)
-        self.initial_data = json.loads(self.initial_data_raw)
+        self.initial_data = extract.initial_data(self.watch_html)
 
         self.vid_info_raw = request.get(self.vid_info_url)
         if not self.age_restricted:
