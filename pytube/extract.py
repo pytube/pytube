@@ -466,13 +466,11 @@ def initial_player_response(watch_html: str) -> str:
     @param watch_html: Html of the watch page
     @return:
     """
-    initial_player_response_pattern = r"window\[['\"]ytInitialPlayerResponse['\"]]\s*=\s*({[^\n]+});"
+    pattern = r"window\[['\"]ytInitialPlayerResponse['\"]]\s*=\s*({[^\n]+});"
     try:
-        match = regex_search(initial_player_response_pattern, watch_html, 1)
+        return regex_search(pattern, watch_html, 1)
     except RegexMatchError:
         return "{}"
-    else:
-        return match
 
 
 def metadata(initial_data) -> Optional[YouTubeMetadata]:

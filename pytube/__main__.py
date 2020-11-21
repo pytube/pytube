@@ -131,7 +131,6 @@ class YouTube:
                 ):
                     raise VideoPrivate(video_id=self.video_id)
 
-
     def descramble(self) -> None:
         """Descramble the stream data and build Stream instances.
 
