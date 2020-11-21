@@ -2,6 +2,7 @@
 """This module contains all non-cipher related data extraction logic."""
 import json
 import logging
+import urllib.parse
 import re
 from collections import OrderedDict
 from datetime import datetime
@@ -132,6 +133,24 @@ def video_id(url: str) -> str:
     return regex_search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url, group=1)
 
 
+def playlist_id(url: str) -> str:
+    """Extract the ``playlist_id`` from a YouTube url.
+
+    This function supports the following patterns:
+
+    - :samp:`https://youtube.com/playlist?list={playlist_id}`
+    - :samp:`https://youtube.com/watch?v={video_id}&list={playlist_id}`
+
+    :param str url:
+        A YouTube url containing a playlist id.
+    :rtype: str
+    :returns:
+        YouTube playlist id.
+    """
+    parsed = urllib.parse.urlparse(url)
+    return parse_qs(parsed.query)['list'][0]
+
+
 def video_info_url(video_id: str, watch_url: str) -> str:
     """Construct the video_info url.
 
@@ -195,7 +214,7 @@ def js_url(html: str) -> str:
     """
     try:
         base_js = get_ytplayer_config(html)['assets']['js']
-    except KeyError:
+    except (KeyError, RegexMatchError):
         base_js = get_ytplayer_js(html)
     return "https://youtube.com" + base_js
 
@@ -267,7 +286,8 @@ def get_ytplayer_config(html: str) -> Any:
     """
     logger.debug("finding initial function name")
     config_patterns = [
-        r";ytplayer\.config\s*=\s*({.*?});",
+        r"ytplayer\.config\s*=\s*({.+?});ytplayer",
+        r"ytInitialPlayerResponse\s*=\s*({.+?(?<!gdpr)});"
     ]
     for pattern in config_patterns:
         regex = re.compile(pattern)
@@ -282,8 +302,7 @@ def get_ytplayer_config(html: str) -> Any:
     #  and use then load that as json to find PLAYER_CONFIG
     #  inside of it.
     setconfig_patterns = [
-        r"yt\.setConfig\((.*'PLAYER_CONFIG':\s*{.+?})\);",
-        r"yt\.setConfig\((.*\"PLAYER_CONFIG\":\s*{.+?})\);"
+        r"yt\.setConfig\((.*['\"]PLAYER_CONFIG['\"]:\s*{.+?})\);"
     ]
     for pattern in setconfig_patterns:
         regex = re.compile(pattern)
@@ -369,7 +388,10 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
     if key == "url_encoded_fmt_stream_map" and not stream_data.get(
         "url_encoded_fmt_stream_map"
     ):
-        streaming_data = json.loads(stream_data["player_response"])["streamingData"]
+        if isinstance(stream_data["player_response"], str):
+            streaming_data = json.loads(stream_data["player_response"])["streamingData"]
+        else:
+            streaming_data = stream_data["player_response"]
         formats = []
         if 'formats' in streaming_data.keys():
             formats.extend(streaming_data['formats'])
@@ -426,13 +448,11 @@ def initial_data(watch_html: str) -> str:
     @param watch_html: Html of the watch page
     @return:
     """
-    initial_data_pattern = r"window\[['\"]ytInitialData['\"]]\s*=\s*([^\n]+)"
+    initial_data_pattern = r"window\[['\"]ytInitialData['\"]]\s*=\s*([^\n]+);"
     try:
-        match = regex_search(initial_data_pattern, watch_html, 1)
+        return regex_search(initial_data_pattern, watch_html, 1)
     except RegexMatchError:
         return "{}"
-    else:
-        return match[:-1]
 
 
 def initial_player_response(watch_html: str) -> str:

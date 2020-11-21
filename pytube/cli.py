@@ -40,7 +40,7 @@ def main():
         print("Loading playlist...")
         playlist = Playlist(args.url)
         if not args.target:
-            args.target = safe_filename(playlist.title())
+            args.target = safe_filename(playlist.title)
         for youtube_video in playlist.videos:
             try:
                 _perform_args_on_youtube(youtube_video, args)

@@ -17,7 +17,7 @@ def test_title(request_get):
         "-ghgoSH6n"
     )
     pl = Playlist(url)
-    pl_title = pl.title()
+    pl_title = pl.title
     assert (
         pl_title
         == "(149) Python Tutorial for Beginners (For Absolute Beginners)"
@@ -50,21 +50,14 @@ def test_init_with_watch_url(request_get):
 
 
 @mock.patch("pytube.contrib.playlist.request.get")
-def test_last_update(request_get, playlist_html):
+def test_last_updated(request_get, playlist_html):
     expected = datetime.date(2020, 3, 11)
     request_get.return_value = playlist_html
-    playlist = Playlist("url")
-    assert playlist.last_update == expected
-
-
-@mock.patch("pytube.contrib.playlist.request.get")
-def test_init_with_watch_id(request_get):
-    request_get.return_value = ""
-    playlist = Playlist("PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n")
-    assert (
-        playlist.playlist_url == "https://www.youtube.com/playlist?list"
+    playlist = Playlist(
+        "https://www.youtube.com/playlist?list"
         "=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n"
     )
+    assert playlist.last_updated == expected
 
 
 @mock.patch("pytube.contrib.playlist.request.get")

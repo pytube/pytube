@@ -63,6 +63,7 @@ This part of the documentation begins with some background information about the
 
    user/install
    user/quickstart
+   user/playlist
 
 The API Documentation / Guide
 -----------------------------

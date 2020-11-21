@@ -149,17 +149,14 @@ Conversely, if you only want to see the DASH streams (also referred to as "adapt
  <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus" progressive="False" type="audio">]
 ```
 
-You can also download a complete Youtube playlist:
+You can also interact with Youtube playlists:
 
 ```python
 >>> from pytube import Playlist
 >>> pl = Playlist("https://www.youtube.com/watch?v=Edpy1szoG80&list=PL153hDY-y1E00uQtCVCVC8xJ25TYX8yPU")
->>> pl.download_all()
->>> # or if you want to download in a specific directory
->>> pl.download_all('/path/to/directory/')
+>>> for video in pl.videos:
+>>>     video.streams.first().download()
 ```
-This will download the highest progressive stream available (generally 720p) from the given playlist. Later more options would be given for user's flexibility
-to choose video resolution.
 
 Pytube allows you to filter on every property available (see the documentation for the complete list), let's take a look at some of the most useful ones.
 

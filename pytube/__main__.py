@@ -148,10 +148,11 @@ class YouTube:
         # On pre-signed videos, we need to use get_ytplayer_config to fix
         #  the player_response item
         if 'streamingData' not in self.player_config_args['player_response']:
-            config_response = get_ytplayer_config(
-                self.watch_html
-            )['args']['player_response']
-            self.player_config_args['player_response'] = config_response
+            config_response = get_ytplayer_config(self.watch_html)
+            if 'args' in config_response:
+                self.player_config_args['player_response'] = config_response['args']['player_response']  # noqa: E501
+            else:
+                self.player_config_args['player_response'] = config_response
 
         # https://github.com/nficano/pytube/issues/165
         stream_maps = ["url_encoded_fmt_stream_map"]
@@ -176,9 +177,12 @@ class YouTube:
             self.initialize_stream_objects(fmt)
 
         # load the player_response object (contains subtitle information)
-        self.player_response = json.loads(
-            self.player_config_args["player_response"]
-        )
+        if isinstance(self.player_config_args["player_response"], str):
+            self.player_response = json.loads(
+                self.player_config_args["player_response"]
+            )
+        else:
+            self.player_response = self.player_config_args["player_response"]
         del self.player_config_args["player_response"]
         self.stream_monostate.title = self.title
         self.stream_monostate.duration = self.length
