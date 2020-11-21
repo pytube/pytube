@@ -1,6 +1,5 @@
 import json
 import pytest
-from unittest import mock
 
 from pytube.exceptions import HTMLParseError
 from pytube.parser import parse_for_object

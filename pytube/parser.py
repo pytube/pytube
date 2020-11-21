@@ -3,6 +3,7 @@ import json
 import re
 from pytube.exceptions import HTMLParseError
 
+
 def parse_for_object(html, preceding_regex):
     """Parses input html to find the end of a JavaScript object.
 
@@ -38,15 +39,10 @@ def parse_for_object_from_startpoint(html, start_point):
     if html[0] != '{':
         raise HTMLParseError('Invalid start point.')
 
-    # First letter MUST be a open brace, so we put that in the stack, and skip the first character.
+    # First letter MUST be a open brace, so we put that in the stack, 
+    # and skip the first character.
     stack = ['{']
     i = 1
-
-    context_openers = [
-        '{',
-        '[',
-        '"'
-    ]
 
     context_closers = {
         '{': '}',
@@ -71,7 +67,6 @@ def parse_for_object_from_startpoint(html, start_point):
         if curr_context == '"':
             # If there's a backslash in a string, we skip a character
             if curr_char == '\\':
-                next_char = html[i+1]
                 i += 2
                 continue
         else:
@@ -84,5 +79,5 @@ def parse_for_object_from_startpoint(html, start_point):
     full_obj = html[:i]
     try:
         return json.loads(full_obj)
-    except:
+    except json.decoder.JSONDecodeError:
         return ast.literal_eval(full_obj)

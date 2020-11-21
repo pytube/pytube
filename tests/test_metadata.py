@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Unit tests for the :module:`metadata <metadata>` module."""
-import json
 from pytube import extract
 
 
