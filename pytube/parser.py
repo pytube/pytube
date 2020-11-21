@@ -39,7 +39,7 @@ def parse_for_object_from_startpoint(html, start_point):
     if html[0] != '{':
         raise HTMLParseError('Invalid start point.')
 
-    # First letter MUST be a open brace, so we put that in the stack, 
+    # First letter MUST be a open brace, so we put that in the stack,
     # and skip the first character.
     stack = ['{']
     i = 1
