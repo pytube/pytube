@@ -20,6 +20,7 @@ from pytube import extract
 from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
+from pytube.exceptions import MembersOnly
 from pytube.exceptions import RecordingUnavailable
 from pytube.exceptions import VideoUnavailable
 from pytube.exceptions import VideoPrivate
