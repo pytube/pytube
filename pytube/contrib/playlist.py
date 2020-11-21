@@ -51,7 +51,7 @@ class Playlist(Sequence):
         """
         req = self.html
         videos_urls, continuation = self._extract_videos(
-            extract.initial_data(self.html)
+            json.dumps(extract.initial_data(self.html))
         )
         if until_watch_id:
             try:
