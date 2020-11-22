@@ -81,7 +81,12 @@ class RecordingUnavailable(ExtractError):
 
 
 class MembersOnly(PytubeError):
-    """Video is members-only."""
+    """Video is members-only.
+
+    YouTube has special videos that are only viewable to users who have
+    subscribed to a content creator.
+    ref: https://support.google.com/youtube/answer/7544492?hl=en
+    """
     def __init__(self, video_id: str):
         """
         :param str video_id:

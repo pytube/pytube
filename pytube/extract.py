@@ -99,7 +99,12 @@ def is_age_restricted(watch_html: str) -> bool:
 
 
 def playability_status(watch_html: str) -> (str, str):
-    """Return the playability status and reason of a video.
+    """Return the playability status and status explanation of a video.
+
+    For example, a video may have a status of LOGIN_REQUIRED, and an explanation
+    of "This is a private video. Please sign in to verify that you may see it."
+
+    This explanation is what gets incorporated into the media player overlay.
 
     :param str watch_html:
         The html contents of the watch page.
