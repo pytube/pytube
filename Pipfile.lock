@@ -345,10 +345,10 @@
         },
         "identify": {
             "hashes": [
-                "sha256:5dd84ac64a9a115b8e0b27d1756b244b882ad264c3c423f42af8235a6e71ca12",
-                "sha256:c9504ba6a043ee2db0a9d69e43246bc138034895f6338d5aed1b41e4a73b1513"
+                "sha256:943cd299ac7f5715fcb3f684e2fc1594c1e0f22a90d15398e5888143bd4144b5",
+                "sha256:cc86e6a9a390879dcc2976cef169dd9cc48843ed70b7380f321d1b118163c60e"
             ],
-            "version": "==1.5.9"
+            "version": "==1.5.10"
         },
         "idna": {
             "hashes": [
@@ -510,11 +510,11 @@
         },
         "pre-commit": {
             "hashes": [
-                "sha256:22e6aa3bd571debb01eb7d34483f11c01b65237be4eebbf30c3d4fb65762d315",
-                "sha256:905ebc9b534b991baec87e934431f2d0606ba27f2b90f7f652985f5a5b8b6ae6"
+                "sha256:4aee0db4808fa48d2458cedd5b9a084ef24dda1a0fa504432a11977a4d1cfd0a",
+                "sha256:b2d106d51c6ba6217e859d81774aae33fd825fe7de0dcf0c46e2586333d7a92e"
             ],
             "index": "pypi",
-            "version": "==2.8.2"
+            "version": "==2.9.0"
         },
         "py": {
             "hashes": [
@@ -791,10 +791,10 @@
         },
         "virtualenv": {
             "hashes": [
-                "sha256:b0011228208944ce71052987437d3843e05690b2f23d1c7da4263fde104c97a2",
-                "sha256:b8d6110f493af256a40d65e29846c69340a947669eec8ce784fcf3dd3af28380"
+                "sha256:6af42359fbb33a6c7eab4d3246524b96fd9d8e07e7141b7a65998f96e28b2c57",
+                "sha256:fd4147c5ba3f694e2e4fc3c767407dc2226899623bb9b49c2f15637c2ee335b3"
             ],
-            "version": "==20.1.0"
+            "version": "==20.2.0"
         },
         "virtualenv-clone": {
             "hashes": [
