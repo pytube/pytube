@@ -3,6 +3,7 @@ from unittest import mock
 
 import pytest
 
+import pytube
 from pytube import YouTube
 from pytube.exceptions import VideoUnavailable
 
@@ -54,3 +55,24 @@ def test_video_keywords(cipher_signature):
         'BLACKPINK', 'Year in Review'
     ]
     assert cipher_signature.keywords == expected
+
+
+def test_js_caching(cipher_signature):
+    assert pytube.__js__ != None
+    assert pytube.__js_url__ != None
+    assert pytube.__js__ == cipher_signature.js
+    assert pytube.__js_url__ == cipher_signature.js_url
+
+    with mock.patch('pytube.request.urlopen') as mock_urlopen:
+        mock_urlopen_object = mock.Mock()
+
+        # We should never read the js from this
+        mock_urlopen_object.read.side_effect = [
+            cipher_signature.watch_html.encode('utf-8'),
+            cipher_signature.vid_info_raw.encode('utf-8'),
+            cipher_signature.js.encode('utf-8')
+        ]
+
+        mock_urlopen.return_value = mock_urlopen_object
+        cipher_signature.prefetch()
+        assert mock_urlopen.call_count == 2
