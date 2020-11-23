@@ -8,6 +8,8 @@ __title__ = "pytube3"
 __author__ = "Nick Ficano, Harold Martin"
 __license__ = "MIT License"
 __copyright__ = "Copyright 2019 Nick Ficano"
+__js__ = None
+__js_url__ = None
 
 from pytube.version import __version__
 from pytube.streams import Stream
