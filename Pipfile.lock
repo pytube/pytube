@@ -233,11 +233,11 @@
         },
         "flake8-executable": {
             "hashes": [
-                "sha256:0b987166ccaf8655e26e30d10e1e12de6877471cb91fa4cc7c1ce28cc692bd61",
-                "sha256:150abd0b6ed289b64a4d59f16ae216a76f62b88ad88318d1e685a3d47bb7e89c"
+                "sha256:606116aa4f1a9c58423aabbe6fa06605522f177679416cd786a17c5a05a09142",
+                "sha256:6219f1264a7701233ed00957bd4a345a41d62f22749d5202d2c2f74abf55fa44"
             ],
             "index": "pypi",
-            "version": "==2.0.4"
+            "version": "==2.1.0"
         },
         "flake8-if-expr": {
             "hashes": [
@@ -459,10 +459,10 @@
         },
         "packaging": {
             "hashes": [
-                "sha256:4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d556079f8",
-                "sha256:998416ba6962ae7fbd6596850b80e17859a5753ba17c32284f67bfff33784181"
+                "sha256:05af3bb85d320377db281cf254ab050e1a7ebcbf5410685a9a407e18a1f81236",
+                "sha256:eb41423378682dadb7166144a4926e443093863024de508ca5c9737d6bc08376"
             ],
-            "version": "==20.4"
+            "version": "==20.7"
         },
         "pathspec": {
             "hashes": [
