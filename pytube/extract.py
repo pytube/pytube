@@ -100,6 +100,30 @@ def is_age_restricted(watch_html: str) -> bool:
     return True
 
 
+def playability_status(watch_html: str) -> (str, str):
+    """Return the playability status and status explanation of a video.
+
+    For example, a video may have a status of LOGIN_REQUIRED, and an explanation
+    of "This is a private video. Please sign in to verify that you may see it."
+
+    This explanation is what gets incorporated into the media player overlay.
+
+    :param str watch_html:
+        The html contents of the watch page.
+    :rtype: bool
+    :returns:
+        Playability status and reason of the video.
+    """
+    player_response = json.loads(initial_player_response(watch_html))
+    status_dict = player_response.get('playabilityStatus', {})
+    if 'status' in status_dict:
+        if 'reason' in status_dict:
+            return status_dict['status'], [status_dict['reason']]
+        if 'messages' in status_dict:
+            return status_dict['status'], status_dict['messages']
+    return None, [None]
+
+
 def video_id(url: str) -> str:
     """Extract the ``video_id`` from a YouTube url.
 
@@ -436,6 +460,22 @@ def initial_data(watch_html: str) -> str:
         return parse_for_object(watch_html, initial_data_pattern)
     except HTMLParseError:
         return {}
+
+
+def initial_player_response(watch_html: str) -> str:
+    """Extract the ytInitialPlayerResponse json from the watch_html page.
+
+    This mostly contains metadata necessary for rendering the page on-load,
+    such as video information, copyright notices, etc.
+
+    @param watch_html: Html of the watch page
+    @return:
+    """
+    pattern = r"window\[['\"]ytInitialPlayerResponse['\"]]\s*=\s*({[^\n]+});"
+    try:
+        return regex_search(pattern, watch_html, 1)
+    except RegexMatchError:
+        return "{}"
 
 
 def metadata(initial_data) -> Optional[YouTubeMetadata]:

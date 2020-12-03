@@ -43,10 +43,10 @@ def test_recording_unavailable():
 
 def test_private_error():
     try:
-        raise VideoPrivate('mRe-514tGMg')
+        raise VideoPrivate('m8uHb5jIGN8')
     except VideoPrivate as e:
-        assert e.video_id == 'mRe-514tGMg'  # noqa: PT017
-        assert str(e) == 'mRe-514tGMg is a private video'
+        assert e.video_id == 'm8uHb5jIGN8'  # noqa: PT017
+        assert str(e) == 'm8uHb5jIGN8 is a private video'
 
 
 def test_raises_video_private(private):
@@ -58,7 +58,7 @@ def test_raises_video_private(private):
         ]
         mock_url_open.return_value = mock_url_open_object
         with pytest.raises(VideoPrivate):
-            YouTube('https://youtube.com/watch?v=mRe-514tGMg')
+            YouTube('https://youtube.com/watch?v=m8uHb5jIGN8')
 
 
 def test_raises_recording_unavailable(missing_recording):

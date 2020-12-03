@@ -20,6 +20,7 @@ from pytube import extract
 from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
+from pytube.exceptions import MembersOnly
 from pytube.exceptions import RecordingUnavailable
 from pytube.exceptions import VideoUnavailable
 from pytube.exceptions import VideoPrivate
@@ -101,6 +102,34 @@ class YouTube:
             self.prefetch()
             self.descramble()
 
+    def check_availability(self):
+        """Check whether the video is available.
+        Raises different exceptions based on why the video is unavailable,
+        otherwise does nothing.
+
+        """
+        if self.watch_html is None:
+            raise VideoUnavailable(video_id=self.video_id)
+
+        status, messages = extract.playability_status(self.watch_html)
+        for reason in messages:
+            if status == 'UNPLAYABLE':
+                if reason == (
+                    'Join this channel to get access to members-only content '
+                    'like this video, and other exclusive perks.'
+                ):
+                    raise MembersOnly(video_id=self.video_id)
+                elif reason == 'This live stream recording is not available.':
+                    raise RecordingUnavailable(video_id=self.video_id)
+                else:
+                    raise VideoUnavailable(video_id=self.video_id)
+            elif status == 'LOGIN_REQUIRED':
+                if reason == (
+                    'This is a private video. '
+                    'Please sign in to verify that you may see it.'
+                ):
+                    raise VideoPrivate(video_id=self.video_id)
+
     def descramble(self) -> None:
         """Descramble the stream data and build Stream instances.
 
@@ -168,15 +197,8 @@ class YouTube:
         :rtype: None
         """
         self.watch_html = request.get(url=self.watch_url)
-        if self.watch_html is None:
-            raise VideoUnavailable(video_id=self.video_id)
+        self.check_availability()
         self.age_restricted = extract.is_age_restricted(self.watch_html)
-
-        if extract.is_private(self.watch_html):
-            raise VideoPrivate(video_id=self.video_id)
-
-        if not extract.recording_available(self.watch_html):
-            raise RecordingUnavailable(video_id=self.video_id)
 
         if self.age_restricted:
             if not self.embed_html:

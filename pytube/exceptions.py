@@ -80,5 +80,21 @@ class RecordingUnavailable(ExtractError):
         self.video_id = video_id
 
 
+class MembersOnly(PytubeError):
+    """Video is members-only.
+
+    YouTube has special videos that are only viewable to users who have
+    subscribed to a content creator.
+    ref: https://support.google.com/youtube/answer/7544492?hl=en
+    """
+    def __init__(self, video_id: str):
+        """
+        :param str video_id:
+            A YouTube video identifier.
+        """
+        super().__init__('%s is a members-only video' % video_id)
+        self.video_id = video_id
+
+
 class HTMLParseError(PytubeError):
     """HTML could not be parsed"""
