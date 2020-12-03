@@ -18,10 +18,12 @@ from urllib.parse import unquote
 from urllib.parse import urlencode
 
 from pytube.cipher import Cipher
+from pytube.exceptions import HTMLParseError
 from pytube.exceptions import LiveStreamError
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search
 from pytube.metadata import YouTubeMetadata
+from pytube.parser import parse_for_object
 
 logger = logging.getLogger(__name__)
 
@@ -269,31 +271,29 @@ def get_ytplayer_config(html: str) -> Any:
     """
     logger.debug("finding initial function name")
     config_patterns = [
-        r"ytplayer\.config\s*=\s*({.+?});ytplayer",
-        r"ytInitialPlayerResponse\s*=\s*({.+?(?<!gdpr)});"
+        r"ytplayer\.config\s*=\s*",
+        r"ytInitialPlayerResponse\s*=\s*"
     ]
     for pattern in config_patterns:
-        regex = re.compile(pattern)
-        function_match = regex.search(html)
-        if function_match:
-            logger.debug("finished regex search, matched: %s", pattern)
-            yt_player_config = function_match.group(1)
-            return json.loads(yt_player_config)
+        # Try each pattern consecutively if they don't find a match
+        try:
+            return parse_for_object(html, pattern)
+        except HTMLParseError:
+            continue
 
     # setConfig() needs to be handled a little differently.
     # We want to parse the entire argument to setConfig()
     #  and use then load that as json to find PLAYER_CONFIG
     #  inside of it.
     setconfig_patterns = [
-        r"yt\.setConfig\((.*['\"]PLAYER_CONFIG['\"]:\s*{.+?})\);"
+        r"yt\.setConfig\(.*['\"]PLAYER_CONFIG['\"]:\s*"
     ]
     for pattern in setconfig_patterns:
-        regex = re.compile(pattern)
-        function_match = regex.search(html)
-        if function_match:
-            logger.debug("finished regex search, matched: %s", pattern)
-            yt_config = function_match.group(1)
-            return json.loads(yt_config)['PLAYER_CONFIG']
+        # Try each pattern consecutively if they don't find a match
+        try:
+            return parse_for_object(html, pattern)
+        except HTMLParseError:
+            continue
 
     raise RegexMatchError(
         caller="get_ytplayer_config", pattern="config_patterns, setconfig_patterns"
@@ -431,11 +431,11 @@ def initial_data(watch_html: str) -> str:
     @param watch_html: Html of the watch page
     @return:
     """
-    initial_data_pattern = r"window\[['\"]ytInitialData['\"]]\s*=\s*([^\n]+);"
+    initial_data_pattern = r"window\[['\"]ytInitialData['\"]]\s*=\s*"
     try:
-        return regex_search(initial_data_pattern, watch_html, 1)
-    except RegexMatchError:
-        return "{}"
+        return parse_for_object(watch_html, initial_data_pattern)
+    except HTMLParseError:
+        return {}
 
 
 def metadata(initial_data) -> Optional[YouTubeMetadata]:
