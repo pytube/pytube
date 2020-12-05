@@ -302,7 +302,9 @@ def get_ytplayer_config(html: str) -> Any:
         # Try each pattern consecutively if they don't find a match
         try:
             return parse_for_object(html, pattern)
-        except HTMLParseError:
+        except HTMLParseError as e:
+            logger.debug(f'Pattern failed: {pattern}')
+            logger.debug(e)
             continue
 
     # setConfig() needs to be handled a little differently.
@@ -398,7 +400,7 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
         if isinstance(stream_data["player_response"], str):
             streaming_data = json.loads(stream_data["player_response"])["streamingData"]
         else:
-            streaming_data = stream_data["player_response"]
+            streaming_data = stream_data["player_response"]["streamingData"]
         formats = []
         if 'formats' in streaming_data.keys():
             formats.extend(streaming_data['formats'])
