@@ -80,4 +80,7 @@ def parse_for_object_from_startpoint(html, start_point):
     try:
         return json.loads(full_obj)
     except json.decoder.JSONDecodeError:
-        return ast.literal_eval(full_obj)
+        try:
+            return ast.literal_eval(full_obj)
+        except ValueError:
+            raise HTMLParseError('Could not parse object.')
