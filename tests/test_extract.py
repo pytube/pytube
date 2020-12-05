@@ -105,8 +105,8 @@ def test_signature_cipher_does_not_error(stream_dict):
 
 
 def test_initial_data_missing():
-    initial_data = extract.initial_data('')
-    assert initial_data == {}
+    with pytest.raises(RegexMatchError):
+        extract.initial_data('')
 
 
 def test_initial_data(stream_dict):
