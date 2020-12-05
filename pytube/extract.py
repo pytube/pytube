@@ -457,11 +457,17 @@ def initial_data(watch_html: str) -> str:
     @param watch_html: Html of the watch page
     @return:
     """
-    initial_data_pattern = r"window\[['\"]ytInitialData['\"]]\s*=\s*"
-    try:
-        return parse_for_object(watch_html, initial_data_pattern)
-    except HTMLParseError:
-        return {}
+    patterns = [
+        r"window\[['\"]ytInitialData['\"]]\s*=\s*",
+        r"ytInitialData\s*=\s*"
+    ]
+    for pattern in patterns:
+        try:
+            return parse_for_object(watch_html, pattern)
+        except HTMLParseError:
+            pass
+
+    raise RegexMatchError(caller="initial_data", pattern='initial_data_pattern')
 
 
 def initial_player_response(watch_html: str) -> str:
