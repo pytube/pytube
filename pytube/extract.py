@@ -100,6 +100,34 @@ def is_age_restricted(watch_html: str) -> bool:
     return True
 
 
+def is_region_blocked(watch_html: str) -> bool:
+    """Determine if a video is not available in the user's region.
+
+    :param str watch_html:
+        The html contents of the watch page.
+    :rtype: bool
+    :returns:
+        True if the video is blocked in the users region.
+        False if not, or if unknown.
+    """
+    player_response = initial_player_response(watch_html)
+    country_code_patterns = [
+        r"gl\s*=\s*['\"](\w{2})['\"]",  # gl="US"
+        r"['\"]gl['\"]\s*:\s*['\"](\w{2})['\"]"  # "gl":"US"
+    ]
+    for pattern in country_code_patterns:
+        try:
+            yt_detected_country = regex_search(pattern, watch_html, 1)
+            available_countries = player_response['microformat'
+                ]['playerMicroformatRenderer']['availableCountries']
+        except (KeyError, RegexMatchError):
+            pass
+        else:
+            if yt_detected_country not in available_countries:
+                return True
+    return False
+
+
 def playability_status(watch_html: str) -> (str, str):
     """Return the playability status and status explanation of a video.
 
@@ -114,7 +142,7 @@ def playability_status(watch_html: str) -> (str, str):
     :returns:
         Playability status and reason of the video.
     """
-    player_response = json.loads(initial_player_response(watch_html))
+    player_response = initial_player_response(watch_html)
     status_dict = player_response.get('playabilityStatus', {})
     if 'status' in status_dict:
         if 'reason' in status_dict:
@@ -467,7 +495,7 @@ def initial_data(watch_html: str) -> str:
         except HTMLParseError:
             pass
 
-    raise RegexMatchError(caller="initial_data", pattern='initial_data_pattern')
+    raise RegexMatchError(caller='initial_data', pattern='initial_data_pattern')
 
 
 def initial_player_response(watch_html: str) -> str:
@@ -479,11 +507,20 @@ def initial_player_response(watch_html: str) -> str:
     @param watch_html: Html of the watch page
     @return:
     """
-    pattern = r"window\[['\"]ytInitialPlayerResponse['\"]]\s*=\s*({[^\n]+});"
-    try:
-        return regex_search(pattern, watch_html, 1)
-    except RegexMatchError:
-        return "{}"
+    patterns = [
+        r"window\[['\"]ytInitialPlayerResponse['\"]]\s*=\s*",
+        r"ytInitialPlayerResponse\s*=\s*"
+    ]
+    for pattern in patterns:
+        try:
+            return parse_for_object(watch_html, pattern)
+        except HTMLParseError:
+            pass
+
+    raise RegexMatchError(
+        caller='initial_player_response',
+        pattern='initial_player_response_pattern'
+    )
 
 
 def metadata(initial_data) -> Optional[YouTubeMetadata]:

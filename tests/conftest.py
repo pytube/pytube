@@ -73,6 +73,13 @@ def missing_recording():
 
 
 @pytest.fixture
+def region_blocked():
+    """Youtube instance initialized with video id hZpzr8TbF08."""
+    filename = "yt-video-hZpzr8TbF08-html.json.gz"
+    return load_playback_file(filename)
+
+
+@pytest.fixture
 def playlist_html():
     """Youtube playlist HTML loaded on 2020-01-25 from
     https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr"""

@@ -96,5 +96,17 @@ class MembersOnly(PytubeError):
         self.video_id = video_id
 
 
+class VideoRegionBlocked(ExtractError):
+    def __init__(self, video_id: str):
+        """
+        :param str video_id:
+            A YouTube video identifier.
+        """
+        super().__init__(
+            '%s is not available in your region' % video_id
+        )
+        self.video_id = video_id
+
+
 class HTMLParseError(PytubeError):
     """HTML could not be parsed"""
