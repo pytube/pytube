@@ -118,8 +118,8 @@ def is_region_blocked(watch_html: str) -> bool:
     for pattern in country_code_patterns:
         try:
             yt_detected_country = regex_search(pattern, watch_html, 1)
-            available_countries = player_response['microformat'
-                ]['playerMicroformatRenderer']['availableCountries']
+            available_countries = player_response[
+                'microformat']['playerMicroformatRenderer']['availableCountries']
         except (KeyError, RegexMatchError):
             pass
         else:
