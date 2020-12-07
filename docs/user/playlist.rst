@@ -39,8 +39,8 @@ Or, if we're only interested in the URLs for the videos, we can look at those as
 
     >>> for url in p.video_urls[:3]:
     >>>     print(url)
-    Python Tutorial for Beginers 1 - Getting Started and Installing Python (For Absolute Beginners)
-    Python Tutorial for Beginers 2 - Numbers and Math in Python
-    Python Tutorial for Beginers 3 - Variables and Inputs
+    Python Tutorial for Beginners 1 - Getting Started and Installing Python (For Absolute Beginners)
+    Python Tutorial for Beginners 2 - Numbers and Math in Python
+    Python Tutorial for Beginners 3 - Variables and Inputs
 
 And that's basically all there is to it! The Playlist class is relatively straightforward.

@@ -14,6 +14,7 @@ from typing import List
 from typing import Optional
 from urllib.parse import parse_qsl
 
+import pytube
 from pytube import Caption
 from pytube import CaptionQuery
 from pytube import extract
@@ -170,12 +171,6 @@ class YouTube:
                 apply_descrambler(self.vid_info, fmt)
             apply_descrambler(self.player_config_args, fmt)
 
-            if not self.js:
-                if not self.embed_html:
-                    self.embed_html = request.get(url=self.embed_url)
-                self.js_url = extract.js_url(self.embed_html)
-                self.js = request.get(self.js_url)
-
             apply_signature(self.player_config_args, fmt, self.js)
 
             # build instances of :class:`Stream <Stream>`
@@ -211,17 +206,25 @@ class YouTube:
             self.vid_info_url = extract.video_info_url_age_restricted(
                 self.video_id, self.watch_url
             )
+            self.js_url = extract.js_url(self.embed_html)
         else:
             self.vid_info_url = extract.video_info_url(
                 video_id=self.video_id, watch_url=self.watch_url
             )
+            self.js_url = extract.js_url(self.watch_html)
 
         self.initial_data = extract.initial_data(self.watch_html)
 
         self.vid_info_raw = request.get(self.vid_info_url)
-        if not self.age_restricted:
-            self.js_url = extract.js_url(self.watch_html)
+
+        # If the js_url doesn't match the cached url, fetch the new js and update
+        #  the cache; otherwise, load the cache.
+        if pytube.__js_url__ != self.js_url:
             self.js = request.get(self.js_url)
+            pytube.__js__ = self.js
+            pytube.__js_url__ = self.js_url
+        else:
+            self.js = pytube.__js__
 
     def initialize_stream_objects(self, fmt: str) -> None:
         """Convert manifest data to instances of :class:`Stream <Stream>`.
