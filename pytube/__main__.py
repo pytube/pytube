@@ -25,6 +25,7 @@ from pytube.exceptions import MembersOnly
 from pytube.exceptions import RecordingUnavailable
 from pytube.exceptions import VideoUnavailable
 from pytube.exceptions import VideoPrivate
+from pytube.exceptions import VideoRegionBlocked
 from pytube.extract import apply_descrambler
 from pytube.extract import apply_signature
 from pytube.extract import get_ytplayer_config
@@ -113,6 +114,7 @@ class YouTube:
             raise VideoUnavailable(video_id=self.video_id)
 
         status, messages = extract.playability_status(self.watch_html)
+
         for reason in messages:
             if status == 'UNPLAYABLE':
                 if reason == (
@@ -123,6 +125,9 @@ class YouTube:
                 elif reason == 'This live stream recording is not available.':
                     raise RecordingUnavailable(video_id=self.video_id)
                 else:
+                    if reason == 'Video unavailable':
+                        if extract.is_region_blocked(self.watch_html):
+                            raise VideoRegionBlocked(video_id=self.video_id)
                     raise VideoUnavailable(video_id=self.video_id)
             elif status == 'LOGIN_REQUIRED':
                 if reason == (
