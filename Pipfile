@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+bumpversion = "*"
 
 [dev-packages]
 black = "==19.10b0"
