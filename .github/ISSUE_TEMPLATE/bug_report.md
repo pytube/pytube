@@ -6,6 +6,11 @@ labels: bug
 assignees: ''
 
 ---
+**Before creating an issue**
+
+Please confirm that you are on the latest version of pytube by installing from the source.
+You can do this by running `python -m pip install git+https://github.com/nficano/pytube`.
+Sometimes, the pypi library repository is not up to date, and your issue may have been fixed already!
 
 **Describe the bug**
 A clear and concise description of what the bug is.
