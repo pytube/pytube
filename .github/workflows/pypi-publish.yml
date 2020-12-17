@@ -10,6 +10,7 @@ on:
 
 jobs:
   build-n-publish:
+    if: github.actor != 'dependabot-preview[bot]'
     name: Build Python distribution and publish to PyPI
     runs-on: ubuntu-latest
     steps:
