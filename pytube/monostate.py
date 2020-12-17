@@ -1,49 +1,14 @@
 # -*- coding: utf-8 -*-
 from typing import Any
+from typing import Callable
 from typing import Optional
-
-
-class OnProgress():
-    def __call__(
-        self, stream: Any, chunk: bytes, bytes_remaining: int
-    ) -> None:
-        """On download progress callback function.
-
-        :param stream:
-            An instance of :class:`Stream <Stream>` being downloaded.
-        :type stream:
-            :py:class:`pytube.Stream`
-        :param bytes chunk:
-            Segment of media file binary data, not yet written to disk.
-        :param int bytes_remaining:
-            How many bytes have been downloaded.
-
-        """
-        ...
-
-
-class OnComplete():
-    def __call__(self, stream: Any, file_path: Optional[str]) -> None:
-        """On download complete handler function.
-
-        :param stream:
-            An instance of :class:`Stream <Stream>` being downloaded.
-        :type stream:
-            :py:class:`pytube.Stream`
-        :param file_path:
-            The file handle where the media is being written to.
-        :type file_path: str
-
-        :rtype: None
-        """
-        ...
 
 
 class Monostate:
     def __init__(
         self,
-        on_progress: Optional[OnProgress],
-        on_complete: Optional[OnComplete],
+        on_progress: Optional[Callable[[Any, bytes, int], None]],
+        on_complete: Optional[Callable[[Any, Optional[str]], None]],
         title: Optional[str] = None,
         duration: Optional[int] = None,
     ):
