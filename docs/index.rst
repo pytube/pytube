@@ -2,7 +2,7 @@
 
 pytube
 ======
-Release v\ |version|. (:ref:`Installation <install>`)
+Release v\ |version|. (:ref:`Installation<install>`)
 
 .. image:: https://img.shields.io/pypi/v/pytube.svg
   :alt: Pypi
