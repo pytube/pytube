@@ -1,4 +1,4 @@
-.. _install:
+.. _playlist:
 
 Using Playlists
 ===============
