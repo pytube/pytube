@@ -52,7 +52,7 @@ Roadmap
 -------
 
 - Allow downloading age restricted content
-- Complete ffmpeg integrationn
+- Complete ffmpeg integration
 
 The User Guide
 --------------
