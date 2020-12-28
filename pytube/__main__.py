@@ -9,6 +9,8 @@ smaller peripheral modules and functions.
 """
 import json
 import logging
+from typing import Any
+from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -32,8 +34,6 @@ from pytube.extract import get_ytplayer_config
 from pytube.helpers import install_proxy
 from pytube.metadata import YouTubeMetadata
 from pytube.monostate import Monostate
-from pytube.monostate import OnComplete
-from pytube.monostate import OnProgress
 
 logger = logging.getLogger(__name__)
 
@@ -45,8 +45,8 @@ class YouTube:
         self,
         url: str,
         defer_prefetch_init: bool = False,
-        on_progress_callback: Optional[OnProgress] = None,
-        on_complete_callback: Optional[OnComplete] = None,
+        on_progress_callback: Optional[Callable[[Any, bytes, int], None]] = None,
+        on_complete_callback: Optional[Callable[[Any, Optional[str]], None]] = None,
         proxies: Dict[str, str] = None,
     ):
         """Construct a :class:`YouTube <YouTube>`.
@@ -390,7 +390,7 @@ class YouTube:
             self._metadata = extract.metadata(self.initial_data)
             return self._metadata
 
-    def register_on_progress_callback(self, func: OnProgress):
+    def register_on_progress_callback(self, func: Callable[[Any, bytes, int], None]):
         """Register a download progress callback function post initialization.
 
         :param callable func:
@@ -402,7 +402,7 @@ class YouTube:
         """
         self.stream_monostate.on_progress = func
 
-    def register_on_complete_callback(self, func: OnComplete):
+    def register_on_complete_callback(self, func: Callable[[Any, Optional[str]], None]):
         """Register a download complete callback function post initialization.
 
         :param callable func:
