@@ -135,6 +135,9 @@ class YouTube:
                     'Please sign in to verify that you may see it.'
                 ):
                     raise VideoPrivate(video_id=self.video_id)
+            elif status == 'ERROR':
+                if reason == 'Video unavailable':
+                    raise VideoUnavailable(video_id=self.video_id)
 
     def descramble(self) -> None:
         """Descramble the stream data and build Stream instances.

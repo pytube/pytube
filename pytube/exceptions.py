@@ -5,12 +5,16 @@ from typing import Union
 
 
 class PytubeError(Exception):
-    """Base pytube exception that all others inherent.
+    """Base pytube exception that all others inherit.
 
     This is done to not pollute the built-in exceptions, which *could* result
     in unintended errors being unexpectedly and incorrectly handled within
     implementers code.
     """
+
+
+class HTMLParseError(PytubeError):
+    """HTML could not be parsed"""
 
 
 class ExtractError(PytubeError):
@@ -32,7 +36,22 @@ class RegexMatchError(ExtractError):
         self.pattern = pattern
 
 
-class LiveStreamError(ExtractError):
+class VideoUnavailable(PytubeError):
+    """Base video unavailable error."""
+    def __init__(self, video_id: str):
+        """
+        :param str video_id:
+            A YouTube video identifier.
+        """
+        self.video_id = video_id
+        super().__init__(self.error_string)
+
+    @property
+    def error_string(self):
+        return f'{self.video_id} is unavailable'
+
+
+class LiveStreamError(VideoUnavailable):
     """Video is a live stream."""
 
     def __init__(self, video_id: str):
@@ -40,47 +59,43 @@ class LiveStreamError(ExtractError):
         :param str video_id:
             A YouTube video identifier.
         """
-        super().__init__(f"{video_id} is streaming live and cannot be loaded")
-
         self.video_id = video_id
+        super().__init__(self.video_id)
+
+    @property
+    def error_string(self):
+        return f'{self.video_id} is streaming live and cannot be loaded'
 
 
-class VideoUnavailable(PytubeError):
-    """Video is unavailable."""
-
+class VideoPrivate(VideoUnavailable):
     def __init__(self, video_id: str):
         """
         :param str video_id:
             A YouTube video identifier.
         """
-        super().__init__(f"{video_id} is unavailable")
-
         self.video_id = video_id
+        super().__init__(self.video_id)
+
+    @property
+    def error_string(self):
+        return f'{self.video_id} is a private video'
 
 
-class VideoPrivate(ExtractError):
+class RecordingUnavailable(VideoUnavailable):
     def __init__(self, video_id: str):
         """
         :param str video_id:
             A YouTube video identifier.
         """
-        super().__init__('%s is a private video' % video_id)
         self.video_id = video_id
+        super().__init__(self.video_id)
+
+    @property
+    def error_string(self):
+        return f'{self.video_id} does not have a live stream recording available'
 
 
-class RecordingUnavailable(ExtractError):
-    def __init__(self, video_id: str):
-        """
-        :param str video_id:
-            A YouTube video identifier.
-        """
-        super().__init__(
-            '%s does not have a live stream recording available' % video_id
-        )
-        self.video_id = video_id
-
-
-class MembersOnly(PytubeError):
+class MembersOnly(VideoUnavailable):
     """Video is members-only.
 
     YouTube has special videos that are only viewable to users who have
@@ -92,21 +107,23 @@ class MembersOnly(PytubeError):
         :param str video_id:
             A YouTube video identifier.
         """
-        super().__init__('%s is a members-only video' % video_id)
         self.video_id = video_id
+        super().__init__(self.video_id)
+
+    @property
+    def error_string(self):
+        return f'{self.video_id} is a members-only video'
 
 
-class VideoRegionBlocked(ExtractError):
+class VideoRegionBlocked(VideoUnavailable):
     def __init__(self, video_id: str):
         """
         :param str video_id:
             A YouTube video identifier.
         """
-        super().__init__(
-            '%s is not available in your region' % video_id
-        )
         self.video_id = video_id
+        super().__init__(self.video_id)
 
-
-class HTMLParseError(PytubeError):
-    """HTML could not be parsed"""
+    @property
+    def error_string(self):
+        return f'{self.video_id} is not available in your region'
