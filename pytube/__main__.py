@@ -12,7 +12,6 @@ import logging
 from typing import Dict
 from typing import List
 from typing import Optional
-from typing import Union
 from urllib.parse import parse_qsl
 
 import pytube
@@ -85,7 +84,7 @@ class YouTube:
         self.fmt_streams: List[Stream] = []
 
         self.initial_data = {}
-        self._metadata: Optional[Union[YouTubeMetadata,list]] = None
+        self._metadata: Optional[YouTubeMetadata] = None
 
         # video_id part of /watch?v=<video_id>
         self.video_id = extract.video_id(url)
@@ -377,7 +376,7 @@ class YouTube:
         return self.player_response.get('videoDetails', {}).get('keywords', [])
 
     @property
-    def metadata(self) -> Optional[Union[YouTubeMetadata,list]]:
+    def metadata(self) -> Optional[YouTubeMetadata]:
         """Get the metadata for the video.
 
         :rtype: YouTubeMetadata
