@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 bumpversion = "*"
+twine = "*"
 
 [dev-packages]
 black = "==19.10b0"
