@@ -27,6 +27,9 @@ def test_regex_match_error():
 
 
 def test_live_stream_error():
+    # Ensure this can be caught as generic VideoUnavailable exception
+    with pytest.raises(VideoUnavailable):
+        raise LiveStreamError(video_id='YLnZklYFe7E')
     try:
         raise LiveStreamError(video_id='YLnZklYFe7E')
     except LiveStreamError as e:
@@ -35,6 +38,9 @@ def test_live_stream_error():
 
 
 def test_recording_unavailable_error():
+    # Ensure this can be caught as generic VideoUnavailable exception
+    with pytest.raises(VideoUnavailable):
+        raise RecordingUnavailable(video_id='5YceQ8YqYMc')
     try:
         raise RecordingUnavailable(video_id='5YceQ8YqYMc')
     except RecordingUnavailable as e:
@@ -43,6 +49,9 @@ def test_recording_unavailable_error():
 
 
 def test_private_error():
+    # Ensure this can be caught as generic VideoUnavailable exception
+    with pytest.raises(VideoUnavailable):
+        raise VideoPrivate('m8uHb5jIGN8')
     try:
         raise VideoPrivate('m8uHb5jIGN8')
     except VideoPrivate as e:
@@ -51,6 +60,9 @@ def test_private_error():
 
 
 def test_region_locked_error():
+    # Ensure this can be caught as generic VideoUnavailable exception
+    with pytest.raises(VideoUnavailable):
+        raise VideoRegionBlocked('hZpzr8TbF08')
     try:
         raise VideoRegionBlocked('hZpzr8TbF08')
     except VideoRegionBlocked as e:
