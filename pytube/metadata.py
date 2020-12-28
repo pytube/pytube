@@ -32,6 +32,9 @@ class YouTubeMetadata:
         if self._metadata[-1] == {}:
             self._metadata = self._metadata[:-1]
 
+    def __getitem__(self, key):
+        return self._metadata[key]
+
     def __iter__(self):
         for el in self._metadata:
             yield el
