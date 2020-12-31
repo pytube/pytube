@@ -1,7 +1,3 @@
-
-##  (24 JULY 2020) Note: Actively soliciting contributers!
-Ping @ronncc if you would like to help out 
-
 <div align="center">
   <p>
   <img src="https://github.com/nficano/pytube/blob/master/images/pytube.png?raw=true" width="456" height="143" alt="pytube logo" />
@@ -16,6 +12,10 @@ Ping @ronncc if you would like to help out
     <p>
   </p>
 </div>
+
+
+###  24 July 2020 Actively soliciting contributers!
+Ping @ronncc if you would like to help out!
 
 # pytube
 *pytube* is a very serious, lightweight, dependency-free Python library (and command-line utility) for downloading YouTube Videos.
