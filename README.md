@@ -31,7 +31,7 @@ $ python -m pip install pytube
 Sometime, the pypi release becomes slightly outdated. To install from the source with pip:
 
 ```bash
-$ python -m pip install git+https://github.com/nficano/pytube
+$ python -m pip install git+https://github.com/pytube/pytube
 ```
 
 ## Description
