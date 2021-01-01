@@ -1,6 +1,6 @@
 <div align="center">
   <p>
-  <img src="https://github.com/nficano/pytube/blob/master/images/pytube.png?raw=true" width="456" height="143" alt="pytube logo" />
+  <img src="https://assets.nickficano.com/gh-pytube.min.svg" width="456" height="143" alt="pytube logo" />
   </p>
   <p align="center">
 	  <img src="https://img.shields.io/pypi/v/pytube.svg" alt="pypi">
