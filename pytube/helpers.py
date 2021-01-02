@@ -102,12 +102,11 @@ def setup_logger(level: int = logging.ERROR, log_filename: str = "pytube.log"):
     logger = logging.getLogger("pytube")
     logger.setLevel(level)
 
-    if level >= logging.DEBUG:
-        file_handler = logging.FileHandler(log_filename)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
+    file_handler = logging.FileHandler(log_filename)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
 
-    if level >= logging.ERROR:
+    if level >= int(logging.ERROR):
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(formatter)
         logger.addHandler(stream_handler)
