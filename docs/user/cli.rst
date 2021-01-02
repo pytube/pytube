@@ -1,7 +1,7 @@
-Command-line interface
-======================
+Command-line interface (CLI)
+=============================
 
-pytube also ships with a tiny cli interface for downloading and probing
+Pytube also ships with a tiny CLI for downloading and probing
 videos.
 
 Let's start with downloading (it will download the mp4 stream with the
@@ -29,8 +29,8 @@ To get a list of all subtitles (caption codes)
 
     $ pytube -c -v https://www.youtube.com/watch?v=hsQi4ouYYzI
 
-To get a download a specific subtitle (caption code) - in this case the
-english subtitles (in srt format)
+To download a specific subtitle (caption code) - in this case the
+english subtitles (in srt format) - use:
 
 .. code:: bash
 

@@ -262,7 +262,8 @@ To get a list of all subtitles (caption codes)
 $ pytube -c -v https://www.youtube.com/watch?v=hsQi4ouYYzI
 ```
 
-To get a download a specific subtitle (caption code) - in this case the english subtitles (in srt format)
+To download a specific subtitle (caption code) - in this case the
+english subtitles (in srt format) - use:
 
 ```bash
 $ pytube -c en https://www.youtube.com/watch?v=hsQi4ouYYzI
