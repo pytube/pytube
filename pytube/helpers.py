@@ -88,8 +88,7 @@ def safe_filename(s: str, max_length: int = 255) -> str:
     return filename[:max_length].rsplit(" ", 0)[0]
 
 
-def setup_logger(level: int = logging.ERROR,
-                 log_filename: Optional[str] = None) -> None:
+def setup_logger(level: int = logging.ERROR, log_filename: Optional[str] = None) -> None:
     """Create a configured instance of logger.
 
     :param int level:
