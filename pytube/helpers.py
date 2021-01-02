@@ -110,7 +110,8 @@ def setup_logger(level: int = logging.ERROR, log_filename: str = "pytube.log"):
     if level >= logging.ERROR:
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(formatter)
-        logger.addHandler(stream_handler)    
+        logger.addHandler(stream_handler)
+
 
 GenericType = TypeVar("GenericType")
 
