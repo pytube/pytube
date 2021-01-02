@@ -124,6 +124,7 @@ def _parse_args(
         action="store_true",
         help="Save the html and js to disk",
     )
+    # TODO(nficano / yvain): empty caption code is not working
     parser.add_argument(
         "-c",
         "--caption-code",
