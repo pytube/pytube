@@ -88,7 +88,7 @@ def safe_filename(s: str, max_length: int = 255) -> str:
     return filename[:max_length].rsplit(" ", 0)[0]
 
 
-def setup_logger(level: int = logging.ERROR):
+def setup_logger(level: int = logging.ERROR, log_filename: str = "pytube.log"):
     """Create a configured instance of logger.
 
     :param int level:
@@ -98,14 +98,19 @@ def setup_logger(level: int = logging.ERROR):
     date_fmt = "%H:%M:%S"
     formatter = logging.Formatter(fmt, datefmt=date_fmt)
 
-    handler = logging.StreamHandler()
-    handler.setFormatter(formatter)
-
     # https://github.com/nficano/pytube/issues/163
     logger = logging.getLogger("pytube")
-    logger.addHandler(handler)
     logger.setLevel(level)
 
+    if level >= logging.DEBUG:
+        file_handler = logging.FileHandler(log_filename)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+
+    if level >= logging.ERROR:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(formatter)
+        logger.addHandler(stream_handler)    
 
 GenericType = TypeVar("GenericType")
 

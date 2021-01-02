@@ -56,6 +56,11 @@ def main():
 def _perform_args_on_youtube(
     youtube: YouTube, args: argparse.Namespace
 ) -> None:
+    if len(sys.argv) == 2 : # no arguemnts parssed
+        print("downloading with best resolution (default)")
+        download_by_resolution(
+            youtube=youtube, resolution="best", target=args.target
+        )
     if args.list:
         display_streams(youtube)
     if args.build_playback_report:
@@ -78,8 +83,7 @@ def _perform_args_on_youtube(
         ffmpeg_process(
             youtube=youtube, resolution=args.ffmpeg, target=args.target
         )
-
-
+    
 def _parse_args(
     parser: argparse.ArgumentParser, args: Optional[List] = None
 ) -> argparse.Namespace:
@@ -426,7 +430,10 @@ def download_by_resolution(
         Target directory for download
     """
     # TODO(nficano): allow dash itags to be selected
-    stream = youtube.streams.get_by_resolution(resolution)
+    if resolution == "best":
+        stream = youtube.streams.get_highest_resolution()
+    else: 
+        stream = youtube.streams.get_by_resolution(resolution)
     if stream is None:
         print(f"Could not find a stream with resolution: {resolution}")
         print("Try one of these:")
