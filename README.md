@@ -234,9 +234,9 @@ Similarly, if your application requires on-download progress logic, pytube expos
  >>> yt.register_on_progress_callback(show_progress_bar)
 ```
 
-## Command-line interface
+## Command-line interface (CLI)
 
-pytube also ships with a tiny cli interface for downloading and probing videos.
+Pytube also ships with a tiny CLI for downloading and probing videos.
 
 Let's start with downloading (it will download the mp4 stream with the highest resolution by default):
 
