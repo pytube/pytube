@@ -250,7 +250,7 @@ To view available streams:
 $ pytube https://www.youtube.com/watch?v=aqz-KE-bpKQ --list
 ```
 
-To download a specific stream, use the tag
+To download a specific stream, use the itag
 
 ```bash
 $ pytube https://www.youtube.com/watch?v=aqz-KE-bpKQ --itag=22
