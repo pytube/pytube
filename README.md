@@ -239,6 +239,7 @@ Similarly, if your application requires on-download progress logic, pytube expos
 Pytube also ships with a tiny CLI for downloading and probing videos.
 
 Let's start with downloading (it will download the mp4 stream with the highest resolution by default):
+If a link to a playlist is provided, it will even download the full playlist.
 
 ```bash
 $ pytube https://www.youtube.com/watch?v=aqz-KE-bpKQ

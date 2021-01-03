@@ -18,7 +18,7 @@ from pytube import CaptionQuery
 from pytube import Playlist
 from pytube import Stream
 from pytube import YouTube
-from pytube.exceptions import PytubeError
+from pytube.exceptions import PytubeError, VideoUnavailable
 from pytube.helpers import safe_filename
 from pytube.helpers import setup_logger
 
@@ -57,9 +57,9 @@ def _perform_args_on_youtube(
     youtube: YouTube, args: argparse.Namespace
 ) -> None:
     if len(sys.argv) == 2 :  # no arguemnts parssed
-        print("downloading with best resolution (default)")
+        print("downloading with highest resolution (default)")
         download_by_resolution(
-            youtube=youtube, resolution="best", target=args.target
+            youtube=youtube, resolution="highest", target=args.target
         )
     if args.list:
         display_streams(youtube)
@@ -432,8 +432,12 @@ def download_by_resolution(
         Target directory for download
     """
     # TODO(nficano): allow dash itags to be selected
-    if resolution == "best":
-        stream = youtube.streams.get_highest_resolution()
+    if resolution == "highest":  # in case no cmd line arguments are provided
+        # VideoUnavailable should be thrown, if no highest resolution found
+        try:
+            stream = youtube.streams.get_highest_resolution()
+        except VideoUnavailable as err:
+            print(f"No video streams available {err}")
     else:
         stream = youtube.streams.get_by_resolution(resolution)
     if stream is None:
