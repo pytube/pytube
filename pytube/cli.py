@@ -29,8 +29,11 @@ def main():
     parser = argparse.ArgumentParser(description=main.__doc__)
     args = _parse_args(parser)
     if args.verbosity:
+        log_filename = None
         log_level = min(args.verbosity, 4) * 10
-        setup_logger(logging.FATAL - log_level)
+        if args.logfile:
+            log_filename = args.logfile
+        setup_logger(logging.FATAL - log_level, log_filename=log_filename)
 
     if not args.url or "youtu" not in args.url:
         parser.print_help()
@@ -119,6 +122,11 @@ def _parse_args(
         default=0,
         dest="verbosity",
         help="Verbosity level, use up to 4 to increase logging -vvvv",
+    )
+    parser.add_argument(
+        "--logfile",
+        action="store",
+        help="logging debug and error messages into a log file",
     )
     parser.add_argument(
         "--build-playback-report",

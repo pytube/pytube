@@ -178,7 +178,7 @@ def test_main_logging_setup(setup_logger):
     with pytest.raises(SystemExit):
         cli.main()
     # Then
-    setup_logger.assert_called_with(40)
+    setup_logger.assert_called_with(40, log_filename=None)
 
 
 @mock.patch("pytube.cli.YouTube", return_value=None)
