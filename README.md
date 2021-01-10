@@ -228,7 +228,7 @@ If your application requires post-processing logic, pytube allows you to specify
 Similarly, if your application requires on-download progress logic, pytube exposes a callback for this as well:
 
 ```python
- >>> def show_progress_bar(stream, chunk, file_handle, bytes_remaining):
+ >>> def show_progress_bar(stream, chunk, bytes_remaining):
          return  # do work
 
  >>> yt.register_on_progress_callback(show_progress_bar)
