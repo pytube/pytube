@@ -234,6 +234,13 @@ Similarly, if your application requires on-download progress logic, pytube expos
  >>> yt.register_on_progress_callback(show_progress_bar)
 ```
 
+Download video(s) to specific directory with specific name
+
+```python
+>>> yt = YouTube('https://youtube.com/watch?v=2lAe1cqCOXo')
+>>> yt.streams.first().download(output_path="/tmp" ,filename='output')
+```
+
 ## Command-line interface
 
 pytube also ships with a tiny cli interface for downloading and probing videos.
