@@ -3,47 +3,44 @@
 Command-line interface (CLI)
 =============================
 
-Pytube also ships with a tiny CLI for downloading and probing
-videos.
+Pytube also ships with a tiny CLI for interacting with videos and playlists.
 
-Let's start with downloading (it will download the mp4 stream with the
-highest resolution by default). If a link to a playlist is provided, 
-it will even download the full playlist.
+To download the highest resolution progressive stream:
 
 .. code:: bash
 
-    $ pytube https://www.youtube.com/watch?v=aqz-KE-bpKQ
+    $ pytube https://www.youtube.com/watch?v=2lAe1cqCOXo
 
 To view available streams:
 
 .. code:: bash
 
-    $ pytube https://www.youtube.com/watch?v=aqz-KE-bpKQ --list
+    $ pytube https://www.youtube.com/watch?v=2lAe1cqCOXo --list
 
 To download a specific stream, use the itag
 
 .. code:: bash
 
-    $ pytube https://www.youtube.com/watch?v=aqz-KE-bpKQ --itag=22
+    $ pytube https://www.youtube.com/watch?v=2lAe1cqCOXo --itag=22
 
 To get a list of all subtitles (caption codes)
 
 .. code:: bash
 
-    $ pytube -c -v https://www.youtube.com/watch?v=hsQi4ouYYzI
+    $ pytube https://www.youtube.com/watch?v=2lAe1cqCOXo --list-captions
 
 To download a specific subtitle (caption code) - in this case the
 english subtitles (in srt format) - use:
 
 .. code:: bash
 
-    $ pytube -c en https://www.youtube.com/watch?v=hsQi4ouYYzI
+    $ pytube https://www.youtube.com/watch?v=2lAe1cqCOXo -c en
 
 It is also possible to just download the audio stream (default AAC/mp4):
 
 .. code:: bash
 
-    $ pytube -a https://www.youtube.com/watch?v=zwkzf-KUNPM&list=PLCgv34KYzfJ7Y0ZSCQ0QQTCME5cA1E7ma
+    $ pytube https://www.youtube.com/watch?v=2lAe1cqCOXo -a
 
 To list all command line options, simply type
 

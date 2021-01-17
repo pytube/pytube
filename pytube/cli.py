@@ -59,18 +59,19 @@ def main():
 def _perform_args_on_youtube(
     youtube: YouTube, args: argparse.Namespace
 ) -> None:
-    if len(sys.argv) == 2 :  # no arguemnts parssed
-        print("downloading with highest resolution (default)")
-        download_by_resolution(
+    if len(sys.argv) == 2 :  # no arguments parsed
+        download_highest_resolution_progressive(
             youtube=youtube, resolution="highest", target=args.target
         )
+    if args.list_captions:
+        _print_available_captions(youtube.captions)
     if args.list:
         display_streams(youtube)
     if args.build_playback_report:
         build_playback_report(youtube)
     if args.itag:
         download_by_itag(youtube=youtube, itag=args.itag, target=args.target)
-    if hasattr(args, "caption_code"):
+    if args.caption_code:
         download_caption(
             youtube=youtube, lang_code=args.caption_code, target=args.target
         )
@@ -138,12 +139,18 @@ def _parse_args(
         "-c",
         "--caption-code",
         type=str,
-        default=argparse.SUPPRESS,
-        nargs="?",
         help=(
             "Download srt captions for given language code. "
             "Prints available language codes if no argument given"
         ),
+    )
+    parser.add_argument(
+        '-lc',
+        '--list-captions',
+        action='store_true',
+        help=(
+            "List available caption codes for a video"
+        )
     )
     parser.add_argument(
         "-t",
@@ -440,14 +447,7 @@ def download_by_resolution(
         Target directory for download
     """
     # TODO(nficano): allow dash itags to be selected
-    if resolution == "highest":  # in case no cmd line arguments are provided
-        # VideoUnavailable should be thrown, if no highest resolution found
-        try:
-            stream = youtube.streams.get_highest_resolution()
-        except VideoUnavailable as err:
-            print(f"No video streams available {err}")
-    else:
-        stream = youtube.streams.get_by_resolution(resolution)
+    stream = youtube.streams.get_by_resolution(resolution)
     if stream is None:
         print(f"Could not find a stream with resolution: {resolution}")
         print("Try one of these:")
@@ -460,6 +460,30 @@ def download_by_resolution(
         _download(stream, target=target)
     except KeyboardInterrupt:
         sys.exit()
+
+
+def download_highest_resolution_progressive(
+    youtube: YouTube, resolution: str, target: Optional[str] = None
+) -> None:
+    """Start downloading the highest resolution progressive stream.
+
+    :param YouTube youtube:
+        A valid YouTube object.
+    :param str resolution:
+        YouTube video resolution.
+    :param str target:
+        Target directory for download
+    """
+    youtube.register_on_progress_callback(on_progress)
+    try:
+        stream = youtube.streams.get_highest_resolution()
+    except VideoUnavailable as err:
+        print(f"No video streams available: {err}")
+    else:
+        try:
+            _download(stream, target=target)
+        except KeyboardInterrupt:
+            sys.exit()
 
 
 def display_streams(youtube: YouTube) -> None:
@@ -493,10 +517,6 @@ def download_caption(
     :param str target:
         Target directory for download
     """
-    if lang_code is None:
-        _print_available_captions(youtube.captions)
-        return
-
     try:
         caption = youtube.captions[lang_code]
         downloaded_path = caption.download(
