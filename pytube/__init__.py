@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
 # flake8: noqa: F401
 # noreorder
 """
 Pytube: a very serious Python library for downloading YouTube Videos.
 """
 __title__ = "pytube"
-__author__ = "Nick Ficano, Harold Martin"
-__license__ = "MIT License"
-__copyright__ = "Copyright 2019 Nick Ficano"
+__author__ = "Nick Ficano"
+__license__ = "Unlicensed"
 __js__ = None
 __js_url__ = None
 
