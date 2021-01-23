@@ -24,6 +24,12 @@ Ping @ronncc if you would like to help out!
 
 To install from pypi with pip:
 
+-----TYPE CAMMANDS ON TERMINAL OR ( CMD ON WINDOWS )---
+
+make sure you have pip installed check how you can install pip here - https://phoenixnap.com/kb/install-pip-windows
+
+if you can't access pip by using "pip" cammand you can also use "pip3"
+
 ```bash
 $ python -m pip install pytube
 ```
