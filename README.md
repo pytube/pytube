@@ -57,15 +57,15 @@ Finally *pytube* also includes a command-line utility, allowing you to quickly d
 ```
 
 ## Features
-- Support for Both Progressive & DASH Streams
+- Support for both progressive & DASH streams
 - Support for downloading complete playlist
-- Easily Register ``on_download_progress`` & ``on_download_complete`` callbacks
-- Command-line Interfaced Included
-- Caption Track Support
-- Outputs Caption Tracks to .srt format (SubRip Subtitle)
-- Ability to Capture Thumbnail URL.
-- Extensively Documented Source Code
-- No Third-Party Dependencies
+- Easily register ``on_download_progress`` & ``on_download_complete`` callbacks
+- Command-line interfaced included
+- Caption track support
+- Outputs caption tracks to .srt format (SubRip Subtitle)
+- Ability to capture thumbnail URL
+- Extensively documented source code
+- No third-party dependencies
 
 ## Getting started
 
