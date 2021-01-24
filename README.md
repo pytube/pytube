@@ -14,8 +14,8 @@
 </div>
 
 
-###  24 July 2020 Actively soliciting contributers!
-Ping @ronncc if you would like to help out!
+###  Actively soliciting contributers!
+Have ideas for how pytube can be improved? Feel free to open an issue or a pull request!
 
 # pytube
 *pytube* is a very serious, lightweight, dependency-free Python library (and command-line utility) for downloading YouTube Videos.
