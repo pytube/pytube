@@ -178,7 +178,7 @@ def test_main_logging_setup(setup_logger):
     with pytest.raises(SystemExit):
         cli.main()
     # Then
-    setup_logger.assert_called_with(40)
+    setup_logger.assert_called_with(40, log_filename=None)
 
 
 @mock.patch("pytube.cli.YouTube", return_value=None)
@@ -222,7 +222,7 @@ def test_main_display_streams(youtube):
 @mock.patch("pytube.cli.YouTube", return_value=None)
 def test_main_download_caption(youtube):
     parser = argparse.ArgumentParser()
-    args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-c"])
+    args = parse_args(parser, ["http://youtube.com/watch?v=9bZkp7q19f0", "-c", "en"])
     cli._parse_args = MagicMock(return_value=args)
     cli.download_caption = MagicMock()
     cli.main()
