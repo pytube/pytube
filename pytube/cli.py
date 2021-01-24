@@ -18,7 +18,7 @@ from pytube import CaptionQuery
 from pytube import Playlist
 from pytube import Stream
 from pytube import YouTube
-from pytube.exceptions import PytubeError
+from pytube.exceptions import PytubeError, VideoUnavailable
 from pytube.helpers import safe_filename
 from pytube.helpers import setup_logger
 
@@ -29,8 +29,11 @@ def main():
     parser = argparse.ArgumentParser(description=main.__doc__)
     args = _parse_args(parser)
     if args.verbosity:
+        log_filename = None
         log_level = min(args.verbosity, 4) * 10
-        setup_logger(logging.FATAL - log_level)
+        if args.logfile:
+            log_filename = args.logfile
+        setup_logger(logging.FATAL - log_level, log_filename=log_filename)
 
     if not args.url or "youtu" not in args.url:
         parser.print_help()
@@ -56,13 +59,19 @@ def main():
 def _perform_args_on_youtube(
     youtube: YouTube, args: argparse.Namespace
 ) -> None:
+    if len(sys.argv) == 2 :  # no arguments parsed
+        download_highest_resolution_progressive(
+            youtube=youtube, resolution="highest", target=args.target
+        )
+    if args.list_captions:
+        _print_available_captions(youtube.captions)
     if args.list:
         display_streams(youtube)
     if args.build_playback_report:
         build_playback_report(youtube)
     if args.itag:
         download_by_itag(youtube=youtube, itag=args.itag, target=args.target)
-    if hasattr(args, "caption_code"):
+    if args.caption_code:
         download_caption(
             youtube=youtube, lang_code=args.caption_code, target=args.target
         )
@@ -116,6 +125,11 @@ def _parse_args(
         help="Verbosity level, use up to 4 to increase logging -vvvv",
     )
     parser.add_argument(
+        "--logfile",
+        action="store",
+        help="logging debug and error messages into a log file",
+    )
+    parser.add_argument(
         "--build-playback-report",
         action="store_true",
         help="Save the html and js to disk",
@@ -124,12 +138,18 @@ def _parse_args(
         "-c",
         "--caption-code",
         type=str,
-        default=argparse.SUPPRESS,
-        nargs="?",
         help=(
             "Download srt captions for given language code. "
             "Prints available language codes if no argument given"
         ),
+    )
+    parser.add_argument(
+        '-lc',
+        '--list-captions',
+        action='store_true',
+        help=(
+            "List available caption codes for a video"
+        )
     )
     parser.add_argument(
         "-t",
@@ -441,6 +461,30 @@ def download_by_resolution(
         sys.exit()
 
 
+def download_highest_resolution_progressive(
+    youtube: YouTube, resolution: str, target: Optional[str] = None
+) -> None:
+    """Start downloading the highest resolution progressive stream.
+
+    :param YouTube youtube:
+        A valid YouTube object.
+    :param str resolution:
+        YouTube video resolution.
+    :param str target:
+        Target directory for download
+    """
+    youtube.register_on_progress_callback(on_progress)
+    try:
+        stream = youtube.streams.get_highest_resolution()
+    except VideoUnavailable as err:
+        print(f"No video streams available: {err}")
+    else:
+        try:
+            _download(stream, target=target)
+        except KeyboardInterrupt:
+            sys.exit()
+
+
 def display_streams(youtube: YouTube) -> None:
     """Probe YouTube video and lists its available formats.
 
@@ -472,10 +516,6 @@ def download_caption(
     :param str target:
         Target directory for download
     """
-    if lang_code is None:
-        _print_available_captions(youtube.captions)
-        return
-
     try:
         caption = youtube.captions[lang_code]
         downloaded_path = caption.download(

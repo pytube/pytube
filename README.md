@@ -225,26 +225,53 @@ exposes a callback for this as well:
  >>> yt.register_on_progress_callback(show_progress_bar)
 ```
 
-Download video(s) to specific directory with specific name:
+You can also download videos to a specific directory with specific filename:
 
 ```python
 >>> yt = YouTube('https://youtube.com/watch?v=2lAe1cqCOXo')
 >>> yt.streams.first().download(output_path="/tmp" ,filename='output')
 ```
 
-## Command-line interface
+## Command-line interface (CLI)
 
-Pytube also ships with a tiny cli interface for downloading and probing videos.
 
-Let's start with downloading:
+Pytube also ships with a tiny CLI for interacting with videos and playlists.
+
+To download the highest resolution progressive stream:
 
 ```bash
-$ pytube http://youtube.com/watch?v=2lAe1cqCOXo --itag=22
+$ pytube https://www.youtube.com/watch?v=2lAe1cqCOXo
 ```
+
 To view available streams:
 
 ```bash
-$ pytube http://youtube.com/watch?v=2lAe1cqCOXo --list
+$ pytube https://www.youtube.com/watch?v=2lAe1cqCOXo --list
+```
+
+To download a specific stream, use the itag
+
+```bash
+$ pytube https://www.youtube.com/watch?v=2lAe1cqCOXo --itag=22
+```
+
+To get a list of all subtitles (caption codes) 
+
+```bash
+$ pytube https://www.youtube.com/watch?v=2lAe1cqCOXo --list-captions
+```
+
+To download a specific subtitle (caption code) - in this case the
+english subtitles (in srt format) - use:
+
+```bash
+$ pytube https://www.youtube.com/watch?v=2lAe1cqCOXo -c en
+```
+
+It is also possible to just download the audio stream (default AAC/mp4):
+
+```bash
+$ pytube https://www.youtube.com/watch?v=2lAe1cqCOXo -a
 ```
 
 Finally, if you're filing a bug report, the cli contains a switch called
