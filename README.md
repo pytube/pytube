@@ -4,9 +4,6 @@
   </p>
   <p align="center">
 	  <img src="https://img.shields.io/pypi/v/pytube.svg" alt="pypi">
-	  <a href="https://travis-ci.org/nficano/pytube">
-      <img src="https://travis-ci.org/nficano/pytube.svg?branch=master" />
-    </a>
 	  <a href="http://python-pytube.readthedocs.io/en/latest/?badge=latest">
       <img src="https://readthedocs.org/projects/python-pytube/badge/?version=latest" />
     </a>
