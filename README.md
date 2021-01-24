@@ -4,21 +4,32 @@
   </p>
   <p align="center">
 	  <img src="https://img.shields.io/pypi/v/pytube.svg" alt="pypi">
-	  <a href="https://travis-ci.org/nficano/pytube"><img src="https://travis-ci.org/nficano/pytube.svg?branch=master" /></a>
-	  <a href="http://python-pytube.readthedocs.io/en/latest/?badge=latest"><img src="https://readthedocs.org/projects/python-pytube/badge/?version=latest" /></a>
-	  <a href="https://codecov.io/gh/nficano/pytube"><img src="https://codecov.io/gh/nficano/pytube/branch/master/graph/badge.svg" /></a>
-      <a href="https://pypi.org/project/pytube/"><img src="https://img.shields.io/pypi/dm/pytube.svg" alt="pypi"></a>
-	  <a href="https://pypi.python.org/pypi/pytube/"><img src="https://img.shields.io/pypi/pyversions/pytube.svg" /></a>
-    <p>
+	  <a href="https://travis-ci.org/nficano/pytube">
+      <img src="https://travis-ci.org/nficano/pytube.svg?branch=master" />
+    </a>
+	  <a href="http://python-pytube.readthedocs.io/en/latest/?badge=latest">
+      <img src="https://readthedocs.org/projects/python-pytube/badge/?version=latest" />
+    </a>
+	  <a href="https://codecov.io/gh/nficano/pytube">
+      <img src="https://codecov.io/gh/nficano/pytube/branch/master/graph/badge.svg" />
+    </a>
+    <a href="https://pypi.org/project/pytube/">
+      <img src="https://img.shields.io/pypi/dm/pytube.svg" alt="pypi">
+    </a>
+	  <a href="https://pypi.python.org/pypi/pytube/">
+      <img src="https://img.shields.io/pypi/pyversions/pytube.svg" />
+    </a>
   </p>
 </div>
 
 
 ###  Actively soliciting contributers!
-Have ideas for how pytube can be improved? Feel free to open an issue or a pull request!
+Have ideas for how pytube can be improved? Feel free to open an issue or a pull
+request!
 
 # pytube
-*pytube* is a very serious, lightweight, dependency-free Python library (and command-line utility) for downloading YouTube Videos.
+*pytube* is a very serious, lightweight, dependency-free Python library (and
+command-line utility) for downloading YouTube Videos.
 
 ## Installation
 
@@ -28,20 +39,26 @@ To install from pypi with pip:
 $ python -m pip install pytube
 ```
 
-Sometime, the pypi release becomes slightly outdated. To install from the source with pip:
+Sometime, the pypi release becomes slightly outdated. To install from the
+source with pip:
 
 ```bash
 $ python -m pip install git+https://github.com/pytube/pytube
 ```
 
 ## Description
-YouTube is the most popular video-sharing platform in the world and as a hacker you may encounter a situation where you want to script something to download videos.  For this I present to you *pytube*.
+YouTube is the most popular video-sharing platform in the world and as a hacker
+you may encounter a situation where you want to script something to download
+videos. For this I present to you *pytube*.
 
-*pytube* is a lightweight library written in Python. It has no third party dependencies and aims to be highly reliable.
+*pytube* is a lightweight library written in Python. It has no third party
+dependencies and aims to be highly reliable.
 
-*pytube* also makes pipelining easy, allowing you to specify callback functions for different download events, such as  ``on progress`` or ``on complete``.
+*pytube* also makes pipelining easy, allowing you to specify callback functions
+for different download events, such as  ``on progress`` or ``on complete``.
 
-Finally *pytube* also includes a command-line utility, allowing you to quickly download videos right from terminal.
+Finally *pytube* also includes a command-line utility, allowing you to quickly
+download videos right from terminal.
 
 ### Behold, a perfect balance of simplicity versus flexibility:
 
@@ -75,7 +92,8 @@ Let's begin with showing how easy it is to download a video with pytube:
 >>> from pytube import YouTube
 >>> YouTube('https://youtube.com/watch?v=2lAe1cqCOXo').streams.first().download()
 ```
-This example will download the highest quality progressive download stream available.
+This example will download the highest quality progressive download stream
+available.
 
 Next, let's explore how we would view what video streams are available:
 
@@ -89,11 +107,21 @@ Next, let's explore how we would view what video streams are available:
  <Stream: itag="250" mime_type="audio/webm" abr="70kbps" acodec="opus" progressive="False" type="audio">,
  <Stream: itag="251" mime_type="audio/webm" abr="160kbps" acodec="opus" progressive="False" type="audio">]
 ```
-You may notice that some streams listed have both a video codec and audio codec, while others have just video or just audio, this is a result of YouTube supporting a streaming technique called Dynamic Adaptive Streaming over HTTP (DASH).
+You may notice that some streams listed have both a video codec and audio
+codec, while others have just video or just audio, this is a result of YouTube
+supporting a streaming technique called Dynamic Adaptive Streaming over HTTP
+(DASH).
 
-In the context of pytube, the implications are for the highest quality streams; you now need to download both the audio and video tracks and then post-process them with software like FFmpeg to merge them.
+In the context of pytube, the implications are for the highest quality streams;
+you now need to download both the audio and video tracks and then post-process
+them with software like FFmpeg to merge them.
 
-The legacy streams that contain the audio and video in a single file (referred to as "progressive download") are still available, but only for resolutions 720p and below.
+The legacy streams that contain the audio and video in a single file (referred
+to as "progressive download") are still available, but only for resolutions
+720p and below.
+
+Pytube allows you to filter on every property available (see the documentation
+for the complete list), let's take a look at some of the most useful ones.
 
 To only view these progressive download streams:
 
@@ -103,7 +131,8 @@ To only view these progressive download streams:
   <Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2" progressive="True" type="video">]
 ```
 
-Conversely, if you only want to see the DASH streams (also referred to as "adaptive") you can do:
+Conversely, if you only want to see the DASH streams (also referred to as
+"adaptive") you can do:
 
 ```python
 >>> yt.streams.filter(adaptive=True)
@@ -124,7 +153,6 @@ You can also interact with Youtube playlists:
 >>>     video.streams.first().download()
 ```
 
-Pytube allows you to filter on every property available (see the documentation for the complete list), let's take a look at some of the most useful ones.
 
 To list the audio only streams:
 
@@ -157,23 +185,28 @@ Multiple filters can also be specified:
   [<Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2" progressive="True" type="video">,
   <Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2" progressive="True" type="video">]
 ```
-You also have an interface to select streams by their itag, without needing to filter:
+You also have an interface to select streams by their itag, without needing to
+filter:
 
 ```python
 >>> yt.streams.get_by_itag(22)
   <Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2" progressive="True" type="video">
 ```
 
-If you need to optimize for a specific feature, such as the "highest resolution" or "lowest average bitrate":
+If you need to optimize for a specific feature, such as the "highest
+resolution" or "lowest average bitrate":
 
 ```python
 >>> yt.streams.filter(progressive=True).order_by('resolution').desc().all()
   [<Stream: itag="22" mime_type="video/mp4" res="720p" fps="30fps" vcodec="avc1.64001F" acodec="mp4a.40.2" progressive="True" type="video">,
   <Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" vcodec="avc1.42001E" acodec="mp4a.40.2" progressive="True" type="video">]
 ```
-Note that ``order_by`` cannot be used if your attribute is undefined in any of the Stream instances, so be sure to apply a filter to remove those before calling it.
+Note that ``order_by`` cannot be used if your attribute is undefined in any of
+the Stream instances, so be sure to apply a filter to remove those before
+calling it.
 
-If your application requires post-processing logic, pytube allows you to specify an "on download complete" callback function:
+If your application requires post-processing logic, pytube allows you to
+specify an "on download complete" callback function:
 
 ```python
  >>> def convert_to_aac(stream, file_handle):
@@ -182,7 +215,8 @@ If your application requires post-processing logic, pytube allows you to specify
  >>> yt.register_on_complete_callback(convert_to_aac)
 ```
 
-Similarly, if your application requires on-download progress logic, pytube exposes a callback for this as well:
+Similarly, if your application requires on-download progress logic, pytube
+exposes a callback for this as well:
 
 ```python
  >>> def show_progress_bar(stream, chunk, bytes_remaining):
@@ -191,7 +225,7 @@ Similarly, if your application requires on-download progress logic, pytube expos
  >>> yt.register_on_progress_callback(show_progress_bar)
 ```
 
-Download video(s) to specific directory with specific name
+Download video(s) to specific directory with specific name:
 
 ```python
 >>> yt = YouTube('https://youtube.com/watch?v=2lAe1cqCOXo')
@@ -200,7 +234,7 @@ Download video(s) to specific directory with specific name
 
 ## Command-line interface
 
-pytube also ships with a tiny cli interface for downloading and probing videos.
+Pytube also ships with a tiny cli interface for downloading and probing videos.
 
 Let's start with downloading:
 
@@ -213,4 +247,6 @@ To view available streams:
 $ pytube http://youtube.com/watch?v=2lAe1cqCOXo --list
 ```
 
-Finally, if you're filing a bug report, the cli contains a switch called ``--build-playback-report``, which bundles up the state, allowing others to easily replay your issue.
+Finally, if you're filing a bug report, the cli contains a switch called
+``--build-playback-report``, which bundles up the state, allowing others
+to easily replay your issue.
