@@ -38,7 +38,7 @@ class Playlist(Sequence):
         self.html = request.get(self.playlist_url)
 
     def _paginate(
-        self, until_watch_id: Optional[str] = None
+            self, until_watch_id: Optional[str] = None
     ) -> Iterable[List[str]]:
         """Parse the video links from the page source, yields the /watch?v=
         part from video link
@@ -149,7 +149,7 @@ class Playlist(Sequence):
                 ][
                     "playlistVideoListRenderer"
                 ]
-            except:
+            except (KeyError, IndexError, TypeError):
                 # this handles the the youtube playlist with sub menus
 
                 important_content = initial_data["contents"][

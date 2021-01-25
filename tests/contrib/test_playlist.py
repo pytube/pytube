@@ -239,6 +239,7 @@ def test_trimmed_pagination_not_found(
     # assert len(list(playlist.trimmed("wont-be-found"))) == 101 # noqa
     assert True
 
+
 # test case for playlist with submenus
 @mock.patch("pytube.contrib.playlist.request.get")
 def test_playlist_submenu(
@@ -254,4 +255,3 @@ def test_playlist_submenu(
     ]
     playlist = Playlist(url)
     assert len(playlist.video_urls) == 12
-

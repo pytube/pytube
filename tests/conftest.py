@@ -104,6 +104,7 @@ def playlist_long_html():
     with gzip.open(file_path, "rb") as f:
         return f.read().decode("utf-8")
 
+
 @pytest.fixture
 def playlist_submenu_html():
     """Youtube playlist HTML loaded on 2020-01-24 from
