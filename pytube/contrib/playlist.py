@@ -131,21 +131,43 @@ class Playlist(Sequence):
         try:
             # this is the json tree structure, if the json was extracted from
             # html
-            important_content = initial_data["contents"][
-                "twoColumnBrowseResultsRenderer"
-            ]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"][
-                "contents"
-            ][
-                0
-            ][
-                "itemSectionRenderer"
-            ][
-                "contents"
-            ][
-                0
-            ][
-                "playlistVideoListRenderer"
-            ]
+            try:
+                # this handles the the youtube playlist without sub menus
+
+                important_content = initial_data["contents"][
+                    "twoColumnBrowseResultsRenderer"
+                ]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"][
+                    "contents"
+                ][
+                    0
+                ][
+                    "itemSectionRenderer"
+                ][
+                    "contents"
+                ][
+                    0
+                ][
+                    "playlistVideoListRenderer"
+                ]
+            except:
+                # this handles the the youtube playlist with sub menus
+
+                important_content = initial_data["contents"][
+                    "twoColumnBrowseResultsRenderer"
+                ]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"][
+                    "contents"
+                ][
+                    1
+                ][
+                    "itemSectionRenderer"
+                ][
+                    "contents"
+                ][
+                    0
+                ][
+                    "playlistVideoListRenderer"
+                ]
+
             videos = important_content["contents"]
         except (KeyError, IndexError, TypeError):
             try:
