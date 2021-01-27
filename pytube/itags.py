@@ -117,7 +117,6 @@ ITAGS = {
 }
 
 HDR = [330, 331, 332, 333, 334, 335, 336, 337]
-_60FPS = [272, 298, 299, 302, 303, 308, 315, 398, 399, 400, 401, 402, 571] + HDR
 _3D = [82, 83, 84, 85, 100, 101, 102]
 LIVE = [91, 92, 93, 94, 95, 96, 132, 151]
 
@@ -139,7 +138,6 @@ def get_format_profile(itag: int) -> Dict:
         "is_live": itag in LIVE,
         "is_3d": itag in _3D,
         "is_hdr": itag in HDR,
-        "fps": 60 if itag in _60FPS else 30,
         "is_dash": (
             itag in DASH_AUDIO
             or itag in DASH_VIDEO

@@ -441,6 +441,7 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
                     "type": format_item["mimeType"],
                     "quality": format_item["quality"],
                     "itag": format_item["itag"],
+                    "fps": format_item["fps"] if 'video' in format_item["mimeType"] else None,
                     "bitrate": format_item.get("bitrate"),
                     "is_otf": (format_item.get("type") == otf_type),
                 }
@@ -462,6 +463,7 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
                     "type": format_item["mimeType"],
                     "quality": format_item["quality"],
                     "itag": format_item["itag"],
+                    "fps": format_item["fps"] if 'video' in format_item["mimeType"] else None,
                     "bitrate": format_item.get("bitrate"),
                     "is_otf": (format_item.get("type") == otf_type),
                 }
