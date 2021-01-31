@@ -75,7 +75,7 @@ class Stream:
         itag_profile = get_format_profile(self.itag)
         self.is_dash = itag_profile["is_dash"]
         self.abr = itag_profile["abr"]  # average bitrate (audio streams only)
-        self.fps = itag_profile[
+        self.fps = stream[
             "fps"
         ]  # frames per second (video streams only)
         self.resolution = itag_profile[
