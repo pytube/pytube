@@ -3,7 +3,7 @@
 Installation of pytube
 ======================
 
-This part of the documentation covers the installation of pytube.
+This guide assumes you already have python and pip installed.
 
 To install pytube, run the following command in your terminal::
 
