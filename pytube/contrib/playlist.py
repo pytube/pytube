@@ -38,7 +38,7 @@ class Playlist(Sequence):
         self.html = request.get(self.playlist_url)
 
     def _paginate(
-            self, until_watch_id: Optional[str] = None
+        self, until_watch_id: Optional[str] = None
     ) -> Iterable[List[str]]:
         """Parse the video links from the page source, yields the /watch?v=
         part from video link
@@ -131,43 +131,20 @@ class Playlist(Sequence):
         try:
             # this is the json tree structure, if the json was extracted from
             # html
+            section_contents =initial_data["contents"][
+                "twoColumnBrowseResultsRenderer"][
+                "tabs"][0]["tabRenderer"]["content"][
+                "sectionListRenderer"]["contents"]
             try:
-                # this handles the the youtube playlist without sub menus
-
-                important_content = initial_data["contents"][
-                    "twoColumnBrowseResultsRenderer"
-                ]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"][
-                    "contents"
-                ][
-                    0
-                ][
-                    "itemSectionRenderer"
-                ][
-                    "contents"
-                ][
-                    0
-                ][
-                    "playlistVideoListRenderer"
-                ]
+                # Playlist without submenus
+                important_content = section_contents[
+                    0]["itemSectionRenderer"][
+                    "contents"][0]["playlistVideoListRenderer"]
             except (KeyError, IndexError, TypeError):
-                # this handles the the youtube playlist with sub menus
-
-                important_content = initial_data["contents"][
-                    "twoColumnBrowseResultsRenderer"
-                ]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"][
-                    "contents"
-                ][
-                    1
-                ][
-                    "itemSectionRenderer"
-                ][
-                    "contents"
-                ][
-                    0
-                ][
-                    "playlistVideoListRenderer"
-                ]
-
+                # Playlist with submenus
+                important_content = section_contents[
+                    1]["itemSectionRenderer"][
+                    "contents"][0]["playlistVideoListRenderer"]
             videos = important_content["contents"]
         except (KeyError, IndexError, TypeError):
             try:
