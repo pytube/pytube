@@ -131,7 +131,7 @@ class Playlist(Sequence):
         try:
             # this is the json tree structure, if the json was extracted from
             # html
-            section_contents =initial_data["contents"][
+            section_contents = initial_data["contents"][
                 "twoColumnBrowseResultsRenderer"][
                 "tabs"][0]["tabRenderer"]["content"][
                 "sectionListRenderer"]["contents"]
