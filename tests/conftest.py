@@ -106,6 +106,19 @@ def playlist_long_html():
 
 
 @pytest.fixture
+def playlist_submenu_html():
+    """Youtube playlist HTML loaded on 2020-01-24 from
+    https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr"""
+    file_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "mocks",
+        "playlist_submenu.html.gz",
+    )
+    with gzip.open(file_path, "rb") as f:
+        return f.read().decode("utf-8")
+
+
+@pytest.fixture
 def stream_dict():
     """Youtube instance initialized with video id WXxV9g7lsFE."""
     file_path = os.path.join(
