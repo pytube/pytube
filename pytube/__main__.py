@@ -339,7 +339,7 @@ class YouTube:
     def length(self) -> int:
         """Get the video length in seconds.
 
-        :rtype: str
+        :rtype: int
 
         """
         return int(
@@ -355,7 +355,7 @@ class YouTube:
     def views(self) -> int:
         """Get the number of the times the video has been viewed.
 
-        :rtype: str
+        :rtype: int
 
         """
         return int(
