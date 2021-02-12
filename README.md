@@ -28,7 +28,43 @@ request!
 *pytube* is a very serious, lightweight, dependency-free Python library (and
 command-line utility) for downloading YouTube Videos.
 
-## Installation
+
+## Documentation
+Detailed documentation about how to use the library can be found on our
+[readthedocs](https://python-pytube.readthedocs.io) page. This is recommended
+for most use cases. If you just want to quickly download a single video,
+the quickstart guide below might be what you're looking for.
+
+
+## Description
+YouTube is the most popular video-sharing platform in the world and as a hacker
+you may encounter a situation where you want to script something to download
+videos. For this I present to you *pytube*.
+
+*pytube* is a lightweight library written in Python. It has no third party
+dependencies and aims to be highly reliable.
+
+*pytube* also makes pipelining easy, allowing you to specify callback functions
+for different download events, such as  ``on progress`` or ``on complete``.
+
+Finally *pytube* also includes a command-line utility, allowing you to quickly
+download videos right from terminal.
+
+
+## Features
+- Support for both progressive & DASH streams
+- Support for downloading complete playlist
+- Easily register ``on_download_progress`` & ``on_download_complete`` callbacks
+- Command-line interfaced included
+- Caption track support
+- Outputs caption tracks to .srt format (SubRip Subtitle)
+- Ability to capture thumbnail URL
+- Extensively documented source code
+- No third-party dependencies
+
+## Quickstart
+
+### Installation
 Pytube requires an installation of python 3.6 or greater, as well as pip.
 Pip is typically bundled with python installations, and you can find options
 for how to install python at https://python.org.
@@ -46,23 +82,13 @@ source with pip:
 $ python -m pip install git+https://github.com/pytube/pytube
 ```
 
-## Description
-YouTube is the most popular video-sharing platform in the world and as a hacker
-you may encounter a situation where you want to script something to download
-videos. For this I present to you *pytube*.
-
-*pytube* is a lightweight library written in Python. It has no third party
-dependencies and aims to be highly reliable.
-
-*pytube* also makes pipelining easy, allowing you to specify callback functions
-for different download events, such as  ``on progress`` or ``on complete``.
-
-Finally *pytube* also includes a command-line utility, allowing you to quickly
-download videos right from terminal.
-
-### Behold, a perfect balance of simplicity versus flexibility:
+### Download a specific video in a python script
+To download a video using the library in a script, you'll need to first import
+the YouTube class from the library, and pass it an argument of the video url.
+From there, you can access the streams and download them.
 
 ```python
+ >>> from pytube import YouTube
  >>> YouTube('https://youtu.be/2lAe1cqCOXo').streams.first().download()
  >>> yt = YouTube('http://youtube.com/watch?v=2lAe1cqCOXo')
  >>> yt.streams
@@ -73,19 +99,14 @@ download videos right from terminal.
   ... .download()
 ```
 
-## Features
-- Support for both progressive & DASH streams
-- Support for downloading complete playlist
-- Easily register ``on_download_progress`` & ``on_download_complete`` callbacks
-- Command-line interfaced included
-- Caption track support
-- Outputs caption tracks to .srt format (SubRip Subtitle)
-- Ability to capture thumbnail URL
-- Extensively documented source code
-- No third-party dependencies
+### Download a specific video with the command-line interface
+Using the CLI is extremely straightforward as well. To download a video at the
+highest progressive quality, you can use the following command:
+```bash
+$ pytube https://youtube.com/watch?v=2lAe1cqCOXo
+```
 
-## Getting Started
-
-We have extensive documentation for how to use the code on
-[readthedocs](https://python-pytube.readthedocs.io), and highly recommend
-checking that out for most use cases!
+You can also do the same for a playlist:
+```bash
+$ pytube https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n
+```

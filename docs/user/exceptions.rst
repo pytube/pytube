@@ -16,13 +16,13 @@ Let's see what your code might look like if you need to do exception handling::
     >>> playlist_url = 'https://youtube.com/playlist?list=special_playlist_id'
     >>> p = Playlist(playlist_url)
     >>> for url in p.video_urls:
-            try:
-                yt = YouTube(url)
-            except VideoUnavailable:
-                print(f'Video {url} is unavaialable, skipping.')
-            else:
-                print(f'Downloading video: {url}')
-                yt.streams.first().download()
+    ...     try:
+    ...         yt = YouTube(url)
+    ...     except VideoUnavailable:
+    ...         print(f'Video {url} is unavaialable, skipping.')
+    ...     else:
+    ...         print(f'Downloading video: {url}')
+    ...         yt.streams.first().download()
 
 This will automatically skip over videos that could not be downloaded due to a
 limitation with the pytube library. You can find more details about what
