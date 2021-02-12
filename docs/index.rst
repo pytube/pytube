@@ -64,6 +64,7 @@ of pytube.
    user/captions
    user/playlist
    user/cli
+   user/exceptions
 
 The API Documentation
 -----------------------------
