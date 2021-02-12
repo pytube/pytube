@@ -238,3 +238,20 @@ def test_trimmed_pagination_not_found(
     playlist = Playlist(url) # noqa
     # assert len(list(playlist.trimmed("wont-be-found"))) == 101 # noqa
     assert True
+
+
+# test case for playlist with submenus
+@mock.patch("pytube.contrib.playlist.request.get")
+def test_playlist_submenu(
+        request_get, playlist_submenu_html):
+    url = "https://www.fakeurl.com/playlist?list=whatever"
+    request_get.side_effect = [
+        playlist_submenu_html,
+        '{"content_html":"<a '
+        'href=\\"/watch?v=BcWz41-4cDk&amp;feature=plpp_video&amp;ved'
+        '=CCYQxjQYACITCO33n5-pn-cCFUG3xAodLogN2yj6LA\\">}", '
+        '"load_more_widget_html":""}',
+        "{}",
+    ]
+    playlist = Playlist(url)
+    assert len(playlist.video_urls) == 12

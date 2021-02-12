@@ -285,7 +285,7 @@ def test_repr_for_audio_streams(cipher_signature):
 def test_repr_for_video_streams(cipher_signature):
     stream = str(cipher_signature.streams.filter(only_video=True)[0])
     expected = (
-        '<Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" '
+        '<Stream: itag="137" mime_type="video/mp4" res="1080p" fps="24fps" '
         'vcodec="avc1.640028" progressive="False" type="video">'
     )
     assert stream == expected
@@ -294,7 +294,7 @@ def test_repr_for_video_streams(cipher_signature):
 def test_repr_for_progressive_streams(cipher_signature):
     stream = str(cipher_signature.streams.filter(progressive=True)[0])
     expected = (
-        '<Stream: itag="18" mime_type="video/mp4" res="360p" fps="30fps" '
+        '<Stream: itag="18" mime_type="video/mp4" res="360p" fps="24fps" '
         'vcodec="avc1.42001E" acodec="mp4a.40.2" progressive="True" '
         'type="video">'
     )
@@ -304,7 +304,7 @@ def test_repr_for_progressive_streams(cipher_signature):
 def test_repr_for_adaptive_streams(cipher_signature):
     stream = str(cipher_signature.streams.filter(adaptive=True)[0])
     expected = (
-        '<Stream: itag="137" mime_type="video/mp4" res="1080p" fps="30fps" '
+        '<Stream: itag="137" mime_type="video/mp4" res="1080p" fps="24fps" '
         'vcodec="avc1.640028" progressive="False" type="video">'
     )
     assert stream == expected

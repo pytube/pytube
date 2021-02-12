@@ -9,7 +9,7 @@ import pytest
         ({"progressive": True}, [18, 22]),
         ({"resolution": "720p"}, [22, 136, 247, 398]),
         ({"res": "720p"}, [22, 136, 247, 398]),
-        ({"fps": 30, "resolution": "480p"}, [135, 244, 397]),
+        ({"fps": 24, "resolution": "480p"}, [135, 244, 397]),
         ({"mime_type": "audio/mp4"}, [140]),
         ({"type": "audio"}, [140, 249, 250, 251]),
         ({"subtype": "3gpp"}, []),
@@ -175,6 +175,6 @@ def test_repr(cipher_signature):
         )
     ) == (
         '[<Stream: itag="18" mime_type="video/mp4" '
-        'res="360p" fps="30fps" vcodec="avc1.42001E" '
+        'res="360p" fps="24fps" vcodec="avc1.42001E" '
         'acodec="mp4a.40.2" progressive="True" type="video">]'
     )
