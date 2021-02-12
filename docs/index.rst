@@ -20,7 +20,8 @@ Release v\ |version|. (:ref:`Installation<install>`)
   :alt: Python Versions
   :target: https://pypi.python.org/pypi/pytube/
 
-**pytube** is a lightweight, Pythonic, dependency-free, library (and command-line utility) for downloading YouTube Videos.
+**pytube** is a lightweight, Pythonic, dependency-free, library (and
+command-line utility) for downloading YouTube Videos.
 
 -------------------
 
@@ -48,28 +49,28 @@ Features
 - Extensively Documented Source Code
 - No Third-Party Dependencies
 
-Roadmap
--------
-
-- Allow downloading age restricted content
-- Complete ffmpeg integration
-
 The User Guide
 --------------
-This part of the documentation begins with some background information about the project, then focuses on step-by-step instructions for getting the most out of pytube.
+This part of the documentation begins with some background information about
+the project, then focuses on step-by-step instructions for getting the most out
+of pytube.
 
 .. toctree::
    :maxdepth: 2
 
    user/install
    user/quickstart
+   user/streams
+   user/captions
    user/playlist
    user/cli
+   user/exceptions
 
-The API Documentation / Guide
+The API Documentation
 -----------------------------
 
-If you are looking for information on a specific function, class, or method, this part of the documentation is for you.
+If you are looking for information on a specific function, class, or method,
+this part of the documentation is for you.
 
 .. toctree::
    :maxdepth: 2
