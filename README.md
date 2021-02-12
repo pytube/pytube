@@ -20,7 +20,7 @@
 </div>
 
 
-###  Actively soliciting contributers!
+### Actively soliciting contributers!
 Have ideas for how pytube can be improved? Feel free to open an issue or a pull
 request!
 
@@ -33,7 +33,7 @@ command-line utility) for downloading YouTube Videos.
 Detailed documentation about how to use the library can be found on our
 [readthedocs](https://python-pytube.readthedocs.io) page. This is recommended
 for most use cases. If you just want to quickly download a single video,
-the quickstart guide below might be what you're looking for.
+the [quickstart](#Quickstart) guide below might be what you're looking for.
 
 
 ## Description
