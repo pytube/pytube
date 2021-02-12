@@ -63,6 +63,9 @@ download videos right from terminal.
 - No third-party dependencies
 
 ## Quickstart
+This guide is only meant to cover the most basic usage of the library. For more
+detailed information, please refer to our
+[readthedocs](https://python-pytube.readthedocs.io) page.
 
 ### Installation
 Pytube requires an installation of python 3.6 or greater, as well as pip.
@@ -82,7 +85,7 @@ source with pip:
 $ python -m pip install git+https://github.com/pytube/pytube
 ```
 
-### Download a specific video in a python script
+### Using pytube in a python script
 To download a video using the library in a script, you'll need to first import
 the YouTube class from the library, and pass it an argument of the video url.
 From there, you can access the streams and download them.
@@ -99,7 +102,7 @@ From there, you can access the streams and download them.
   ... .download()
 ```
 
-### Download a specific video with the command-line interface
+### Using the command-line interface
 Using the CLI is extremely straightforward as well. To download a video at the
 highest progressive quality, you can use the following command:
 ```bash
