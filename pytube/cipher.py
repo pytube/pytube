@@ -33,9 +33,18 @@ logger = logging.getLogger(__name__)
 class Cipher:
     def __init__(self, js: str):
         self.transform_plan: List[str] = get_transform_plan(js)
-        var, _ = self.transform_plan[0].split(".")
+        var_regex = re.compile(r"^\w+\W")
+        var_match = var_regex.search(self.transform_plan[0])
+        if not var_match:
+            raise RegexMatchError(
+                caller="__init__", pattern=var_regex.pattern
+            )
+        var = var_match.group(0)[:-1]
         self.transform_map = get_transform_map(js, var)
-        self.js_func_regex = re.compile(r"\w+\.(\w+)\(\w,(\d+)\)")
+        self.js_func_patterns = [
+            r"\w+\.(\w+)\(\w,(\d+)\)",
+            r"\w+\[(\"\w+\")\]\(\w,(\d+)\)"
+        ]
 
     def get_signature(self, ciphered_signature: str) -> str:
         """Decipher the signature.
@@ -87,13 +96,16 @@ class Cipher:
 
         """
         logger.debug("parsing transform function")
-        parse_match = self.js_func_regex.search(js_func)
-        if not parse_match:
-            raise RegexMatchError(
-                caller="parse_function", pattern="js_func_regex"
-            )
-        fn_name, fn_arg = parse_match.groups()
-        return fn_name, int(fn_arg)
+        for pattern in self.js_func_patterns:
+            regex = re.compile(pattern)
+            parse_match = regex.search(js_func)
+            if parse_match:
+                fn_name, fn_arg = parse_match.groups()
+                return fn_name, int(fn_arg)
+
+        raise RegexMatchError(
+            caller="parse_function", pattern="js_func_patterns"
+        )
 
 
 def get_initial_function_name(js: str) -> str:
