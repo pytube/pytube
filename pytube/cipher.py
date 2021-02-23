@@ -37,8 +37,8 @@ class Cipher:
         var_match = var_regex.search(self.transform_plan[0])
         if not var_match:
             raise RegexMatchError(
-            caller="__init__", pattern="var_regex"
-        )
+                caller="__init__", pattern=var_regex.pattern
+            )
         var = var_match.group(0)[:-1]
         self.transform_map = get_transform_map(js, var)
         self.js_func_patterns = [
@@ -102,10 +102,10 @@ class Cipher:
             if parse_match:
                 fn_name, fn_arg = parse_match.groups()
                 return fn_name, int(fn_arg)
-        
+
         raise RegexMatchError(
-                caller="parse_function", pattern="js_func_regex"
-            )
+            caller="parse_function", pattern="js_func_patterns"
+        )
 
 
 def get_initial_function_name(js: str) -> str:
