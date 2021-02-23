@@ -2,7 +2,6 @@
 """Module for interacting with a user's youtube channel."""
 import json
 import logging
-import re
 from typing import Dict
 from typing import Iterable
 from typing import List
@@ -11,11 +10,12 @@ from typing import Tuple
 
 from pytube import extract
 from pytube import request
-from pytube import YouTube
 from pytube.helpers import cache
 from pytube.helpers import uniqueify
+from pytube.helpers import install_proxy
 
 logger = logging.getLogger(__name__)
+
 
 class Channel:
     def __init__(self, url: str, proxies: Optional[Dict[str, str]] = None):
@@ -91,7 +91,7 @@ class Channel:
         :returns: List of video URLs
         """
         # TODO: convert to an iterator, so a user can subscript how much they want
-        # e.g. Channel.video_urls[:100]
+        # such as Channel.video_urls[:100]
         return [
             self._video_url(video)
             for page in list(self._paginate_videos())
@@ -158,8 +158,8 @@ class Channel:
             a continuation token, if more videos are available
         """
         initial_data = json.loads(raw_json)
-            # this is the json tree structure, if the json was extracted from
-            # html
+        # this is the json tree structure, if the json was extracted from
+        # html
         try:
             videos = initial_data["contents"][
                 "twoColumnBrowseResultsRenderer"][
