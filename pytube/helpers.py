@@ -20,6 +20,23 @@ from pytube.exceptions import RegexMatchError
 logger = logging.getLogger(__name__)
 
 
+class ContinuationBase:
+    def __init__(self):
+        ...
+
+    def __iter__(self):
+        ...
+
+    def __getitem__(self, key):
+        if type(key) is not int:
+            raise TypeError
+
+    def continuation_generator(self):
+        ...
+
+
+
+
 def regex_search(pattern: str, string: str, group: int) -> str:
     """Shortcut method to search a string for a given pattern.
 
