@@ -33,8 +33,17 @@ logger = logging.getLogger(__name__)
 class Cipher:
     def __init__(self, js: str):
         self.transform_plan: List[str] = get_transform_plan(js)
-        var, _ = self.transform_plan[0].split(".")
+
+        if "." not in self.transform_plan[0] and "[" not in self.transform_plan[0]:
+            raise RegexMatchError(
+                caller="__init__", pattern="multiple"
+            )
+        elif "." in self.transform_plan[0]:
+            var, _ = self.transform_plan[0].split(".")
+        elif "[" in self.transform_plan[0]:
+            var = self.transform_plan[0][:self.transform_plan[0].find("[")]
         self.transform_map = get_transform_map(js, var)
+
         self.js_func_regex = re.compile(r"\w+\.(\w+)\(\w,(\d+)\)")
 
     def get_signature(self, ciphered_signature: str) -> str:
