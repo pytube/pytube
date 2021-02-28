@@ -1,0 +1,32 @@
+# .github/workflows/pypi-publish.yml
+name: Publish to PyPI
+
+on:
+  release:
+    types: [ created ]
+
+jobs:
+  deploy:
+    if: github.actor == 'nficano' || github.actor == 'RONNCC' || github.actor == 'tfdahlin'
+    name: Build Python distribution and publish to PyPI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build setuptools wheel twine
+
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          python -m build
+          python -m twine upload dist/*
