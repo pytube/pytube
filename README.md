@@ -3,7 +3,7 @@
   <img src="https://assets.nickficano.com/gh-pytube.min.svg" width="456" height="143" alt="pytube logo" />
   </p>
   <p align="center">
-	  <img src="https://img.shields.io/pypi/v/pytube.svg" alt="pypi">
+	  <img src="https://img.shields.io/pypi/dm/pytube" alt="pypi">
 	  <a href="http://python-pytube.readthedocs.io/en/latest/?badge=latest">
       <img src="https://readthedocs.org/projects/python-pytube/badge/?version=latest" />
     </a>
@@ -14,7 +14,7 @@
       <img src="https://img.shields.io/pypi/dm/pytube.svg" alt="pypi">
     </a>
 	  <a href="https://pypi.python.org/pypi/pytube/">
-      <img src="https://img.shields.io/pypi/pyversions/pytube.svg" />
+      <img src="https://img.shields.io/pypi/v/pytube" />
     </a>
   </p>
 </div>
