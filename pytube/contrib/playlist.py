@@ -122,8 +122,12 @@ class Playlist(Sequence):
             # extra data required for post request
             {
                 "continuation": continuation,
-                "context": {"client": {"clientName": "WEB",
-                                       "clientVersion": "2.20200720.00.02"}}
+                "context": {
+                    "client": {
+                        "clientName": "WEB",
+                        "clientVersion": "2.20200720.00.02"
+                    }
+                }
             }
         )
 
