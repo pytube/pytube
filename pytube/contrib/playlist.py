@@ -122,7 +122,8 @@ class Playlist(Sequence):
             # extra data required for post request
             {
                 "continuation": continuation,
-                "context": {"client": {"clientName": "WEB", "clientVersion": "2.20200720.00.02"}}
+                "context": {"client": {"clientName": "WEB",
+                                       "clientVersion": "2.20200720.00.02"}}
             }
         )
 
@@ -160,8 +161,9 @@ class Playlist(Sequence):
                 # this is the json tree structure, if the json was directly sent
                 # by the server in a continuation response
                 # no longer a list and no longer has the "response" key
-                important_content = initial_data['onResponseReceivedActions'][0]['appendContinuationItemsAction']
-                videos = important_content['continuationItems']
+                important_content = initial_data['onResponseReceivedActions'][0][
+                    'appendContinuationItemsAction']['continuationItems']
+                videos = important_content
             except (KeyError, IndexError, TypeError) as p:
                 print(p)
                 return [], None
