@@ -30,6 +30,10 @@ class Playlist(Sequence):
         if proxies:
             install_proxy(proxies)
 
+        # extracted from requests on the webpage, but can also be located in
+        # the initial html (script with ytcfg.set)
+        self.yt_api_key = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
+
         self.playlist_id = extract.playlist_id(url)
 
         self.playlist_url = (
@@ -49,7 +53,6 @@ class Playlist(Sequence):
         :rtype: Iterable[List[str]]
         :returns: Iterable of lists of YouTube watch ids
         """
-        req = self.html
         videos_urls, continuation = self._extract_videos(
             json.dumps(extract.initial_data(self.html))
         )
@@ -67,15 +70,15 @@ class Playlist(Sequence):
         # than 100 songs inside a playlist, so we need to add further requests
         # to gather all of them
         if continuation:
-            load_more_url, headers = self._build_continuation_url(continuation)
+            load_more_url, headers, data = self._build_continuation_url(continuation)
         else:
-            load_more_url, headers = None, None
+            load_more_url, headers, data = None, None, None
 
-        while load_more_url and headers:  # there is an url found
+        while load_more_url and headers and data:  # there is an url found
             logger.debug("load more url: %s", load_more_url)
             # requesting the next page of videos with the url generated from the
-            # previous page
-            req = request.get(load_more_url, extra_headers=headers)
+            # previous page, needs to be a post
+            req = request.post(load_more_url, extra_headers=headers, data=data)
             # extract up to 100 songs from the page loaded
             # returns another continuation if more videos are available
             videos_urls, continuation = self._extract_videos(req)
@@ -89,32 +92,38 @@ class Playlist(Sequence):
             yield videos_urls
 
             if continuation:
-                load_more_url, headers = self._build_continuation_url(
+                load_more_url, headers, data = self._build_continuation_url(
                     continuation
                 )
             else:
-                load_more_url, headers = None, None
+                load_more_url, headers, data = None, None, None
 
-    @staticmethod
-    def _build_continuation_url(continuation: str) -> Tuple[str, dict]:
+    def _build_continuation_url(self, continuation: str) -> Tuple[str, dict, dict]:
         """Helper method to build the url and headers required to request
         the next page of videos
 
         :param str continuation: Continuation extracted from the json response
             of the last page
-        :rtype: Tuple[str, dict]
+        :rtype: Tuple[str, dict, dict]
         :returns: Tuple of an url and required headers for the next http
             request
         """
         return (
             (
-                f"https://www.youtube.com/browse_ajax?ctoken="
-                f"{continuation}&continuation={continuation}"
+                # was changed to this format (and post requests)
+                # between 2021.03.02 and 2021.03.03
+                "https://www.youtube.com/youtubei/v1/browse?key="
+                f"{self.yt_api_key}"
             ),
             {
                 "X-YouTube-Client-Name": "1",
                 "X-YouTube-Client-Version": "2.20200720.00.02",
             },
+            # extra data required for post request
+            {
+                "continuation": continuation,
+                "context": {"client": {"clientName": "WEB", "clientVersion": "2.20200720.00.02"}}
+            }
         )
 
     @staticmethod
@@ -150,10 +159,9 @@ class Playlist(Sequence):
             try:
                 # this is the json tree structure, if the json was directly sent
                 # by the server in a continuation response
-                important_content = initial_data[1]['response']['onResponseReceivedActions'][
-                    0
-                ]['appendContinuationItemsAction']['continuationItems']
-                videos = important_content
+                # no longer a list and no longer has the "response" key
+                important_content = initial_data['onResponseReceivedActions'][0]['appendContinuationItemsAction']
+                videos = important_content['continuationItems']
             except (KeyError, IndexError, TypeError) as p:
                 print(p)
                 return [], None
