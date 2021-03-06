@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
 from unittest import mock
-from unittest.mock import MagicMock
 
 from pytube import Playlist
 
@@ -80,6 +79,7 @@ def test_video_urls(request_get, playlist_html):
         "https://www.youtube.com/watch?v=zixd-si9Q-o",
     ]
     request_get.assert_called()
+
 
 @mock.patch("pytube.request.get")
 def test_html(request_get, playlist_html):
