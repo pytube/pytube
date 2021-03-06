@@ -10,31 +10,17 @@ import warnings
 from typing import Any
 from typing import Callable
 from typing import Dict
+from typing import Iterable
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import TypeVar
 from urllib import request
 
+from pytube import extract
 from pytube.exceptions import RegexMatchError
 
 logger = logging.getLogger(__name__)
-
-
-class ContinuationBase:
-    def __init__(self):
-        ...
-
-    def __iter__(self):
-        ...
-
-    def __getitem__(self, key):
-        if type(key) is not int:
-            raise TypeError
-
-    def continuation_generator(self):
-        ...
-
-
 
 
 def regex_search(pattern: str, string: str, group: int) -> str:
