@@ -169,16 +169,20 @@ def test_trimmed(request_get, playlist_html):
 
 
 @mock.patch("pytube.request.get")
-def test_playlist_failed_pagination(request_get, playlist_long_html):
+@mock.patch("pytube.request.post")
+def test_playlist_failed_pagination(request_post, request_get, playlist_long_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.side_effect = [
         playlist_long_html,
-        "{}",
+    ]
+    request_post.side_effect = [
+        "{}"
     ]
     playlist = Playlist(url)
     video_urls = playlist.video_urls
     assert len(video_urls) == 100
-    assert request_get.call_count == 2
+    assert request_get.call_count == 1
+    assert request_post.call_count == 1
     # TODO: Cannot get this test to work probably
     # request_get.assert_called_with(
     #    "https://www.youtube.com/browse_ajax?ctoken" # noqa
@@ -192,10 +196,13 @@ def test_playlist_failed_pagination(request_get, playlist_long_html):
 
 
 @mock.patch("pytube.request.get")
-def test_playlist_pagination(request_get, playlist_html, playlist_long_html):
+@mock.patch("pytube.request.post")
+def test_playlist_pagination(request_post, request_get, playlist_html, playlist_long_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.side_effect = [
-        playlist_long_html,
+        playlist_long_html
+    ]
+    request_post.side_effect = [
         '{"content_html":"<a '
         'href=\\"/watch?v=BcWz41-4cDk&amp;feature=plpp_video&amp;ved'
         '=CCYQxjQYACITCO33n5-pn-cCFUG3xAodLogN2yj6LA\\">}", '
@@ -204,7 +211,8 @@ def test_playlist_pagination(request_get, playlist_html, playlist_long_html):
     ]
     playlist = Playlist(url)
     assert len(playlist.video_urls) == 100
-    assert request_get.call_count == 2
+    assert request_get.call_count == 1
+    assert request_post.call_count == 1
 
 
 @mock.patch("pytube.request.get")
