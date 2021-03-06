@@ -110,7 +110,7 @@ def find_object_from_startpoint(html, start_point):
         i += 1
 
     full_obj = html[:i]
-    return full_obj
+    return full_obj  # noqa: R504
 
 
 def parse_for_object_from_startpoint(html, start_point):
