@@ -10,6 +10,7 @@ from typing import Tuple
 
 from pytube import extract
 from pytube import request
+from pytube.continuation import Continuation
 from pytube.helpers import cache
 from pytube.helpers import uniqueify
 from pytube.helpers import install_proxy
@@ -41,6 +42,8 @@ class Channel:
         self._community_html = None
         self._featured_channels_html = None
         self._about_html = None
+
+        self.continuation_class = Continuation
 
     @property
     def videos_html(self):
@@ -101,51 +104,34 @@ class Channel:
     def _paginate_videos(
         self, until_watch_id: Optional[str] = None
     ) -> Iterable[List[str]]:
-        req = self.videos_html
-        video_urls, continuation = self._extract_videos(
-            json.dumps(extract.initial_data(req))
-        )
-        if until_watch_id:
+        """Parse the video links from the page source, yields the /watch?v=
+        part from video link
+
+        :param until_watch_id Optional[str]: YouTube Video watch id until
+            which the playlist should be read.
+
+        :rtype: Iterable[List[str]]
+        :returns: Iterable of lists of YouTube watch ids
+        """
+        gen = self.continuation_class._paginate(self.videos_html)
+        try:
+            curr = next(gen)
+        except StopIteration:
+            return
+        while True:
+            # Trim the current page if necessary, else yield the whole thing
             try:
-                trim_index = video_urls.index(f'/watch?v={until_watch_id}')
-                yield video_urls[:trim_index]
-                return
+                trim_index = curr.index(f'/watch?v={until_watch_id}')
+                yield curr[:trim_index]
+                break
             except ValueError:
-                pass
-        yield video_urls
+                yield curr
 
-        # Extraction from a channel only returns 60 videos at a time
-        # if self._extract_videos returns a continuation there are more
-        # than 60 songs inside a playlist, so we need to add further requests
-        # to gather all of them
-        if continuation:
-            load_more_url, headers = self._build_continuation_url(continuation)
-        else:
-            load_more_url, headers = None, None
-
-        while load_more_url and headers:  # there is an url found
-            logger.debug("load more url: %s", load_more_url)
-            # requesting the next page of videos with the url generated from the
-            # previous page
-            req = request.get(load_more_url, extra_headers=headers)
-            # extract up to 60 songs from the page loaded
-            # returns another continuation if more videos are available
-            videos_urls, continuation = self._extract_videos(req)
-            if until_watch_id:
-                try:
-                    trim_index = videos_urls.index(f"/watch?v={until_watch_id}")
-                    yield videos_urls[:trim_index]
-                    return
-                except ValueError:
-                    pass
-            yield videos_urls
-
-            if continuation:
-                load_more_url, headers = self._build_continuation_url(
-                    continuation
-                )
-            else:
-                load_more_url, headers = None, None
+            # Try to get the next page
+            try:
+                curr = next(gen)
+            except StopIteration:
+                break
 
     @staticmethod
     def _extract_videos(raw_json: str) -> Tuple[List[str], Optional[str]]:
@@ -203,28 +189,6 @@ class Channel:
                 ),
             ),
             continuation,
-        )
-
-    @staticmethod
-    def _build_continuation_url(continuation: str) -> Tuple[str, dict]:
-        """Helper method to build the url and headers required to request
-        the next page of videos
-
-        :param str continuation: Continuation extracted from the json response
-            of the last page
-        :rtype: Tuple[str, dict]
-        :returns: Tuple of an url and required headers for the next http
-            request
-        """
-        return (
-            (
-                f"https://www.youtube.com/browse_ajax?ctoken="
-                f"{continuation}&continuation={continuation}"
-            ),
-            {
-                "X-YouTube-Client-Name": "1",
-                "X-YouTube-Client-Version": "2.20200720.00.02",
-            },
         )
 
     @staticmethod
