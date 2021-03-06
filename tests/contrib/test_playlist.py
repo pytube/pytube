@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 from pytube import Playlist
 
 
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 def test_title(request_get):
     request_get.return_value = (
         "<title>(149) Python Tutorial for Beginners "
@@ -24,7 +24,7 @@ def test_title(request_get):
     )
 
 
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 def test_init_with_playlist_url(request_get):
     request_get.return_value = ""
     url = (
@@ -35,7 +35,7 @@ def test_init_with_playlist_url(request_get):
     assert playlist.playlist_url == url
 
 
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 def test_init_with_watch_url(request_get):
     request_get.return_value = ""
     url = (
@@ -49,7 +49,7 @@ def test_init_with_watch_url(request_get):
     )
 
 
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 def test_last_updated(request_get, playlist_html):
     expected = datetime.date(2020, 3, 11)
     request_get.return_value = playlist_html
@@ -60,13 +60,11 @@ def test_last_updated(request_get, playlist_html):
     assert playlist.last_updated == expected
 
 
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 def test_video_urls(request_get, playlist_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.return_value = playlist_html
     playlist = Playlist(url)
-    playlist._find_load_more_url = MagicMock(return_value=None)
-    request_get.assert_called()
     assert playlist.video_urls == [
         "https://www.youtube.com/watch?v=ujTCoH21GlA",
         "https://www.youtube.com/watch?v=45ryDIPHdGg",
@@ -81,15 +79,22 @@ def test_video_urls(request_get, playlist_html):
         "https://www.youtube.com/watch?v=g1Zbuk1gAfk",
         "https://www.youtube.com/watch?v=zixd-si9Q-o",
     ]
+    request_get.assert_called()
+
+@mock.patch("pytube.request.get")
+def test_html(request_get, playlist_html):
+    url = "https://www.fakeurl.com/playlist?list=whatever"
+    request_get.return_value = playlist_html
+    playlist = Playlist(url)
+    assert playlist.html == playlist_html
+    request_get.assert_called()
 
 
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 def test_repr(request_get, playlist_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.return_value = playlist_html
     playlist = Playlist(url)
-    playlist._find_load_more_url = MagicMock(return_value=None)
-    request_get.assert_called()
     assert (
         repr(playlist) == "["
         "'https://www.youtube.com/watch?v=ujTCoH21GlA', "
@@ -106,30 +111,29 @@ def test_repr(request_get, playlist_html):
         "'https://www.youtube.com/watch?v=zixd-si9Q-o'"
         "]"
     )
+    request_get.assert_called()
 
 
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 def test_sequence(request_get, playlist_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.return_value = playlist_html
     playlist = Playlist(url)
-    playlist._find_load_more_url = MagicMock(return_value=None)
     assert playlist[0] == "https://www.youtube.com/watch?v=ujTCoH21GlA"
     assert len(playlist) == 12
 
 
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
 def test_videos(youtube, request_get, playlist_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.return_value = playlist_html
     playlist = Playlist(url)
-    playlist._find_load_more_url = MagicMock(return_value=None)
-    request_get.assert_called()
     assert len(list(playlist.videos)) == 12
+    request_get.assert_called()
 
 
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 @mock.patch("pytube.cli.YouTube.__init__", return_value=None)
 def test_load_more(youtube, request_get, playlist_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
@@ -138,12 +142,11 @@ def test_load_more(youtube, request_get, playlist_html):
         '{"content_html":"", "load_more_widget_html":""}',
     ]
     playlist = Playlist(url)
-    playlist._find_load_more_url = MagicMock(side_effect=["dummy", None])
-    request_get.assert_called()
     assert len(list(playlist.videos)) == 12
+    request_get.assert_called()
 
 
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 @mock.patch("pytube.contrib.playlist.install_proxy", return_value=None)
 def test_proxy(install_proxy, request_get):
     url = "https://www.fakeurl.com/playlist?list=whatever"
@@ -152,21 +155,20 @@ def test_proxy(install_proxy, request_get):
     install_proxy.assert_called_with({"http": "things"})
 
 
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 def test_trimmed(request_get, playlist_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.return_value = playlist_html
     playlist = Playlist(url)
-    playlist._find_load_more_url = MagicMock(return_value=None)
-    assert request_get.call_count == 1
     trimmed = list(playlist.trimmed("1BYu65vLKdA"))
     assert trimmed == [
         "https://www.youtube.com/watch?v=ujTCoH21GlA",
         "https://www.youtube.com/watch?v=45ryDIPHdGg",
     ]
+    assert request_get.call_count == 1
 
 
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 def test_playlist_failed_pagination(request_get, playlist_long_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.side_effect = [
@@ -189,7 +191,7 @@ def test_playlist_failed_pagination(request_get, playlist_long_html):
     # ) # noqa
 
 
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 def test_playlist_pagination(request_get, playlist_html, playlist_long_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.side_effect = [
@@ -205,7 +207,7 @@ def test_playlist_pagination(request_get, playlist_html, playlist_long_html):
     assert request_get.call_count == 2
 
 
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 def test_trimmed_pagination(request_get, playlist_html, playlist_long_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.side_effect = [
@@ -222,7 +224,7 @@ def test_trimmed_pagination(request_get, playlist_html, playlist_long_html):
 
 
 # TODO: Test case not clear to me
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 def test_trimmed_pagination_not_found(
     request_get, playlist_html, playlist_long_html
 ):
@@ -241,7 +243,7 @@ def test_trimmed_pagination_not_found(
 
 
 # test case for playlist with submenus
-@mock.patch("pytube.contrib.playlist.request.get")
+@mock.patch("pytube.request.get")
 def test_playlist_submenu(
         request_get, playlist_submenu_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
