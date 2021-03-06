@@ -30,16 +30,33 @@ class Playlist(Sequence):
         if proxies:
             install_proxy(proxies)
 
-        # extracted from requests on the webpage, but can also be located in
-        # the initial html (script with ytcfg.set)
-        self.yt_api_key = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
+        # These need to be initialized as None for the properties.
+        self._html = None
+        self._ytcfg = None
 
         self.playlist_id = extract.playlist_id(url)
 
         self.playlist_url = (
             f"https://www.youtube.com/playlist?list={self.playlist_id}"
         )
-        self.html = request.get(self.playlist_url)
+
+    @property
+    def html(self):
+        if self._html:
+            return self._html
+        self._html = request.get(self.playlist_url)
+        return self._html
+
+    @property
+    def ytcfg(self):
+        if self._ytcfg:
+            return self._ytcfg
+        self._ytcfg = extract.get_ytcfg(self.html)
+        return self._ytcfg
+
+    @property
+    def yt_api_key(self):
+        return self.ytcfg['INNERTUBE_API_KEY']
 
     def _paginate(
         self, until_watch_id: Optional[str] = None
