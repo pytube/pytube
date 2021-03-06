@@ -24,6 +24,7 @@ from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search
 from pytube.metadata import YouTubeMetadata
 from pytube.parser import parse_for_object
+from pytube.parser import parse_for_all_objects
 
 logger = logging.getLogger(__name__)
 
@@ -367,6 +368,40 @@ def get_ytplayer_config(html: str) -> Any:
 
     raise RegexMatchError(
         caller="get_ytplayer_config", pattern="config_patterns, setconfig_patterns"
+    )
+
+
+def get_ytcfg(html: str) -> str:
+    """Get the entirety of the ytcfg object.
+
+    This is built over multiple pieces, so we have to find all matches and
+    combine the dicts together.
+
+    :param str html:
+        The html contents of the watch page.
+    :rtype: str
+    :returns:
+        Substring of the html containing the encoded manifest data.
+    """
+    ytcfg = {}
+    ytcfg_patterns = [
+        r"ytcfg\s=\s",
+        r"ytcfg\.set\("
+    ]
+    for pattern in ytcfg_patterns:
+        # Try each pattern consecutively and try to build a cohesive object
+        try:
+            found_objects = parse_for_all_objects(html, pattern)
+            for obj in found_objects:
+                ytcfg.update(obj)
+        except HTMLParseError:
+            continue
+
+    if len(ytcfg) > 0:
+        return ytcfg
+
+    raise RegexMatchError(
+        caller="get_ytcfg", pattern="ytcfg_pattenrs"
     )
 
 

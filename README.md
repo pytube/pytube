@@ -1,23 +1,17 @@
 <div align="center">
   <p>
-  <img src="https://assets.nickficano.com/gh-pytube.min.svg" width="456" height="143" alt="pytube logo" />
+    <img src="https://assets.nickficano.com/gh-pytube.min.svg" width="456" height="143" alt="pytube logo" />
   </p>
   <p align="center">
-	  <img src="https://img.shields.io/pypi/v/pytube.svg" alt="pypi">
-	  <a href="http://python-pytube.readthedocs.io/en/latest/?badge=latest">
-      <img src="https://readthedocs.org/projects/python-pytube/badge/?version=latest" />
+    <img src="https://img.shields.io/pypi/dm/pytube?style=flat-square" alt="pypi"/>
+    <img src="https://readthedocs.org/projects/python-pytube/badge/?version=latest&style=flat-square" />
+    <a href="https://codecov.io/gh/pytube/pytube" aria-label="coverage">
+      <img src="https://img.shields.io/codecov/c/github/pytube/pytube?style=flat-square" />
     </a>
-	  <a href="https://codecov.io/gh/nficano/pytube">
-      <img src="https://codecov.io/gh/nficano/pytube/branch/master/graph/badge.svg" />
-    </a>
-    <a href="https://pypi.org/project/pytube/">
-      <img src="https://img.shields.io/pypi/dm/pytube.svg" alt="pypi">
-    </a>
-	  <a href="https://pypi.python.org/pypi/pytube/">
-      <img src="https://img.shields.io/pypi/pyversions/pytube.svg" />
-    </a>
+    <img src="https://img.shields.io/pypi/v/pytube?style=flat-square" />
   </p>
 </div>
+
 
 
 ### Actively soliciting contributers!

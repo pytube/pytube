@@ -3,6 +3,7 @@
 import logging
 from functools import lru_cache
 import re
+import json
 from urllib import parse
 from urllib.request import Request
 from urllib.request import urlopen
@@ -15,12 +16,16 @@ default_chunk_size = 4096  # 4kb
 default_range_size = 9437184  # 9MB
 
 
-def _execute_request(url, method=None, headers=None):
+def _execute_request(url, method=None, headers=None, data=None):
     base_headers = {"User-Agent": "Mozilla/5.0", "accept-language": "en-US,en"}
     if headers:
         base_headers.update(headers)
+    if data:
+        # encode data for request
+        if not isinstance(data, bytes):
+            data = bytes(json.dumps(data), encoding="utf-8")
     if url.lower().startswith("http"):
-        request = Request(url, headers=base_headers, method=method)
+        request = Request(url, headers=base_headers, method=method, data=data)
     else:
         raise ValueError("Invalid URL")
     return urlopen(request)  # nosec
@@ -40,6 +45,31 @@ def get(url, extra_headers=None):
     if extra_headers is None:
         extra_headers = {}
     return _execute_request(url, headers=extra_headers).read().decode("utf-8")
+
+
+def post(url, extra_headers=None, data=None):
+    """Send an http POST request.
+
+    :param str url:
+        The URL to perform the POST request for.
+    :param dict extra_headers:
+        Extra headers to add to the request
+    :param dict data:
+        The data to send on the POST request
+    :rtype: str
+    :returns:
+        UTF-8 encoded string of response
+    """
+    # could technically be implemented in get,
+    # but to avoid confusion implemented like this
+    if extra_headers is None:
+        extra_headers = {}
+    if data is None:
+        data = {}
+    # required because the youtube servers are strict on content type
+    # raises HTTPError [400]: Bad Request otherwise
+    extra_headers.update({"Content-Type": "application/json"})
+    return _execute_request(url, headers=extra_headers, data=data).read().decode("utf-8")
 
 
 def seq_stream(url, chunk_size=default_chunk_size, range_size=default_range_size):
