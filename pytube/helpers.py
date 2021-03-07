@@ -209,7 +209,6 @@ def create_mock_html_json(vid_id) -> Dict[str, Any]:
         'https://www.youtube.com/watch?v=%s' % vid_id,
         defer_prefetch_init=True
     )
-    yt.prefetch()
     html_data = {
         'url': yt.watch_url,
         'js': yt.js,
