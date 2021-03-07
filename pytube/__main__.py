@@ -100,6 +100,10 @@ class YouTube:
         if proxies:
             install_proxy(proxies)
 
+        self._author = None
+        self._title = None
+        self._publish_date = None
+
     @property
     def watch_html(self):
         if self._watch_html:
@@ -284,6 +288,10 @@ class YouTube:
 
     @property
     def vid_info(self):
+        """Parse the raw vid info and return the parsed result.
+
+        :rtype: Dict[Any, Any]
+        """
         return dict(parse_qsl(self.vid_info_raw))
 
     @property
@@ -321,7 +329,6 @@ class YouTube:
         """Get the thumbnail url image.
 
         :rtype: str
-
         """
         thumbnail_details = (
             self.player_response.get("videoDetails", {})
@@ -339,25 +346,38 @@ class YouTube:
         """Get the publish date.
 
         :rtype: datetime
-
         """
-        return extract.publish_date(self.watch_html)
+        if self._publish_date:
+            return self._publish_date
+        self._publish_date = extract.publish_date(self.watch_html)
+        return self._publish_date
+
+    @publish_date.setter
+    def publish_date(self, value):
+        """Sets the publish date."""
+        self._publish_date = value
 
     @property
     def title(self) -> str:
         """Get the video title.
 
         :rtype: str
-
         """
-        return self.player_response['videoDetails']['title']
+        if self._title:
+            return self._title
+        self._title = self.player_response['videoDetails']['title']
+        return self._title
+
+    @title.setter
+    def title(self, value):
+        """Sets the title value."""
+        self._title = value
 
     @property
     def description(self) -> str:
         """Get the video description.
 
         :rtype: str
-
         """
         return self.player_response.get("videoDetails", {}).get("shortDescription")
 
@@ -375,7 +395,6 @@ class YouTube:
         """Get the video length in seconds.
 
         :rtype: int
-
         """
         return int(
             self.player_config_args.get("length_seconds")
@@ -391,7 +410,6 @@ class YouTube:
         """Get the number of the times the video has been viewed.
 
         :rtype: int
-
         """
         return int(
             self.player_response.get("videoDetails", {}).get("viewCount")
@@ -402,9 +420,17 @@ class YouTube:
         """Get the video author.
         :rtype: str
         """
-        return self.player_response.get("videoDetails", {}).get(
+        if self._author:
+            return self._author
+        self._author = self.player_response.get("videoDetails", {}).get(
             "author", "unknown"
         )
+        return self._author
+
+    @author.setter
+    def author(self, value):
+        """Set the video author."""
+        self._author = value
 
     @property
     def keywords(self) -> List[str]:
