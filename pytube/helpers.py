@@ -173,6 +173,14 @@ def install_proxy(proxy_handler: Dict[str, str]) -> None:
 
 
 def uniqueify(duped_list: List) -> List:
+    """Remove duplicate items from a list, while maintaining list order.
+
+    :param List duped_list
+        List to remove duplicates from
+
+    :return List result
+        De-duplicated list
+    """
     seen: Dict[Any, bool] = {}
     result = []
     for item in duped_list:
