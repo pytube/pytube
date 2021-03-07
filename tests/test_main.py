@@ -5,7 +5,7 @@ import pytest
 
 import pytube
 from pytube import YouTube
-from pytube.exceptions import VideoUnavailable
+from pytube.exceptions import RegexMatchError
 
 
 @mock.patch("pytube.__main__.YouTube")
@@ -29,11 +29,11 @@ def test_install_proxy(opener):
 
 @mock.patch("pytube.request.get")
 def test_video_unavailable(get):
-    get.return_value = None
+    get.return_value = ""
     youtube = YouTube(
         "https://www.youtube.com/watch?v=9bZkp7q19f0", defer_prefetch_init=True
     )
-    with pytest.raises(VideoUnavailable):
+    with pytest.raises(RegexMatchError):
         youtube.prefetch()
 
 
