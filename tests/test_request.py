@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-import os
+import os, pytest
 from unittest import mock
-
-import pytest
 
 from pytube import request
 

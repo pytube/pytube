@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 """Reusable dependency injected testing components."""
-import gzip
-import json
-import os
+import gzip, json, os, pytest
 from unittest import mock
-
-import pytest
 
 from pytube import YouTube
 

@@ -3,12 +3,7 @@ import pytest
 from unittest import mock
 
 from pytube import YouTube
-from pytube.exceptions import LiveStreamError
-from pytube.exceptions import RecordingUnavailable
-from pytube.exceptions import RegexMatchError
-from pytube.exceptions import VideoUnavailable
-from pytube.exceptions import VideoPrivate
-from pytube.exceptions import VideoRegionBlocked
+from pytube.exceptions import *
 
 
 def test_video_unavailable():

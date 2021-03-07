@@ -1,26 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """A simple command line application to download youtube videos."""
-import argparse
+import argparse, gzip, json, logging, os, shutil, sys
 import datetime as dt
-import gzip
-import json
-import logging
-import os
-import shutil
 import subprocess  # nosec
-import sys
-from typing import List
-from typing import Optional
+from typing import List, Optional
 
 from pytube import __version__
-from pytube import CaptionQuery
-from pytube import Playlist
-from pytube import Stream
-from pytube import YouTube
-from pytube.exceptions import PytubeError, VideoUnavailable
-from pytube.helpers import safe_filename
-from pytube.helpers import setup_logger
+from pytube import CaptionQuery, Playlist, Stream, YouTube
+from pytube.exceptions import *
+from pytube.helpers import safe_filename, setup_logger
 
 
 def main():

@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 """Implements a simple wrapper around urlopen."""
-import logging
+import logging, re, json
 from functools import lru_cache
-import re
-import json
 from urllib import parse
-from urllib.request import Request
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import regex_search

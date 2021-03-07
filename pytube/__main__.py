@@ -12,8 +12,9 @@ from typing import Any, Callable, Dict, List, Optional
 from urllib.parse import parse_qsl
 
 import pytube
-from pytube import exceptions, extract, request
+from pytube import extract, request
 from pytube import Stream, StreamQuery
+from pytube.exceptions import *
 from pytube.helpers import install_proxy
 from pytube.metadata import YouTubeMetadata
 from pytube.monostate import Monostate
@@ -94,7 +95,7 @@ class YouTube:
 
         """
         if self.watch_html is None:
-            raise exceptions.VideoUnavailable(video_id=self.video_id)
+            raise VideoUnavailable(video_id=self.video_id)
 
         status, messages = extract.playability_status(self.watch_html)
 
@@ -104,23 +105,23 @@ class YouTube:
                     'Join this channel to get access to members-only content '
                     'like this video, and other exclusive perks.'
                 ):
-                    raise exceptions.MembersOnly(video_id=self.video_id)
+                    raise MembersOnly(video_id=self.video_id)
                 elif reason == 'This live stream recording is not available.':
-                    raise exceptions.RecordingUnavailable(video_id=self.video_id)
+                    raise RecordingUnavailable(video_id=self.video_id)
                 else:
                     if reason == 'Video unavailable':
                         if extract.is_region_blocked(self.watch_html):
-                            raise exceptions.VideoRegionBlocked(video_id=self.video_id)
-                    raise exceptions.VideoUnavailable(video_id=self.video_id)
+                            raise VideoRegionBlocked(video_id=self.video_id)
+                    raise VideoUnavailable(video_id=self.video_id)
             elif status == 'LOGIN_REQUIRED':
                 if reason == (
                     'This is a private video. '
                     'Please sign in to verify that you may see it.'
                 ):
-                    raise exceptions.VideoPrivate(video_id=self.video_id)
+                    raise VideoPrivate(video_id=self.video_id)
             elif status == 'ERROR':
                 if reason == 'Video unavailable':
-                    raise exceptions.VideoUnavailable(video_id=self.video_id)
+                    raise VideoUnavailable(video_id=self.video_id)
 
     def descramble(self) -> None:
         """Descramble the stream data and build Stream instances.

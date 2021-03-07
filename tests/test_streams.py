@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-import os
-import random
+import os, random, pytest
 from datetime import datetime
-import pytest
 from unittest import mock
 from unittest.mock import MagicMock, Mock
 from urllib.error import HTTPError
 
-from pytube import request
-from pytube import Stream
+from pytube import request, Stream
 
 
 @mock.patch("pytube.streams.request")

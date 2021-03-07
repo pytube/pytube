@@ -1,24 +1,12 @@
 # -*- coding: utf-8 -*-
 """Module to download a complete playlist from a youtube channel."""
-import json
-import logging
-import re
+import json, logging, re
 from collections.abc import Sequence
-from datetime import date
-from datetime import datetime
-from typing import Dict, Tuple
-from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import Union
+from datetime import date, datetime
+from typing import Dict, Iterable, List, Optional, Tuple, Union
 
-from pytube import extract
-from pytube import request
-from pytube import YouTube
-from pytube.helpers import cache
-from pytube.helpers import install_proxy
-from pytube.helpers import regex_search
-from pytube.helpers import uniqueify
+from pytube import extract, request, YouTube
+from pytube.helpers import cache, install_proxy, regex_search, uniqueify
 
 logger = logging.getLogger(__name__)
 

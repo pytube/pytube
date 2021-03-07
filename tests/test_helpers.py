@@ -1,20 +1,11 @@
 # -*- coding: utf-8 -*-
-import gzip
-import io
-import json
-import os
+import gzip, io, json, os, pytest
 from unittest import mock
-
-import pytest
 
 from pytube import helpers
 from pytube.exceptions import RegexMatchError
-from pytube.helpers import cache
-from pytube.helpers import create_mock_html_json
-from pytube.helpers import deprecated
-from pytube.helpers import setup_logger
-from pytube.helpers import target_directory
-from pytube.helpers import uniqueify
+from pytube.helpers import cache, create_mock_html_json, deprecated, setup_logger
+from pytube.helpers import target_directory, uniqueify
 
 
 def test_regex_search_no_match():
