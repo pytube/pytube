@@ -180,7 +180,7 @@ class YouTube:
             return self._initial_data
         self._initial_data = extract.initial_data(self.watch_html)
         return self._initial_data
-    
+
     def check_availability(self):
         """Check whether the video is available.
 
@@ -289,7 +289,7 @@ class YouTube:
     @property
     def vid_info(self):
         return dict(parse_qsl(self.vid_info_raw))
-    
+
     @property
     def caption_tracks(self) -> List[Caption]:
         """Get a list of :class:`Caption <Caption>`.
