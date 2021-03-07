@@ -79,7 +79,7 @@ def test_raises_video_private(private):
         ]
         mock_url_open.return_value = mock_url_open_object
         with pytest.raises(VideoPrivate):
-            YouTube('https://youtube.com/watch?v=m8uHb5jIGN8')
+            YouTube('https://youtube.com/watch?v=m8uHb5jIGN8').streams
 
 
 def test_raises_recording_unavailable(missing_recording):
@@ -91,7 +91,7 @@ def test_raises_recording_unavailable(missing_recording):
         ]
         mock_url_open.return_value = mock_url_open_object
         with pytest.raises(RecordingUnavailable):
-            YouTube('https://youtube.com/watch?v=5YceQ8YqYMc')
+            YouTube('https://youtube.com/watch?v=5YceQ8YqYMc').streams
 
 
 def test_raises_video_region_blocked(region_blocked):
@@ -103,4 +103,4 @@ def test_raises_video_region_blocked(region_blocked):
         ]
         mock_url_open.return_value = mock_url_open_object
         with pytest.raises(VideoRegionBlocked):
-            YouTube('https://youtube.com/watch?v=hZpzr8TbF08')
+            YouTube('https://youtube.com/watch?v=hZpzr8TbF08').streams
