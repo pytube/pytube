@@ -63,27 +63,27 @@ class YouTube:
             complete events.
 
         """
-        self.js: Optional[str] = None  # js fetched by js_url
-        self.js_url: Optional[str] = None  # the url to the js, parsed from watch html
+        self._js: Optional[str] = None  # js fetched by js_url
+        self._js_url: Optional[str] = None  # the url to the js, parsed from watch html
 
         # note: vid_info may eventually be removed. It sounds like it once had
         # additional formats, but that doesn't appear to still be the case.
 
         # the url to vid info, parsed from watch html
-        self.vid_info_url: Optional[str] = None
-        self.vid_info_raw: Optional[str] = None  # content fetched by vid_info_url
-        self.vid_info: Optional[Dict] = None  # parsed content of vid_info_raw
+        self._vid_info_url: Optional[str] = None
+        self._vid_info_raw: Optional[str] = None  # content fetched by vid_info_url
+        self._vid_info: Optional[Dict] = None  # parsed content of vid_info_raw
 
-        self.watch_html: Optional[str] = None  # the html of /watch?v=<video_id>
-        self.embed_html: Optional[str] = None
+        self._watch_html: Optional[str] = None  # the html of /watch?v=<video_id>
+        self._embed_html: Optional[str] = None
         self.player_config_args: Dict = {}  # inline js in the html containing
         self.player_response: Dict = {}
         # streams
-        self.age_restricted: Optional[bool] = None
+        self._age_restricted: Optional[bool] = None
 
         self.fmt_streams: List[Stream] = []
 
-        self.initial_data = {}
+        self._initial_data = None
         self._metadata: Optional[YouTubeMetadata] = None
 
         # video_id part of /watch?v=<video_id>
@@ -101,18 +101,92 @@ class YouTube:
             install_proxy(proxies)
 
         if not defer_prefetch_init:
-            self.prefetch()
             self.descramble()
 
+    @property
+    def watch_html(self):
+        if self._watch_html:
+            return self._watch_html
+        self._watch_html = request.get(url=self.watch_url)
+        return self._watch_html
+
+    @property
+    def embed_html(self):
+        if self._embed_html:
+            return self._embed_html
+        self._embed_html = request.get(url=self.embed_url)
+        return self._embed_html
+
+    @property
+    def vid_info_raw(self):
+        if self._vid_info_raw:
+            return self._vid_info_raw
+        self._vid_info_raw = request.get(self.vid_info_url)
+        return self._vid_info_raw
+
+    @property
+    def age_restricted(self):
+        if self._age_restricted:
+            return self._age_restricted
+        self._age_restricted = extract.is_age_restricted(self.watch_html)
+        return self._age_restricted
+
+    @property
+    def vid_info_url(self):
+        if self._vid_info_url:
+            return self._vid_info_url
+
+        if self.age_restricted:
+            self._vid_info_url = extract.video_info_url_age_restricted(
+                self.video_id, self.watch_url
+            )
+        else:
+            self._vid_info_url = extract.video_info_url(
+                video_id=self.video_id, watch_url=self.watch_url
+            )
+        return self._vid_info_url
+
+    @property
+    def js_url(self):
+        if self._js_url:
+            return self._js_url
+
+        if self.age_restricted:
+            self._js_url = extract.js_url(self.embed_html)
+        else:
+            self._js_url = extract.js_url(self.watch_html)
+
+        return self._js_url
+
+    @property
+    def js(self):
+        if self._js:
+            return self._js
+
+        # If the js_url doesn't match the cached url, fetch the new js and update
+        #  the cache; otherwise, load the cache.
+        if pytube.__js_url__ != self.js_url:
+            self._js = request.get(self.js_url)
+            pytube.__js__ = self._js
+            pytube.__js_url__ = self.js_url
+        else:
+            self._js = pytube.__js__
+
+        return self._js
+
+    @property
+    def initial_data(self):
+        if self._initial_data:
+            return self._initial_data
+        self._initial_data = extract.initial_data(self.watch_html)
+        return self._initial_data
+    
     def check_availability(self):
         """Check whether the video is available.
+
         Raises different exceptions based on why the video is unavailable,
         otherwise does nothing.
-
         """
-        if self.watch_html is None:
-            raise VideoUnavailable(video_id=self.video_id)
-
         status, messages = extract.playability_status(self.watch_html)
 
         for reason in messages:
@@ -148,11 +222,9 @@ class YouTube:
         interstitial step.
 
         :rtype: None
-
         """
-        self.vid_info = dict(parse_qsl(self.vid_info_raw))
+        self.check_availability()
         self.player_config_args = self.vid_info
-        self.player_response = json.loads(self.vid_info['player_response'])
 
         # On pre-signed videos, we need to use get_ytplayer_config to fix
         #  the player_response item
@@ -180,6 +252,7 @@ class YouTube:
             self.initialize_stream_objects(fmt)
 
         # load the player_response object (contains subtitle information)
+        self.player_response = json.loads(self.vid_info['player_response'])
         if isinstance(self.player_config_args["player_response"], str):
             self.player_response = json.loads(
                 self.player_config_args["player_response"]
@@ -189,45 +262,6 @@ class YouTube:
         del self.player_config_args["player_response"]
         self.stream_monostate.title = self.title
         self.stream_monostate.duration = self.length
-
-    def prefetch(self) -> None:
-        """Eagerly download all necessary data.
-
-        Eagerly executes all necessary network requests so all other
-        operations don't does need to make calls outside of the interpreter
-        which blocks for long periods of time.
-
-        :rtype: None
-        """
-        self.watch_html = request.get(url=self.watch_url)
-        self.check_availability()
-        self.age_restricted = extract.is_age_restricted(self.watch_html)
-
-        if self.age_restricted:
-            if not self.embed_html:
-                self.embed_html = request.get(url=self.embed_url)
-            self.vid_info_url = extract.video_info_url_age_restricted(
-                self.video_id, self.watch_url
-            )
-            self.js_url = extract.js_url(self.embed_html)
-        else:
-            self.vid_info_url = extract.video_info_url(
-                video_id=self.video_id, watch_url=self.watch_url
-            )
-            self.js_url = extract.js_url(self.watch_html)
-
-        self.initial_data = extract.initial_data(self.watch_html)
-
-        self.vid_info_raw = request.get(self.vid_info_url)
-
-        # If the js_url doesn't match the cached url, fetch the new js and update
-        #  the cache; otherwise, load the cache.
-        if pytube.__js_url__ != self.js_url:
-            self.js = request.get(self.js_url)
-            pytube.__js__ = self.js
-            pytube.__js_url__ = self.js_url
-        else:
-            self.js = pytube.__js__
 
     def initialize_stream_objects(self, fmt: str) -> None:
         """Convert manifest data to instances of :class:`Stream <Stream>`.
@@ -252,6 +286,10 @@ class YouTube:
             )
             self.fmt_streams.append(video)
 
+    @property
+    def vid_info(self):
+        return dict(parse_qsl(self.vid_info_raw))
+    
     @property
     def caption_tracks(self) -> List[Caption]:
         """Get a list of :class:`Caption <Caption>`.
