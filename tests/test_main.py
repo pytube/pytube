@@ -34,7 +34,7 @@ def test_video_unavailable(get):
         "https://www.youtube.com/watch?v=9bZkp7q19f0", defer_prefetch_init=True
     )
     with pytest.raises(RegexMatchError):
-        youtube.prefetch()
+        youtube.check_availability()
 
 
 def test_video_keywords(cipher_signature):
@@ -62,17 +62,3 @@ def test_js_caching(cipher_signature):
     assert pytube.__js_url__ is not None
     assert pytube.__js__ == cipher_signature.js
     assert pytube.__js_url__ == cipher_signature.js_url
-
-    with mock.patch('pytube.request.urlopen') as mock_urlopen:
-        mock_urlopen_object = mock.Mock()
-
-        # We should never read the js from this
-        mock_urlopen_object.read.side_effect = [
-            cipher_signature.watch_html.encode('utf-8'),
-            cipher_signature.vid_info_raw.encode('utf-8'),
-            cipher_signature.js.encode('utf-8')
-        ]
-
-        mock_urlopen.return_value = mock_urlopen_object
-        cipher_signature.prefetch()
-        assert mock_urlopen.call_count == 2
