@@ -255,6 +255,7 @@ def test_author(cipher_signature):
     assert cipher_signature.author == expected
 
     expected = "unknown"
+    cipher_signature.author = None
     cipher_signature._player_response = {'key': 'value'}
     assert cipher_signature.author == expected
 
