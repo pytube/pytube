@@ -76,12 +76,12 @@ class YouTube:
 
         self._watch_html: Optional[str] = None  # the html of /watch?v=<video_id>
         self._embed_html: Optional[str] = None
-        self.player_config_args: Dict = {}  # inline js in the html containing
-        self.player_response: Dict = {}
+        self._player_config_args: Optional[Dict] = None  # inline js in the html containing
+        self._player_response: Optional[Dict] = None
         # streams
         self._age_restricted: Optional[bool] = None
 
-        self.fmt_streams: List[Stream] = []
+        self._fmt_streams: Optional[List[Stream]] = None
 
         self._initial_data = None
         self._metadata: Optional[YouTubeMetadata] = None
@@ -99,9 +99,6 @@ class YouTube:
 
         if proxies:
             install_proxy(proxies)
-
-        if not defer_prefetch_init:
-            self.descramble()
 
     @property
     def watch_html(self):
@@ -175,11 +172,83 @@ class YouTube:
         return self._js
 
     @property
+    def player_response(self):
+        """The player response contains subtitle information and video details."""
+        if self._player_response:
+            return self._player_response
+
+        if isinstance(self.player_config_args["player_response"], str):
+            self._player_response = json.loads(
+                self.player_config_args["player_response"]
+            )
+        else:
+            self._player_response = self.player_config_args["player_response"]
+        return self._player_response
+
+    @property
     def initial_data(self):
         if self._initial_data:
             return self._initial_data
         self._initial_data = extract.initial_data(self.watch_html)
         return self._initial_data
+
+    @property
+    def player_config_args(self):
+        if self._player_config_args:
+            return self._player_config_args
+
+        self._player_config_args = self.vid_info
+        # On pre-signed videos, we need to use get_ytplayer_config to fix
+        #  the player_response item
+        if 'streamingData' not in self.player_config_args['player_response']:
+            config_response = get_ytplayer_config(self.watch_html)
+            if 'args' in config_response:
+                self.player_config_args['player_response'] = config_response['args']['player_response']  # noqa: E501
+            else:
+                self.player_config_args['player_response'] = config_response
+
+        return self._player_config_args
+
+    @property
+    def fmt_streams(self):
+        """Returns a list of streams if they have been initialized.
+
+        If the streams have not been initialized, finds all relevant
+        streams and initializes them.
+        """
+        self.check_availability()
+        if self._fmt_streams:
+            return self._fmt_streams
+
+        self._fmt_streams = []
+        # https://github.com/nficano/pytube/issues/165
+        stream_maps = ["url_encoded_fmt_stream_map"]
+        if "adaptive_fmts" in self.player_config_args:
+            stream_maps.append("adaptive_fmts")
+
+        # unscramble the progressive and adaptive stream manifests.
+        for fmt in stream_maps:
+            if not self.age_restricted and fmt in self.vid_info:
+                apply_descrambler(self.vid_info, fmt)
+            apply_descrambler(self.player_config_args, fmt)
+
+            apply_signature(self.player_config_args, fmt, self.js)
+
+            # build instances of :class:`Stream <Stream>`
+            # Initialize stream objects
+            stream_manifest = self.player_config_args[fmt]
+            for stream in stream_manifest:
+                video = Stream(
+                    stream=stream,
+                    player_config_args=self.player_config_args,
+                    monostate=self.stream_monostate,
+                )
+                self._fmt_streams.append(video)
+
+        self.stream_monostate.title = self.title
+        self.stream_monostate.duration = self.length
+
+        return self._fmt_streams
 
     def check_availability(self):
         """Check whether the video is available.
@@ -213,79 +282,6 @@ class YouTube:
                 if reason == 'Video unavailable':
                     raise VideoUnavailable(video_id=self.video_id)
 
-    def descramble(self) -> None:
-        """Descramble the stream data and build Stream instances.
-
-        The initialization process takes advantage of Python's
-        "call-by-reference evaluation," which allows dictionary transforms to
-        be applied in-place, instead of holding references to mutations at each
-        interstitial step.
-
-        :rtype: None
-        """
-        self.check_availability()
-        self.player_config_args = self.vid_info
-
-        # On pre-signed videos, we need to use get_ytplayer_config to fix
-        #  the player_response item
-        if 'streamingData' not in self.player_config_args['player_response']:
-            config_response = get_ytplayer_config(self.watch_html)
-            if 'args' in config_response:
-                self.player_config_args['player_response'] = config_response['args']['player_response']  # noqa: E501
-            else:
-                self.player_config_args['player_response'] = config_response
-
-        # https://github.com/nficano/pytube/issues/165
-        stream_maps = ["url_encoded_fmt_stream_map"]
-        if "adaptive_fmts" in self.player_config_args:
-            stream_maps.append("adaptive_fmts")
-
-        # unscramble the progressive and adaptive stream manifests.
-        for fmt in stream_maps:
-            if not self.age_restricted and fmt in self.vid_info:
-                apply_descrambler(self.vid_info, fmt)
-            apply_descrambler(self.player_config_args, fmt)
-
-            apply_signature(self.player_config_args, fmt, self.js)
-
-            # build instances of :class:`Stream <Stream>`
-            self.initialize_stream_objects(fmt)
-
-        # load the player_response object (contains subtitle information)
-        self.player_response = json.loads(self.vid_info['player_response'])
-        if isinstance(self.player_config_args["player_response"], str):
-            self.player_response = json.loads(
-                self.player_config_args["player_response"]
-            )
-        else:
-            self.player_response = self.player_config_args["player_response"]
-        del self.player_config_args["player_response"]
-        self.stream_monostate.title = self.title
-        self.stream_monostate.duration = self.length
-
-    def initialize_stream_objects(self, fmt: str) -> None:
-        """Convert manifest data to instances of :class:`Stream <Stream>`.
-
-        Take the unscrambled stream data and uses it to initialize
-        instances of :class:`Stream <Stream>` for each media stream.
-
-        :param str fmt:
-            Key in stream manifest (``ytplayer_config``) containing progressive
-            download or adaptive streams (e.g.: ``url_encoded_fmt_stream_map``
-            or ``adaptive_fmts``).
-
-        :rtype: None
-
-        """
-        stream_manifest = self.player_config_args[fmt]
-        for stream in stream_manifest:
-            video = Stream(
-                stream=stream,
-                player_config_args=self.player_config_args,
-                monostate=self.stream_monostate,
-            )
-            self.fmt_streams.append(video)
-
     @property
     def vid_info(self):
         return dict(parse_qsl(self.vid_info_raw))
@@ -317,6 +313,7 @@ class YouTube:
 
         :rtype: :class:`StreamQuery <StreamQuery>`.
         """
+        self.check_availability()
         return StreamQuery(self.fmt_streams)
 
     @property
