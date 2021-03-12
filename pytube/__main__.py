@@ -205,7 +205,7 @@ class YouTube:
 
         if self.age_restricted:
             if not self.embed_html:
-                self.embed_html = request.get(url=self.embed_url, timeout=2)
+                self.embed_html = request.get(url=self.embed_url)
             self.vid_info_url = extract.video_info_url_age_restricted(
                 self.video_id, self.watch_url
             )
@@ -218,7 +218,7 @@ class YouTube:
 
         self.initial_data = extract.initial_data(self.watch_html)
 
-        self.vid_info_raw = request.get(self.vid_info_url, timeout=2)
+        self.vid_info_raw = request.get(self.vid_info_url)
 
         # If the js_url doesn't match the cached url, fetch the new js and update
         #  the cache; otherwise, load the cache.
