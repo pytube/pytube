@@ -218,7 +218,7 @@ class YouTube:
 
         self.initial_data = extract.initial_data(self.watch_html)
 
-        self.vid_info_raw = request.get(self.vid_info_url, timout=2)
+        self.vid_info_raw = request.get(self.vid_info_url, timeout=2)
 
         # If the js_url doesn't match the cached url, fetch the new js and update
         #  the cache; otherwise, load the cache.
