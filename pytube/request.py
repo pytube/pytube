@@ -28,7 +28,7 @@ def _execute_request(url, method=None, headers=None, data=None):
         request = Request(url, headers=base_headers, method=method, data=data, timeout=2)
     else:
         raise ValueError("Invalid URL")
-    return urlopen(request)  # nosec
+    return urlopen(request, timeout=2)  # nosec
 
 
 def get(url, extra_headers=None):
