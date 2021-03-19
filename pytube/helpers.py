@@ -173,6 +173,14 @@ def install_proxy(proxy_handler: Dict[str, str]) -> None:
 
 
 def uniqueify(duped_list: List) -> List:
+    """Remove duplicate items from a list, while maintaining list order.
+
+    :param List duped_list
+        List to remove duplicates from
+
+    :return List result
+        De-duplicated list
+    """
     seen: Dict[Any, bool] = {}
     result = []
     for item in duped_list:
@@ -205,11 +213,7 @@ def create_mock_html_json(vid_id) -> Dict[str, Any]:
     pytube_mocks_path = os.path.join(pytube_dir_path, 'tests', 'mocks')
     gzip_filepath = os.path.join(pytube_mocks_path, gzip_filename)
 
-    yt = YouTube(
-        'https://www.youtube.com/watch?v=%s' % vid_id,
-        defer_prefetch_init=True
-    )
-    yt.prefetch()
+    yt = YouTube(f'https://www.youtube.com/watch?v={vid_id}')
     html_data = {
         'url': yt.watch_url,
         'js': yt.js,
