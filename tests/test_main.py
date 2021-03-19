@@ -21,7 +21,6 @@ def test_install_proxy(opener):
     proxies = {"http": "http://www.example.com:3128/"}
     YouTube(
         "https://www.youtube.com/watch?v=9bZkp7q19f0",
-        defer_prefetch_init=True,
         proxies=proxies,
     )
     opener.assert_called()
@@ -30,9 +29,7 @@ def test_install_proxy(opener):
 @mock.patch("pytube.request.get")
 def test_video_unavailable(get):
     get.return_value = ""
-    youtube = YouTube(
-        "https://www.youtube.com/watch?v=9bZkp7q19f0", defer_prefetch_init=True
-    )
+    youtube = YouTube("https://www.youtube.com/watch?v=9bZkp7q19f0")
     with pytest.raises(RegexMatchError):
         youtube.check_availability()
 
