@@ -44,7 +44,6 @@ class YouTube:
     def __init__(
         self,
         url: str,
-        defer_prefetch_init: bool = False,
         on_progress_callback: Optional[Callable[[Any, bytes, int], None]] = None,
         on_complete_callback: Optional[Callable[[Any, Optional[str]], None]] = None,
         proxies: Dict[str, str] = None,
