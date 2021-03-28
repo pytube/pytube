@@ -1,6 +1,6 @@
 name: Greetings
 
-on: [pull_request, issues]
+on: [issues]
 
 jobs:
   greeting:
@@ -10,4 +10,3 @@ jobs:
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         issue-message: 'Thank you for contributing to PyTube. Please remember to reference [Contributing.md](https://github.com/nficano/pytube/blob/master/Contributing.md)'
-        pr-message: 'Thank you for contributing to PyTube. Please remember to reference [Contributing.md](https://github.com/nficano/pytube/blob/master/Contributing.md)'
