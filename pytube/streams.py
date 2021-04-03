@@ -234,7 +234,7 @@ class Stream:
             (optional) Skip existing files, defaults to True
         :type skip_existing: bool
         :param timeout:
-            (optional) Request timeout length
+            (optional) Request timeout length in seconds
         :type timeout: int
         :returns:
             Path to the saved video
