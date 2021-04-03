@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """Implements a simple wrapper around urlopen."""
+import json
 import logging
 from functools import lru_cache
 import re
-import json
+import socket
 from urllib import parse
 from urllib.request import Request
 from urllib.request import urlopen
@@ -16,7 +17,13 @@ default_chunk_size = 4096  # 4kb
 default_range_size = 9437184  # 9MB
 
 
-def _execute_request(url, method=None, headers=None, data=None):
+def _execute_request(
+    url,
+    method=None,
+    headers=None,
+    data=None,
+    timeout=socket._GLOBAL_DEFAULT_TIMEOUT
+):
     base_headers = {"User-Agent": "Mozilla/5.0", "accept-language": "en-US,en"}
     if headers:
         base_headers.update(headers)
@@ -25,13 +32,19 @@ def _execute_request(url, method=None, headers=None, data=None):
         if not isinstance(data, bytes):
             data = bytes(json.dumps(data), encoding="utf-8")
     if url.lower().startswith("http"):
-        request = Request(url, headers=base_headers, method=method, data=data)
+        request = Request(
+            url,
+            headers=base_headers,
+            method=method,
+            data=data,
+            timeout=timeout
+        )
     else:
         raise ValueError("Invalid URL")
     return urlopen(request)  # nosec
 
 
-def get(url, extra_headers=None):
+def get(url, extra_headers=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
     """Send an http GET request.
 
     :param str url:
@@ -44,10 +57,15 @@ def get(url, extra_headers=None):
     """
     if extra_headers is None:
         extra_headers = {}
-    return _execute_request(url, headers=extra_headers).read().decode("utf-8")
+    response = _execute_request(
+        url,
+        headers=extra_headers,
+        timeout=timeout
+    )
+    return response.read().decode("utf-8")
 
 
-def post(url, extra_headers=None, data=None):
+def post(url, extra_headers=None, data=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
     """Send an http POST request.
 
     :param str url:
@@ -69,7 +87,13 @@ def post(url, extra_headers=None, data=None):
     # required because the youtube servers are strict on content type
     # raises HTTPError [400]: Bad Request otherwise
     extra_headers.update({"Content-Type": "application/json"})
-    return _execute_request(url, headers=extra_headers, data=data).read().decode("utf-8")
+    response = _execute_request(
+        url,
+        headers=extra_headers,
+        data=data,
+        timeout=timeout
+    )
+    return response.read().decode("utf-8")
 
 
 def seq_stream(url, chunk_size=default_chunk_size, range_size=default_range_size):
