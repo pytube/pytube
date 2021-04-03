@@ -6,6 +6,7 @@ from functools import lru_cache
 import re
 import socket
 from urllib import parse
+from urllib.error import URLError
 from urllib.request import Request
 from urllib.request import urlopen
 
@@ -36,12 +37,11 @@ def _execute_request(
             url,
             headers=base_headers,
             method=method,
-            data=data,
-            timeout=timeout
+            data=data
         )
     else:
         raise ValueError("Invalid URL")
-    return urlopen(request)  # nosec
+    return urlopen(request, timeout=timeout)  # nosec
 
 
 def get(url, extra_headers=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
@@ -117,7 +117,7 @@ def seq_stream(
     url = base_url + parse.urlencode(querys)
 
     segment_data = b''
-    for chunk in stream(url):
+    for chunk in stream(url, timeout=timeout, max_retries=max_retries):
         yield chunk
         segment_data += chunk
 
@@ -136,7 +136,7 @@ def seq_stream(
         querys['sq'] = seq_num
         url = base_url + parse.urlencode(querys)
 
-        yield from stream(url)
+        yield from stream(url, timeout=timeout, max_retries=max_retries)
         seq_num += 1
     return  # pylint: disable=R1711
 
@@ -155,9 +155,29 @@ def stream(
     while downloaded < file_size:
         stop_pos = min(downloaded + default_range_size, file_size) - 1
         range_header = f"bytes={downloaded}-{stop_pos}"
-        response = _execute_request(
-            url, method="GET", headers={"Range": range_header}
-        )
+        tries = 0
+
+        # Attempt to make the request multiple times as necessary.
+        while True:
+            # If the max retries is exceeded, raise an exception
+            if tries >= 1 + max_retries:
+                raise MaxRetriesExceeded()
+
+            # Try to execute the request, ignoring socket timeouts
+            try:
+                response = _execute_request(
+                    url,
+                    method="GET",
+                    headers={"Range": range_header},
+                    timeout=timeout
+                )
+            except URLError as e:
+                if isinstance(e, socket.timeout):
+                    pass
+            else:
+                # On a successful request, break from loop
+                break
+            tries += 1
         if file_size == default_range_size:
             try:
                 content_range = response.info()["Content-Range"]
