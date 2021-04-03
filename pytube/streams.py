@@ -211,6 +211,7 @@ class Stream:
         filename: Optional[str] = None,
         filename_prefix: Optional[str] = None,
         skip_existing: bool = True,
+        timeout: Optional[int] = None
     ) -> str:
         """Write the media stream to disk.
 
@@ -230,8 +231,11 @@ class Stream:
             filename but still add a prefix.
         :type filename_prefix: str or None
         :param skip_existing:
-            (optional) skip existing files, defaults to True
+            (optional) Skip existing files, defaults to True
         :type skip_existing: bool
+        :param timeout:
+            (optional) Request timeout length
+        :type timeout: int
         :returns:
             Path to the saved video
         :rtype: str
