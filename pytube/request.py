@@ -96,12 +96,13 @@ def post(url, extra_headers=None, data=None, timeout=socket._GLOBAL_DEFAULT_TIME
     return response.read().decode("utf-8")
 
 
-def seq_stream(url, chunk_size=default_chunk_size, range_size=default_range_size):
+def seq_stream(
+    url,
+    timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
+    max_retries=0
+):
     """Read the response in sequence.
     :param str url: The URL to perform the GET request for.
-    :param int chunk_size: The size in bytes of each chunk. Defaults to 4KB
-    :param int range_size: The size in bytes of each range request. Defaults
-    to 9MB
     :rtype: Iterable[bytes]
     """
     # YouTube expects a request sequence number as part of the parameters.
@@ -140,30 +141,31 @@ def seq_stream(url, chunk_size=default_chunk_size, range_size=default_range_size
     return  # pylint: disable=R1711
 
 
-def stream(url, chunk_size=default_chunk_size, range_size=default_range_size):
+def stream(
+    url,
+    timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
+    max_retries=0
+):
     """Read the response in chunks.
     :param str url: The URL to perform the GET request for.
-    :param int chunk_size: The size in bytes of each chunk. Defaults to 4KB
-    :param int range_size: The size in bytes of each range request. Defaults
-    to 9MB
     :rtype: Iterable[bytes]
     """
-    file_size: int = range_size  # fake filesize to start
+    file_size: int = default_range_size  # fake filesize to start
     downloaded = 0
     while downloaded < file_size:
-        stop_pos = min(downloaded + range_size, file_size) - 1
+        stop_pos = min(downloaded + default_range_size, file_size) - 1
         range_header = f"bytes={downloaded}-{stop_pos}"
         response = _execute_request(
             url, method="GET", headers={"Range": range_header}
         )
-        if file_size == range_size:
+        if file_size == default_range_size:
             try:
                 content_range = response.info()["Content-Range"]
                 file_size = int(content_range.split("/")[1])
             except (KeyError, IndexError, ValueError) as e:
                 logger.error(e)
         while True:
-            chunk = response.read(chunk_size)
+            chunk = response.read(default_chunk_size)
             if not chunk:
                 break
             downloaded += len(chunk)
