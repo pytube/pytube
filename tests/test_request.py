@@ -34,9 +34,9 @@ def test_streaming(mock_urlopen):
 def test_timeout(mock_urlopen):
     exc = URLError(reason=socket.timeout('timed_out'))
     mock_urlopen.side_effect = exc
+    generator = request.stream('http://fakeassurl.gov/timeout_test', timeout=1)
     with pytest.raises(MaxRetriesExceeded):
-        gen = request.stream('http://fakeassurl.gov/timeout_test', timeout=1)
-        next(gen)
+        next(generator)
 
 
 @mock.patch("pytube.request.urlopen")
