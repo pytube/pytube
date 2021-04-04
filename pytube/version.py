@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__version__ = "10.6.1"
+__version__ = "10.7.0"
 
 if __name__ == "__main__":
     print(__version__)
