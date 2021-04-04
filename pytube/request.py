@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 """Implements a simple wrapper around urlopen."""
+import json
 import logging
 from functools import lru_cache
 import re
-import json
+import socket
 from urllib import parse
+from urllib.error import URLError
 from urllib.request import Request
 from urllib.request import urlopen
 
-from pytube.exceptions import RegexMatchError
+from pytube.exceptions import RegexMatchError, MaxRetriesExceeded
 from pytube.helpers import regex_search
 
 logger = logging.getLogger(__name__)
@@ -16,7 +18,13 @@ default_chunk_size = 4096  # 4kb
 default_range_size = 9437184  # 9MB
 
 
-def _execute_request(url, method=None, headers=None, data=None):
+def _execute_request(
+    url,
+    method=None,
+    headers=None,
+    data=None,
+    timeout=socket._GLOBAL_DEFAULT_TIMEOUT
+):
     base_headers = {"User-Agent": "Mozilla/5.0", "accept-language": "en-US,en"}
     if headers:
         base_headers.update(headers)
@@ -28,10 +36,10 @@ def _execute_request(url, method=None, headers=None, data=None):
         request = Request(url, headers=base_headers, method=method, data=data)
     else:
         raise ValueError("Invalid URL")
-    return urlopen(request)  # nosec
+    return urlopen(request, timeout=timeout)  # nosec
 
 
-def get(url, extra_headers=None):
+def get(url, extra_headers=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
     """Send an http GET request.
 
     :param str url:
@@ -44,10 +52,11 @@ def get(url, extra_headers=None):
     """
     if extra_headers is None:
         extra_headers = {}
-    return _execute_request(url, headers=extra_headers).read().decode("utf-8")
+    response = _execute_request(url, headers=extra_headers, timeout=timeout)
+    return response.read().decode("utf-8")
 
 
-def post(url, extra_headers=None, data=None):
+def post(url, extra_headers=None, data=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
     """Send an http POST request.
 
     :param str url:
@@ -69,15 +78,22 @@ def post(url, extra_headers=None, data=None):
     # required because the youtube servers are strict on content type
     # raises HTTPError [400]: Bad Request otherwise
     extra_headers.update({"Content-Type": "application/json"})
-    return _execute_request(url, headers=extra_headers, data=data).read().decode("utf-8")
+    response = _execute_request(
+        url,
+        headers=extra_headers,
+        data=data,
+        timeout=timeout
+    )
+    return response.read().decode("utf-8")
 
 
-def seq_stream(url, chunk_size=default_chunk_size, range_size=default_range_size):
+def seq_stream(
+    url,
+    timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
+    max_retries=0
+):
     """Read the response in sequence.
     :param str url: The URL to perform the GET request for.
-    :param int chunk_size: The size in bytes of each chunk. Defaults to 4KB
-    :param int range_size: The size in bytes of each range request. Defaults
-    to 9MB
     :rtype: Iterable[bytes]
     """
     # YouTube expects a request sequence number as part of the parameters.
@@ -92,7 +108,7 @@ def seq_stream(url, chunk_size=default_chunk_size, range_size=default_range_size
     url = base_url + parse.urlencode(querys)
 
     segment_data = b''
-    for chunk in stream(url):
+    for chunk in stream(url, timeout=timeout, max_retries=max_retries):
         yield chunk
         segment_data += chunk
 
@@ -111,35 +127,57 @@ def seq_stream(url, chunk_size=default_chunk_size, range_size=default_range_size
         querys['sq'] = seq_num
         url = base_url + parse.urlencode(querys)
 
-        yield from stream(url)
+        yield from stream(url, timeout=timeout, max_retries=max_retries)
         seq_num += 1
     return  # pylint: disable=R1711
 
 
-def stream(url, chunk_size=default_chunk_size, range_size=default_range_size):
+def stream(
+    url,
+    timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
+    max_retries=0
+):
     """Read the response in chunks.
     :param str url: The URL to perform the GET request for.
-    :param int chunk_size: The size in bytes of each chunk. Defaults to 4KB
-    :param int range_size: The size in bytes of each range request. Defaults
-    to 9MB
     :rtype: Iterable[bytes]
     """
-    file_size: int = range_size  # fake filesize to start
+    file_size: int = default_range_size  # fake filesize to start
     downloaded = 0
     while downloaded < file_size:
-        stop_pos = min(downloaded + range_size, file_size) - 1
+        stop_pos = min(downloaded + default_range_size, file_size) - 1
         range_header = f"bytes={downloaded}-{stop_pos}"
-        response = _execute_request(
-            url, method="GET", headers={"Range": range_header}
-        )
-        if file_size == range_size:
+        tries = 0
+
+        # Attempt to make the request multiple times as necessary.
+        while True:
+            # If the max retries is exceeded, raise an exception
+            if tries >= 1 + max_retries:
+                raise MaxRetriesExceeded()
+
+            # Try to execute the request, ignoring socket timeouts
+            try:
+                response = _execute_request(
+                    url,
+                    method="GET",
+                    headers={"Range": range_header},
+                    timeout=timeout
+                )
+            except URLError as e:
+                if isinstance(e.reason, socket.timeout):
+                    pass
+            else:
+                # On a successful request, break from loop
+                break
+            tries += 1
+
+        if file_size == default_range_size:
             try:
                 content_range = response.info()["Content-Range"]
                 file_size = int(content_range.split("/")[1])
             except (KeyError, IndexError, ValueError) as e:
                 logger.error(e)
         while True:
-            chunk = response.read(chunk_size)
+            chunk = response.read(default_chunk_size)
             if not chunk:
                 break
             downloaded += len(chunk)

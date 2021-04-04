@@ -211,6 +211,8 @@ class Stream:
         filename: Optional[str] = None,
         filename_prefix: Optional[str] = None,
         skip_existing: bool = True,
+        timeout: Optional[int] = None,
+        max_retries: Optional[int] = 0
     ) -> str:
         """Write the media stream to disk.
 
@@ -230,8 +232,11 @@ class Stream:
             filename but still add a prefix.
         :type filename_prefix: str or None
         :param skip_existing:
-            (optional) skip existing files, defaults to True
+            (optional) Skip existing files, defaults to True
         :type skip_existing: bool
+        :param timeout:
+            (optional) Request timeout length in seconds
+        :type timeout: int
         :returns:
             Path to the saved video
         :rtype: str
@@ -244,20 +249,20 @@ class Stream:
         )
 
         if skip_existing and self.exists_at_path(file_path):
-            logger.debug("file %s already exists, skipping", file_path)
+            logger.debug(f'file {file_path} already exists, skipping')
             self.on_complete(file_path)
             return file_path
 
         bytes_remaining = self.filesize
-        logger.debug(
-            "downloading (%s total bytes) file to %s",
-            self.filesize,
-            file_path,
-        )
+        logger.debug(f'downloading ({self.filesize} total bytes) file to {file_path}')
 
         with open(file_path, "wb") as fh:
             try:
-                for chunk in request.stream(self.url):
+                for chunk in request.stream(
+                    self.url,
+                    timeout=timeout,
+                    max_retries=max_retries
+                ):
                     # reduce the (bytes) remainder by the length of the chunk.
                     bytes_remaining -= len(chunk)
                     # send to the on_progress callback.
@@ -266,7 +271,11 @@ class Stream:
                 if e.code != 404:
                     raise
                 # Some adaptive streams need to be requested with sequence numbers
-                for chunk in request.seq_stream(self.url):
+                for chunk in request.seq_stream(
+                    self.url,
+                    timeout=timeout,
+                    max_retries=max_retries
+                ):
                     # reduce the (bytes) remainder by the length of the chunk.
                     bytes_remaining -= len(chunk)
                     # send to the on_progress callback.
