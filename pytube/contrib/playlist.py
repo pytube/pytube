@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Module to download a complete playlist from a youtube channel."""
-import json, logging, re
+import json
+import logging
+import re
 from collections.abc import Sequence
 from datetime import date, datetime
 from typing import Dict, Iterable, List, Optional, Tuple, Union

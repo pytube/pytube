@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import os, pytest
+import os
+import pytest
 from unittest import mock
 from unittest.mock import MagicMock, mock_open, patch
 

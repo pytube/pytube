@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-import gzip, io, json, os, pytest
+import gzip
+import io
+import json
+import os
+import pytest
 from unittest import mock
 
 from pytube import helpers
@@ -108,14 +112,16 @@ def test_create_mock_html_json(mock_url_open, mock_open):
     mock_url_open_object = mock.Mock()
 
     # Order is:
-    # 1. watch_html -- must have js match
-    # 2. vid_info_raw
-    # 3. js
+    # 1. watch_html -- must have jsurl match
+    # 2. embed html
+    # 3. watch html
+    # 4. raw vid info
     mock_url_open_object.read.side_effect = [
         (b'yt.setConfig({"PLAYER_CONFIG":{"args":[]}});ytInitialData = {};ytInitialPlayerResponse = {};'  # noqa: E501
          b'"jsUrl":"/s/player/13371337/player_ias.vflset/en_US/base.js"'),
+        b'embed_html',
+        b'watch_html',
         b'vid_info_raw',
-        b'js_result',
     ]
     mock_url_open.return_value = mock_url_open_object
 

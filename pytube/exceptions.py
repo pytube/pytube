@@ -12,6 +12,10 @@ class PytubeError(Exception):
     """
 
 
+class MaxRetriesExceeded(PytubeError):
+    """Maximum number of retries exceeded."""
+
+
 class HTMLParseError(PytubeError):
     """HTML could not be parsed"""
 

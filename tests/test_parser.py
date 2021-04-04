@@ -1,4 +1,5 @@
-import json, pytest
+import json
+import pytest
 
 from pytube.exceptions import HTMLParseError
 from pytube.parser import parse_for_object

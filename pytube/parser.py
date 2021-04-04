@@ -1,4 +1,6 @@
-import ast, json, re
+import ast
+import json
+import re
 from pytube.exceptions import HTMLParseError
 
 

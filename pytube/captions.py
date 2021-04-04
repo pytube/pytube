@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-import math, os, time
+import math
+import os
+import time
 import xml.etree.ElementTree as ElementTree
 from html import unescape
 from typing import Dict, Optional

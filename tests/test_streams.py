@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-import os, random, pytest
+import os
+import random
+import pytest
 from datetime import datetime
 from unittest import mock
 from unittest.mock import MagicMock, Mock
@@ -248,17 +250,18 @@ def test_on_complete_hook(cipher_signature):
 
 def test_author(cipher_signature):
     expected = "Test author"
-    cipher_signature.player_response = {"videoDetails": {"author": expected}}
+    cipher_signature._player_response = {"videoDetails": {"author": expected}}
     assert cipher_signature.author == expected
 
     expected = "unknown"
-    cipher_signature.player_response = {}
+    cipher_signature.author = None
+    cipher_signature._player_response = {'key': 'value'}
     assert cipher_signature.author == expected
 
 
 def test_thumbnail_when_in_details(cipher_signature):
     expected = "some url"
-    cipher_signature.player_response = {
+    cipher_signature._player_response = {
         "videoDetails": {"thumbnail": {"thumbnails": [{"url": expected}]}}
     }
     assert cipher_signature.thumbnail_url == expected
@@ -266,7 +269,7 @@ def test_thumbnail_when_in_details(cipher_signature):
 
 def test_thumbnail_when_not_in_details(cipher_signature):
     expected = "https://img.youtube.com/vi/2lAe1cqCOXo/maxresdefault.jpg"
-    cipher_signature.player_response = {}
+    cipher_signature._player_response = {'key': 'value'}
     assert cipher_signature.thumbnail_url == expected
 
 
