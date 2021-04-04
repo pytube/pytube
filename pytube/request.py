@@ -172,12 +172,13 @@ def stream(
                     timeout=timeout
                 )
             except URLError as e:
-                if isinstance(e, socket.timeout):
+                if isinstance(e.reason, socket.timeout):
                     pass
             else:
                 # On a successful request, break from loop
                 break
             tries += 1
+
         if file_size == default_range_size:
             try:
                 content_range = response.info()["Content-Range"]
