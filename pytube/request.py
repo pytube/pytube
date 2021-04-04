@@ -33,12 +33,7 @@ def _execute_request(
         if not isinstance(data, bytes):
             data = bytes(json.dumps(data), encoding="utf-8")
     if url.lower().startswith("http"):
-        request = Request(
-            url,
-            headers=base_headers,
-            method=method,
-            data=data
-        )
+        request = Request(url, headers=base_headers, method=method, data=data)
     else:
         raise ValueError("Invalid URL")
     return urlopen(request, timeout=timeout)  # nosec
