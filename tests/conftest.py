@@ -3,9 +3,8 @@
 import gzip
 import json
 import os
-from unittest import mock
-
 import pytest
+from unittest import mock
 
 from pytube import YouTube
 

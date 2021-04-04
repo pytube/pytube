@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 import socket
 import os
+import pytest
 from unittest import mock
 from urllib.error import URLError
-
-import pytest
 
 from pytube import request
 from pytube.exceptions import MaxRetriesExceeded

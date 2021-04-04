@@ -2,13 +2,12 @@
 """Implements a simple wrapper around urlopen."""
 import json
 import logging
-from functools import lru_cache
 import re
 import socket
+from functools import lru_cache
 from urllib import parse
 from urllib.error import URLError
-from urllib.request import Request
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 from pytube.exceptions import RegexMatchError, MaxRetriesExceeded
 from pytube.helpers import regex_search

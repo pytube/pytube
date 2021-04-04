@@ -9,28 +9,13 @@ smaller peripheral modules and functions.
 """
 import json
 import logging
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Optional
+from typing import Any, Callable, Dict, List, Optional
 from urllib.parse import parse_qsl
 
 import pytube
-from pytube import Caption
-from pytube import CaptionQuery
-from pytube import extract
-from pytube import request
-from pytube import Stream
-from pytube import StreamQuery
-from pytube.exceptions import MembersOnly
-from pytube.exceptions import RecordingUnavailable
-from pytube.exceptions import VideoUnavailable
-from pytube.exceptions import VideoPrivate
-from pytube.exceptions import VideoRegionBlocked
-from pytube.extract import apply_descrambler
-from pytube.extract import apply_signature
-from pytube.extract import get_ytplayer_config
+import pytube.exceptions as exceptions
+from pytube import extract, request
+from pytube import Stream, StreamQuery
 from pytube.helpers import install_proxy
 from pytube.metadata import YouTubeMetadata
 from pytube.monostate import Monostate
@@ -204,7 +189,7 @@ class YouTube:
         # On pre-signed videos, we need to use get_ytplayer_config to fix
         #  the player_response item
         if 'streamingData' not in self.player_config_args['player_response']:
-            config_response = get_ytplayer_config(self.watch_html)
+            config_response = extract.get_ytplayer_config(self.watch_html)
             if 'args' in config_response:
                 self.player_config_args['player_response'] = config_response['args']['player_response']  # noqa: E501
             else:
@@ -232,10 +217,10 @@ class YouTube:
         # unscramble the progressive and adaptive stream manifests.
         for fmt in stream_maps:
             if not self.age_restricted and fmt in self.vid_info:
-                apply_descrambler(self.vid_info, fmt)
-            apply_descrambler(self.player_config_args, fmt)
+                extract.apply_descrambler(self.vid_info, fmt)
+            extract.apply_descrambler(self.player_config_args, fmt)
 
-            apply_signature(self.player_config_args, fmt, self.js)
+            extract.apply_signature(self.player_config_args, fmt, self.js)
 
             # build instances of :class:`Stream <Stream>`
             # Initialize stream objects
@@ -267,23 +252,23 @@ class YouTube:
                     'Join this channel to get access to members-only content '
                     'like this video, and other exclusive perks.'
                 ):
-                    raise MembersOnly(video_id=self.video_id)
+                    raise exceptions.MembersOnly(video_id=self.video_id)
                 elif reason == 'This live stream recording is not available.':
-                    raise RecordingUnavailable(video_id=self.video_id)
+                    raise exceptions.RecordingUnavailable(video_id=self.video_id)
                 else:
                     if reason == 'Video unavailable':
                         if extract.is_region_blocked(self.watch_html):
-                            raise VideoRegionBlocked(video_id=self.video_id)
-                    raise VideoUnavailable(video_id=self.video_id)
+                            raise exceptions.VideoRegionBlocked(video_id=self.video_id)
+                    raise exceptions.VideoUnavailable(video_id=self.video_id)
             elif status == 'LOGIN_REQUIRED':
                 if reason == (
                     'This is a private video. '
                     'Please sign in to verify that you may see it.'
                 ):
-                    raise VideoPrivate(video_id=self.video_id)
+                    raise exceptions.VideoPrivate(video_id=self.video_id)
             elif status == 'ERROR':
                 if reason == 'Video unavailable':
-                    raise VideoUnavailable(video_id=self.video_id)
+                    raise exceptions.VideoUnavailable(video_id=self.video_id)
 
     @property
     def vid_info(self):
@@ -294,7 +279,7 @@ class YouTube:
         return dict(parse_qsl(self.vid_info_raw))
 
     @property
-    def caption_tracks(self) -> List[Caption]:
+    def caption_tracks(self) -> List[pytube.Caption]:
         """Get a list of :class:`Caption <Caption>`.
 
         :rtype: List[Caption]
@@ -304,15 +289,15 @@ class YouTube:
             .get("playerCaptionsTracklistRenderer", {})
             .get("captionTracks", [])
         )
-        return [Caption(track) for track in raw_tracks]
+        return [pytube.Caption(track) for track in raw_tracks]
 
     @property
-    def captions(self) -> CaptionQuery:
+    def captions(self) -> pytube.CaptionQuery:
         """Interface to query caption tracks.
 
         :rtype: :class:`CaptionQuery <CaptionQuery>`.
         """
-        return CaptionQuery(self.caption_tracks)
+        return pytube.CaptionQuery(self.caption_tracks)
 
     @property
     def streams(self) -> StreamQuery:

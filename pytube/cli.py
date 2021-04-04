@@ -2,25 +2,20 @@
 # -*- coding: utf-8 -*-
 """A simple command line application to download youtube videos."""
 import argparse
-import datetime as dt
 import gzip
 import json
 import logging
 import os
 import shutil
-import subprocess  # nosec
 import sys
-from typing import List
-from typing import Optional
+import datetime as dt
+import subprocess  # nosec
+from typing import List, Optional
 
+import pytube.exceptions as exceptions
 from pytube import __version__
-from pytube import CaptionQuery
-from pytube import Playlist
-from pytube import Stream
-from pytube import YouTube
-from pytube.exceptions import PytubeError, VideoUnavailable
-from pytube.helpers import safe_filename
-from pytube.helpers import setup_logger
+from pytube import CaptionQuery, Playlist, Stream, YouTube
+from pytube.helpers import safe_filename, setup_logger
 
 
 def main():
@@ -47,7 +42,7 @@ def main():
         for youtube_video in playlist.videos:
             try:
                 _perform_args_on_youtube(youtube_video, args)
-            except PytubeError as e:
+            except exceptions.PytubeError as e:
                 print(f"There was an error with video: {youtube_video}")
                 print(e)
     else:
@@ -476,7 +471,7 @@ def download_highest_resolution_progressive(
     youtube.register_on_progress_callback(on_progress)
     try:
         stream = youtube.streams.get_highest_resolution()
-    except VideoUnavailable as err:
+    except exceptions.VideoUnavailable as err:
         print(f"No video streams available: {err}")
     else:
         try:

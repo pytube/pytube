@@ -16,16 +16,10 @@ signature and decoding it.
 import logging
 import re
 from itertools import chain
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from pytube.exceptions import RegexMatchError
-from pytube.helpers import cache
-from pytube.helpers import regex_search
+from pytube.helpers import cache, regex_search
 
 logger = logging.getLogger(__name__)
 
