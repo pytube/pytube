@@ -67,11 +67,12 @@ class Caption:
         segments = []
         root = ElementTree.fromstring(xml_captions)
         for i, child in enumerate(list(root)):
-            if "dur" not in child.attrib:
-                continue
             text = child.text or ""
             caption = unescape(text.replace("\n", " ").replace("  ", " "),)
-            duration = float(child.attrib["dur"])
+            try:
+                duration = float(child.attrib["dur"])
+            except KeyError:
+                duration = 0.0
             start = float(child.attrib["start"])
             end = start + duration
             sequence_number = i + 1  # convert from 0-indexed to 1.
