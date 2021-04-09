@@ -18,7 +18,7 @@ setup(
     name="pytube",
     version=__version__,  # noqa: F821
     author="Nick Ficano, Harold Martin",
-    author_email="nficano@gmail.com, harold.martin@gmail.com",
+    author_email="nficano@gmail.com",
     packages=["pytube", "pytube.contrib"],
     package_data={"": ["LICENSE"],},
     url="https://github.com/nficano/pytube",
