@@ -21,16 +21,16 @@ setup(
     author_email="nficano@gmail.com",
     packages=["pytube", "pytube.contrib"],
     package_data={"": ["LICENSE"],},
-    url="https://github.com/nficano/pytube",
-    license="MIT",
+    url="https://github.com/pytube/pytube",
+    license="The Unlicense (Unlicense)",
     entry_points={
         "console_scripts": [
-            "pytube = pytube.cli:main", "pytube3 = pytube.cli:main"],},
+            "pytube = pytube.cli:main"],},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: The Unlicense (Unlicense)",
         "Natural Language :: English",
         "Operating System :: MacOS",
         "Operating System :: Microsoft",
@@ -54,7 +54,7 @@ setup(
     zip_safe=True,
     python_requires=">=3.6",
     project_urls={
-        "Bug Reports": "https://github.com/nficano/pytube/issues",
+        "Bug Reports": "https://github.com/pytube/pytube/issues",
         "Read the Docs": "https://python-pytube.readthedocs.io/en/latest",
     },
     keywords=["youtube", "download", "video", "stream",],
