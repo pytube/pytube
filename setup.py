@@ -36,6 +36,7 @@ setup(
         "Operating System :: Microsoft",
         "Operating System :: POSIX",
         "Operating System :: Unix",
+        "Operating System :: Linux",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
