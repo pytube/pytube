@@ -52,7 +52,7 @@ setup(
     python_requires=">=3.6",
     project_urls={
         "Bug Reports": "https://github.com/pytube/pytube/issues",
-        "Read the Docs": "https://python-pytube.readthedocs.io/en/latest",
+        "Read the Docs": "https://pytube.io",
     },
     keywords=["youtube", "download", "video", "stream",],
 )

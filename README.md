@@ -4,7 +4,7 @@
   </p>
   <p align="center">
 	<a href="https://pypi.org/project/pytube/"><img src="https://img.shields.io/pypi/dm/pytube?style=flat-square" alt="pypi"/></a>
-	<a href="https://python-pytube.readthedocs.io/en/latest/"><img src="https://readthedocs.org/projects/python-pytube/badge/?version=latest&style=flat-square" /></a>
+	<a href="https://pytube.io/en/latest/"><img src="https://readthedocs.org/projects/python-pytube/badge/?version=latest&style=flat-square" /></a>
     <a href="https://codecov.io/gh/pytube/pytube" aria-label="coverage"><img src="https://img.shields.io/codecov/c/github/pytube/pytube?style=flat-square" /></a>
 	<a href="https://pypi.org/project/pytube/"><img src="https://img.shields.io/pypi/v/pytube?style=flat-square" /></a>
   </p>
@@ -22,8 +22,8 @@ command-line utility) for downloading YouTube Videos.
 
 ## Documentation
 
-Detailed documentation about how to use the library can be found on our
-[readthedocs](https://python-pytube.readthedocs.io) page. This is recommended
+Detailed documentation about how to use the library can be found on 
+[pytube.io](pytube.io). This is recommended
 for most use cases. If you just want to quickly download a single video,
 the [quickstart](#Quickstart) guide below might be what you're looking for.
 
@@ -57,8 +57,7 @@ download videos right from terminal.
 ## Quickstart
 
 This guide is only meant to cover the most basic usage of the library. For more
-detailed information, please refer to our
-[readthedocs](https://python-pytube.readthedocs.io) page.
+detailed information, please refer to [pytube.io](https://pytube.io).
 
 ### Installation
 
