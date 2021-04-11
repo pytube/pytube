@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    if: github.actor == 'pytube' || github.actor == 'RONNCC' || github.actor == 'tfdahlin'
+    if: github.actor == 'nficano' || github.actor == 'RONNCC' || github.actor == 'tfdahlin'
     name: Build Python distribution and publish to PyPI
     runs-on: ubuntu-latest
     steps:
