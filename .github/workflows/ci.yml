@@ -35,6 +35,6 @@ jobs:
       - uses: actions/checkout@master
       - uses: codecov/codecov-action@v1
         with:
-          file: .coverage
+          file: .coveragerc
           fail_ci_if_error: true
           
