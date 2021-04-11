@@ -1,4 +1,3 @@
-
 """
 This module contains a container for stream manifest data.
 

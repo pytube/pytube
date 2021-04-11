@@ -1,4 +1,3 @@
-
 """This module contains the YouTubeMetadata class."""
 import json
 from typing import Dict, List, Optional

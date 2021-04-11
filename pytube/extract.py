@@ -1,4 +1,3 @@
-
 """This module contains all non-cipher related data extraction logic."""
 import json
 import logging

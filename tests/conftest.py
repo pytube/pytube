@@ -1,4 +1,3 @@
-
 """Reusable dependency injected testing components."""
 import gzip
 import json

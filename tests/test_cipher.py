@@ -1,4 +1,3 @@
-
 import pytest
 
 from pytube import cipher

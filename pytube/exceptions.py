@@ -1,4 +1,3 @@
-
 """Library specific exception definitions."""
 from typing import Pattern, Union
 

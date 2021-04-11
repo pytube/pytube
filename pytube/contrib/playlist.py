@@ -1,4 +1,3 @@
-
 """Module to download a complete playlist from a youtube channel."""
 import json
 import logging
