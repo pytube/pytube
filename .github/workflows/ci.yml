@@ -29,11 +29,3 @@ jobs:
 
       - name: Run make ci
         run: make ci
-
-      # https://github.com/codecov/codecov-action
-      - name: Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          file: .coverage
-          fail_ci_if_error: true
-          
