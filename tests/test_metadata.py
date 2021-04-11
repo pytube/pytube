@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Unit tests for the :module:`metadata <metadata>` module."""
 from pytube import extract
 

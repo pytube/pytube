@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """Various helper functions implemented by pytube."""
 import functools
 import gzip

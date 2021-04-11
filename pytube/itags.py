@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """This module contains a lookup table of YouTube's itag values."""
 from typing import Dict
 

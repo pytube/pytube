@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """Reusable dependency injected testing components."""
 import gzip
 import json

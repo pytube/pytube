@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """This module provides a query interface for media streams and captions."""
 from collections.abc import Mapping, Sequence
 from typing import Callable, List, Optional, Union

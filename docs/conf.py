@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """pytube documentation build configuration file."""
 import os
 import sys

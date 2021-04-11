@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """Implements a simple wrapper around urlopen."""
 import json
 import logging
