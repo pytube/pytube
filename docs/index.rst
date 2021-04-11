@@ -8,13 +8,13 @@ Release v\ |version|. (:ref:`Installation<install>`)
   :alt: Pypi
   :target: https://pypi.python.org/pypi/pytube/
 
-.. image:: https://travis-ci.org/nficano/pytube.svg?branch=master
+.. image:: https://travis-ci.org/pytube/pytube.svg?branch=master
    :alt: Build status
-   :target: https://travis-ci.org/nficano/pytube
+   :target: https://travis-ci.org/pytube/pytube
 
-.. image:: https://coveralls.io/repos/github/nficano/pytube/badge.svg?branch=master
+.. image:: https://coveralls.io/repos/github/pytube/pytube/badge.svg?branch=master
   :alt: Coverage
-  :target: https://coveralls.io/github/nficano/pytube?branch=master
+  :target: https://coveralls.io/github/pytube/pytube?branch=master
 
 .. image:: https://img.shields.io/pypi/pyversions/pytube.svg
   :alt: Python Versions

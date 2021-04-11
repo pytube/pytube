@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""This module contains setup instructions for pytube3."""
+"""This module contains setup instructions for pytube."""
 import codecs
 import os
 
@@ -17,7 +17,7 @@ with open(os.path.join(here, "pytube", "version.py")) as fp:
 setup(
     name="pytube",
     version=__version__,  # noqa: F821
-    author="Nick Ficano, Harold Martin",
+    author="Ronnie Ghose, Taylor Fox Dahlin, Nick Ficano",
     author_email="hey@pytube.io",
     packages=["pytube", "pytube.contrib"],
     package_data={"": ["LICENSE"],},
@@ -32,11 +32,7 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: The Unlicense (Unlicense)",
         "Natural Language :: English",
-        "Operating System :: MacOS",
-        "Operating System :: Microsoft",
-        "Operating System :: POSIX",
-        "Operating System :: Unix",
-        "Operating System :: Linux",
+        "Operating System :: OS Independent",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
@@ -48,7 +44,7 @@ setup(
         "Topic :: Terminals",
         "Topic :: Utilities",
     ],
-    description=("Python 3 library for downloading YouTube Videos."),
+    description=("Python library for downloading YouTube Videos."),
     include_package_data=True,
     long_description_content_type="text/markdown",
     long_description=long_description,
