@@ -8,17 +8,12 @@ Release v\ |version|. (:ref:`Installation<install>`)
   :alt: Pypi
   :target: https://pypi.python.org/pypi/pytube/
 
-.. image:: https://travis-ci.org/pytube/pytube.svg?branch=master
-   :alt: Build status
-   :target: https://travis-ci.org/pytube/pytube
-
-.. image:: https://coveralls.io/repos/github/pytube/pytube/badge.svg?branch=master
-  :alt: Coverage
-  :target: https://coveralls.io/github/pytube/pytube?branch=master
-
 .. image:: https://img.shields.io/pypi/pyversions/pytube.svg
   :alt: Python Versions
   :target: https://pypi.python.org/pypi/pytube/
+
+.. image:: https://readthedocs.org/projects/python-pytube/badge/?version=latest&style=flat-square
+  :alt: Readthedocs
 
 **pytube** is a lightweight, Pythonic, dependency-free, library (and
 command-line utility) for downloading YouTube Videos.
