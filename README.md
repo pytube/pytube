@@ -23,7 +23,7 @@ command-line utility) for downloading YouTube Videos.
 ## Documentation
 
 Detailed documentation about how to use the library can be found on 
-[pytube.io](pytube.io). This is recommended
+[pytube.io](https://pytube.io). This is recommended
 for most use cases. If you just want to quickly download a single video,
 the [quickstart](#Quickstart) guide below might be what you're looking for.
 
