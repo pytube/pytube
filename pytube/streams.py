@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This module contains a container for stream manifest data.
 

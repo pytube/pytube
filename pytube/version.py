@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 __version__ = "10.7.1"
 
 if __name__ == "__main__":

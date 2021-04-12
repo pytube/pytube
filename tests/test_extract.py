@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Unit tests for the :module:`extract <extract>` module."""
 from datetime import datetime
 import pytest

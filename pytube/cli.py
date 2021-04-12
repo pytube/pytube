@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """A simple command line application to download youtube videos."""
 import argparse
 import gzip

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Various helper functions implemented by pytube."""
 import functools
 import gzip
@@ -93,7 +92,7 @@ def setup_logger(level: int = logging.ERROR, log_filename: Optional[str] = None)
     date_fmt = "%H:%M:%S"
     formatter = logging.Formatter(fmt, datefmt=date_fmt)
 
-    # https://github.com/nficano/pytube/issues/163
+    # https://github.com/pytube/pytube/issues/163
     logger = logging.getLogger("pytube")
     logger.setLevel(level)
 

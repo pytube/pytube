@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import gzip
 import io
 import json
