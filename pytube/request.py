@@ -161,8 +161,12 @@ def stream(
                     timeout=timeout
                 )
             except URLError as e:
+                # We only want to skip over timeout errors, and
+                # raise any other URLError exceptions
                 if isinstance(e.reason, socket.timeout):
                     pass
+                else:
+                    raise
             else:
                 # On a successful request, break from loop
                 break
