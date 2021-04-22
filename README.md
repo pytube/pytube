@@ -108,7 +108,8 @@ You can also do the same for a playlist:
 $ pytube https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n
 ```
 
-###  Contributors
+##  Contributors
+Thanks to everyone who has contributed to pytube! You can find a detailed list of contributors under related package on GitHub.
 
 <a href="https://github.com/pytube/pytube/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=pytube/pytube" />
