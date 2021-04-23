@@ -229,8 +229,11 @@ class Stream:
             (optional) Skip existing files, defaults to True
         :type skip_existing: bool
         :param timeout:
-            (optional) Request timeout length in seconds
+            (optional) Request timeout length in seconds. Uses system default.
         :type timeout: int
+        :param max_retries:
+            (optional) Number of retries to attempt after socket timeout. Defaults to 0.
+        :type max_retries: int
         :returns:
             Path to the saved video
         :rtype: str
