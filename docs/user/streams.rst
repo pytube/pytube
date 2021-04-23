@@ -42,7 +42,7 @@ Pytube has built-in functionality to filter the streams available in a YouTube
 object with the .filter() method. You can pass it a number of different keyword
 arguments, so let's review some of the different options you're most likely to
 use. For a complete list of available properties to filter on, you can view the
-API documentation here: :py:meth:`pytube.StreamQuery.filter`.
+API documentation here: :meth:`pytube.StreamQuery.filter`.
 
 Filtering by streaming method
 -----------------------------
@@ -93,3 +93,17 @@ To query only streams in the MP4 format::
     ...
     <Stream: itag="394" mime_type="video/mp4" res="None" fps="30fps" vcodec="av01.0.00M.08" progressive="False" type="video">,
     <Stream: itag="140" mime_type="audio/mp4" abr="128kbps" acodec="mp4a.40.2" progressive="False" type="audio">]
+
+Downloading Streams
+===================
+
+After you've selected the :class:`Stream <pytube.Stream>` you're interested,
+you're ready to interact with it. At this point, you can query information
+about the stream, such as its filesize, whether the stream is adaptive, and
+more. You can also use the download method to save the file::
+
+    >>> stream = yt.streams.get_by_itag(22)
+    >>> stream.download()
+
+The download method has a number of different useful arguments, which are
+documented in the API reference here: :meth:`pytube.Stream.download`.
