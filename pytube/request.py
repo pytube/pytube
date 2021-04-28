@@ -12,7 +12,6 @@ from pytube.exceptions import RegexMatchError, MaxRetriesExceeded
 from pytube.helpers import regex_search
 
 logger = logging.getLogger(__name__)
-default_chunk_size = 4096  # 4kb
 default_range_size = 9437184  # 9MB
 
 
@@ -179,7 +178,7 @@ def stream(
             except (KeyError, IndexError, ValueError) as e:
                 logger.error(e)
         while True:
-            chunk = response.read(default_chunk_size)
+            chunk = response.read()
             if not chunk:
                 break
             downloaded += len(chunk)
