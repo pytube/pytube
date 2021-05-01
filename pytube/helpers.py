@@ -25,7 +25,7 @@ class DeferredGeneratorList:
     all simultaneously. This should allow for speed improvements for playlist
     and channel interactions.
     """
-    def __init__(self, generator, func=None):
+    def __init__(self, generator):
         """Construct a :class:`DeferredGeneratorList <DeferredGeneratorList>`.
 
         :param generator generator:
@@ -35,7 +35,6 @@ class DeferredGeneratorList:
         """
         self.gen = generator
         self._elements = []
-        self._func = func
 
     def __eq__(self, other):
         return list(self) == list(other)
@@ -47,7 +46,7 @@ class DeferredGeneratorList:
             raise TypeError
         # If the key has already been put into the array, return that
         if key < len(self._elements):
-            return self.func_call(self._elements[key])
+            return self._elements[key]
 
         # Otherwise, generate as necessary
         while True:
@@ -58,16 +57,23 @@ class DeferredGeneratorList:
             else:
                 self._elements.append(next_item)
                 if key < len(self._elements):
-                    return self.func_call(self._elements[key])
+                    return self._elements[key]
 
         # If we reach the end of the generator, attempt to access
         #  the key. This should raise IndexError.
-        return self.func_call(self._elements[key])
+        return self._elements[key]
 
     def __iter__(self):
         """Custom iterator for dynamically generated list."""
-        self.iter_index = 0
-        return self
+        iter_index = 0
+        while True:
+            try:
+                curr_item = self[iter_index]
+            except IndexError:
+                return
+            else:
+                yield curr_item
+                iter_index += 1
 
     def __next__(self) -> Any:
         """Fetch next element in iterator."""
@@ -88,6 +94,10 @@ class DeferredGeneratorList:
         self.generate_all()
         return str(self._elements)
 
+    def __reversed__(self):
+        self.generate_all()
+        return self._elements[::-1]
+
     def generate_all(self):
         """Generate all items."""
         while True:
@@ -97,12 +107,6 @@ class DeferredGeneratorList:
                 break
             else:
                 self._elements.append(next_item)
-
-    def func_call(self, arg):
-        if self._func:
-            return self._func(arg)
-        else:
-            return arg
 
 
 def regex_search(pattern: str, string: str, group: int) -> str:
