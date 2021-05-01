@@ -25,9 +25,20 @@ class DeferredGeneratorList:
     all simultaneously. This should allow for speed improvements for playlist
     and channel interactions.
     """
-    def __init__(self, generator):
+    def __init__(self, generator, func=None):
+        """Construct a :class:`DeferredGeneratorList <DeferredGeneratorList>`.
+
+        :param generator generator:
+            The deferrable generator to create a wrapper for.
+        :param func func:
+            (Optional) A function to call on the generator items to produce the list.
+        """
         self.gen = generator
         self._elements = []
+        self._func = func
+
+    def __eq__(self, other):
+        return list(self) == list(other)
 
     def __getitem__(self, key: int) -> Any:
         """Only generate items as they're asked for."""
@@ -36,7 +47,7 @@ class DeferredGeneratorList:
             raise TypeError
         # If the key has already been put into the array, return that
         if key < len(self._elements):
-            return self._elements[key]
+            return self.func_call(self._elements[key])
 
         # Otherwise, generate as necessary
         while True:
@@ -47,11 +58,11 @@ class DeferredGeneratorList:
             else:
                 self._elements.append(next_item)
                 if key < len(self._elements):
-                    return self._elements[key]
+                    return self.func_call(self._elements[key])
 
-        # If we reach the end of the generator, attempt to return
+        # If we reach the end of the generator, attempt to access
         #  the key. This should raise IndexError.
-        return self._elements[key]
+        return self.func_call(self._elements[key])
 
     def __iter__(self):
         """Custom iterator for dynamically generated list."""
@@ -60,12 +71,25 @@ class DeferredGeneratorList:
 
     def __next__(self) -> Any:
         """Fetch next element in iterator."""
-        curr_element = self._elements[self.iter_index]
+        try:
+            curr_element = self[self.iter_index]
+        except IndexError:
+            raise StopIteration
         self.iter_index += 1
         return curr_element
 
     def __len__(self) -> int:
-        """Generate all items, and return length of list."""
+        """eturn length of list of all items."""
+        self.generate_all()
+        return len(self._elements)
+
+    def __repr__(self) -> str:
+        """String representation of all items."""
+        self.generate_all()
+        return str(self._elements)
+
+    def generate_all(self):
+        """Generate all items."""
         while True:
             try:
                 next_item = next(self.gen)
@@ -73,7 +97,12 @@ class DeferredGeneratorList:
                 break
             else:
                 self._elements.append(next_item)
-        return len(self._elements)
+
+    def func_call(self, arg):
+        if self._func:
+            return self._func(arg)
+        else:
+            return arg
 
 
 def regex_search(pattern: str, string: str, group: int) -> str:
