@@ -6,10 +6,9 @@ import logging
 import os
 import re
 import warnings
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar
+from typing import Any, Callable, Dict, List, Optional, TypeVar
 from urllib import request
 
-from pytube import extract
 from pytube.exceptions import RegexMatchError
 
 logger = logging.getLogger(__name__)
@@ -30,7 +29,7 @@ class DeferredGeneratorList:
         self.gen = generator
         self._elements = []
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: int) -> Any:
         """Only generate items as they're asked for."""
         # We only allow querying with indexes.
         if not isinstance(key, int):
@@ -59,13 +58,13 @@ class DeferredGeneratorList:
         self.iter_index = 0
         return self
 
-    def __next__(self):
+    def __next__(self) -> Any:
         """Fetch next element in iterator."""
         curr_element = self._elements[self.iter_index]
         self.iter_index += 1
         return curr_element
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Generate all items, and return length of list."""
         while True:
             try:
