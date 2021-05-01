@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""This module contains setup instructions for pytube3."""
+"""This module contains setup instructions for pytube."""
 import codecs
 import os
 
@@ -17,26 +16,22 @@ with open(os.path.join(here, "pytube", "version.py")) as fp:
 setup(
     name="pytube",
     version=__version__,  # noqa: F821
-    author="Nick Ficano, Harold Martin",
-    author_email="nficano@gmail.com, harold.martin@gmail.com",
+    author="Ronnie Ghose, Taylor Fox Dahlin, Nick Ficano",
+    author_email="hey@pytube.io",
     packages=["pytube", "pytube.contrib"],
     package_data={"": ["LICENSE"],},
-    url="https://github.com/nficano/pytube",
-    license="MIT",
+    url="https://github.com/pytube/pytube",
+    license="The Unlicense (Unlicense)",
     entry_points={
         "console_scripts": [
-            "pytube = pytube.cli:main", "pytube3 = pytube.cli:main"],},
-    install_requires=["typing_extensions"],
+            "pytube = pytube.cli:main"],},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: The Unlicense (Unlicense)",
         "Natural Language :: English",
-        "Operating System :: MacOS",
-        "Operating System :: Microsoft",
-        "Operating System :: POSIX",
-        "Operating System :: Unix",
+        "Operating System :: OS Independent",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
@@ -55,8 +50,8 @@ setup(
     zip_safe=True,
     python_requires=">=3.6",
     project_urls={
-        "Bug Reports": "https://github.com/nficano/pytube/issues",
-        "Read the Docs": "https://python-pytube.readthedocs.io/en/latest",
+        "Bug Reports": "https://github.com/pytube/pytube/issues",
+        "Read the Docs": "https://pytube.io",
     },
     keywords=["youtube", "download", "video", "stream",],
 )

@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
 import math
 import os
 import time
 import xml.etree.ElementTree as ElementTree
 from html import unescape
-from typing import Dict
-from typing import Optional
+from typing import Dict, Optional
 
 from pytube import request
-from pytube.helpers import safe_filename
-from pytube.helpers import target_directory
+from pytube.helpers import safe_filename, target_directory
 
 
 class Caption:
@@ -69,7 +66,10 @@ class Caption:
         for i, child in enumerate(list(root)):
             text = child.text or ""
             caption = unescape(text.replace("\n", " ").replace("  ", " "),)
-            duration = float(child.attrib["dur"])
+            try:
+                duration = float(child.attrib["dur"])
+            except KeyError:
+                duration = 0.0
             start = float(child.attrib["start"])
             end = start + duration
             sequence_number = i + 1  # convert from 0-indexed to 1.

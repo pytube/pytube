@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This module contains all logic necessary to decipher the signature.
 
@@ -16,16 +15,10 @@ signature and decoding it.
 import logging
 import re
 from itertools import chain
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from pytube.exceptions import RegexMatchError
-from pytube.helpers import cache
-from pytube.helpers import regex_search
+from pytube.helpers import cache, regex_search
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +48,7 @@ class Cipher:
             The ciphered signature sent in the ``player_config``.
         :rtype: str
         :returns:
-           Decrypted signature required to download the media content.
+            Decrypted signature required to download the media content.
         """
         signature = list(ciphered_signature)
 
@@ -114,7 +107,7 @@ def get_initial_function_name(js: str) -> str:
         The contents of the base.js asset file.
     :rtype: str
     :returns:
-       Function name from regex match
+        Function name from regex match
     """
 
     function_patterns = [
@@ -232,7 +225,7 @@ def reverse(arr: List, _: Optional[Any]):
 
     .. code-block:: javascript
 
-       function(a, b) { a.reverse() }
+        function(a, b) { a.reverse() }
 
     This method takes an unused ``b`` variable as their transform functions
     universally sent two arguments.
@@ -252,7 +245,7 @@ def splice(arr: List, b: int):
 
     .. code-block:: javascript
 
-       function(a, b) { a.splice(0, b) }
+        function(a, b) { a.splice(0, b) }
 
     **Example**:
 
@@ -269,7 +262,7 @@ def swap(arr: List, b: int):
 
     .. code-block:: javascript
 
-       function(a, b) { var c=a[0];a[0]=a[b%a.length];a[b]=c }
+        function(a, b) { var c=a[0];a[0]=a[b%a.length];a[b]=c }
 
     **Example**:
 
@@ -285,7 +278,6 @@ def map_functions(js_func: str) -> Callable:
 
     :param str js_func:
         The JavaScript version of the transform function.
-
     """
     mapper = (
         # function(a){a.reverse()}

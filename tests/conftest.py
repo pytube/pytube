@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """Reusable dependency injected testing components."""
 import gzip
 import json
 import os
-from unittest import mock
-
 import pytest
+from unittest import mock
 
 from pytube import YouTube
 
@@ -34,7 +32,18 @@ def load_and_init_from_playback_file(filename, mock_urlopen):
     ]
     mock_urlopen.return_value = mock_url_open_object
 
-    return YouTube(pb["url"])
+    # Pytest caches this result, so we can speed up the tests
+    #  by causing the object to fetch all the relevant information
+    #  it needs. Previously, this was handled by prefetch_init()
+    #  and descramble(), but this functionality has since been
+    #  deferred
+    v = YouTube(pb["url"])
+    v.watch_html
+    v.vid_info_raw
+    v.js
+    v.fmt_streams
+    v.player_response
+    return v
 
 
 @pytest.fixture

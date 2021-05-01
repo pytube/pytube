@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 from unittest import mock
 
 import pytest
 
 import pytube
 from pytube import YouTube
-from pytube.exceptions import VideoUnavailable
+from pytube.exceptions import RegexMatchError
 
 
 @mock.patch("pytube.__main__.YouTube")
@@ -21,7 +20,6 @@ def test_install_proxy(opener):
     proxies = {"http": "http://www.example.com:3128/"}
     YouTube(
         "https://www.youtube.com/watch?v=9bZkp7q19f0",
-        defer_prefetch_init=True,
         proxies=proxies,
     )
     opener.assert_called()
@@ -29,12 +27,10 @@ def test_install_proxy(opener):
 
 @mock.patch("pytube.request.get")
 def test_video_unavailable(get):
-    get.return_value = None
-    youtube = YouTube(
-        "https://www.youtube.com/watch?v=9bZkp7q19f0", defer_prefetch_init=True
-    )
-    with pytest.raises(VideoUnavailable):
-        youtube.prefetch()
+    get.return_value = ""
+    youtube = YouTube("https://www.youtube.com/watch?v=9bZkp7q19f0")
+    with pytest.raises(RegexMatchError):
+        youtube.check_availability()
 
 
 def test_video_keywords(cipher_signature):
@@ -62,17 +58,3 @@ def test_js_caching(cipher_signature):
     assert pytube.__js_url__ is not None
     assert pytube.__js__ == cipher_signature.js
     assert pytube.__js_url__ == cipher_signature.js_url
-
-    with mock.patch('pytube.request.urlopen') as mock_urlopen:
-        mock_urlopen_object = mock.Mock()
-
-        # We should never read the js from this
-        mock_urlopen_object.read.side_effect = [
-            cipher_signature.watch_html.encode('utf-8'),
-            cipher_signature.vid_info_raw.encode('utf-8'),
-            cipher_signature.js.encode('utf-8')
-        ]
-
-        mock_urlopen.return_value = mock_urlopen_object
-        cipher_signature.prefetch()
-        assert mock_urlopen.call_count == 2

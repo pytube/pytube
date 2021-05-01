@@ -1,14 +1,8 @@
-# -*- coding: utf-8 -*-
 """This module provides a query interface for media streams and captions."""
-from collections.abc import Mapping
-from collections.abc import Sequence
-from typing import Callable
-from typing import List
-from typing import Optional
-from typing import Union
+from collections.abc import Mapping, Sequence
+from typing import Callable, List, Optional, Union
 
-from pytube import Caption
-from pytube import Stream
+from pytube import Caption, Stream
 from pytube.helpers import deprecated
 
 

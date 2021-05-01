@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """pytube documentation build configuration file."""
 import os
 import sys
@@ -36,8 +35,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "pytube"
-copyright = "2019, Nick Ficano"  # noqa: A001
-author = "Nick Ficano, Harold Martin"
+author = "Ronnie Ghose, Taylor Fox Dahlin, Nick Ficano"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

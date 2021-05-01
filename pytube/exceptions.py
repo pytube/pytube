@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 """Library specific exception definitions."""
-from typing import Pattern
-from typing import Union
+from typing import Pattern, Union
 
 
 class PytubeError(Exception):
@@ -11,6 +9,10 @@ class PytubeError(Exception):
     in unintended errors being unexpectedly and incorrectly handled within
     implementers code.
     """
+
+
+class MaxRetriesExceeded(PytubeError):
+    """Maximum number of retries exceeded."""
 
 
 class HTMLParseError(PytubeError):

@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
+import socket
 import os
-from unittest import mock
-
 import pytest
+from unittest import mock
+from urllib.error import URLError
 
 from pytube import request
+from pytube.exceptions import MaxRetriesExceeded
 
 
 @mock.patch("pytube.request.urlopen")
@@ -16,15 +17,24 @@ def test_streaming(mock_urlopen):
         os.urandom(8 * 1024),
         None,
     ]
-    response = mock.Mock()
-    response.read.side_effect = fake_stream_binary
-    response.info.return_value = {"Content-Range": "bytes 200-1000/24576"}
-    mock_urlopen.return_value = response
+    mock_response = mock.Mock()
+    mock_response.read.side_effect = fake_stream_binary
+    mock_response.info.return_value = {"Content-Range": "bytes 200-1000/24576"}
+    mock_urlopen.return_value = mock_response
     # When
-    response = request.stream("http://fakeassurl.gov")
+    response = request.stream("http://fakeassurl.gov/streaming_test")
     # Then
-    call_count = len(list(response))
-    assert call_count == 3
+    assert len(b''.join(response)) == 3 * 8 * 1024
+    assert mock_response.read.call_count == 4
+
+
+@mock.patch('pytube.request.urlopen')
+def test_timeout(mock_urlopen):
+    exc = URLError(reason=socket.timeout('timed_out'))
+    mock_urlopen.side_effect = exc
+    generator = request.stream('http://fakeassurl.gov/timeout_test', timeout=1)
+    with pytest.raises(MaxRetriesExceeded):
+        next(generator)
 
 
 @mock.patch("pytube.request.urlopen")

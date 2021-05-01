@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Various helper functions implemented by pytube."""
 import functools
 import gzip
@@ -7,14 +6,7 @@ import logging
 import os
 import re
 import warnings
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import TypeVar
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar
 from urllib import request
 
 from pytube import extract
@@ -101,7 +93,7 @@ def setup_logger(level: int = logging.ERROR, log_filename: Optional[str] = None)
     date_fmt = "%H:%M:%S"
     formatter = logging.Formatter(fmt, datefmt=date_fmt)
 
-    # https://github.com/nficano/pytube/issues/163
+    # https://github.com/pytube/pytube/issues/163
     logger = logging.getLogger("pytube")
     logger.setLevel(level)
 
@@ -176,6 +168,14 @@ def install_proxy(proxy_handler: Dict[str, str]) -> None:
 
 
 def uniqueify(duped_list: List) -> List:
+    """Remove duplicate items from a list, while maintaining list order.
+
+    :param List duped_list
+        List to remove duplicates from
+
+    :return List result
+        De-duplicated list
+    """
     seen: Dict[Any, bool] = {}
     result = []
     for item in duped_list:
@@ -208,11 +208,7 @@ def create_mock_html_json(vid_id) -> Dict[str, Any]:
     pytube_mocks_path = os.path.join(pytube_dir_path, 'tests', 'mocks')
     gzip_filepath = os.path.join(pytube_mocks_path, gzip_filename)
 
-    yt = YouTube(
-        'https://www.youtube.com/watch?v=%s' % vid_id,
-        defer_prefetch_init=True
-    )
-    yt.prefetch()
+    yt = YouTube(f'https://www.youtube.com/watch?v={vid_id}')
     html_data = {
         'url': yt.watch_url,
         'js': yt.js,
