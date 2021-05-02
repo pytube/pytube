@@ -47,11 +47,12 @@ class DeferredGeneratorList:
             raise TypeError('Key must be either a slice or int.')
 
         # Convert int keys to slice
+        key_slice = key
         if isinstance(key, int):
-            key = slice(key, key + 1, 1)
+            key_slice = slice(key, key + 1, 1)
 
         # Generate all elements up to the final item
-        while len(self._elements) < key.stop:
+        while len(self._elements) < key_slice.stop:
             try:
                 next_item = next(self.gen)
             except StopIteration:
