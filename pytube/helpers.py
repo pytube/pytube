@@ -82,7 +82,7 @@ class DeferredGeneratorList:
         except IndexError:
             raise StopIteration
         self.iter_index += 1
-        return curr_element
+        return curr_element  # noqa:R504
 
     def __len__(self) -> int:
         """Return length of list of all items."""
