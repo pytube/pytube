@@ -48,7 +48,7 @@ class DeferredGeneratorList:
 
         # Convert int keys to slice
         if isinstance(key, int):
-            key = slice(key, key+1, 1)
+            key = slice(key, key + 1, 1)
 
         # Generate all elements up to the final item
         while len(self._elements) < key.stop:
