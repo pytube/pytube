@@ -19,15 +19,24 @@ class Playlist(Sequence):
         if proxies:
             install_proxy(proxies)
 
+        self._input_url = url
+
         # These need to be initialized as None for the properties.
         self._html = None
         self._ytcfg = None
 
-        self.playlist_id = extract.playlist_id(url)
+        self._playlist_id = None
 
-        self.playlist_url = (
-            f"https://www.youtube.com/playlist?list={self.playlist_id}"
-        )
+    @property
+    def playlist_id(self):
+        if self._playlist_id:
+            return self._playlist_id
+        self._playlist_id = extract.playlist_id(self._input_url)
+        return self._playlist_id
+
+    @property
+    def playlist_url(self):
+        return f"https://www.youtube.com/playlist?list={self.playlist_id}"
 
     @property
     def html(self):
@@ -175,7 +184,7 @@ class Playlist(Sequence):
                     'appendContinuationItemsAction']['continuationItems']
                 videos = important_content
             except (KeyError, IndexError, TypeError) as p:
-                print(p)
+                logger.info(p)
                 return [], None
 
         try:
@@ -219,7 +228,10 @@ class Playlist(Sequence):
             yield from (self._video_url(watch_path) for watch_path in page)
 
     def url_generator(self):
-        """Generator that yields video URLs."""
+        """Generator that yields video URLs.
+
+        :Yields: Video URLs
+        """
         for page in self._paginate():
             for video in page:
                 yield self._video_url(video)
@@ -234,13 +246,18 @@ class Playlist(Sequence):
         """
         return DeferredGeneratorList(self.url_generator())
 
+    def videos_generator(self):
+        for url in self.video_urls:
+            yield YouTube(url)
+
     @property
     def videos(self) -> Iterable[YouTube]:
         """Yields YouTube objects of videos in this playlist
 
-        :Yields: YouTube
+        :rtype: List[YouTube]
+        :returns: List of YouTube
         """
-        yield from (YouTube(url) for url in self.video_urls)
+        return DeferredGeneratorList(self.videos_generator())
 
     def __getitem__(self, i: Union[slice, int]) -> Union[str, List[str]]:
         return self.video_urls[i]
