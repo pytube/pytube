@@ -2,26 +2,17 @@
 """Module for interacting with a user's youtube channel."""
 import json
 import logging
-from typing import Dict
-from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import Tuple
+from typing import Dict, List, Optional, Tuple
 
-from pytube import extract
-from pytube import request
-from pytube.continuation import Continuation
-from pytube.helpers import cache
+from pytube import extract, Playlist, request
 from pytube.helpers import uniqueify
-from pytube.helpers import install_proxy
 
 logger = logging.getLogger(__name__)
 
 
-class Channel:
+class Channel(Playlist):
     def __init__(self, url: str, proxies: Optional[Dict[str, str]] = None):
-        if proxies:
-            install_proxy(proxies)
+        super().__init__(url, proxies)
 
         self.channel_name = extract.channel_name(url)
 
@@ -34,24 +25,18 @@ class Channel:
         self.featured_channels_url = self.channel_url + '/channels'
         self.about_url = self.channel_url + '/about'
 
-        # Defer all of the html fetches until we need them
-        self._videos_html = None
-
         # Possible future additions
         self._playlists_html = None
         self._community_html = None
         self._featured_channels_html = None
         self._about_html = None
 
-        self.continuation_class = Continuation
-
     @property
-    def videos_html(self):
-        if self._videos_html:
-            return self._videos_html
-        else:
-            self._videos_html = request.get(self.videos_url)
-            return self._videos_html
+    def html(self):
+        if self._html:
+            return self._html
+        self._html = request.get(self.videos_url)
+        return self._html
 
     @property
     def playlists_html(self):
@@ -85,54 +70,6 @@ class Channel:
             self._about_html = request.get(self.about_url)
             return self._about_html
 
-    @property  # type: ignore
-    @cache
-    def video_urls(self) -> List[str]:
-        """Complete links of all the videos in playlist
-
-        :rtype: List[str]
-        :returns: List of video URLs
-        """
-        # TODO: convert to an iterator, so a user can subscript how much they want
-        # such as Channel.video_urls[:100]
-        return [
-            self._video_url(video)
-            for page in list(self._paginate_videos())
-            for video in page
-        ]
-
-    def _paginate_videos(
-        self, until_watch_id: Optional[str] = None
-    ) -> Iterable[List[str]]:
-        """Parse the video links from the page source, yields the /watch?v=
-        part from video link
-
-        :param until_watch_id Optional[str]: YouTube Video watch id until
-            which the playlist should be read.
-
-        :rtype: Iterable[List[str]]
-        :returns: Iterable of lists of YouTube watch ids
-        """
-        gen = self.continuation_class._paginate(self.videos_html)
-        try:
-            curr = next(gen)
-        except StopIteration:
-            return
-        while True:
-            # Trim the current page if necessary, else yield the whole thing
-            try:
-                trim_index = curr.index(f'/watch?v={until_watch_id}')
-                yield curr[:trim_index]
-                break
-            except ValueError:
-                yield curr
-
-            # Try to get the next page
-            try:
-                curr = next(gen)
-            except StopIteration:
-                break
-
     @staticmethod
     def _extract_videos(raw_json: str) -> Tuple[List[str], Optional[str]]:
         """Extracts videos from a raw json page
@@ -161,9 +98,17 @@ class Channel:
                     0
                 ]['appendContinuationItemsAction']['continuationItems']
                 videos = important_content
-            except (KeyError, IndexError, TypeError) as p:
-                print(p)
-                return [], None
+            except (KeyError, IndexError, TypeError):
+                try:
+                    # this is the json tree structure, if the json was directly sent
+                    # by the server in a continuation response
+                    # no longer a list and no longer has the "response" key
+                    important_content = initial_data['onResponseReceivedActions'][0][
+                        'appendContinuationItemsAction']['continuationItems']
+                    videos = important_content
+                except (KeyError, IndexError, TypeError) as p:
+                    logger.info(p)
+                    return [], None
 
         try:
             continuation = videos[-1]['continuationItemRenderer'][
@@ -190,7 +135,3 @@ class Channel:
             ),
             continuation,
         )
-
-    @staticmethod
-    def _video_url(watch_path: str):
-        return f"https://www.youtube.com{watch_path}"
