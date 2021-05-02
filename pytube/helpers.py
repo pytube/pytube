@@ -37,30 +37,29 @@ class DeferredGeneratorList:
         self._elements = []
 
     def __eq__(self, other):
-        return list(self) == list(other)
+        """We want to mimic list behavior for comparison."""
+        return list(self) == other
 
-    def __getitem__(self, key: int) -> Any:
+    def __getitem__(self, key) -> Any:
         """Only generate items as they're asked for."""
         # We only allow querying with indexes.
-        if not isinstance(key, int):
-            raise TypeError
-        # If the key has already been put into the array, return that
-        if key < len(self._elements):
-            return self._elements[key]
+        if not isinstance(key, (int, slice)):
+            raise TypeError('Key must be either a slice or int.')
 
-        # Otherwise, generate as necessary
-        while True:
+        # Convert int keys to slice
+        if isinstance(key, int):
+            key = slice(key, key+1, 1)
+
+        # Generate all elements up to the final item
+        while len(self._elements) < key.stop:
             try:
                 next_item = next(self.gen)
             except StopIteration:
-                break
+                # If we can't find enough elements for the slice, raise an IndexError
+                raise IndexError
             else:
                 self._elements.append(next_item)
-                if key < len(self._elements):
-                    return self._elements[key]
 
-        # If we reach the end of the generator, attempt to access
-        #  the key. This should raise IndexError.
         return self._elements[key]
 
     def __iter__(self):
@@ -85,7 +84,7 @@ class DeferredGeneratorList:
         return curr_element
 
     def __len__(self) -> int:
-        """eturn length of list of all items."""
+        """Return length of list of all items."""
         self.generate_all()
         return len(self._elements)
 
