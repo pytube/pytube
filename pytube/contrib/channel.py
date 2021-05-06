@@ -20,7 +20,7 @@ class Channel(Playlist):
             f"https://www.youtube.com/c/{self.channel_name}"
         )
         self.videos_url = self.channel_url + '/videos'
-        self.playlists_url = self.channel_url + '/playlists_url'
+        self.playlists_url = self.channel_url + '/playlists'
         self.community_url = self.channel_url + '/community'
         self.featured_channels_url = self.channel_url + '/channels'
         self.about_url = self.channel_url + '/about'
