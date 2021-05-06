@@ -91,7 +91,8 @@ def region_blocked():
 @pytest.fixture
 def playlist_html():
     """Youtube playlist HTML loaded on 2020-01-25 from
-    https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr"""
+    https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr
+    """
     file_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         "mocks",
@@ -104,7 +105,8 @@ def playlist_html():
 @pytest.fixture
 def playlist_long_html():
     """Youtube playlist HTML loaded on 2020-01-25 from
-    https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr"""
+    https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr
+    """
     file_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         "mocks",
@@ -117,7 +119,8 @@ def playlist_long_html():
 @pytest.fixture
 def playlist_submenu_html():
     """Youtube playlist HTML loaded on 2020-01-24 from
-    https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr"""
+    https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr
+    """
     file_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         "mocks",
@@ -138,3 +141,17 @@ def stream_dict():
     with gzip.open(file_path, "rb") as f:
         content = json.loads(f.read().decode("utf-8"))
         return content['watch_html']
+
+
+@pytest.fixture
+def channel_videos_html():
+    """Youtube channel HTML loaded on 2021-05-05 from
+    https://www.youtube.com/c/ProgrammingKnowledge/videos
+    """
+    file_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "mocks",
+        "channel-videos.html.gz",
+    )
+    with gzip.open(file_path, 'rb') as f:
+        return f.read().decode('utf-8')
