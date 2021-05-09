@@ -50,3 +50,11 @@ def test_js_caching(cipher_signature):
     assert pytube.__js_url__ is not None
     assert pytube.__js__ == cipher_signature.js
     assert pytube.__js_url__ == cipher_signature.js_url
+
+
+def test_channel_id(cipher_signature):
+    assert cipher_signature.channel_id == 'UCBR8-60-B28hp2BmDPdntcQ'
+
+
+def test_channel_url(cipher_signature):
+    assert cipher_signature.channel_url == 'https://www.youtube.com/channel/UCBR8-60-B28hp2BmDPdntcQ'
