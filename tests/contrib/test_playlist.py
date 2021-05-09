@@ -5,11 +5,8 @@ from pytube import Playlist
 
 
 @mock.patch("pytube.request.get")
-def test_title(request_get):
-    request_get.return_value = (
-        "<title>(149) Python Tutorial for Beginners "
-        "(For Absolute Beginners) - YouTube</title>"
-    )
+def test_title(request_get, playlist_long_html):
+    request_get.return_value = playlist_long_html
     url = (
         "https://www.fakeurl.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ"
         "-ghgoSH6n"
@@ -18,7 +15,7 @@ def test_title(request_get):
     pl_title = pl.title
     assert (
         pl_title
-        == "(149) Python Tutorial for Beginners (For Absolute Beginners)"
+        == "Python Tutorial for Beginners (For Absolute Beginners)"
     )
 
 
@@ -48,9 +45,9 @@ def test_init_with_watch_url(request_get):
 
 
 @mock.patch("pytube.request.get")
-def test_last_updated(request_get, playlist_html):
-    expected = datetime.date(2020, 3, 11)
-    request_get.return_value = playlist_html
+def test_last_updated(request_get, playlist_long_html):
+    expected = datetime.date(2020, 10, 8)
+    request_get.return_value = playlist_long_html
     playlist = Playlist(
         "https://www.youtube.com/playlist?list"
         "=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n"
@@ -251,8 +248,7 @@ def test_trimmed_pagination_not_found(
 
 # test case for playlist with submenus
 @mock.patch("pytube.request.get")
-def test_playlist_submenu(
-        request_get, playlist_submenu_html):
+def test_playlist_submenu(request_get, playlist_submenu_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.side_effect = [
         playlist_submenu_html,
@@ -264,3 +260,63 @@ def test_playlist_submenu(
     ]
     playlist = Playlist(url)
     assert len(playlist.video_urls) == 12
+
+
+@mock.patch("pytube.request.get")
+def test_playlist_length(request_get, playlist_long_html):
+    url = 'https://www.example.com/playlist?list=whatever'
+    request_get.return_value = playlist_long_html
+    p = Playlist(url)
+    assert p.length == 217
+
+
+@mock.patch("pytube.request.get")
+def test_playlist_description(request_get, playlist_long_html):
+    url = 'https://www.example.com/playlist?list=whatever'
+    request_get.return_value = playlist_long_html
+    p = Playlist(url)
+    assert p.description == (
+        'Python Object Oriented - Learning Python in '
+        "simple and easy steps ,python,xml,script,install, A beginner's "
+        'tutorial containing complete knowledge of Python Syntax Object '
+        'Oriented Language, Methods, Tuples,Learn,Python,Tutorial,Interactive,'
+        'Free, Tools/Utilities,Getting the most popular pages from your Apache'
+        ' logfile,Make your life easier with Virtualenvwrapper,This site now '
+        'runs on Django,PythonForBeginners.com has a new owner,How to use '
+        'Pillow, a fork of PIL,How to use the Python Imaging Library,Python '
+        'Websites and Tutorials,How to use Envoy,Using Feedparser in Python,'
+        'Subprocess and Shell Commands in Python, Exceptions Handling, '
+        'Sockets, GUI, Extentions, XML Programming'
+    )
+
+
+@mock.patch("pytube.request.get")
+def test_playlist_views(request_get, playlist_long_html):
+    url = 'https://www.example.com/playlist?list=whatever'
+    request_get.return_value = playlist_long_html
+    p = Playlist(url)
+    assert p.views == 4617130
+
+
+@mock.patch("pytube.request.get")
+def test_playlist_owner(request_get, playlist_long_html):
+    url = 'https://www.example.com/playlist?list=whatever'
+    request_get.return_value = playlist_long_html
+    p = Playlist(url)
+    assert p.owner == 'ProgrammingKnowledge'
+
+
+@mock.patch("pytube.request.get")
+def test_playlist_owner_id(request_get, playlist_long_html):
+    url = 'https://www.example.com/playlist?list=whatever'
+    request_get.return_value = playlist_long_html
+    p = Playlist(url)
+    assert p.owner_id == 'UCs6nmQViDpUw0nuIx9c_WvA'
+
+
+@mock.patch("pytube.request.get")
+def test_playlist_owner_url(request_get, playlist_long_html):
+    url = 'https://www.example.com/playlist?list=whatever'
+    request_get.return_value = playlist_long_html
+    p = Playlist(url)
+    assert p.owner_url == 'https://www.youtube.com/channel/UCs6nmQViDpUw0nuIx9c_WvA'

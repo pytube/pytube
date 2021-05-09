@@ -7,14 +7,6 @@ from pytube import YouTube
 from pytube.exceptions import RegexMatchError
 
 
-@mock.patch("pytube.__main__.YouTube")
-def test_prefetch_deferred(youtube):
-    instance = youtube.return_value
-    instance.prefetch_descramble.return_value = None
-    YouTube("https://www.youtube.com/watch?v=9bZkp7q19f0", True)
-    assert not instance.prefetch_descramble.called
-
-
 @mock.patch("urllib.request.install_opener")
 def test_install_proxy(opener):
     proxies = {"http": "http://www.example.com:3128/"}
@@ -58,3 +50,11 @@ def test_js_caching(cipher_signature):
     assert pytube.__js_url__ is not None
     assert pytube.__js__ == cipher_signature.js
     assert pytube.__js_url__ == cipher_signature.js_url
+
+
+def test_channel_id(cipher_signature):
+    assert cipher_signature.channel_id == 'UCBR8-60-B28hp2BmDPdntcQ'
+
+
+def test_channel_url(cipher_signature):
+    assert cipher_signature.channel_url == 'https://www.youtube.com/channel/UCBR8-60-B28hp2BmDPdntcQ'  # noqa:E501

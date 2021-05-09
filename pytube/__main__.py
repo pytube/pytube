@@ -423,6 +423,20 @@ class YouTube:
         return self.player_response.get('videoDetails', {}).get('keywords', [])
 
     @property
+    def channel_id(self) -> str:
+        """Get the video poster's channel id.
+        :rtype: str
+        """
+        return self.player_response.get('videoDetails', {}).get('channelId', None)
+
+    @property
+    def channel_url(self) -> str:
+        """Construct the channel url for the video's poster from the channel id.
+        :rtype: str
+        """
+        return f'https://www.youtube.com/channel/{self.channel_id}'
+
+    @property
     def metadata(self) -> Optional[YouTubeMetadata]:
         """Get the metadata for the video.
 
