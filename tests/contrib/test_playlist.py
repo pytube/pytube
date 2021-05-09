@@ -5,11 +5,8 @@ from pytube import Playlist
 
 
 @mock.patch("pytube.request.get")
-def test_title(request_get):
-    request_get.return_value = (
-        "<title>(149) Python Tutorial for Beginners "
-        "(For Absolute Beginners) - YouTube</title>"
-    )
+def test_title(request_get, playlist_long_html):
+    request_get.return_value = playlist_long_html
     url = (
         "https://www.fakeurl.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ"
         "-ghgoSH6n"
@@ -18,7 +15,7 @@ def test_title(request_get):
     pl_title = pl.title
     assert (
         pl_title
-        == "(149) Python Tutorial for Beginners (For Absolute Beginners)"
+        == "Python Tutorial for Beginners (For Absolute Beginners)"
     )
 
 
@@ -48,9 +45,9 @@ def test_init_with_watch_url(request_get):
 
 
 @mock.patch("pytube.request.get")
-def test_last_updated(request_get, playlist_html):
-    expected = datetime.date(2020, 3, 11)
-    request_get.return_value = playlist_html
+def test_last_updated(request_get, playlist_long_html):
+    expected = datetime.date(2020, 10, 8)
+    request_get.return_value = playlist_long_html
     playlist = Playlist(
         "https://www.youtube.com/playlist?list"
         "=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n"
