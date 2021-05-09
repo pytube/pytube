@@ -14,6 +14,101 @@ from pytube.exceptions import RegexMatchError
 logger = logging.getLogger(__name__)
 
 
+class DeferredGeneratorList:
+    """A wrapper class for deferring list generation.
+
+    Pytube has some continuation generators that create web calls, which means
+    that any time a full list is requested, all of those web calls must be
+    made at once, which could lead to slowdowns. This will allow individual
+    elements to be queried, so that slowdowns only happen as necessary. For
+    example, you can iterate over elements in the list without accessing them
+    all simultaneously. This should allow for speed improvements for playlist
+    and channel interactions.
+    """
+    def __init__(self, generator):
+        """Construct a :class:`DeferredGeneratorList <DeferredGeneratorList>`.
+
+        :param generator generator:
+            The deferrable generator to create a wrapper for.
+        :param func func:
+            (Optional) A function to call on the generator items to produce the list.
+        """
+        self.gen = generator
+        self._elements = []
+
+    def __eq__(self, other):
+        """We want to mimic list behavior for comparison."""
+        return list(self) == other
+
+    def __getitem__(self, key) -> Any:
+        """Only generate items as they're asked for."""
+        # We only allow querying with indexes.
+        if not isinstance(key, (int, slice)):
+            raise TypeError('Key must be either a slice or int.')
+
+        # Convert int keys to slice
+        key_slice = key
+        if isinstance(key, int):
+            key_slice = slice(key, key + 1, 1)
+
+        # Generate all elements up to the final item
+        while len(self._elements) < key_slice.stop:
+            try:
+                next_item = next(self.gen)
+            except StopIteration:
+                # If we can't find enough elements for the slice, raise an IndexError
+                raise IndexError
+            else:
+                self._elements.append(next_item)
+
+        return self._elements[key]
+
+    def __iter__(self):
+        """Custom iterator for dynamically generated list."""
+        iter_index = 0
+        while True:
+            try:
+                curr_item = self[iter_index]
+            except IndexError:
+                return
+            else:
+                yield curr_item
+                iter_index += 1
+
+    def __next__(self) -> Any:
+        """Fetch next element in iterator."""
+        try:
+            curr_element = self[self.iter_index]
+        except IndexError:
+            raise StopIteration
+        self.iter_index += 1
+        return curr_element  # noqa:R504
+
+    def __len__(self) -> int:
+        """Return length of list of all items."""
+        self.generate_all()
+        return len(self._elements)
+
+    def __repr__(self) -> str:
+        """String representation of all items."""
+        self.generate_all()
+        return str(self._elements)
+
+    def __reversed__(self):
+        self.generate_all()
+        return self._elements[::-1]
+
+    def generate_all(self):
+        """Generate all items."""
+        while True:
+            try:
+                next_item = next(self.gen)
+            except StopIteration:
+                break
+            else:
+                self._elements.append(next_item)
+
+
 def regex_search(pattern: str, string: str, group: int) -> str:
     """Shortcut method to search a string for a given pattern.
 

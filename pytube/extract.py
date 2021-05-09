@@ -178,6 +178,37 @@ def playlist_id(url: str) -> str:
     return parse_qs(parsed.query)['list'][0]
 
 
+def channel_name(url: str) -> str:
+    """Extract the ``channel_name`` or ``channel_id`` from a YouTube url.
+
+    This function supports the following patterns:
+
+    - :samp:`https://youtube.com/c/{channel_name}/*`
+    - :samp:`https://youtube.com/channel/{channel_id}/*
+
+    :param str url:
+        A YouTube url containing a channel name.
+    :rtype: str
+    :returns:
+        YouTube channel name.
+    """
+    patterns = [
+        r"(?:\/c\/([\d\w_\-]+)(\/.*)?)",
+        r"(?:\/channel\/([\w\d_\-]+)(\/.*)?)"
+    ]
+    for pattern in patterns:
+        regex = re.compile(pattern)
+        function_match = regex.search(url)
+        if function_match:
+            logger.debug("finished regex search, matched: %s", pattern)
+            channel_id = function_match.group(1)
+            return channel_id
+
+    raise RegexMatchError(
+        caller="channel_name", pattern="patterns"
+    )
+
+
 def video_info_url(video_id: str, watch_url: str) -> str:
     """Construct the video_info url.
 

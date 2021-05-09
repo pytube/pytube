@@ -7,7 +7,7 @@ from datetime import date, datetime
 from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 from pytube import extract, request, YouTube
-from pytube.helpers import cache, install_proxy, regex_search, uniqueify
+from pytube.helpers import cache, DeferredGeneratorList, install_proxy, regex_search, uniqueify
 
 logger = logging.getLogger(__name__)
 
@@ -19,15 +19,24 @@ class Playlist(Sequence):
         if proxies:
             install_proxy(proxies)
 
+        self._input_url = url
+
         # These need to be initialized as None for the properties.
         self._html = None
         self._ytcfg = None
 
-        self.playlist_id = extract.playlist_id(url)
+        self._playlist_id = None
 
-        self.playlist_url = (
-            f"https://www.youtube.com/playlist?list={self.playlist_id}"
-        )
+    @property
+    def playlist_id(self):
+        if self._playlist_id:
+            return self._playlist_id
+        self._playlist_id = extract.playlist_id(self._input_url)
+        return self._playlist_id
+
+    @property
+    def playlist_url(self):
+        return f"https://www.youtube.com/playlist?list={self.playlist_id}"
 
     @property
     def html(self):
@@ -175,7 +184,7 @@ class Playlist(Sequence):
                     'appendContinuationItemsAction']['continuationItems']
                 videos = important_content
             except (KeyError, IndexError, TypeError) as p:
-                print(p)
+                logger.info(p)
                 return [], None
 
         try:
@@ -218,27 +227,37 @@ class Playlist(Sequence):
         for page in self._paginate(until_watch_id=video_id):
             yield from (self._video_url(watch_path) for watch_path in page)
 
+    def url_generator(self):
+        """Generator that yields video URLs.
+
+        :Yields: Video URLs
+        """
+        for page in self._paginate():
+            for video in page:
+                yield self._video_url(video)
+
     @property  # type: ignore
     @cache
-    def video_urls(self) -> List[str]:
+    def video_urls(self) -> DeferredGeneratorList:
         """Complete links of all the videos in playlist
 
         :rtype: List[str]
         :returns: List of video URLs
         """
-        return [
-            self._video_url(video)
-            for page in list(self._paginate())
-            for video in page
-        ]
+        return DeferredGeneratorList(self.url_generator())
+
+    def videos_generator(self):
+        for url in self.video_urls:
+            yield YouTube(url)
 
     @property
     def videos(self) -> Iterable[YouTube]:
         """Yields YouTube objects of videos in this playlist
 
-        :Yields: YouTube
+        :rtype: List[YouTube]
+        :returns: List of YouTube
         """
-        yield from (YouTube(url) for url in self.video_urls)
+        return DeferredGeneratorList(self.videos_generator())
 
     def __getitem__(self, i: Union[slice, int]) -> Union[str, List[str]]:
         return self.video_urls[i]
@@ -247,7 +266,7 @@ class Playlist(Sequence):
         return len(self.video_urls)
 
     def __repr__(self) -> str:
-        return f"{self.video_urls}"
+        return f"{repr(self.video_urls)}"
 
     @property
     @cache
