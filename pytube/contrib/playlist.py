@@ -1,13 +1,12 @@
 """Module to download a complete playlist from a youtube channel."""
 import json
 import logging
-import re
 from collections.abc import Sequence
 from datetime import date, datetime
 from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 from pytube import extract, request, YouTube
-from pytube.helpers import cache, DeferredGeneratorList, install_proxy, regex_search, uniqueify
+from pytube.helpers import cache, DeferredGeneratorList, install_proxy, uniqueify
 
 logger = logging.getLogger(__name__)
 
@@ -296,7 +295,7 @@ class Playlist(Sequence):
         :rtype: datetime.date
         """
         last_updated_text = self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
-        'stats'][2]['runs'][1]['text']
+            'stats'][2]['runs'][1]['text']
         date_components = last_updated_text.split()
         month = date_components[0]
         day = date_components[1].strip(',')
@@ -314,12 +313,12 @@ class Playlist(Sequence):
         :rtype: Optional[str]
         """
         return self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
-        'title']['runs'][0]['text']
+            'title']['runs'][0]['text']
 
     @property
     def description(self) -> str:
         return self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
-        'description']['simpleText']
+            'description']['simpleText']
 
     @property
     def length(self):
@@ -329,7 +328,7 @@ class Playlist(Sequence):
         :rtype: int
         """
         return int(self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
-        'stats'][0]['runs'][0])
+            'stats'][0]['runs'][0])
 
     @property
     def views(self):
@@ -340,7 +339,7 @@ class Playlist(Sequence):
         """
         # "1,234,567 views"
         views_text = self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
-        'stats'][1]['simpleText']
+            'stats'][1]['simpleText']
         # "1,234,567"
         count_text = views_text.split()[0]
         # "1234567"
@@ -355,7 +354,7 @@ class Playlist(Sequence):
         :rtype: str
         """
         return self.sidebar_info[1]['playlistSidebarSecondaryInfoRenderer'][
-        'videoOwner']['title']['runs'][0]['text']
+            'videoOwner']['title']['runs'][0]['text']
 
     @staticmethod
     def _video_url(watch_path: str):
