@@ -24,6 +24,8 @@ class Playlist(Sequence):
         # These need to be initialized as None for the properties.
         self._html = None
         self._ytcfg = None
+        self._initial_data = None
+        self._sidebar_info = None
 
         self._playlist_id = None
 
@@ -51,6 +53,23 @@ class Playlist(Sequence):
             return self._ytcfg
         self._ytcfg = extract.get_ytcfg(self.html)
         return self._ytcfg
+
+    @property
+    def initial_data(self):
+        if self._initial_data:
+            return self._initial_data
+        else:
+            self._initial_data = extract.initial_data(self.html)
+            return self._initial_data
+
+    @property
+    def sidebar_info(self):
+        if self._sidebar_info:
+            return self._sidebar_info
+        else:
+            self._sidebar_info = self.initial_data['sidebar'][
+                'playlistSidebarRenderer']['items']
+            return self._sidebar_info
 
     @property
     def yt_api_key(self):
@@ -271,15 +290,20 @@ class Playlist(Sequence):
     @property
     @cache
     def last_updated(self) -> Optional[date]:
-        date_match = re.search(
-            r"Last updated on (\w{3}) (\d{1,2}), (\d{4})", self.html
-        )
-        if date_match:
-            month, day, year = date_match.groups()
-            return datetime.strptime(
-                f"{month} {day:0>2} {year}", "%b %d %Y"
-            ).date()
-        return None
+        """Extract the date that the playlist was last updated.
+
+        :return: Date of last playlist update
+        :rtype: datetime.date
+        """
+        last_updated_text = self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
+        'stats'][2]['runs'][1]['text']
+        date_components = last_updated_text.split()
+        month = date_components[0]
+        day = date_components[1].strip(',')
+        year = date_components[2]
+        return datetime.strptime(
+            f"{month} {day:0>2} {year}", "%b %d %Y"
+        ).date()
 
     @property
     @cache
@@ -289,8 +313,49 @@ class Playlist(Sequence):
         :return: playlist title (name)
         :rtype: Optional[str]
         """
-        pattern = r"<title>(.+?)</title>"
-        return regex_search(pattern, self.html, 1).replace("- YouTube", "").strip()
+        return self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
+        'title']['runs'][0]['text']
+
+    @property
+    def description(self) -> str:
+        return self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
+        'description']['simpleText']
+
+    @property
+    def length(self):
+        """Extract the number of videos in the playlist.
+
+        :return: Playlist video count
+        :rtype: int
+        """
+        return int(self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
+        'stats'][0]['runs'][0])
+
+    @property
+    def views(self):
+        """Extract view count for playlist.
+
+        :return: Playlist view count
+        :rtype: int
+        """
+        # "1,234,567 views"
+        views_text = self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
+        'stats'][1]['simpleText']
+        # "1,234,567"
+        count_text = views_text.split()[0]
+        # "1234567"
+        count_text = count_text.replace(',', '')
+        return int(count_text)
+
+    @property
+    def owner(self):
+        """Extract the owner of the playlist.
+
+        :return: Playlist owner name.
+        :rtype: str
+        """
+        return self.sidebar_info[1]['playlistSidebarSecondaryInfoRenderer'][
+        'videoOwner']['title']['runs'][0]['text']
 
     @staticmethod
     def _video_url(watch_path: str):
