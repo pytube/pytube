@@ -355,7 +355,28 @@ class Playlist(Sequence):
         :rtype: str
         """
         return self.sidebar_info[1]['playlistSidebarSecondaryInfoRenderer'][
-            'videoOwner']['title']['runs'][0]['text']
+            'videoOwner']['videoOwnerRenderer']['title']['runs'][0]['text']
+
+    @property
+    def owner_id(self):
+        """Extract the channel_id of the owner of the playlist.
+
+        :return: Playlist owner's channel ID.
+        :rtype: str
+        """
+        return self.sidebar_info[1]['playlistSidebarSecondaryInfoRenderer'][
+            'videoOwner']['videoOwnerRenderer']['title']['runs'][0][
+            'navigationEndpoint']['browseEndpoint']['browseId']
+
+    @property
+    def owner_url(self):
+        """Create the channel url of the owner of the playlist.
+
+        :return: Playlist owner's channel url.
+        :rtype: str
+        """
+        return f'https://www.youtube.com/channel/{self.owner_id}'
+
 
     @staticmethod
     def _video_url(watch_path: str):
