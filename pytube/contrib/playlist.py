@@ -327,8 +327,9 @@ class Playlist(Sequence):
         :return: Playlist video count
         :rtype: int
         """
-        return int(self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
-            'stats'][0]['runs'][0])
+        count_text = self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
+            'stats'][0]['runs'][0]
+        return int(count_text)
 
     @property
     def views(self):
