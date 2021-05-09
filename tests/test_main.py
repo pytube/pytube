@@ -57,4 +57,4 @@ def test_channel_id(cipher_signature):
 
 
 def test_channel_url(cipher_signature):
-    assert cipher_signature.channel_url == 'https://www.youtube.com/channel/UCBR8-60-B28hp2BmDPdntcQ'
+    assert cipher_signature.channel_url == 'https://www.youtube.com/channel/UCBR8-60-B28hp2BmDPdntcQ'  # noqa:E501
