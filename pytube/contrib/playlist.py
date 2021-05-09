@@ -328,7 +328,7 @@ class Playlist(Sequence):
         :rtype: int
         """
         count_text = self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
-            'stats'][0]['runs'][0]
+            'stats'][0]['runs'][0]['text']
         return int(count_text)
 
     @property
