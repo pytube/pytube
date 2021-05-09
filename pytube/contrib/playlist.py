@@ -377,7 +377,6 @@ class Playlist(Sequence):
         """
         return f'https://www.youtube.com/channel/{self.owner_id}'
 
-
     @staticmethod
     def _video_url(watch_path: str):
         return f"https://www.youtube.com{watch_path}"
