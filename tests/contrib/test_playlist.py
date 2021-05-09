@@ -277,7 +277,7 @@ def test_playlist_description(request_get, playlist_long_html):
     p = Playlist(url)
     assert p.description == (
         'Python Object Oriented - Learning Python in '
-        'simple and easy steps ,python,xml,script,install, A beginner\'s '
+        "simple and easy steps ,python,xml,script,install, A beginner's "
         'tutorial containing complete knowledge of Python Syntax Object '
         'Oriented Language, Methods, Tuples,Learn,Python,Tutorial,Interactive,'
         'Free, Tools/Utilities,Getting the most popular pages from your Apache'
