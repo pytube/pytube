@@ -62,7 +62,7 @@ class Stream:
         self.is_otf: bool = stream["is_otf"]
         self.bitrate: Optional[int] = stream["bitrate"]
 
-        self._filesize: Optional[int] = None  # filesize in bytes
+        self._filesize: int = stream["content_length"]  # filesize in bytes
 
         # Additional information about the stream format, such as resolution,
         # frame rate, and whether the stream is live (HLS) or 3D.
@@ -147,13 +147,13 @@ class Stream:
         :returns:
             Filesize (in bytes) of the stream.
         """
-        if self._filesize is None:
-            try:
-                self._filesize = request.filesize(self.url)
-            except HTTPError as e:
-                if e.code != 404:
-                    raise
-                self._filesize = request.seq_filesize(self.url)
+        #if self._filesize is None:
+        #    try:
+        #        self._filesize = request.filesize(self.url)
+        #    except HTTPError as e:
+        #        if e.code != 404:
+        #            raise
+        #        self._filesize = request.seq_filesize(self.url)
         return self._filesize
 
     @property
