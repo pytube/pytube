@@ -72,7 +72,7 @@ class YouTube:
         # video_id part of /watch?v=<video_id>
         self.video_id = extract.video_id(url)
 
-        self.watch_url = f"https://youtube.com/watch?v={self.video_id}"
+        self.watch_url = f"https://www.youtube.com/watch?v={self.video_id}"
         self.embed_url = f"https://www.youtube.com/embed/{self.video_id}"
 
         # Shared between all instances of `Stream` (Borg pattern).
