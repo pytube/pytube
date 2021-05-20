@@ -258,7 +258,7 @@ def video_info_url_age_restricted(video_id: str, embed_html: str) -> str:
 
 
 def _video_info_url(params: OrderedDict) -> str:
-    return "https://youtube.com/get_video_info?" + urlencode(params)
+    return "https://www.youtube.com/get_video_info?html5=1&video_id=" + params['video_id']
 
 
 def js_url(html: str) -> str:
