@@ -264,3 +264,27 @@ def head(url):
     """
     response_headers = _execute_request(url, method="HEAD").info()
     return {k.lower(): v for k, v in response_headers.items()}
+
+
+def call_api(method, endpoint, video_id, query_params={}, data={}, timeout=None):
+    query_params.update(
+        {
+            'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
+
+        }
+    )
+    data.update({
+        'context': {
+            'client': {
+                'clientName': 'WEB',
+                'clientVersion': '2.20200720.00.02'
+            }
+        }
+    })
+    base_url = 'https://www.youtube.com/youtubei/v1'
+    endpoint_url = f'{base_url}/{endpoint}'
+    if query_params:
+        endpoint_url = f'{endpoint_url}?{parse.urlencode(query_params)}'
+    response = _execute_request(endpoint_url, method, headers={'Content-Type': 'application/json'}, data=data)
+    json_data = json.loads(response.read())
+    return json_data

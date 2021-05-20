@@ -56,6 +56,7 @@ class YouTube:
         self._vid_info_url: Optional[str] = None
         self._vid_info_raw: Optional[str] = None  # content fetched by vid_info_url
         self._vid_info: Optional[Dict] = None  # parsed content of vid_info_raw
+        self._api_json: Optional[Dict] = None
 
         self._watch_html: Optional[str] = None  # the html of /watch?v=<video_id>
         self._embed_html: Optional[str] = None
@@ -107,6 +108,13 @@ class YouTube:
             return self._vid_info_raw
         self._vid_info_raw = request.get(self.vid_info_url)
         return self._vid_info_raw
+
+    @property
+    def api_json(self):
+        if self._api_json:
+            return self._api_json
+        self._api_json = request.call_api('POST', 'player', self.video_id, query_params={'videoId': self.video_id})
+        return self._api_json
 
     @property
     def age_restricted(self):
