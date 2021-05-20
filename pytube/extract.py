@@ -480,6 +480,7 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
     if key == "url_encoded_fmt_stream_map" and not stream_data.get(
         "url_encoded_fmt_stream_map"
     ):
+        streaming_data = stream_data
         if isinstance(stream_data["player_response"], str):
             streaming_data = json.loads(stream_data["player_response"])["streamingData"]
         else:

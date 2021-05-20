@@ -193,16 +193,21 @@ class YouTube:
             return self._player_config_args
 
         self._player_config_args = self.vid_info
+        self._player_config_args = {
+            'player_response': self.vid_info
+        }
+        return self._player_config_args
+        # Skip this now?
         # On pre-signed videos, we need to use get_ytplayer_config to fix
         #  the player_response item
-        if 'streamingData' not in self.player_config_args['player_response']:
-            config_response = extract.get_ytplayer_config(self.watch_html)
-            if 'args' in config_response:
-                self.player_config_args['player_response'] = config_response['args']['player_response']  # noqa: E501
-            else:
-                self.player_config_args['player_response'] = config_response
-
-        return self._player_config_args
+        #if 'streamingData' not in self.player_config_args['player_response']:
+        #    config_response = extract.get_ytplayer_config(self.watch_html)
+        #    if 'args' in config_response:
+        #        self.player_config_args['player_response'] = config_response['args']['player_response']  # noqa: E501
+        #    else:
+        #        self.player_config_args['player_response'] = config_response
+        #
+        #return self._player_config_args
 
     @property
     def fmt_streams(self):
@@ -223,6 +228,7 @@ class YouTube:
 
         # unscramble the progressive and adaptive stream manifests.
         for fmt in stream_maps:
+            #print(self.vid_info)
             if not self.age_restricted and fmt in self.vid_info:
                 extract.apply_descrambler(self.vid_info, fmt)
             extract.apply_descrambler(self.player_config_args, fmt)
@@ -283,7 +289,8 @@ class YouTube:
 
         :rtype: Dict[Any, Any]
         """
-        return dict(parse_qsl(self.vid_info_raw))
+        return self.api_json
+        #return dict(parse_qsl(self.vid_info_raw))
 
     @property
     def caption_tracks(self) -> List[pytube.Caption]:
