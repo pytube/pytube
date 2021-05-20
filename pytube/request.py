@@ -5,7 +5,7 @@ import re
 import socket
 from functools import lru_cache
 from urllib import parse
-from urllib.error import URLError
+from urllib.error import URLError, HTTPError
 from urllib.request import Request, urlopen
 
 from pytube.exceptions import RegexMatchError, MaxRetriesExceeded
@@ -33,7 +33,12 @@ def _execute_request(
         request = Request(url, headers=base_headers, method=method, data=data)
     else:
         raise ValueError("Invalid URL")
-    return urlopen(request, timeout=timeout)  # nosec
+    try:
+        return urlopen(request, timeout=timeout)  # nosec
+    except HTTPError:
+        logger.warn(f'Exception encountered while executing web request:')
+        logger.warn(f'{method or "GET"} {url}')
+        raise
 
 
 def get(url, extra_headers=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
