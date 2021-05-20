@@ -227,6 +227,7 @@ def video_info_url(video_id: str, watch_url: str) -> str:
             ("ps", "default"),
             ("eurl", quote(watch_url)),
             ("hl", "en_US"),
+            ("html5", "1"),
         ]
     )
     return _video_info_url(params)
