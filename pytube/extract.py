@@ -134,6 +134,8 @@ def playability_status(watch_html: str) -> (str, str):
     """
     player_response = initial_player_response(watch_html)
     status_dict = player_response.get('playabilityStatus', {})
+    if 'liveStreamability' in status_dict:
+        return 'LIVE_STREAM', 'Video is a live stream.'
     if 'status' in status_dict:
         if 'reason' in status_dict:
             return status_dict['status'], [status_dict['reason']]
