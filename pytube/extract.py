@@ -193,15 +193,17 @@ def channel_name(url: str) -> str:
         YouTube channel name.
     """
     patterns = [
-        r"(?:\/c\/([\d\w_\-]+)(\/.*)?)",
-        r"(?:\/channel\/([\w\d_\-]+)(\/.*)?)"
+        r"(?:\/(c)\/([\d\w_\-]+)(\/.*)?)",
+        r"(?:\/(channel)\/([\w\d_\-]+)(\/.*)?)"
     ]
     for pattern in patterns:
         regex = re.compile(pattern)
         function_match = regex.search(url)
         if function_match:
             logger.debug("finished regex search, matched: %s", pattern)
-            return function_match.group(0)
+            uri_style = function_match.group(1)
+            uri_identifier = function_match.group(2)
+            return f'/{uri_style}/{uri_identifier}'
 
     raise RegexMatchError(
         caller="channel_name", pattern="patterns"
