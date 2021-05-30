@@ -201,8 +201,7 @@ def channel_name(url: str) -> str:
         function_match = regex.search(url)
         if function_match:
             logger.debug("finished regex search, matched: %s", pattern)
-            channel_id = function_match.group(1)
-            return channel_id
+            return function_match.group(0)
 
     raise RegexMatchError(
         caller="channel_name", pattern="patterns"

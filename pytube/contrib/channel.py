@@ -14,10 +14,10 @@ class Channel(Playlist):
     def __init__(self, url: str, proxies: Optional[Dict[str, str]] = None):
         super().__init__(url, proxies)
 
-        self.channel_name = extract.channel_name(url)
+        self.channel_uri = extract.channel_name(url)
 
         self.channel_url = (
-            f"https://www.youtube.com/c/{self.channel_name}"
+            f"https://www.youtube.com/{self.channel_uri}"
         )
         self.videos_url = self.channel_url + '/videos'
         self.playlists_url = self.channel_url + '/playlists'
