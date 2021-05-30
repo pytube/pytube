@@ -17,7 +17,7 @@ class Channel(Playlist):
         self.channel_uri = extract.channel_name(url)
 
         self.channel_url = (
-            f"https://www.youtube.com/{self.channel_uri}"
+            f"https://www.youtube.com{self.channel_uri}"
         )
         self.videos_url = self.channel_url + '/videos'
         self.playlists_url = self.channel_url + '/playlists'
