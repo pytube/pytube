@@ -268,6 +268,8 @@ class YouTube:
             elif status == 'ERROR':
                 if reason == 'Video unavailable':
                     raise exceptions.VideoUnavailable(video_id=self.video_id)
+            elif status == 'LIVE_STREAM':
+                raise exceptions.LiveStreamError(video_id=self.video_id)
 
     @property
     def vid_info(self):
