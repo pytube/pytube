@@ -329,6 +329,7 @@ class Playlist(Sequence):
         """
         count_text = self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
             'stats'][0]['runs'][0]['text']
+        count_text = count_text.replace(',','')
         return int(count_text)
 
     @property
