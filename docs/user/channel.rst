@@ -43,4 +43,4 @@ Or, if we're only interested in the URLs for the videos, we can look at those as
     'https://www.youtube.com/watch?v=YBfInrtWq8Y',
     'https://www.youtube.com/watch?v=EP9WrMw6Gzg']
 
-And that's basically all there is to it! The Channel class is relatively straightforward.
+And that's basically all there is to it!
