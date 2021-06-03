@@ -55,11 +55,13 @@ class Channel(Playlist):
 
         :rtype: str
         """
-        return self.initial_data['metadata']['channelMetadataRenderer']['title']
+        return self.initial_data['metadata']['channelMetadataRenderer']['externalId']
 
     @property
     def vanity_url(self):
         """Get the vanity URL of the YouTube channel.
+
+        Returns None if it doesn't exist.
 
         :rtype: str
         """
