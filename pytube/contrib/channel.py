@@ -12,6 +12,13 @@ logger = logging.getLogger(__name__)
 
 class Channel(Playlist):
     def __init__(self, url: str, proxies: Optional[Dict[str, str]] = None):
+        """Construct a :class:`Channel <Channel>`.
+
+        :param str url:
+            A valid YouTube channel URL.
+        :param proxies:
+            (Optional) A dictionary of proxies to use for web requests.
+        """
         super().__init__(url, proxies)
 
         self.channel_uri = extract.channel_name(url)
@@ -19,6 +26,7 @@ class Channel(Playlist):
         self.channel_url = (
             f"https://www.youtube.com{self.channel_uri}"
         )
+
         self.videos_url = self.channel_url + '/videos'
         self.playlists_url = self.channel_url + '/playlists'
         self.community_url = self.channel_url + '/community'
@@ -32,7 +40,37 @@ class Channel(Playlist):
         self._about_html = None
 
     @property
+    def channel_name(self):
+        """Get the name of the YouTube channel.
+
+        :rtype: str
+        """
+        return self.initial_data['metadata']['channelMetadataRenderer']['title']
+
+    @property
+    def channel_id(self):
+        """Get the ID of the YouTube channel.
+
+        This will return the underlying ID, not the vanity URL.
+
+        :rtype: str
+        """
+        return self.initial_data['metadata']['channelMetadataRenderer']['title']
+
+    @property
+    def vanity_url(self):
+        """Get the vanity URL of the YouTube channel.
+
+        :rtype: str
+        """
+        return self.initial_data['metadata']['channelMetadataRenderer'].get('vanityChannelUrl', None)  # noqa:E501
+
+    @property
     def html(self):
+        """Get the html for the /videos page.
+
+        :rtype: str
+        """
         if self._html:
             return self._html
         self._html = request.get(self.videos_url)
@@ -40,6 +78,12 @@ class Channel(Playlist):
 
     @property
     def playlists_html(self):
+        """Get the html for the /playlists page.
+
+        Currently unused for any functionality.
+
+        :rtype: str
+        """
         if self._playlists_html:
             return self._playlists_html
         else:
@@ -48,6 +92,12 @@ class Channel(Playlist):
 
     @property
     def community_html(self):
+        """Get the html for the /community page.
+
+        Currently unused for any functionality.
+
+        :rtype: str
+        """
         if self._community_html:
             return self._community_html
         else:
@@ -56,6 +106,12 @@ class Channel(Playlist):
 
     @property
     def featured_channels_html(self):
+        """Get the html for the /channels page.
+
+        Currently unused for any functionality.
+
+        :rtype: str
+        """
         if self._featured_channels_html:
             return self._featured_channels_html
         else:
@@ -64,6 +120,12 @@ class Channel(Playlist):
 
     @property
     def about_html(self):
+        """Get the html for the /about page.
+
+        Currently unused for any functionality.
+
+        :rtype: str
+        """
         if self._about_html:
             return self._about_html
         else:
