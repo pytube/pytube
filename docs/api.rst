@@ -20,6 +20,13 @@ Playlist Object
    :members:
    :inherited-members:
 
+Channel Object
+--------------
+
+.. autoclass:: pytube.contrib.channel.Channel
+   :members:
+   :inherited-members:
+
 Stream Object
 -------------
 

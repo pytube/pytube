@@ -36,8 +36,6 @@ class YouTube:
 
         :param str url:
             A valid YouTube watch URL.
-        :param bool defer_prefetch_init:
-            Defers executing any network requests.
         :param func on_progress_callback:
             (Optional) User defined callback function for stream download
             progress events.
@@ -420,6 +418,7 @@ class YouTube:
     @property
     def keywords(self) -> List[str]:
         """Get the video keywords.
+
         :rtype: List[str]
         """
         return self.player_response.get('videoDetails', {}).get('keywords', [])
@@ -427,6 +426,7 @@ class YouTube:
     @property
     def channel_id(self) -> str:
         """Get the video poster's channel id.
+
         :rtype: str
         """
         return self.player_response.get('videoDetails', {}).get('channelId', None)
@@ -434,6 +434,7 @@ class YouTube:
     @property
     def channel_url(self) -> str:
         """Construct the channel url for the video's poster from the channel id.
+
         :rtype: str
         """
         return f'https://www.youtube.com/channel/{self.channel_id}'

@@ -30,6 +30,10 @@ class Playlist(Sequence):
 
     @property
     def playlist_id(self):
+        """Get the playlist id.
+
+        :rtype: str
+        """
         if self._playlist_id:
             return self._playlist_id
         self._playlist_id = extract.playlist_id(self._input_url)
@@ -37,10 +41,18 @@ class Playlist(Sequence):
 
     @property
     def playlist_url(self):
+        """Get the base playlist url.
+
+        :rtype: str
+        """
         return f"https://www.youtube.com/playlist?list={self.playlist_id}"
 
     @property
     def html(self):
+        """Get the playlist page html.
+
+        :rtype: str
+        """
         if self._html:
             return self._html
         self._html = request.get(self.playlist_url)
@@ -48,6 +60,10 @@ class Playlist(Sequence):
 
     @property
     def ytcfg(self):
+        """Extract the ytcfg from the playlist page html.
+
+        :rtype: dict
+        """
         if self._ytcfg:
             return self._ytcfg
         self._ytcfg = extract.get_ytcfg(self.html)
@@ -55,6 +71,10 @@ class Playlist(Sequence):
 
     @property
     def initial_data(self):
+        """Extract the initial data from the playlist page html.
+
+        :rtype: dict
+        """
         if self._initial_data:
             return self._initial_data
         else:
@@ -63,6 +83,10 @@ class Playlist(Sequence):
 
     @property
     def sidebar_info(self):
+        """Extract the sidebar info from the playlist page html.
+
+        :rtype: dict
+        """
         if self._sidebar_info:
             return self._sidebar_info
         else:
@@ -72,6 +96,10 @@ class Playlist(Sequence):
 
     @property
     def yt_api_key(self):
+        """Extract the INNERTUBE_API_KEY from the playlist ytcfg.
+
+        :rtype: str
+        """
         return self.ytcfg['INNERTUBE_API_KEY']
 
     def _paginate(
