@@ -2,10 +2,10 @@
 """Module for interacting with a user's youtube channel."""
 import json
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Iterable
 
 from pytube import extract, Playlist, request
-from pytube.helpers import uniqueify
+from pytube.helpers import uniqueify, cache, DeferredGeneratorList
 
 logger = logging.getLogger(__name__)
 
@@ -199,3 +199,99 @@ class Channel(Playlist):
             ),
             continuation,
         )
+
+    @staticmethod
+    def _extract_playlists(raw_json: str) -> Tuple[List[str], Optional[str]]:
+        """Extracts playlists from a raw json page
+
+        :param str raw_json: Input json extracted from the page or the last
+            server response
+        :rtype: Tuple[List[str], Optional[str]]
+        :returns: Tuple containing a list of up to 100 video watch ids and
+            a continuation token, if more videos are available
+        """
+        initial_data = json.loads(raw_json)
+
+        # this is the json tree structure, if the json was extracted from
+        # html
+        try:
+            playlists = initial_data["contents"][
+                "twoColumnBrowseResultsRenderer"][
+                "tabs"][2]["tabRenderer"]["content"][
+                "sectionListRenderer"]["contents"][0][
+                "itemSectionRenderer"]["contents"][0][
+                'shelfRenderer']["content"][
+                'horizontalListRenderer']["items"]
+        except (KeyError, IndexError, TypeError):
+            playlists = []
+
+        continuation = None
+        # remove duplicates
+        return (
+            uniqueify(
+                list(
+                    # only extract the video ids from the video data
+                    map(
+                        lambda x: (
+                            f"/playlist?list="
+                            f"{x['gridPlaylistRenderer']['playlistId']}"
+                        ),
+                        playlists
+                    )
+                ),
+            ),
+            continuation,
+        )
+
+    @property
+    def playlists(self) -> Iterable[Playlist]:
+        """Yields Playlist objects of playlists in this channel
+
+        :rtype: List[Playlist]
+        :returns: List of Playlist
+        """
+        return DeferredGeneratorList(self.playlist_generator())
+
+    def playlist_generator(self):
+        for url in self.playlist_urls:
+            yield Playlist(url)
+
+    def playlist_url_generator(self):
+        """Generator that yields video URLs.
+
+        :Yields: Video URLs
+        """
+        for page in self._paginate_playlists():
+            for playlist in page:
+                yield self._playlist_url(playlist)
+
+    def _paginate_playlists(
+        self, until_watch_id: Optional[str] = None
+    ) -> Iterable[List[str]]:
+        """Parse the playlist links from the page source, yields the /watch?v=
+        part from video link
+
+        :param until_watch_id Optional[str]: YouTube Video watch id until
+            which the playlist should be read.
+
+        :rtype: Iterable[List[str]]
+        :returns: Iterable of lists of YouTube playlist ids
+        """
+        playlist_urls, continuation = self._extract_playlists(
+            json.dumps(extract.initial_data(self.playlists_html))
+        )
+        yield playlist_urls
+
+    @staticmethod
+    def _playlist_url(playlist_path: str):
+        return f"https://www.youtube.com{playlist_path}"
+
+    @property  # type: ignore
+    @cache
+    def playlist_urls(self) -> DeferredGeneratorList:
+        """Complete links of all the playlists in channel
+
+        :rtype: List[str]
+        :returns: List of playlist URLs
+        """
+        return DeferredGeneratorList(self.playlist_url_generator())
