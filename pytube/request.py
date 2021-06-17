@@ -33,7 +33,12 @@ def _execute_request(
         request = Request(url, headers=base_headers, method=method, data=data)
     else:
         raise ValueError("Invalid URL")
-    return urlopen(request, timeout=timeout)  # nosec
+    try:
+        return urlopen(request, timeout=timeout)  # nosec
+    except Exception:
+        logger.warn(f'Exception encountered while executing web request:')
+        logger.warn(f'Request: {method or "GET"} {url}')
+        raise
 
 
 def get(url, extra_headers=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
