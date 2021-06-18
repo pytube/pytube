@@ -237,7 +237,7 @@ def video_info_url(video_id: str, watch_url: str) -> str:
             ("html5", "1"),
         ]
     )
-    return _video_info_url(params)
+    return _video_info_url(params) + "&c=TVHTML5&cver=7.20201028"
 
 
 def video_info_url_age_restricted(video_id: str, embed_html: str) -> str:
