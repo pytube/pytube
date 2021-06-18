@@ -9,7 +9,6 @@ smaller peripheral modules and functions.
 import json
 import logging
 from typing import Any, Callable, Dict, List, Optional
-from urllib.parse import parse_qsl
 
 import pytube
 import pytube.exceptions as exceptions

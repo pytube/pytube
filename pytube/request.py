@@ -36,7 +36,7 @@ def _execute_request(
     try:
         return urlopen(request, timeout=timeout)  # nosec
     except Exception:
-        logger.warn(f'Exception encountered while executing web request:')
+        logger.warn('Exception encountered while executing web request:')
         logger.warn(f'Request: {method or "GET"} {url}')
         raise
 
@@ -266,11 +266,14 @@ def head(url):
     return {k.lower(): v for k, v in response_headers.items()}
 
 
-def call_api(method, endpoint, video_id, query_params={}, data={}, timeout=None):
+def call_api(method, endpoint, video_id, query_params=None, data=None, timeout=None):
+    if not query_params:
+        query_params = {}
+    if not data:
+        data = {}
     query_params.update(
         {
             'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
-
         }
     )
     data.update({
@@ -285,6 +288,10 @@ def call_api(method, endpoint, video_id, query_params={}, data={}, timeout=None)
     endpoint_url = f'{base_url}/{endpoint}'
     if query_params:
         endpoint_url = f'{endpoint_url}?{parse.urlencode(query_params)}'
-    response = _execute_request(endpoint_url, method, headers={'Content-Type': 'application/json'}, data=data)
-    json_data = json.loads(response.read())
-    return json_data
+    response = _execute_request(
+        endpoint_url,
+        method,
+        headers={'Content-Type': 'application/json'},
+        data=data
+    )
+    return json.loads(response.read())
