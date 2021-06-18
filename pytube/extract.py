@@ -235,6 +235,8 @@ def video_info_url(video_id: str, watch_url: str) -> str:
             ("eurl", quote(watch_url)),
             ("hl", "en_US"),
             ("html5", "1"),
+            ("c", "TVHTML5"),
+            ("cver", "6.20180913"),
         ]
     )
     return _video_info_url(params)
@@ -265,6 +267,8 @@ def video_info_url_age_restricted(video_id: str, embed_html: str) -> str:
             ("eurl", eurl),
             ("sts", sts),
             ("html5", "1"),
+            ("c", "TVHTML5"),
+            ("cver", "6.20180913"),
         ]
     )
     return _video_info_url(params)
