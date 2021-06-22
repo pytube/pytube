@@ -1,4 +1,9 @@
-"""This module is designed to interact with the innertube API."""
+"""This module is designed to interact with the innertube API.
+
+This module is NOT intended to be used directly by end users, as each of the
+interfaces returns raw results. These should instead be parsed to extract
+the useful information for the end user.
+"""
 # Native python imports
 import json
 from urllib import parse
