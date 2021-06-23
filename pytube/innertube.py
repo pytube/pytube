@@ -56,36 +56,36 @@ class InnerTube:
 
         TODO: Figure out how we can use this
         """
-        # endpoint = f'{self.base_url}/browse'
+        # endpoint = f'{self.base_url}/browse'  # noqa:E800
         ...
-        # return self._call_api(endpoint, query, self.base_data)
+        # return self._call_api(endpoint, query, self.base_data)  # noqa:E800
 
     def config(self):
         """Make a request to the config endpoint.
 
         TODO: Figure out how we can use this
         """
-        # endpoint = f'{self.base_url}/config'
+        # endpoint = f'{self.base_url}/config'  # noqa:E800
         ...
-        # return self._call_api(endpoint, query, self.base_data)
+        # return self._call_api(endpoint, query, self.base_data)  # noqa:E800
 
     def guide(self):
         """Make a request to the guide endpoint.
 
         TODO: Figure out how we can use this
         """
-        # endpoint = f'{self.base_url}/guide'
+        # endpoint = f'{self.base_url}/guide'  # noqa:E800
         ...
-        # return self._call_api(endpoint, query, self.base_data)
+        # return self._call_api(endpoint, query, self.base_data)  # noqa:E800
 
     def next(self):
         """Make a request to the next endpoint.
 
         TODO: Figure out how we can use this
         """
-        # endpoint = f'{self.base_url}/next'
+        # endpoint = f'{self.base_url}/next'  # noqa:E800
         ...
-        # return self._call_api(endpoint, query, self.base_data)
+        # return self._call_api(endpoint, query, self.base_data)  # noqa:E800
 
     def player(self, video_id):
         """Make a request to the player endpoint.
