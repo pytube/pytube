@@ -15,6 +15,7 @@ class Search:
         self.query = query
         self._innertube_client = InnerTube()
 
+        self._initial_results = None
         self._results = None
         self._completion_suggestions = None
         self._current_continuation = None
@@ -29,7 +30,8 @@ class Search:
         """
         if self._completion_suggestions:
             return self._completion_suggestions
-        self._completion_suggestions = self.raw_results['refinements']
+        if self.results:
+            self._completion_suggestions = self._initial_results['refinements']
         return self._completion_suggestions
 
     @property
@@ -120,6 +122,10 @@ class Search:
                 if 'playlistRenderer' in video_details:
                     continue
 
+                # Skip channel results
+                if 'channelRenderer' in video_details:
+                    continue
+
                 if 'videoRenderer' not in video_details:
                     logger.warn('Unexpected renderer encountered.')
                     logger.warn(f'Renderer name: {video_details.keys()}')
@@ -186,4 +192,7 @@ class Search:
         :returns:
             The raw json object returned by the innertube API.
         """
-        return self._innertube_client.search(self.query, continuation)
+        query_results = self._innertube_client.search(self.query, continuation)
+        if not self._initial_results:
+            self._initial_results = query_results
+        return query_results
