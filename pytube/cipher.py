@@ -19,6 +19,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import cache, regex_search
+from pytube.parser import find_object_from_startpoint
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,8 @@ class Cipher:
             r"\w+\.(\w+)\(\w,(\d+)\)",
             r"\w+\[(\"\w+\")\]\(\w,(\d+)\)"
         ]
+
+        self.throttling_plan = get_throttling_plan(js)
 
     def get_signature(self, ciphered_signature: str) -> str:
         """Decipher the signature.
@@ -216,6 +219,75 @@ def get_transform_map(js: str, var: str) -> Dict:
         fn = map_functions(function)
         mapper[name] = fn
     return mapper
+
+
+def get_throttling_function_name(js: str) -> str:
+    """Extract the name of the function that computes the throttling parameter.
+
+    :param str js:
+        The contents of the base.js asset file.
+    :rtype: str
+    :returns:
+        The name of the function used to compute the throttling parameter.
+    """
+    function_patterns = [
+        # https://github.com/ytdl-org/youtube-dl/issues/29326#issuecomment-865985377
+        # a.C&&(b=a.get("n"))&&(b=Dea(b),a.set("n",b))}};
+        # In above case, `Dea` is the relevant function name
+        r'''a\.C&&\(b=a\.get\("n"\)\)&&\(b=([^(]+)\(b\),a\.set\("n",b\)\)}};''',
+    ]
+    logger.debug('Finding throttling function name')
+    for pattern in function_patterns:
+        regex = re.compile(pattern)
+        function_match = regex.search(js)
+        if function_match:
+            logger.debug("finished regex search, matched: %s", pattern)
+            return function_match.group(1)
+
+    raise RegexMatchError(
+        caller="get_throttling_function_name", pattern="multiple"
+    )
+
+
+def get_throttling_function_code(js: str) -> str:
+    """Extract the raw code for the throttling function.
+
+    :param str js:
+        The contents of the base.js asset file.
+    :rtype: str
+    :returns:
+        The name of the function used to compute the throttling parameter.
+    """
+    # Begin by extracting the correct function name
+    name = re.escape(get_throttling_function_name(js))
+
+    # Identify where the function is defined
+    pattern_start = r"%s=function\(\w\)" % name
+    regex = re.compile(pattern_start)
+    match = regex.search(js)
+
+    # Extract the code within curly braces for the function itself, and merge any split lines
+    code_lines_list = find_object_from_startpoint(js, match.span()[1]).split('\n')
+    joined_lines = "".join(code_lines_list)
+
+    # Prepend function definition (e.g. `Dea=function(a)`)
+    return match.group(0) + joined_lines
+
+
+def get_throttling_plan(js: str) -> str:
+    """Extract the "throttling plan".
+
+    The "throttling plan" is the functions that the throttling parameter is
+    cycled through to obtain the throttling parameter.
+
+    :param str js:
+        The contents of the base.js asset file.
+    :returns:
+        The full function code for computing the throttlign parameter.
+    """
+    raw_code = get_throttling_function_code(js)
+    print(raw_code)
+    ...
 
 
 def reverse(arr: List, _: Optional[Any]):
