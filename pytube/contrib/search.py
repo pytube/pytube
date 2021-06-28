@@ -12,12 +12,23 @@ logger = logging.getLogger(__name__)
 
 class Search:
     def __init__(self, query):
+        """Initialize Search object.
+
+        :param str query:
+            Search query provided by the user.
+        """
         self.query = query
         self._innertube_client = InnerTube()
 
+        # The first search, without a continuation, is structured differently
+        #  and contains completion suggestions, so we must store this separately
         self._initial_results = None
+
         self._results = None
         self._completion_suggestions = None
+
+        # Used for keeping track of query continuations so that new results
+        #  are always returned when get_next_results() is called
         self._current_continuation = None
 
     @property
