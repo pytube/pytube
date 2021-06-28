@@ -70,7 +70,7 @@ def find_object_from_startpoint(html, start_point):
     """
     html = html[start_point:]
     if html[0] != '{':
-        raise HTMLParseError('Invalid start point.')
+        raise HTMLParseError(f'Invalid start point. Start of HTML:\n{html[:20]}')
 
     # First letter MUST be a open brace, so we put that in the stack,
     # and skip the first character.
