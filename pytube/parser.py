@@ -69,12 +69,12 @@ def find_object_from_startpoint(html, start_point):
         A dict created from parsing the object.
     """
     html = html[start_point:]
-    if html[0] != '{':
+    if html[0] not in ['{','[']:
         raise HTMLParseError(f'Invalid start point. Start of HTML:\n{html[:20]}')
 
     # First letter MUST be a open brace, so we put that in the stack,
     # and skip the first character.
-    stack = ['{']
+    stack = [html[0]]
     i = 1
 
     context_closers = {
