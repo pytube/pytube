@@ -19,7 +19,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import cache, regex_search
-from pytube.parser import find_object_from_startpoint
+from pytube.parser import find_object_from_startpoint, throttling_array_split
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +41,7 @@ class Cipher:
         ]
 
         self.throttling_plan = get_throttling_plan(js)
+        self.throttling_array = get_throttling_function_array(js)
 
     def get_signature(self, ciphered_signature: str) -> str:
         """Decipher the signature.
@@ -274,7 +275,62 @@ def get_throttling_function_code(js: str) -> str:
     return match.group(0) + joined_lines
 
 
-def get_throttling_plan(js: str) -> str:
+def get_throttling_function_array(js: str) -> List[Any]:
+    """Extract the "c" array.
+
+    :param str js:
+        The contents of the base.js asset file.
+    :returns:
+        The array of various integers, arrays, and functions.
+    """
+    raw_code = get_throttling_function_code(js)
+
+    array_start = r",c=\["
+    array_regex = re.compile(array_start)
+    match = array_regex.search(raw_code)
+
+    array_raw = find_object_from_startpoint(raw_code, match.span()[1]-1)
+    str_array = throttling_array_split(array_raw)
+
+    converted_array = []
+    for el in str_array:
+        try:
+            converted_array.append(int(el))
+            continue
+        except ValueError:
+            # Not an integer value.
+            pass
+
+        if el == 'null':
+            converted_array.append(None)
+            continue
+
+        # if el == '"pop"':
+        #    TODO: Figure out how this is meant to work. It's weird that it's a string
+
+        if el.startswith('function'):
+            mapper = (
+                (r"{for\(\w=\(\w%\w\.length\+\w\.length\)%\w\.length;\w--;\)\w\.unshift\(\w.pop\(\)\)}", throttling_unshift),  # noqa:E501
+                (r"{\w\.reverse\(\)}", reverse),
+                (r"{\w\.push\(\w\)}", push),
+                (r";var\s\w=\w\[0\];\w\[0\]=\w\[\w\];\w\[\w\]=\w}", swap),
+            )
+
+            found = False
+            for pattern, fn in mapper:
+                if re.search(pattern, el):
+                    converted_array.append(fn)
+                    found = True
+            if found:
+                continue
+
+        converted_array.append(el)
+
+    for i in range(len(str_array)):
+        print(f'{str_array[i]}: {converted_array[i]}')
+
+
+def get_throttling_plan(js: str):
     """Extract the "throttling plan".
 
     The "throttling plan" is a list of tuples used for calling functions
@@ -362,6 +418,33 @@ def swap(arr: List, b: int):
     """
     r = b % len(arr)
     return list(chain([arr[r]], arr[1:r], [arr[0]], arr[r + 1 :]))
+
+
+def push(d: list, e: Any):
+    """Pushes an element onto a list."""
+    d.append(e)
+    return d
+
+
+def throttling_mod_func(d: list, e: int):
+    """Perform the modular function from the throttling array functions.
+
+    In the javascript, the modular operation is as follows:
+    e = (e % d.length + d.length) % d.length
+
+    We simply translate this to python here.
+    """
+    return (e % len(d) + len(d)) % len(d)
+
+
+def throttling_unshift(d: list, e: int):
+    """Rotates the elements of the list to the right.
+
+    In the javascript, the operation is as follows:
+    for(e=(e%d.length+d.length)%d.length;e--;)d.unshift(d.pop())
+    """
+    e = throttling_mod_func(d, e)
+    return d[0-e:] + d[:0-e]
 
 
 def map_functions(js_func: str) -> Callable:
