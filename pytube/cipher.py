@@ -277,8 +277,10 @@ def get_throttling_function_code(js: str) -> str:
 def get_throttling_plan(js: str) -> str:
     """Extract the "throttling plan".
 
-    The "throttling plan" is the functions that the throttling parameter is
-    cycled through to obtain the throttling parameter.
+    The "throttling plan" is a list of tuples used for calling functions
+    in the c array. The first element of the tuple is the index of the
+    function to call, and any remaining elements of the tuple are arguments
+    to pass to that function.
 
     :param str js:
         The contents of the base.js asset file.
@@ -286,8 +288,25 @@ def get_throttling_plan(js: str) -> str:
         The full function code for computing the throttlign parameter.
     """
     raw_code = get_throttling_function_code(js)
-    print(raw_code)
-    ...
+
+    transform_start = r"try{"
+    plan_regex = re.compile(transform_start)
+    match = plan_regex.search(raw_code)
+
+    transform_plan_raw = find_object_from_startpoint(raw_code, match.span()[1]-1)
+
+    # Steps are either c[x](c[y]) or c[x](c[y],c[z])
+    step_start = r"c\[(\d+)\]\(c\[(\d+)\](,c(\[(\d+)\]))?\)"
+    step_regex = re.compile(step_start)
+    matches = step_regex.findall(transform_plan_raw)
+    transform_steps = []
+    for match in matches:
+        if match[4] != '':
+            transform_steps.append((match[0],match[1],match[4]))
+        else:
+            transform_steps.append((match[0],match[1]))
+
+    return transform_steps
 
 
 def reverse(arr: List, _: Optional[Any]):
