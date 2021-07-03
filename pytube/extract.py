@@ -475,8 +475,13 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
             initial_n = list(query_params['n'][0])
             new_n = cipher.calculate_n(initial_n)
             query_params['n'][0] = new_n
+
             # Update the value
             parsed = urlparse(url)
+            # The parsed query params are lists of a single element, convert to proper dicts.
+            query_params = {
+                k: v[0] for k,v in query_params.items()
+            }
             url = f'{parsed.scheme}://{parsed.netloc}{parsed.path}?{urlencode(query_params)}'
 
         # 403 forbidden fix
