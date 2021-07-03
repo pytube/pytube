@@ -152,6 +152,7 @@ def throttling_array_split(js_array):
     comma_regex = re.compile(r",")
     func_regex = re.compile(r"function\([^)]+\)")
 
+
     while len(curr_substring) > 0:
         if curr_substring.startswith('function'):
             # Handle functions separately. These can contain commas
@@ -164,7 +165,14 @@ def throttling_array_split(js_array):
             curr_substring = curr_substring[len(full_function_def)+1:]
         else:
             match = comma_regex.search(curr_substring)
-            match_start, match_end = match.span()
+
+            # Try-catch to capture end of array
+            try:
+                match_start, match_end = match.span()
+            except AttributeError:
+                match_start = len(curr_substring) - 1
+                match_end = match_start + 1
+
             curr_el = curr_substring[:match_start]
             results.append(curr_el)
             curr_substring = curr_substring[match_end:]
