@@ -265,7 +265,7 @@ def get_throttling_function_name(js: str) -> str:
         # https://github.com/ytdl-org/youtube-dl/issues/29326#issuecomment-865985377
         # a.C&&(b=a.get("n"))&&(b=Dea(b),a.set("n",b))}};
         # In above case, `Dea` is the relevant function name
-        r'''a\.C&&\(b=a\.get\("n"\)\)&&\(b=([^(]+)\(b\),a\.set\("n",b\)\)}};''',
+        r'a\.C&&\(b=a\.get\("n"\)\)&&\(b=([^(]+)\(b\),a\.set\("n",b\)\)}};',
     ]
     logger.debug('Finding throttling function name')
     for pattern in function_patterns:
@@ -611,14 +611,14 @@ def throttling_swap(d: list, e: int):
     d[e] = f
 
 
-def js_splice(arr: list, start: int, deleteCount=None, *items):
+def js_splice(arr: list, start: int, delete_count=None, *items):
     """Implementation of javascript's splice function.
 
     :param list arr:
         Array to splice
     :param int start:
         Index at which to start changing the array
-    :param int deleteCount:
+    :param int delete_count:
         Number of elements to delete from the array
     :param *items:
         Items to add to the array
@@ -636,14 +636,14 @@ def js_splice(arr: list, start: int, deleteCount=None, *items):
         # Non-integer start values are treated as 0 in js
         start = 0
 
-    # Special condition when deleteCount is greater than remaining elements
-    if not deleteCount or deleteCount >= len(arr) - start:
-        deleteCount = len(arr) - start
+    # Special condition when delete_count is greater than remaining elements
+    if not delete_count or delete_count >= len(arr) - start:
+        delete_count = len(arr) - start  # noqa: N806
 
-    deleted_elements = arr[start:start + deleteCount]
+    deleted_elements = arr[start:start + delete_count]
 
     # Splice appropriately.
-    new_arr = arr[:start] + list(items) + arr[start + deleteCount:]
+    new_arr = arr[:start] + list(items) + arr[start + delete_count:]
 
     # Replace contents of input array
     arr.clear()
