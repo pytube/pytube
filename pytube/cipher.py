@@ -45,7 +45,6 @@ class Cipher:
 
         self.calculated_n = None
 
-
     def calculate_n(self, initial_n: list):
         """Converts n to the correct value to prevent throttling."""
         if self.calculated_n:
@@ -320,7 +319,7 @@ def get_throttling_function_array(js: str) -> List[Any]:
     array_regex = re.compile(array_start)
     match = array_regex.search(raw_code)
 
-    array_raw = find_object_from_startpoint(raw_code, match.span()[1]-1)
+    array_raw = find_object_from_startpoint(raw_code, match.span()[1] - 1)
     str_array = throttling_array_split(array_raw)
 
     converted_array = []
@@ -348,10 +347,10 @@ def get_throttling_function_array(js: str) -> List[Any]:
                 (r"{\w\.push\(\w\)}", throttling_push),
                 (r";var\s\w=\w\[0\];\w\[0\]=\w\[\w\];\w\[\w\]=\w}", throttling_swap),
                 (r"case\s\d+", throttling_cipher_function),
-                (r"\w\.splice\(0,1,\w\.splice\(\w,1,\w\[0\]\)\[0\]\)", throttling_nested_splice),
+                (r"\w\.splice\(0,1,\w\.splice\(\w,1,\w\[0\]\)\[0\]\)", throttling_nested_splice),  # noqa:E501
                 (r";\w\.splice\(\w,1\)}", js_splice),
-                (r"\w\.splice\(-\w\)\.reverse\(\)\.forEach\(function\(\w\){\w\.unshift\(\w\)}\)", throttling_prepend),
-                (r"for\(var \w=\w\.length;\w;\)\w\.push\(\w\.splice\(--\w,1\)\[0\]\)}", throttling_reverse)
+                (r"\w\.splice\(-\w\)\.reverse\(\)\.forEach\(function\(\w\){\w\.unshift\(\w\)}\)", throttling_prepend),  # noqa:E501
+                (r"for\(var \w=\w\.length;\w;\)\w\.push\(\w\.splice\(--\w,1\)\[0\]\)}", throttling_reverse),  # noqa:E501
             )
 
             found = False
@@ -391,7 +390,7 @@ def get_throttling_plan(js: str):
     plan_regex = re.compile(transform_start)
     match = plan_regex.search(raw_code)
 
-    transform_plan_raw = find_object_from_startpoint(raw_code, match.span()[1]-1)
+    transform_plan_raw = find_object_from_startpoint(raw_code, match.span()[1] - 1)
 
     # Steps are either c[x](c[y]) or c[x](c[y],c[z])
     step_start = r"c\[(\d+)\]\(c\[(\d+)\](,c(\[(\d+)\]))?\)"
@@ -497,7 +496,7 @@ def throttling_unshift(d: list, e: int):
     for(e=(e%d.length+d.length)%d.length;e--;)d.unshift(d.pop())
     """
     e = throttling_mod_func(d, e)
-    new_arr = d[0-e:] + d[:0-e]
+    new_arr = d[-e:] + d[:-e]
     d.clear()
     for el in new_arr:
         d.append(el)
@@ -593,7 +592,7 @@ def throttling_prepend(d: list, e: int):
     e = throttling_mod_func(d, e)
 
     # Then do the prepending
-    new_arr = d[0-e:] + d[:0-e]
+    new_arr = d[-e:] + d[:-e]
 
     # And update the input list
     d.clear()
@@ -612,7 +611,7 @@ def throttling_swap(d: list, e: int):
     d[e] = f
 
 
-def js_splice(arr: list, start: int, deleteCount = None, *items):
+def js_splice(arr: list, start: int, deleteCount=None, *items):
     """Implementation of javascript's splice function.
 
     :param list arr:
@@ -624,7 +623,7 @@ def js_splice(arr: list, start: int, deleteCount = None, *items):
     :param *items:
         Items to add to the array
 
-    Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
+    Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice  # noqa:E501
     """
     # Special conditions for start value
     try:
@@ -641,10 +640,10 @@ def js_splice(arr: list, start: int, deleteCount = None, *items):
     if not deleteCount or deleteCount >= len(arr) - start:
         deleteCount = len(arr) - start
 
-    deleted_elements = arr[start:start+deleteCount]
+    deleted_elements = arr[start:start + deleteCount]
 
     # Splice appropriately.
-    new_arr = arr[:start] + list(items) + arr[start+deleteCount:]
+    new_arr = arr[:start] + list(items) + arr[start + deleteCount:]
 
     # Replace contents of input array
     arr.clear()
