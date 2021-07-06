@@ -92,14 +92,6 @@ def test_get_ytplayer_js_with_no_match_should_error():
         extract.get_ytplayer_js("")
 
 
-def test_signature_cipher_does_not_error(stream_dict):
-    # TODO: figure out what changed about this test
-    # config_args = extract.get_ytplayer_config(stream_dict)['args']
-    # extract.apply_descrambler(config_args, "url_encoded_fmt_stream_map")
-    # assert "s" in config_args["url_encoded_fmt_stream_map"][0].keys()
-    ...
-
-
 def test_initial_data_missing():
     with pytest.raises(RegexMatchError):
         extract.initial_data('')
