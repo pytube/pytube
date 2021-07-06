@@ -140,7 +140,7 @@ def test_parse_args_falsey():
     assert args.build_playback_report is False
     assert args.itag is None
     assert args.list is False
-    assert args.verbose == False
+    assert args.verbose is False
 
 
 def test_parse_args_truthy():
@@ -161,7 +161,7 @@ def test_parse_args_truthy():
     assert args.build_playback_report is True
     assert args.itag == 10
     assert args.list is True
-    assert args.verbose == True
+    assert args.verbose is True
 
 
 @mock.patch("pytube.cli.setup_logger", return_value=None)

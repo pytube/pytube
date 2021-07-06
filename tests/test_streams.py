@@ -27,16 +27,10 @@ def test_stream_to_buffer(mock_request, cipher_signature):
     assert buffer.write.call_count == 3
 
 
-#@mock.patch(
-#    "pytube.streams.request.head", MagicMock(return_value={"content-length": "6796391"})
-#)
 def test_filesize(cipher_signature):
     assert cipher_signature.streams[0].filesize == 28282013
 
 
-#@mock.patch(
-#    "pytube.streams.request.head", MagicMock(return_value={"content-length": "6796391"})
-#)
 def test_filesize_approx(cipher_signature):
     stream = cipher_signature.streams[0]
 
