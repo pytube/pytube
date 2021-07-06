@@ -147,7 +147,7 @@ class Stream:
         :returns:
             Filesize (in bytes) of the stream.
         """
-        if self._filesize is None:
+        if self._filesize == 0:
             try:
                 self._filesize = request.filesize(self.url)
             except HTTPError as e:
