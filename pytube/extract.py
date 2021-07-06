@@ -6,7 +6,7 @@ import re
 from collections import OrderedDict
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
-from urllib.parse import parse_qs, parse_qsl, quote, unquote, urlencode
+from urllib.parse import parse_qs, parse_qsl, quote, unquote, urlencode, urlparse
 
 from pytube.cipher import Cipher
 from pytube.exceptions import HTMLParseError, LiveStreamError, RegexMatchError
@@ -468,6 +468,22 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
         logger.debug(
             "finished descrambling signature for itag=%s", stream["itag"]
         )
+        query_params = parse_qs(urlparse(url).query)
+        if 'ratebypass' not in query_params.keys():
+            # Cipher n to get the updated value
+
+            initial_n = list(query_params['n'][0])
+            new_n = cipher.calculate_n(initial_n)
+            query_params['n'][0] = new_n
+
+            # Update the value
+            parsed = urlparse(url)
+            # The parsed query params are lists of a single element, convert to proper dicts.
+            query_params = {
+                k: v[0] for k,v in query_params.items()
+            }
+            url = f'{parsed.scheme}://{parsed.netloc}{parsed.path}?{urlencode(query_params)}'
+
         # 403 forbidden fix
         stream_manifest[i]["url"] = url + "&sig=" + signature
 

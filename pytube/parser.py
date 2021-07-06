@@ -69,12 +69,12 @@ def find_object_from_startpoint(html, start_point):
         A dict created from parsing the object.
     """
     html = html[start_point:]
-    if html[0] != '{':
-        raise HTMLParseError('Invalid start point.')
+    if html[0] not in ['{','[']:
+        raise HTMLParseError(f'Invalid start point. Start of HTML:\n{html[:20]}')
 
     # First letter MUST be a open brace, so we put that in the stack,
     # and skip the first character.
-    stack = ['{']
+    stack = [html[0]]
     i = 1
 
     context_closers = {
@@ -132,3 +132,47 @@ def parse_for_object_from_startpoint(html, start_point):
             return ast.literal_eval(full_obj)
         except (ValueError, SyntaxError):
             raise HTMLParseError('Could not parse object.')
+
+
+def throttling_array_split(js_array):
+    """Parses the throttling array into a python list of strings.
+
+    Expects input to begin with `[` and close with `]`.
+
+    :param str js_array:
+        The javascript array, as a string.
+    :rtype: list:
+    :returns:
+        A list of strings representing splits on `,` in the throttling array.
+    """
+    results = []
+    curr_substring = js_array[1:]
+
+    comma_regex = re.compile(r",")
+    func_regex = re.compile(r"function\([^)]+\)")
+
+    while len(curr_substring) > 0:
+        if curr_substring.startswith('function'):
+            # Handle functions separately. These can contain commas
+            match = func_regex.search(curr_substring)
+            match_start, match_end = match.span()
+
+            function_text = find_object_from_startpoint(curr_substring, match.span()[1])
+            full_function_def = curr_substring[:match_end + len(function_text)]
+            results.append(full_function_def)
+            curr_substring = curr_substring[len(full_function_def) + 1:]
+        else:
+            match = comma_regex.search(curr_substring)
+
+            # Try-catch to capture end of array
+            try:
+                match_start, match_end = match.span()
+            except AttributeError:
+                match_start = len(curr_substring) - 1
+                match_end = match_start + 1
+
+            curr_el = curr_substring[:match_start]
+            results.append(curr_el)
+            curr_substring = curr_substring[match_end:]
+
+    return results

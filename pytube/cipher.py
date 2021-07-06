@@ -19,6 +19,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from pytube.exceptions import RegexMatchError
 from pytube.helpers import cache, regex_search
+from pytube.parser import find_object_from_startpoint, throttling_array_split
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,39 @@ class Cipher:
             r"\w+\.(\w+)\(\w,(\d+)\)",
             r"\w+\[(\"\w+\")\]\(\w,(\d+)\)"
         ]
+
+        self.throttling_plan = get_throttling_plan(js)
+        self.throttling_array = get_throttling_function_array(js)
+
+        self.calculated_n = None
+
+    def calculate_n(self, initial_n: list):
+        """Converts n to the correct value to prevent throttling."""
+        if self.calculated_n:
+            return self.calculated_n
+
+        # First, update all instances of 'b' with the list(initial_n)
+        for i in range(len(self.throttling_array)):
+            if self.throttling_array[i] == 'b':
+                self.throttling_array[i] = initial_n
+
+        for step in self.throttling_plan:
+            curr_func = self.throttling_array[int(step[0])]
+            if not callable(curr_func):
+                logger.debug(f'{curr_func} is not callable.')
+                logger.debug(f'Throttling array:\n{self.throttling_array}\n')
+                raise TypeError(f'{curr_func} is not callable.')
+
+            first_arg = self.throttling_array[int(step[1])]
+
+            if len(step) == 2:
+                curr_func(first_arg)
+            elif len(step) == 3:
+                second_arg = self.throttling_array[int(step[2])]
+                curr_func(first_arg, second_arg)
+
+        self.calculated_n = ''.join(initial_n)
+        return self.calculated_n
 
     def get_signature(self, ciphered_signature: str) -> str:
         """Decipher the signature.
@@ -218,6 +252,160 @@ def get_transform_map(js: str, var: str) -> Dict:
     return mapper
 
 
+def get_throttling_function_name(js: str) -> str:
+    """Extract the name of the function that computes the throttling parameter.
+
+    :param str js:
+        The contents of the base.js asset file.
+    :rtype: str
+    :returns:
+        The name of the function used to compute the throttling parameter.
+    """
+    function_patterns = [
+        # https://github.com/ytdl-org/youtube-dl/issues/29326#issuecomment-865985377
+        # a.C&&(b=a.get("n"))&&(b=Dea(b),a.set("n",b))}};
+        # In above case, `Dea` is the relevant function name
+        r'a\.C&&\(b=a\.get\("n"\)\)&&\(b=([^(]+)\(b\),a\.set\("n",b\)\)}};',
+    ]
+    logger.debug('Finding throttling function name')
+    for pattern in function_patterns:
+        regex = re.compile(pattern)
+        function_match = regex.search(js)
+        if function_match:
+            logger.debug("finished regex search, matched: %s", pattern)
+            return function_match.group(1)
+
+    raise RegexMatchError(
+        caller="get_throttling_function_name", pattern="multiple"
+    )
+
+
+def get_throttling_function_code(js: str) -> str:
+    """Extract the raw code for the throttling function.
+
+    :param str js:
+        The contents of the base.js asset file.
+    :rtype: str
+    :returns:
+        The name of the function used to compute the throttling parameter.
+    """
+    # Begin by extracting the correct function name
+    name = re.escape(get_throttling_function_name(js))
+
+    # Identify where the function is defined
+    pattern_start = r"%s=function\(\w\)" % name
+    regex = re.compile(pattern_start)
+    match = regex.search(js)
+
+    # Extract the code within curly braces for the function itself, and merge any split lines
+    code_lines_list = find_object_from_startpoint(js, match.span()[1]).split('\n')
+    joined_lines = "".join(code_lines_list)
+
+    # Prepend function definition (e.g. `Dea=function(a)`)
+    return match.group(0) + joined_lines
+
+
+def get_throttling_function_array(js: str) -> List[Any]:
+    """Extract the "c" array.
+
+    :param str js:
+        The contents of the base.js asset file.
+    :returns:
+        The array of various integers, arrays, and functions.
+    """
+    raw_code = get_throttling_function_code(js)
+
+    array_start = r",c=\["
+    array_regex = re.compile(array_start)
+    match = array_regex.search(raw_code)
+
+    array_raw = find_object_from_startpoint(raw_code, match.span()[1] - 1)
+    str_array = throttling_array_split(array_raw)
+
+    converted_array = []
+    for el in str_array:
+        try:
+            converted_array.append(int(el))
+            continue
+        except ValueError:
+            # Not an integer value.
+            pass
+
+        if el == 'null':
+            converted_array.append(None)
+            continue
+
+        if el.startswith('"') and el.endswith('"'):
+            # Convert e.g. '"abcdef"' to string without quotation marks, 'abcdef'
+            converted_array.append(el[1:-1])
+            continue
+
+        if el.startswith('function'):
+            mapper = (
+                (r"{for\(\w=\(\w%\w\.length\+\w\.length\)%\w\.length;\w--;\)\w\.unshift\(\w.pop\(\)\)}", throttling_unshift),  # noqa:E501
+                (r"{\w\.reverse\(\)}", throttling_reverse),
+                (r"{\w\.push\(\w\)}", throttling_push),
+                (r";var\s\w=\w\[0\];\w\[0\]=\w\[\w\];\w\[\w\]=\w}", throttling_swap),
+                (r"case\s\d+", throttling_cipher_function),
+                (r"\w\.splice\(0,1,\w\.splice\(\w,1,\w\[0\]\)\[0\]\)", throttling_nested_splice),  # noqa:E501
+                (r";\w\.splice\(\w,1\)}", js_splice),
+                (r"\w\.splice\(-\w\)\.reverse\(\)\.forEach\(function\(\w\){\w\.unshift\(\w\)}\)", throttling_prepend),  # noqa:E501
+                (r"for\(var \w=\w\.length;\w;\)\w\.push\(\w\.splice\(--\w,1\)\[0\]\)}", throttling_reverse),  # noqa:E501
+            )
+
+            found = False
+            for pattern, fn in mapper:
+                if re.search(pattern, el):
+                    converted_array.append(fn)
+                    found = True
+            if found:
+                continue
+
+        converted_array.append(el)
+
+    # Replace null elements with array itself
+    for i in range(len(converted_array)):
+        if converted_array[i] is None:
+            converted_array[i] = converted_array
+
+    return converted_array
+
+
+def get_throttling_plan(js: str):
+    """Extract the "throttling plan".
+
+    The "throttling plan" is a list of tuples used for calling functions
+    in the c array. The first element of the tuple is the index of the
+    function to call, and any remaining elements of the tuple are arguments
+    to pass to that function.
+
+    :param str js:
+        The contents of the base.js asset file.
+    :returns:
+        The full function code for computing the throttlign parameter.
+    """
+    raw_code = get_throttling_function_code(js)
+
+    transform_start = r"try{"
+    plan_regex = re.compile(transform_start)
+    match = plan_regex.search(raw_code)
+
+    transform_plan_raw = find_object_from_startpoint(raw_code, match.span()[1] - 1)
+
+    # Steps are either c[x](c[y]) or c[x](c[y],c[z])
+    step_start = r"c\[(\d+)\]\(c\[(\d+)\](,c(\[(\d+)\]))?\)"
+    step_regex = re.compile(step_start)
+    matches = step_regex.findall(transform_plan_raw)
+    transform_steps = []
+    for match in matches:
+        if match[4] != '':
+            transform_steps.append((match[0],match[1],match[4]))
+        else:
+            transform_steps.append((match[0],match[1]))
+
+    return transform_steps
+
+
 def reverse(arr: List, _: Optional[Any]):
     """Reverse elements in a list.
 
@@ -271,6 +459,198 @@ def swap(arr: List, b: int):
     """
     r = b % len(arr)
     return list(chain([arr[r]], arr[1:r], [arr[0]], arr[r + 1 :]))
+
+
+def throttling_reverse(arr: list):
+    """Reverses the input list.
+
+    Needs to do an in-place reversal so that the passed list gets changed.
+    To accomplish this, we create a reversed copy, and then change each
+    indvidual element.
+    """
+    reverse_copy = arr.copy()[::-1]
+    for i in range(len(reverse_copy)):
+        arr[i] = reverse_copy[i]
+
+
+def throttling_push(d: list, e: Any):
+    """Pushes an element onto a list."""
+    d.append(e)
+
+
+def throttling_mod_func(d: list, e: int):
+    """Perform the modular function from the throttling array functions.
+
+    In the javascript, the modular operation is as follows:
+    e = (e % d.length + d.length) % d.length
+
+    We simply translate this to python here.
+    """
+    return (e % len(d) + len(d)) % len(d)
+
+
+def throttling_unshift(d: list, e: int):
+    """Rotates the elements of the list to the right.
+
+    In the javascript, the operation is as follows:
+    for(e=(e%d.length+d.length)%d.length;e--;)d.unshift(d.pop())
+    """
+    e = throttling_mod_func(d, e)
+    new_arr = d[-e:] + d[:-e]
+    d.clear()
+    for el in new_arr:
+        d.append(el)
+
+
+def throttling_cipher_function(d: list, e: str):
+    """This ciphers d with e to generate a new list.
+
+    In the javascript, the operation is as follows:
+    var h = [A-Za-z0-9-_], f = 96;  // simplified from switch-case loop
+    d.forEach(
+        function(l,m,n){
+            this.push(
+                n[m]=h[
+                    (h.indexOf(l)-h.indexOf(this[m])+m-32+f--)%h.length
+                ]
+            )
+        },
+        e.split("")
+    )
+    """
+    h = list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_')
+    f = 96
+    # by naming it "this" we can more closely reflect the js
+    this = list(e)
+
+    # This is so we don't run into weirdness with enumerate while
+    #  we change the input list
+    copied_list = d.copy()
+
+    for m, l in enumerate(copied_list):
+        bracket_val = (h.index(l) - h.index(this[m]) + m - 32 + f) % len(h)
+        this.append(
+            h[bracket_val]
+        )
+        d[m] = h[bracket_val]
+        f -= 1
+
+
+def throttling_nested_splice(d: list, e: int):
+    """Nested splice function in throttling js.
+
+    In the javascript, the operation is as follows:
+    function(d,e){
+        e=(e%d.length+d.length)%d.length;
+        d.splice(
+            0,
+            1,
+            d.splice(
+                e,
+                1,
+                d[0]
+            )[0]
+        )
+    }
+
+    While testing, all this seemed to do is swap element 0 and e,
+    but the actual process is preserved in case there was an edge
+    case that was not considered.
+    """
+    e = throttling_mod_func(d, e)
+    inner_splice = js_splice(
+        d,
+        e,
+        1,
+        d[0]
+    )
+    js_splice(
+        d,
+        0,
+        1,
+        inner_splice[0]
+    )
+
+
+def throttling_prepend(d: list, e: int):
+    """
+
+    In the javascript, the operation is as follows:
+    function(d,e){
+        e=(e%d.length+d.length)%d.length;
+        d.splice(-e).reverse().forEach(
+            function(f){
+                d.unshift(f)
+            }
+        )
+    }
+
+    Effectively, this moves the last e elements of d to the beginning.
+    """
+    start_len = len(d)
+    # First, calculate e
+    e = throttling_mod_func(d, e)
+
+    # Then do the prepending
+    new_arr = d[-e:] + d[:-e]
+
+    # And update the input list
+    d.clear()
+    for el in new_arr:
+        d.append(el)
+
+    end_len = len(d)
+    assert start_len == end_len
+
+
+def throttling_swap(d: list, e: int):
+    """Swap positions of the 0'th and e'th elements in-place."""
+    e = throttling_mod_func(d, e)
+    f = d[0]
+    d[0] = d[e]
+    d[e] = f
+
+
+def js_splice(arr: list, start: int, delete_count=None, *items):
+    """Implementation of javascript's splice function.
+
+    :param list arr:
+        Array to splice
+    :param int start:
+        Index at which to start changing the array
+    :param int delete_count:
+        Number of elements to delete from the array
+    :param *items:
+        Items to add to the array
+
+    Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice  # noqa:E501
+    """
+    # Special conditions for start value
+    try:
+        if start > len(arr):
+            start = len(arr)
+        # If start is negative, count backwards from end
+        if start < 0:
+            start = len(arr) - start
+    except TypeError:
+        # Non-integer start values are treated as 0 in js
+        start = 0
+
+    # Special condition when delete_count is greater than remaining elements
+    if not delete_count or delete_count >= len(arr) - start:
+        delete_count = len(arr) - start  # noqa: N806
+
+    deleted_elements = arr[start:start + delete_count]
+
+    # Splice appropriately.
+    new_arr = arr[:start] + list(items) + arr[start + delete_count:]
+
+    # Replace contents of input array
+    arr.clear()
+    for el in new_arr:
+        arr.append(el)
+
+    return deleted_elements
 
 
 def map_functions(js_func: str) -> Callable:

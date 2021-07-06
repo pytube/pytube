@@ -1,6 +1,7 @@
 """Unit tests for the :module:`extract <extract>` module."""
 from datetime import datetime
 import pytest
+import re
 
 from pytube import extract
 from pytube.exceptions import RegexMatchError
@@ -31,10 +32,11 @@ def test_info_url_age_restricted(cipher_signature):
 
 def test_js_url(cipher_signature):
     expected = (
-        "https://youtube.com/s/player/9b65e980/player_ias.vflset/en_US/base.js"
+        r"https://youtube.com/s/player/([\w\d]+)/player_ias.vflset/en_US/base.js"
     )
     result = extract.js_url(cipher_signature.watch_html)
-    assert expected == result
+    match = re.search(expected, result)
+    assert match is not None
 
 
 def test_age_restricted(age_restricted):
@@ -88,12 +90,6 @@ def test_get_ytplayer_config_with_no_match_should_error():
 def test_get_ytplayer_js_with_no_match_should_error():
     with pytest.raises(RegexMatchError):
         extract.get_ytplayer_js("")
-
-
-def test_signature_cipher_does_not_error(stream_dict):
-    config_args = extract.get_ytplayer_config(stream_dict)['args']
-    extract.apply_descrambler(config_args, "url_encoded_fmt_stream_map")
-    assert "s" in config_args["url_encoded_fmt_stream_map"][0].keys()
 
 
 def test_initial_data_missing():
