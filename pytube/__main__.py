@@ -85,6 +85,9 @@ class YouTube:
         self._title = None
         self._publish_date = None
 
+    def __repr__(self):
+        return f'<pytube.__main__.YouTube object: videoId={self.video_id}>'
+
     @property
     def watch_html(self):
         if self._watch_html:

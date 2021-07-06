@@ -103,7 +103,7 @@ class InnerTube:
         query.update(self.base_params)
         return self._call_api(endpoint, query, self.base_data)
 
-    def search(self, search_query):
+    def search(self, search_query, continuation=None):
         """Make a request to the search endpoint.
 
         :param str search_query:
@@ -117,4 +117,8 @@ class InnerTube:
             'query': search_query
         }
         query.update(self.base_params)
-        return self._call_api(endpoint, query, self.base_data)
+        data = {}
+        if continuation:
+            data['continuation'] = continuation
+        data.update(self.base_data)
+        return self._call_api(endpoint, query, data)
