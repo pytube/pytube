@@ -345,14 +345,11 @@ def test_segmented_stream_on_404(cipher_signature):
             ]
 
             # Request order for stream:
-            # Filesize:
-            #   1. head(url) -> 404
-            #   2. get(url&sn=0)
-            #   3. head(url&sn=[1,2,3])
-            # Download:
-            #   4. info(url) -> 404
-            #   5. get(url&sn=0)
-            #   6. get(url&sn=[1,2,3])
+            #   1. get(url&sn=0)
+            #   2. head(url&sn=[1,2,3])
+            #   3. info(url) -> 404
+            #   4. get(url&sn=0)
+            #   5. get(url&sn=[1,2,3])
 
             # Handle filesize requests
             mock_head.side_effect = [
@@ -363,7 +360,6 @@ def test_segmented_stream_on_404(cipher_signature):
             # Each response must be followed by None, to break iteration
             #  in the stream() function
             mock_url_open_object.read.side_effect = [
-                responses[0], None,
                 responses[0], None,
                 responses[1], None,
                 responses[2], None,
