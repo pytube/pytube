@@ -1,4 +1,5 @@
 """Implements a simple wrapper around urlopen."""
+import http.client
 import json
 import logging
 import re
@@ -166,6 +167,9 @@ def stream(
                     pass
                 else:
                     raise
+            except http.client.IncompleteRead:
+                # Allow retries on IncompleteRead errors for unreliable connections
+                pass
             else:
                 # On a successful request, break from loop
                 break
