@@ -348,7 +348,20 @@ class YouTube:
         """
         if self._title:
             return self._title
-        self._title = self.player_response['videoDetails']['title']
+
+        try:
+            self._title = self.player_response['videoDetails']['title']
+        except KeyError:
+            # Check_availability will raise the correct exception in most cases
+            #  if it doesn't, ask for a report.
+            self.check_availability()
+            raise exceptions.PytubeError(
+                (
+                    f'Exception while accessing title of {self.watch_url}. '
+                    'Please file a bug report at https://github.com/pytube/pytube'
+                )
+            )
+
         return self._title
 
     @title.setter
