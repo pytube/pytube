@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 from unittest import mock
 from unittest.mock import MagicMock, patch
@@ -139,7 +140,7 @@ def test_parse_args_falsey():
     assert args.build_playback_report is False
     assert args.itag is None
     assert args.list is False
-    assert args.verbosity == 0
+    assert args.verbose is False
 
 
 def test_parse_args_truthy():
@@ -160,7 +161,7 @@ def test_parse_args_truthy():
     assert args.build_playback_report is True
     assert args.itag == 10
     assert args.list is True
-    assert args.verbosity == 3
+    assert args.verbose is True
 
 
 @mock.patch("pytube.cli.setup_logger", return_value=None)
@@ -173,7 +174,7 @@ def test_main_logging_setup(setup_logger):
     with pytest.raises(SystemExit):
         cli.main()
     # Then
-    setup_logger.assert_called_with(40, log_filename=None)
+    setup_logger.assert_called_with(logging.DEBUG, log_filename=None)
 
 
 @mock.patch("pytube.cli.YouTube", return_value=None)

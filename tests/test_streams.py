@@ -27,22 +27,16 @@ def test_stream_to_buffer(mock_request, cipher_signature):
     assert buffer.write.call_count == 3
 
 
-@mock.patch(
-    "pytube.streams.request.head", MagicMock(return_value={"content-length": "6796391"})
-)
 def test_filesize(cipher_signature):
-    assert cipher_signature.streams[0].filesize == 6796391
+    assert cipher_signature.streams[0].filesize == 28282013
 
 
-@mock.patch(
-    "pytube.streams.request.head", MagicMock(return_value={"content-length": "6796391"})
-)
 def test_filesize_approx(cipher_signature):
     stream = cipher_signature.streams[0]
 
     assert stream.filesize_approx == 28309811
     stream.bitrate = None
-    assert stream.filesize_approx == 6796391
+    assert stream.filesize_approx == 28282013
 
 
 def test_default_filename(cipher_signature):
@@ -345,14 +339,11 @@ def test_segmented_stream_on_404(cipher_signature):
             ]
 
             # Request order for stream:
-            # Filesize:
-            #   1. head(url) -> 404
-            #   2. get(url&sn=0)
-            #   3. head(url&sn=[1,2,3])
-            # Download:
-            #   4. info(url) -> 404
-            #   5. get(url&sn=0)
-            #   6. get(url&sn=[1,2,3])
+            #   1. get(url&sn=0)
+            #   2. head(url&sn=[1,2,3])
+            #   3. info(url) -> 404
+            #   4. get(url&sn=0)
+            #   5. get(url&sn=[1,2,3])
 
             # Handle filesize requests
             mock_head.side_effect = [
@@ -363,7 +354,6 @@ def test_segmented_stream_on_404(cipher_signature):
             # Each response must be followed by None, to break iteration
             #  in the stream() function
             mock_url_open_object.read.side_effect = [
-                responses[0], None,
                 responses[0], None,
                 responses[1], None,
                 responses[2], None,
@@ -394,5 +384,6 @@ def test_segmented_only_catches_404(cipher_signature):
     stream = cipher_signature.streams.filter(adaptive=True)[0]
     with mock.patch('pytube.request.head') as mock_head:
         mock_head.side_effect = HTTPError('', 403, 'Forbidden', '', '')
-        with pytest.raises(HTTPError):
-            stream.download()
+        with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
+            with pytest.raises(HTTPError):
+                stream.download()

@@ -17,17 +17,20 @@ from pytube import CaptionQuery, Playlist, Stream, YouTube
 from pytube.helpers import safe_filename, setup_logger
 
 
+logger = logging.getLogger(__name__)
+
+
 def main():
     """Command line application to download youtube videos."""
     # noinspection PyTypeChecker
     parser = argparse.ArgumentParser(description=main.__doc__)
     args = _parse_args(parser)
-    if args.verbosity:
+    if args.verbose:
         log_filename = None
-        log_level = min(args.verbosity, 4) * 10
         if args.logfile:
             log_filename = args.logfile
-        setup_logger(logging.FATAL - log_level, log_filename=log_filename)
+        setup_logger(logging.DEBUG, log_filename=log_filename)
+        logger.debug(f'Pytube version: {__version__}')
 
     if not args.url or "youtu" not in args.url:
         parser.print_help()
@@ -113,10 +116,9 @@ def _parse_args(
     parser.add_argument(
         "-v",
         "--verbose",
-        action="count",
-        default=0,
-        dest="verbosity",
-        help="Verbosity level, use up to 4 to increase logging -vvvv",
+        action="store_true",
+        dest="verbose",
+        help="Set logger output to verbose output.",
     )
     parser.add_argument(
         "--logfile",
