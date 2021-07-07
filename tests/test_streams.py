@@ -114,7 +114,7 @@ def test_views(cipher_signature):
     "pytube.streams.request.head", MagicMock(return_value={"content-length": "6796391"})
 )
 @mock.patch(
-    "pytube.streams.request.stream",
+    "pytube.request.stream",
     MagicMock(return_value=iter([str(random.getrandbits(8 * 1024))])),
 )
 def test_download(cipher_signature):
@@ -127,7 +127,7 @@ def test_download(cipher_signature):
     "pytube.streams.request.head", MagicMock(return_value={"content-length": "16384"})
 )
 @mock.patch(
-    "pytube.streams.request.stream",
+    "pytube.request.stream",
     MagicMock(return_value=iter([str(random.getrandbits(8 * 1024))])),
 )
 @mock.patch("pytube.streams.target_directory", MagicMock(return_value="/target"))
@@ -145,7 +145,7 @@ def test_download_with_prefix(cipher_signature):
     "pytube.streams.request.head", MagicMock(return_value={"content-length": "16384"})
 )
 @mock.patch(
-    "pytube.streams.request.stream",
+    "pytube.request.stream",
     MagicMock(return_value=iter([str(random.getrandbits(8 * 1024))])),
 )
 @mock.patch("pytube.streams.target_directory", MagicMock(return_value="/target"))
@@ -163,7 +163,7 @@ def test_download_with_filename(cipher_signature):
     "pytube.streams.request.head", MagicMock(return_value={"content-length": "16384"})
 )
 @mock.patch(
-    "pytube.streams.request.stream",
+    "pytube.request.stream",
     MagicMock(return_value=iter([str(random.getrandbits(8 * 1024))])),
 )
 @mock.patch("pytube.streams.target_directory", MagicMock(return_value="/target"))
@@ -184,7 +184,7 @@ def test_download_with_existing(cipher_signature):
     "pytube.streams.request.head", MagicMock(return_value={"content-length": "16384"})
 )
 @mock.patch(
-    "pytube.streams.request.stream",
+    "pytube.request.stream",
     MagicMock(return_value=iter([str(random.getrandbits(8 * 1024))])),
 )
 @mock.patch("pytube.streams.target_directory", MagicMock(return_value="/target"))
@@ -215,7 +215,7 @@ def test_progressive_streams_return_includes_video_track(cipher_signature):
     "pytube.streams.request.head", MagicMock(return_value={"content-length": "16384"})
 )
 @mock.patch(
-    "pytube.streams.request.stream",
+    "pytube.request.stream",
     MagicMock(return_value=iter([str(random.getrandbits(8 * 1024))])),
 )
 def test_on_progress_hook(cipher_signature):
@@ -236,7 +236,7 @@ def test_on_progress_hook(cipher_signature):
     "pytube.streams.request.head", MagicMock(return_value={"content-length": "16384"})
 )
 @mock.patch(
-    "pytube.streams.request.stream",
+    "pytube.request.stream",
     MagicMock(return_value=iter([str(random.getrandbits(8 * 1024))])),
 )
 def test_on_complete_hook(cipher_signature):
@@ -382,7 +382,7 @@ def test_segmented_stream_on_404(cipher_signature):
 
 def test_segmented_only_catches_404(cipher_signature):
     stream = cipher_signature.streams.filter(adaptive=True)[0]
-    with mock.patch('pytube.streams.request.stream') as mock_stream:
+    with mock.patch('pytube.request.stream') as mock_stream:
         mock_stream.side_effect = HTTPError('', 403, 'Forbidden', '', '')
         with mock.patch("pytube.streams.open", mock.mock_open(), create=True):
             with pytest.raises(HTTPError):
