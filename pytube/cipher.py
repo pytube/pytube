@@ -60,7 +60,7 @@ class Cipher:
             if not callable(curr_func):
                 logger.debug(f'{curr_func} is not callable.')
                 logger.debug(f'Throttling array:\n{self.throttling_array}\n')
-                raise TypeError(f'{curr_func} is not callable.')
+                raise ExtractError(f'{curr_func} is not callable.')
 
             first_arg = self.throttling_array[int(step[1])]
 
