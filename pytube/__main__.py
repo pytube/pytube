@@ -220,7 +220,17 @@ class YouTube:
                 extract.apply_descrambler(self.vid_info, fmt)
             extract.apply_descrambler(self.player_config_args, fmt)
 
-            extract.apply_signature(self.player_config_args, fmt, self.js)
+            # If the cached js doesn't work, try fetching a new js file
+            # https://github.com/pytube/pytube/issues/1054
+            try:
+                extract.apply_signature(self.player_config_args, fmt, self.js)
+            except ExtractError:
+                # To force an update to the js file, we clear the cache and retry
+                self._js = None
+                self._js_url = None
+                pytube.__js__ = None
+                pytube.__js_url__ = None
+                extract.apply_signature(self.player_config_args, fmt, self.js)
 
             # build instances of :class:`Stream <Stream>`
             # Initialize stream objects
