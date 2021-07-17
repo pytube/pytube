@@ -155,7 +155,7 @@ def test_download_with_filename(cipher_signature):
         file_path = stream.download(filename="cool name bro")
         assert file_path == os.path.join(
             "/target",
-            "cool name bro.mp4"
+            "cool name bro"
         )
 
 
