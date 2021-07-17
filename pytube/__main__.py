@@ -224,7 +224,7 @@ class YouTube:
             # https://github.com/pytube/pytube/issues/1054
             try:
                 extract.apply_signature(self.player_config_args, fmt, self.js)
-            except ExtractError:
+            except exceptions.ExtractError:
                 # To force an update to the js file, we clear the cache and retry
                 self._js = None
                 self._js_url = None

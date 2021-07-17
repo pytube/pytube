@@ -17,7 +17,7 @@ import re
 from itertools import chain
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from pytube.exceptions import RegexMatchError
+from pytube.exceptions import ExtractError, RegexMatchError
 from pytube.helpers import cache, regex_search
 from pytube.parser import find_object_from_startpoint, throttling_array_split
 
