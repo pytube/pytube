@@ -5,6 +5,7 @@ interfaces returns raw results. These should instead be parsed to extract
 the useful information for the end user.
 """
 # Native python imports
+from datetime import datetime
 import json
 from urllib import parse
 
@@ -12,8 +13,49 @@ from urllib import parse
 from pytube import request
 
 
+_default_clients = {
+    'WEB': {
+        'context': {
+            'client': {
+                'clientName': 'WEB',
+                'clientVersion': '2.20200720.00.02'
+            }
+        },
+        'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+    },
+    'ANDROID': {
+        'context': {
+            'client': {
+                'clientName': 'ANDROID',
+                'clientVersion': '16.20'
+            }
+        },
+        'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+    }
+}
+_token_timeout = 1800
+
 class InnerTube:
     """Object for interacting with the innertube API."""
+    def __init__(self, client='WEB', bearer_token=None):
+        self.context = _default_clients[client]['context']
+        self.api_key = _default_clients[client]['api_key']
+        self.bearer_token = bearer_token
+        self.last_refresh = None
+        self.refresh_bearer_token()
+
+    def refresh_bearer_token(self, force=False):
+        """Refreshes the OAuth token."""
+        # Skip refresh if it's been less than 30 minutes
+        if not force:
+            # Use a 30-minute timer.
+            if (datetime.now() - self.last_refresh).total_seconds() < _token_timeout:
+                return
+
+        # TODO: Refresh the token
+
+        self.last_refresh = datetime.now()
+
     @property
     def base_url(self):
         """Return the base url endpoint for the innertube API."""
@@ -23,30 +65,31 @@ class InnerTube:
     def base_data(self):
         """Return the base json data to transmit to the innertube API."""
         return {
-            'context': {
-                'client': {
-                    'clientName': 'WEB',
-                    'clientVersion': '2.20200720.00.02'
-                }
-            }
+            'context': self.context
         }
 
     @property
     def base_params(self):
         """Return the base query parameters to transmit to the innertube API."""
         return {
-            'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+            'key': self.api_key
         }
 
     def _call_api(self, endpoint, query, data):
         """Make a request to a given endpoint with the provided query parameters and data."""
         endpoint_url = f'{endpoint}?{parse.urlencode(query)}'
+        headers = {
+            'Content-Type': 'application/json',
+        }
+        # Add the bearer token if applicable
+        if self.bearer_token:
+            self.refresh_bearer_token()
+            headers['authorization'] = f'Bearer {self.bearer_token}'
+
         response = request._execute_request(
             endpoint_url,
             'POST',
-            headers={
-                'Content-Type': 'application/json',
-            },
+            headers=headers,
             data=data
         )
         return json.loads(response.read())
