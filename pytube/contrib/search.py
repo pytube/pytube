@@ -141,6 +141,10 @@ class Search:
                 if 'horizontalCardListRenderer' in video_details:
                     continue
 
+                # Can't seem to reproduce, probably related to typo fix suggestions
+                if 'didYouMeanRenderer' in video_details:
+                    continue
+
                 if 'videoRenderer' not in video_details:
                     logger.warn('Unexpected renderer encountered.')
                     logger.warn(f'Renderer name: {video_details.keys()}')
