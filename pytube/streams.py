@@ -282,16 +282,14 @@ class Stream:
 
     def get_file_path(
         self,
-        filename: Optional[str],
-        output_path: Optional[str],
+        filename: Optional[str] = None,
+        output_path: Optional[str] = None,
         filename_prefix: Optional[str] = None,
     ) -> str:
-        if filename:
-            filename = f"{safe_filename(filename)}.{self.subtype}"
-        else:
+        if not filename:
             filename = self.default_filename
         if filename_prefix:
-            filename = f"{safe_filename(filename_prefix)}{filename}"
+            filename = f"{filename_prefix}{filename}"
         return os.path.join(target_directory(output_path), filename)
 
     def exists_at_path(self, file_path: str) -> bool:

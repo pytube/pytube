@@ -17,7 +17,7 @@ import re
 from itertools import chain
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from pytube.exceptions import RegexMatchError
+from pytube.exceptions import ExtractError, RegexMatchError
 from pytube.helpers import cache, regex_search
 from pytube.parser import find_object_from_startpoint, throttling_array_split
 
@@ -60,7 +60,7 @@ class Cipher:
             if not callable(curr_func):
                 logger.debug(f'{curr_func} is not callable.')
                 logger.debug(f'Throttling array:\n{self.throttling_array}\n')
-                raise TypeError(f'{curr_func} is not callable.')
+                raise ExtractError(f'{curr_func} is not callable.')
 
             first_arg = self.throttling_array[int(step[1])]
 

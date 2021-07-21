@@ -137,6 +137,14 @@ class Search:
                 if 'channelRenderer' in video_details:
                     continue
 
+                # Skip 'people also searched for' results
+                if 'horizontalCardListRenderer' in video_details:
+                    continue
+
+                # Can't seem to reproduce, probably related to typo fix suggestions
+                if 'didYouMeanRenderer' in video_details:
+                    continue
+
                 if 'videoRenderer' not in video_details:
                     logger.warn('Unexpected renderer encountered.')
                     logger.warn(f'Renderer name: {video_details.keys()}')
@@ -166,7 +174,11 @@ class Search:
                     else:
                         vid_view_count_text = vid_renderer['viewCountText']['simpleText']
                     # Strip ' views' text, then remove commas
-                    vid_view_count = int(vid_view_count_text.split()[0].replace(',',''))
+                    stripped_text = vid_view_count_text.split()[0].replace(',','')
+                    if stripped_text == 'No':
+                        vid_view_count = 0
+                    else:
+                        vid_view_count = int(stripped_text)
                 else:
                     vid_view_count = 0
                 if 'lengthText' in vid_renderer:
