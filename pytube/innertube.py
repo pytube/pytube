@@ -35,6 +35,7 @@ _default_clients = {
 }
 _token_timeout = 1800
 
+
 class InnerTube:
     """Object for interacting with the innertube API."""
     def __init__(self, client='WEB', bearer_token=None):
@@ -45,9 +46,12 @@ class InnerTube:
         self.refresh_bearer_token()
 
     def refresh_bearer_token(self, force=False):
-        """Refreshes the OAuth token."""
+        """Refreshes the OAuth token.
+
+        This is skeleton code for potential future functionality, so it is incomplete.
+        """
         # Skip refresh if it's been less than 30 minutes
-        if not force:
+        if self.last_refresh and not force:
             # Use a 30-minute timer.
             if (datetime.now() - self.last_refresh).total_seconds() < _token_timeout:
                 return
@@ -165,3 +169,42 @@ class InnerTube:
             data['continuation'] = continuation
         data.update(self.base_data)
         return self._call_api(endpoint, query, data)
+
+    def verify_age(self, video_id):
+        """Make a request to the age_verify endpoint.
+
+        Notable examples of the types of video this verification step is for:
+        * https://www.youtube.com/watch?v=QLdAhwSBZ3w
+        * https://www.youtube.com/watch?v=hc0ZDaAZQT0
+
+        :param str video_id:
+            The video id to get player info for.
+        :rtype: dict
+        :returns:
+            Returns information that includes a URL for bypassing certain restrictions.
+        """
+        endpoint = f'{self.base_url}/verify_age'
+        data = {
+            'nextEndpoint': {
+                'urlEndpoint': {
+                    'url': f'/watch?v={video_id}'
+                }
+            },
+            'setControvercy': True
+        }
+        data.update(self.base_data)
+        result = self._call_api(endpoint, self.base_params, data)
+        return result
+
+    def get_transcript(self, video_id):
+        """Make a request to the get_transcript endpoint.
+
+        This is likely related to captioning for videos, but is currently untested.
+        """
+        endpoint = f'{self.base_url}/get_transcript'
+        query = {
+            'videoId': video_id,
+        }
+        query.update(self.base_params)
+        result = self._call_api(endpoint, query, self.base_data)
+        return result
