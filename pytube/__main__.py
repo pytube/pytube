@@ -108,7 +108,7 @@ class YouTube:
         if self._vid_info_raw:
             return self._vid_info_raw
         innertube = InnerTube()
-        vid_info_raw = innertube.player(  self.video_id)
+        vid_info_raw = innertube.player(self.video_id)
         # Rename dict key "responseContext" to "player_response"
         # for backward compatibility.
         vid_info_raw["player_response"] = vid_info_raw.pop("responseContext")
@@ -190,6 +190,7 @@ class YouTube:
     def player_config_args(self):
         if self._player_config_args:
             return self._player_config_args
+
         self._player_config_args = self.vid_info
         # On pre-signed videos, we need to use get_ytplayer_config to fix
         #  the player_response item
