@@ -7,6 +7,7 @@ smaller peripheral modules and functions.
 
 """
 import json
+import requests
 import logging
 from typing import Any, Callable, Dict, List, Optional
 from urllib.parse import parse_qsl
@@ -18,6 +19,7 @@ from pytube import Stream, StreamQuery
 from pytube.helpers import install_proxy
 from pytube.metadata import YouTubeMetadata
 from pytube.monostate import Monostate
+from pytube.innertube import _default_clients
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +108,22 @@ class YouTube:
     def vid_info_raw(self):
         if self._vid_info_raw:
             return self._vid_info_raw
-        self._vid_info_raw = request.get(self.vid_info_url)
+        
+        video_data = { 
+            "context": {
+                "client": {
+                    "clientName": "ANDROID",
+                    "clientVersion": "16.05"
+                }
+            },
+            "videoId":self.video_id
+        }
+
+        player_url = "https://www.youtube.com/youtubei/v1/player"
+        headers = {"X-Goog-Api-Key":_default_clients["ANDROID"]["api_key"]}
+        info_raw_req = requests.post(player_url, headers=headers,
+                                     data=json.dumps(video_data))
+        self._vid_info_raw = info_raw_req.json()
         return self._vid_info_raw
 
     @property
@@ -165,12 +182,12 @@ class YouTube:
         if self._player_response:
             return self._player_response
 
-        if isinstance(self.player_config_args["player_response"], str):
+        if isinstance(self.player_config_args["responseContext"], str):
             self._player_response = json.loads(
-                self.player_config_args["player_response"]
+                self.player_config_args["responseContext"]
             )
         else:
-            self._player_response = self.player_config_args["player_response"]
+            self._player_response = self.player_config_args["responseContext"]
         return self._player_response
 
     @property
@@ -184,16 +201,16 @@ class YouTube:
     def player_config_args(self):
         if self._player_config_args:
             return self._player_config_args
-
+        print(self.vid_info)
         self._player_config_args = self.vid_info
         # On pre-signed videos, we need to use get_ytplayer_config to fix
         #  the player_response item
-        if 'streamingData' not in self.player_config_args['player_response']:
+        if 'streamingData' not in self.player_config_args['responseContext']:
             config_response = extract.get_ytplayer_config(self.watch_html)
             if 'args' in config_response:
-                self.player_config_args['player_response'] = config_response['args']['player_response']  # noqa: E501
+                self.player_config_args['responseContext'] = config_response['args']['responseContext']  # noqa: E501
             else:
-                self.player_config_args['player_response'] = config_response
+                self.player_config_args['responseContext'] = config_response
 
         return self._player_config_args
 
@@ -288,7 +305,7 @@ class YouTube:
 
         :rtype: Dict[Any, Any]
         """
-        return dict(parse_qsl(self.vid_info_raw))
+        return self.vid_info_raw
 
     @property
     def caption_tracks(self) -> List[pytube.Caption]:
