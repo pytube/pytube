@@ -108,7 +108,11 @@ class YouTube:
         if self._vid_info_raw:
             return self._vid_info_raw
         innertube = InnerTube()
-        self._vid_info_raw = innertube.player(self.video_id)
+        vid_info_raw = innertube.player(  self.video_id)
+        # Rename dict key "responseContext" to "player_response"
+        # for backward compatibility.
+        vid_info_raw["player_response"] = vid_info_raw.pop("responseContext")
+        self._vid_info_raw = vid_info_raw
         return self._vid_info_raw
 
     @property
@@ -167,12 +171,12 @@ class YouTube:
         if self._player_response:
             return self._player_response
 
-        if isinstance(self.player_config_args["responseContext"], str):
+        if isinstance(self.player_config_args["player_response"], str):
             self._player_response = json.loads(
-                self.player_config_args["responseContext"]
+                self.player_config_args["player_response"]
             )
         else:
-            self._player_response = self.player_config_args["responseContext"]
+            self._player_response = self.player_config_args["player_response"]
         return self._player_response
 
     @property
@@ -189,12 +193,12 @@ class YouTube:
         self._player_config_args = self.vid_info
         # On pre-signed videos, we need to use get_ytplayer_config to fix
         #  the player_response item
-        if 'streamingData' not in self.player_config_args['responseContext']:
+        if 'streamingData' not in self.player_config_args['player_response']:
             config_response = extract.get_ytplayer_config(self.watch_html)
             if 'args' in config_response:
-                self.player_config_args['responseContext'] = config_response['args']['responseContext']  # noqa: E501
+                self.player_config_args['player_response'] = config_response['args']['player_response']  # noqa: E501
             else:
-                self.player_config_args['responseContext'] = config_response
+                self.player_config_args['player_response'] = config_response
 
         return self._player_config_args
 
