@@ -7,7 +7,6 @@ smaller peripheral modules and functions.
 
 """
 import json
-import requests
 import logging
 from typing import Any, Callable, Dict, List, Optional
 from urllib.parse import parse_qsl
@@ -17,9 +16,9 @@ import pytube.exceptions as exceptions
 from pytube import extract, request
 from pytube import Stream, StreamQuery
 from pytube.helpers import install_proxy
+from pytube.innertube import InnerTube
 from pytube.metadata import YouTubeMetadata
 from pytube.monostate import Monostate
-from pytube.innertube import _default_clients
 
 logger = logging.getLogger(__name__)
 
@@ -108,22 +107,8 @@ class YouTube:
     def vid_info_raw(self):
         if self._vid_info_raw:
             return self._vid_info_raw
-        
-        video_data = { 
-            "context": {
-                "client": {
-                    "clientName": "ANDROID",
-                    "clientVersion": "16.05"
-                }
-            },
-            "videoId":self.video_id
-        }
-
-        player_url = "https://www.youtube.com/youtubei/v1/player"
-        headers = {"X-Goog-Api-Key":_default_clients["ANDROID"]["api_key"]}
-        info_raw_req = requests.post(player_url, headers=headers,
-                                     data=json.dumps(video_data))
-        self._vid_info_raw = info_raw_req.json()
+        innertube = InnerTube()
+        self._vid_info_raw = innertube.player(self.video_id)
         return self._vid_info_raw
 
     @property
