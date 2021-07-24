@@ -19,6 +19,16 @@ from pytube import request
 _client_id = '861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com'
 _client_secret = 'SboVhoG9s0rNafixCSGGKXAT'
 
+# Extracted API keys -- unclear what these are linked to.
+_api_keys = [
+    'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
+    'AIzaSyCtkvNIR1HCEwzsqK6JuE6KqpyjusIRI30',
+    'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
+    'AIzaSyC8UYZpvA2eknNex0Pjid0_eTLJoDu6los',
+    'AIzaSyCjc_pVEDi4qsv5MtC2dMXzpIaDoRFLsxw',
+    'AIzaSyDHQ9ipnphqTzDqZsbtd8_Ru4_kiKVQe2k'
+]
+
 _default_clients = {
     'WEB': {
         'context': {
@@ -181,6 +191,10 @@ class InnerTube:
 
     def _call_api(self, endpoint, query, data):
         """Make a request to a given endpoint with the provided query parameters and data."""
+        # Remove the API key if oauth is being used.
+        if self.use_oauth:
+            del query['key']
+
         endpoint_url = f'{endpoint}?{parse.urlencode(query)}'
         headers = {
             'Content-Type': 'application/json',
