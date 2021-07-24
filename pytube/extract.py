@@ -447,8 +447,7 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
             url: str = stream["url"]
         except KeyError:
             live_stream = (
-                json.loads(config_args["player_response"])
-                .get("playabilityStatus", {},)
+                config_args.get("playabilityStatus", {},)
                 .get("liveStreamability")
             )
             if live_stream:
@@ -513,15 +512,11 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
     if key == "url_encoded_fmt_stream_map" and not stream_data.get(
         "url_encoded_fmt_stream_map"
     ):
-        if isinstance(stream_data["player_response"], str):
-            streaming_data = json.loads(stream_data["player_response"])["streamingData"]
-        else:
-            streaming_data = stream_data["player_response"]["streamingData"]
         formats = []
-        if 'formats' in streaming_data.keys():
-            formats.extend(streaming_data['formats'])
-        if 'adaptiveFormats' in streaming_data.keys():
-            formats.extend(streaming_data['adaptiveFormats'])
+        if 'formats' in stream_data.keys():
+            formats.extend(stream_data['formats'])
+        if 'adaptiveFormats' in stream_data.keys():
+            formats.extend(stream_data['adaptiveFormats'])
         try:
             stream_data[key] = [
                 {
