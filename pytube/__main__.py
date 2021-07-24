@@ -108,11 +108,11 @@ class YouTube:
         if self._vid_info_raw:
             return self._vid_info_raw
         innertube = InnerTube()
-        vid_info_raw = innertube.player(self.video_id)
+        innertube_response = innertube.player(self.video_id)
         # Rename dict key "responseContext" to "player_response"
         # for backward compatibility.
-        vid_info_raw["player_response"] = vid_info_raw.pop("responseContext")
-        self._vid_info_raw = vid_info_raw
+        innertube_response["player_response"] = innertube_response.pop("responseContext")
+        self._vid_info_raw = innertube_response
         return self._vid_info_raw
 
     @property
