@@ -76,7 +76,9 @@ class InnerTube:
     def base_params(self):
         """Return the base query parameters to transmit to the innertube API."""
         return {
-            'key': self.api_key
+            'key': self.api_key,
+            'contentCheckOk': True,
+            'racyCheckOk': True
         }
 
     def _call_api(self, endpoint, query, data):
