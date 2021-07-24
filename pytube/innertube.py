@@ -7,11 +7,17 @@ the useful information for the end user.
 # Native python imports
 from datetime import datetime
 import json
+import os
+import pathlib
+import time
 from urllib import parse
 
 # Local imports
 from pytube import request
 
+# YouTube on TV client secrets
+_client_id = '861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com'
+_client_secret = 'SboVhoG9s0rNafixCSGGKXAT'
 
 _default_clients = {
     'WEB': {
@@ -34,31 +40,123 @@ _default_clients = {
     }
 }
 _token_timeout = 1800
-
+_cache_dir = pathlib.Path(__file__).parent.resolve() / '__cache__'
+_token_file = os.path.join(_cache_dir, 'tokens.json')
 
 class InnerTube:
     """Object for interacting with the innertube API."""
-    def __init__(self, client='WEB', bearer_token=None):
+    def __init__(self, client='WEB', use_oauth=False, allow_cache=False):
         self.context = _default_clients[client]['context']
         self.api_key = _default_clients[client]['api_key']
-        self.bearer_token = bearer_token
-        self.last_refresh = None
-        self.refresh_bearer_token()
+        self.access_token = None
+        self.refresh_token = None
+        self.use_oauth = use_oauth
+        self.allow_cache = allow_cache
+
+        # Stored as epoch time
+        self.expires = None
+
+        # Try to load from file if specified
+        if self.use_oauth and self.allow_cache:
+            # Try to load from file if possible
+            if os.path.exists(_token_file):
+                with open(_token_file) as f:
+                    data = json.load(f)
+                    self.access_token = data['access_token']
+                    self.refresh_token = data['refresh_token']
+                    self.expires = data['expires']
+                    self.refresh_bearer_token()
+
+    def cache_tokens(self):
+        """Cache tokens to file if allowed."""
+        if not self.allow_cache:
+            return
+
+        data = {
+            'access_token': self.access_token,
+            'refresh_token': self.refresh_token,
+            'expires': self.expires
+        }
+        if not os.path.exists(_cache_dir):
+            os.mkdir(_cache_dir)
+        with open(_token_file, 'w') as f:
+            json.dump(data, f)
 
     def refresh_bearer_token(self, force=False):
         """Refreshes the OAuth token.
 
         This is skeleton code for potential future functionality, so it is incomplete.
         """
-        # Skip refresh if it's been less than 30 minutes
-        if self.last_refresh and not force:
-            # Use a 30-minute timer.
-            if (datetime.now() - self.last_refresh).total_seconds() < _token_timeout:
-                return
+        if not self.use_oauth:
+            return
+        # Skip refresh if it's not necessary and not forced
+        if self.expires > time.time() and not force:
+            return
 
-        # TODO: Refresh the token
+        # Subtracting 30 seconds is arbitrary to avoid potential time discrepencies
+        start_time = int(time.time() - 30)
+        data = {
+            'client_id': _client_id,
+            'client_secret': _client_secret,
+            'grant_type': 'refresh_token',
+            'refresh_token': self.refresh_token
+        }
+        response = request._execute_request(
+            'https://oauth2.googleapis.com/token',
+            'POST',
+            headers={
+                'Content-Type': 'application/json'
+            },
+            data=data
+        )
+        response_data = json.loads(response.read())
 
-        self.last_refresh = datetime.now()
+        self.access_token = response_data['access_token']
+        self.expires = start_time + response_data['expires_in']
+        self.cache_tokens()
+
+    def fetch_bearer_token(self):
+        """Fetch an OAuth token."""
+        # Subtracting 30 seconds is arbitrary to avoid potential time discrepencies
+        start_time = int(time.time() - 30)
+        data = {
+            'client_id': _client_id,
+            'scope': 'https://www.googleapis.com/auth/youtube'
+        }
+        response = request._execute_request(
+            'https://oauth2.googleapis.com/device/code',
+            'POST',
+            headers={
+                'Content-Type': 'application/json'
+            },
+            data=data
+        )
+        response_data = json.loads(response.read())
+        verification_url = response_data['verification_url']
+        user_code = response_data['user_code']
+        print(f'Please open {verification_url} and input code {user_code}')
+        x = input('Press enter when you have completed this step.')
+
+        data = {
+            'client_id': _client_id,
+            'client_secret': _client_secret,
+            'device_code': response_data['device_code'],
+            'grant_type': 'urn:ietf:params:oauth:grant-type:device_code'
+        }
+        response = request._execute_request(
+            'https://oauth2.googleapis.com/token',
+            'POST',
+            headers={
+                'Content-Type': 'application/json'
+            },
+            data=data
+        )
+        response_data = json.loads(response.read())
+
+        self.access_token = response_data['access_token']
+        self.refresh_token = response_data['refresh_token']
+        self.expires = start_time + response_data['expires_in']
+        self.cache_tokens()
 
     @property
     def base_url(self):
@@ -88,9 +186,13 @@ class InnerTube:
             'Content-Type': 'application/json',
         }
         # Add the bearer token if applicable
-        if self.bearer_token:
-            self.refresh_bearer_token()
-            headers['authorization'] = f'Bearer {self.bearer_token}'
+        if self.use_oauth:
+            if self.access_token:
+                self.refresh_bearer_token()
+                headers['Authorization'] = f'Bearer {self.access_token}'
+            else:
+                self.fetch_bearer_token()
+                headers['Authorization'] = f'Bearer {self.access_token}'
 
         response = request._execute_request(
             endpoint_url,
