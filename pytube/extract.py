@@ -516,7 +516,7 @@ def apply_descrambler(stream_data: Dict) -> None:
             if 'signatureCipher' in data:
                 cipher_url = parse_qs(data['signatureCipher'])
                 data['url'] = cipher_url['url'][0]
-                data['s'] = cipher_url['url'][0]
+                data['s'] = cipher_url['s'][0]
         data['is_otf'] = data.get('type') == 'FORMAT_STREAM_TYPE_OTF'
 
     logger.debug("applying descrambler")
