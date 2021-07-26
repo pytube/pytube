@@ -9,7 +9,6 @@ smaller peripheral modules and functions.
 import json
 import logging
 from typing import Any, Callable, Dict, List, Optional
-from urllib.parse import parse_qsl
 
 import pytube
 import pytube.exceptions as exceptions
@@ -172,39 +171,29 @@ class YouTube:
             return self._fmt_streams
 
         self._fmt_streams = []
-        # https://github.com/pytube/pytube/issues/165
-        stream_maps = ["url_encoded_fmt_stream_map"]
-        if "adaptive_fmts" in self.streaming_data:
-            stream_maps.append("adaptive_fmts")
 
-        # unscramble the progressive and adaptive stream manifests.
-        for fmt in stream_maps:
-            if not self.age_restricted and fmt in self.vid_info:
-                extract.apply_descrambler(self.streaming_data, fmt)
-            extract.apply_descrambler(self.streaming_data, fmt)
+        stream_manifest = extract.apply_descrambler(self.streaming_data)
 
-            # If the cached js doesn't work, try fetching a new js file
-            # https://github.com/pytube/pytube/issues/1054
-            try:
-                extract.apply_signature(self.streaming_data, fmt, self.js)
-            except exceptions.ExtractError:
-                # To force an update to the js file, we clear the cache and retry
-                self._js = None
-                self._js_url = None
-                pytube.__js__ = None
-                pytube.__js_url__ = None
-                extract.apply_signature(self.streaming_data, fmt, self.js)
+        # If the cached js doesn't work, try fetching a new js file
+        # https://github.com/pytube/pytube/issues/1054
+        try:
+            extract.apply_signature(stream_manifest, self.vid_info, self.js)
+        except exceptions.ExtractError:
+            # To force an update to the js file, we clear the cache and retry
+            self._js = None
+            self._js_url = None
+            pytube.__js__ = None
+            pytube.__js_url__ = None
+            extract.apply_signature(stream_manifest, self.vid_info, self.js)
 
-            # build instances of :class:`Stream <Stream>`
-            # Initialize stream objects
-            stream_manifest = self.streaming_data[fmt]
-            for stream in stream_manifest:
-                video = Stream(
-                    stream=stream,
-                    player_config_args=self.streaming_data,
-                    monostate=self.stream_monostate,
-                )
-                self._fmt_streams.append(video)
+        # build instances of :class:`Stream <Stream>`
+        # Initialize stream objects
+        for stream in stream_manifest:
+            video = Stream(
+                stream=stream,
+                monostate=self.stream_monostate,
+            )
+            self._fmt_streams.append(video)
 
         self.stream_monostate.title = self.title
         self.stream_monostate.duration = self.length

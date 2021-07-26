@@ -25,15 +25,12 @@ class Stream:
     """Container for stream manifest data."""
 
     def __init__(
-        self, stream: Dict, player_config_args: Dict, monostate: Monostate
+        self, stream: Dict, monostate: Monostate
     ):
         """Construct a :class:`Stream <Stream>`.
 
         :param dict stream:
             The unscrambled data extracted from YouTube.
-        :param dict player_config_args:
-            The data object containing video media data like title and
-            keywords.
         :param dict monostate:
             Dictionary of data shared across all instances of
             :class:`Stream <Stream>`.
@@ -50,7 +47,7 @@ class Stream:
         # set type and codec info
 
         # 'video/webm; codecs="vp8, vorbis"' -> 'video/webm', ['vp8', 'vorbis']
-        self.mime_type, self.codecs = extract.mime_type_codec(stream["type"])
+        self.mime_type, self.codecs = extract.mime_type_codec(stream["mimeType"])
 
         # 'video/webm' -> 'video', 'webm'
         self.type, self.subtype = self.mime_type.split("/")
@@ -62,25 +59,21 @@ class Stream:
         self.is_otf: bool = stream["is_otf"]
         self.bitrate: Optional[int] = stream["bitrate"]
 
-        self._filesize: Optional[int] = stream['content_length']  # filesize in bytes
+        self._filesize: Optional[int] = stream['contentLength']  # filesize in bytes
 
         # Additional information about the stream format, such as resolution,
         # frame rate, and whether the stream is live (HLS) or 3D.
         itag_profile = get_format_profile(self.itag)
         self.is_dash = itag_profile["is_dash"]
         self.abr = itag_profile["abr"]  # average bitrate (audio streams only)
-        self.fps = stream[
-            "fps"
-        ]  # frames per second (video streams only)
+        if 'fps' in stream:
+            self.fps = stream['fps']  # Video streams only
         self.resolution = itag_profile[
             "resolution"
         ]  # resolution (e.g.: "480p")
         self.is_3d = itag_profile["is_3d"]
         self.is_hdr = itag_profile["is_hdr"]
         self.is_live = itag_profile["is_live"]
-
-        # The player configuration, contains info like the video title.
-        self.player_config_args = player_config_args
 
     @property
     def is_adaptive(self) -> bool:

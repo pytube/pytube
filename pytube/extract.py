@@ -1,12 +1,11 @@
 """This module contains all non-cipher related data extraction logic."""
-import json
 import logging
 import urllib.parse
 import re
 from collections import OrderedDict
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
-from urllib.parse import parse_qs, parse_qsl, quote, unquote, urlencode, urlparse
+from urllib.parse import parse_qs, quote, urlencode, urlparse
 
 from pytube.cipher import Cipher
 from pytube.exceptions import HTMLParseError, LiveStreamError, RegexMatchError
@@ -426,28 +425,23 @@ def get_ytcfg(html: str) -> str:
     )
 
 
-def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
+def apply_signature(stream_manifest: Dict, vid_info: Dict, js: str) -> None:
     """Apply the decrypted signature to the stream manifest.
 
-    :param dict config_args:
+    :param dict stream_manifest:
         Details of the media streams available.
-    :param str fmt:
-        Key in stream manifests (``ytplayer_config``) containing progressive
-        download or adaptive streams (e.g.: ``url_encoded_fmt_stream_map`` or
-        ``adaptive_fmts``).
     :param str js:
         The contents of the base.js asset file.
 
     """
     cipher = Cipher(js=js)
-    stream_manifest = config_args[fmt]
 
     for i, stream in enumerate(stream_manifest):
         try:
             url: str = stream["url"]
         except KeyError:
             live_stream = (
-                config_args.get("playabilityStatus", {},)
+                vid_info.get("playabilityStatus", {},)
                 .get("liveStreamability")
             )
             if live_stream:
@@ -467,27 +461,28 @@ def apply_signature(config_args: Dict, fmt: str, js: str) -> None:
         logger.debug(
             "finished descrambling signature for itag=%s", stream["itag"]
         )
+        parsed_url = urlparse(url)
+
+        # Convert query params off url to dict
         query_params = parse_qs(urlparse(url).query)
+        query_params = {
+            k: v[0] for k,v in query_params.items()
+        }
+        query_params['sig'] = signature
         if 'ratebypass' not in query_params.keys():
             # Cipher n to get the updated value
 
-            initial_n = list(query_params['n'][0])
+            initial_n = list(query_params['n'])
             new_n = cipher.calculate_n(initial_n)
-            query_params['n'][0] = new_n
+            query_params['n'] = new_n
 
-            # Update the value
-            parsed = urlparse(url)
-            # The parsed query params are lists of a single element, convert to proper dicts.
-            query_params = {
-                k: v[0] for k,v in query_params.items()
-            }
-            url = f'{parsed.scheme}://{parsed.netloc}{parsed.path}?{urlencode(query_params)}'
+        url = f'{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}?{urlencode(query_params)}'  # noqa:E501
 
         # 403 forbidden fix
-        stream_manifest[i]["url"] = url + "&sig=" + signature
+        stream_manifest[i]["url"] = url
 
 
-def apply_descrambler(stream_data: Dict, key: str) -> None:
+def apply_descrambler(stream_data: Dict) -> None:
     """Apply various in-place transforms to YouTube's media stream data.
 
     Creates a ``list`` of dictionaries by string splitting on commas, then
@@ -496,8 +491,6 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
 
     :param dict stream_data:
         Dictionary containing query string encoded values.
-    :param str key:
-        Name of the key in dictionary.
 
     **Example**:
 
@@ -507,60 +500,27 @@ def apply_descrambler(stream_data: Dict, key: str) -> None:
     {'foo': [{'bar': '1', 'var': 'test'}, {'em': '5', 't': 'url encoded'}]}
 
     """
-    otf_type = "FORMAT_STREAM_TYPE_OTF"
+    if 'url' in stream_data:
+        return
 
-    if key == "url_encoded_fmt_stream_map" and not stream_data.get(
-        "url_encoded_fmt_stream_map"
-    ):
-        formats = []
-        if 'formats' in stream_data.keys():
-            formats.extend(stream_data['formats'])
-        if 'adaptiveFormats' in stream_data.keys():
-            formats.extend(stream_data['adaptiveFormats'])
-        try:
-            stream_data[key] = [
-                {
-                    "url": format_item["url"],
-                    "type": format_item["mimeType"],
-                    "quality": format_item["quality"],
-                    "itag": format_item["itag"],
-                    "fps": format_item["fps"] if 'video' in format_item["mimeType"] else None,
-                    "bitrate": format_item.get("bitrate"),
-                    "is_otf": (format_item.get("type") == otf_type),
-                    'content_length': int(format_item.get('contentLength', 0)),
-                }
-                for format_item in formats
-            ]
-        except KeyError:
-            cipher_url = [
-                parse_qs(
-                    data[
-                        "cipher" if "cipher" in data.keys() else "signatureCipher"
-                    ]
-                )
-                for data in formats
-            ]
-            stream_data[key] = [
-                {
-                    "url": cipher_url[i]["url"][0],
-                    "s": cipher_url[i]["s"][0],
-                    "type": format_item["mimeType"],
-                    "quality": format_item["quality"],
-                    "itag": format_item["itag"],
-                    "fps": format_item["fps"] if 'video' in format_item["mimeType"] else None,
-                    "bitrate": format_item.get("bitrate"),
-                    "is_otf": (format_item.get("type") == otf_type),
-                    'content_length': int(format_item.get('contentLength', 0)),
-                }
-                for i, format_item in enumerate(formats)
-            ]
-    else:
-        stream_data[key] = [
-            {k: unquote(v) for k, v in parse_qsl(i)}
-            for i in stream_data[key].split(",")
-        ]
+    # Merge formats and adaptiveFormats into a single list
+    formats = []
+    if 'formats' in stream_data.keys():
+        formats.extend(stream_data['formats'])
+    if 'adaptiveFormats' in stream_data.keys():
+        formats.extend(stream_data['adaptiveFormats'])
+
+    # Extract url and s from signatureCiphers as necessary
+    for data in formats:
+        if 'url' not in data:
+            if 'signatureCipher' in data:
+                cipher_url = parse_qs(data['signatureCipher'])
+                data['url'] = cipher_url['url'][0]
+                data['s'] = cipher_url['url'][0]
+        data['is_otf'] = data.get('type') == 'FORMAT_STREAM_TYPE_OTF'
 
     logger.debug("applying descrambler")
+    return formats
 
 
 def initial_data(watch_html: str) -> str:
