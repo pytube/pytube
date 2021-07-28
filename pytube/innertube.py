@@ -55,7 +55,7 @@ _token_file = os.path.join(_cache_dir, 'tokens.json')
 
 class InnerTube:
     """Object for interacting with the innertube API."""
-    def __init__(self, client='WEB', use_oauth=False, allow_cache=True):
+    def __init__(self, client='ANDROID', use_oauth=False, allow_cache=True):
         self.context = _default_clients[client]['context']
         self.api_key = _default_clients[client]['api_key']
         self.access_token = None
