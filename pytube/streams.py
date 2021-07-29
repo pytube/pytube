@@ -59,7 +59,8 @@ class Stream:
         self.is_otf: bool = stream["is_otf"]
         self.bitrate: Optional[int] = stream["bitrate"]
 
-        self._filesize: Optional[int] = int(stream.get('contentLength', 0))  # filesize in bytes
+        # filesize in bytes
+        self._filesize: Optional[int] = int(stream.get('contentLength', 0))
 
         # Additional information about the stream format, such as resolution,
         # frame rate, and whether the stream is live (HLS) or 3D.

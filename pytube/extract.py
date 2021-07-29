@@ -501,7 +501,7 @@ def apply_descrambler(stream_data: Dict) -> None:
 
     """
     if 'url' in stream_data:
-        return
+        return None
 
     # Merge formats and adaptiveFormats into a single list
     formats = []
