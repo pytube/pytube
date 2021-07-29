@@ -157,7 +157,12 @@ class YouTube:
 
     @property
     def streaming_data(self):
-        return self.vid_info['streamingData']
+        """Return streamingData from video info."""
+        if 'streamingData' in self.vid_info:
+            return self.vid_info['streamingData']
+        else:
+            self.bypass_age_gate()
+            return self.vid_info['streamingData']
 
     @property
     def fmt_streams(self):
@@ -244,16 +249,33 @@ class YouTube:
             return self._vid_info
 
         innertube = InnerTube(use_oauth=self.use_oauth, allow_cache=self.allow_oauth_cache)
+
         innertube_response = innertube.player(self.video_id)
-        playability_reason = innertube_response['playabilityStatus'].get('reason', None)
-        if playability_reason == 'Sign in to confirm your age':
-            if not self.use_oauth:
-                raise exceptions.AgeRestrictedError(self.video_id)
+
         # Rename dict key "responseContext" to "player_response"
         # for backward compatibility.
         innertube_response["player_response"] = innertube_response.pop("responseContext")
         self._vid_info = innertube_response
         return self._vid_info
+
+    def bypass_age_gate(self):
+        """Attempt to update the vid_info by bypassing the age gate."""
+        innertube = InnerTube(
+            client='ANDROID_EMBED',
+            use_oauth=self.use_oauth,
+            allow_cache=self.allow_oauth_cache
+        )
+        innertube_response = innertube.player(self.video_id)
+
+        playability_status = innertube_response['playabilityStatus'].get('status', None)
+
+        # If we still can't access the video, raise an exception
+        # (tier 3 age restriction)
+        if playability_status == 'LOGIN_REQUIRED':
+            raise exceptions.AgeRestrictedError(self.video_id)
+
+        innertube_response["player_response"] = innertube_response.pop("responseContext")
+        self._vid_info = innertube_response
 
     @property
     def caption_tracks(self) -> List[pytube.Caption]:

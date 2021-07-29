@@ -46,6 +46,26 @@ _default_clients = {
             }
         },
         'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+    },
+    'WEB_EMBED': {
+        'context': {
+            'client': {
+                'clientName': 'WEB',
+                'clientVersion': '2.20210721.00.00',
+                'clientScreen': 'EMBED'
+            }
+        },
+        'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+    },
+    'ANDROID_EMBED': {
+        'context': {
+            'client': {
+                'clientName': 'ANDROID',
+                'clientVersion': '16.20',
+                'clientScreen': 'EMBED'
+            }
+        },
+        'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
     }
 }
 _token_timeout = 1800
@@ -56,6 +76,16 @@ _token_file = os.path.join(_cache_dir, 'tokens.json')
 class InnerTube:
     """Object for interacting with the innertube API."""
     def __init__(self, client='ANDROID', use_oauth=False, allow_cache=True):
+        """Initialize an InnerTube object.
+
+        :param str client:
+            Client to use for the object.
+            Default to web because it returns the most playback types.
+        :param bool use_oauth:
+            Whether or not to authenticate to YouTube.
+        :param bool allow_cache:
+            Allows caching of oauth tokens on the machine.
+        """
         self.context = _default_clients[client]['context']
         self.api_key = _default_clients[client]['api_key']
         self.access_token = None
@@ -93,9 +123,10 @@ class InnerTube:
             json.dump(data, f)
 
     def refresh_bearer_token(self, force=False):
-        """Refreshes the OAuth token.
+        """Refreshes the OAuth token if necessary.
 
-        This is skeleton code for potential future functionality, so it is incomplete.
+        :param bool force:
+            Force-refresh the bearer token.
         """
         if not self.use_oauth:
             return
