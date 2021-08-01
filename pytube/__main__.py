@@ -271,7 +271,7 @@ class YouTube:
 
         # If we still can't access the video, raise an exception
         # (tier 3 age restriction)
-        if playability_status == 'LOGIN_REQUIRED':
+        if playability_status == 'UNPLAYABLE':
             raise exceptions.AgeRestrictedError(self.video_id)
 
         innertube_response["player_response"] = innertube_response.pop("responseContext")
