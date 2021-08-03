@@ -6,7 +6,6 @@ exclusively on the developer interface. Pytube offloads the heavy lifting to
 smaller peripheral modules and functions.
 
 """
-import json
 import logging
 from typing import Any, Callable, Dict, List, Optional
 
@@ -135,20 +134,6 @@ class YouTube:
         return self._js
 
     @property
-    def player_response(self):
-        """The player response contains subtitle information and video details."""
-        if self._player_response:
-            return self._player_response
-
-        if isinstance(self.player_config_args["player_response"], str):
-            self._player_response = json.loads(
-                self.player_config_args["player_response"]
-            )
-        else:
-            self._player_response = self.player_config_args["player_response"]
-        return self._player_response
-
-    @property
     def initial_data(self):
         if self._initial_data:
             return self._initial_data
@@ -248,10 +233,6 @@ class YouTube:
         innertube = InnerTube(use_oauth=self.use_oauth, allow_cache=self.allow_oauth_cache)
 
         innertube_response = innertube.player(self.video_id)
-
-        # Rename dict key "responseContext" to "player_response"
-        # for backward compatibility.
-        innertube_response["player_response"] = innertube_response.pop("responseContext")
         self._vid_info = innertube_response
         return self._vid_info
 
@@ -271,7 +252,6 @@ class YouTube:
         if playability_status == 'UNPLAYABLE':
             raise exceptions.AgeRestrictedError(self.video_id)
 
-        innertube_response["player_response"] = innertube_response.pop("responseContext")
         self._vid_info = innertube_response
 
     @property
