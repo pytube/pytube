@@ -86,15 +86,3 @@ def test_raises_recording_unavailable(missing_recording):
         mock_url_open.return_value = mock_url_open_object
         with pytest.raises(exceptions.RecordingUnavailable):
             YouTube('https://youtube.com/watch?v=5YceQ8YqYMc').streams
-
-
-def test_raises_video_region_blocked(region_blocked):
-    with mock.patch('pytube.request.urlopen') as mock_url_open:
-        # Mock the responses to YouTube
-        mock_url_open_object = mock.Mock()
-        mock_url_open_object.read.side_effect = [
-            region_blocked['watch_html'].encode('utf-8')
-        ]
-        mock_url_open.return_value = mock_url_open_object
-        with pytest.raises(exceptions.VideoRegionBlocked):
-            YouTube('https://youtube.com/watch?v=hZpzr8TbF08').streams

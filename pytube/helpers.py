@@ -288,7 +288,6 @@ def generate_all_html_json_mocks():
     test_vid_ids = [
         '2lAe1cqCOXo',
         '5YceQ8YqYMc',
-        'hZpzr8TbF08',
         'irauhITDrsE',
         'm8uHb5jIGN8',
         'QRS8MkLhQmM',
@@ -326,7 +325,7 @@ def create_mock_html_json(vid_id) -> Dict[str, Any]:
         'js': yt.js,
         'embed_html': yt.embed_html,
         'watch_html': yt.watch_html,
-        'vid_info_raw': yt.vid_info_raw
+        'vid_info': yt.vid_info
     }
 
     logger.info(f'Outputing json.gz file to {gzip_filepath}')

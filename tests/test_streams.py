@@ -28,19 +28,19 @@ def test_stream_to_buffer(mock_request, cipher_signature):
 
 
 def test_filesize(cipher_signature):
-    assert cipher_signature.streams[0].filesize == 28282013
+    assert cipher_signature.streams[0].filesize == 3399554
 
 
 def test_filesize_approx(cipher_signature):
     stream = cipher_signature.streams[0]
 
-    assert stream.filesize_approx == 28309811
+    assert stream.filesize_approx == 3403320
     stream.bitrate = None
-    assert stream.filesize_approx == 28282013
+    assert stream.filesize_approx == 3399554
 
 
 def test_default_filename(cipher_signature):
-    expected = "YouTube Rewind 2019 For the Record  YouTubeRewind.mp4"
+    expected = "YouTube Rewind 2019 For the Record  YouTubeRewind.3gpp"
     stream = cipher_signature.streams[0]
     assert stream.default_filename == expected
 
@@ -137,7 +137,7 @@ def test_download_with_prefix(cipher_signature):
         file_path = stream.download(filename_prefix="prefix")
         assert file_path == os.path.join(
             "/target",
-            "prefixYouTube Rewind 2019 For the Record  YouTubeRewind.mp4"
+            "prefixYouTube Rewind 2019 For the Record  YouTubeRewind.3gpp"
         )
 
 
@@ -175,7 +175,7 @@ def test_download_with_existing(cipher_signature):
         file_path = stream.download()
         assert file_path == os.path.join(
             "/target",
-            "YouTube Rewind 2019 For the Record  YouTubeRewind.mp4"
+            "YouTube Rewind 2019 For the Record  YouTubeRewind.3gpp"
         )
         assert not request.stream.called
 
@@ -196,7 +196,7 @@ def test_download_with_existing_no_skip(cipher_signature):
         file_path = stream.download(skip_existing=False)
         assert file_path == os.path.join(
             "/target",
-            "YouTube Rewind 2019 For the Record  YouTubeRewind.mp4"
+            "YouTube Rewind 2019 For the Record  YouTubeRewind.3gpp"
         )
         assert request.stream.called
 
@@ -250,32 +250,19 @@ def test_on_complete_hook(cipher_signature):
 
 
 def test_author(cipher_signature):
-    expected = "Test author"
-    cipher_signature._player_response = {"videoDetails": {"author": expected}}
-    assert cipher_signature.author == expected
-
-    expected = "unknown"
-    cipher_signature.author = None
-    cipher_signature._player_response = {'key': 'value'}
-    assert cipher_signature.author == expected
+    assert cipher_signature.author == 'YouTube'
 
 
 def test_thumbnail_when_in_details(cipher_signature):
-    expected = "some url"
+    expected = f"https://i.ytimg.com/vi/{cipher_signature.video_id}/sddefault.jpg"
     cipher_signature._player_response = {
         "videoDetails": {"thumbnail": {"thumbnails": [{"url": expected}]}}
     }
     assert cipher_signature.thumbnail_url == expected
 
 
-def test_thumbnail_when_not_in_details(cipher_signature):
-    expected = "https://img.youtube.com/vi/2lAe1cqCOXo/maxresdefault.jpg"
-    cipher_signature._player_response = {'key': 'value'}
-    assert cipher_signature.thumbnail_url == expected
-
-
 def test_repr_for_audio_streams(cipher_signature):
-    stream = str(cipher_signature.streams.filter(only_audio=True)[0])
+    stream = str(cipher_signature.streams.filter(only_audio=True)[1])
     expected = (
         '<Stream: itag="140" mime_type="audio/mp4" abr="128kbps" '
         'acodec="mp4a.40.2" progressive="False" type="audio">'
@@ -293,13 +280,16 @@ def test_repr_for_video_streams(cipher_signature):
 
 
 def test_repr_for_progressive_streams(cipher_signature):
-    stream = str(cipher_signature.streams.filter(progressive=True)[0])
+    stream_reprs = [
+        str(s)
+        for s in cipher_signature.streams.filter(progressive=True)
+    ]
     expected = (
         '<Stream: itag="18" mime_type="video/mp4" res="360p" fps="24fps" '
         'vcodec="avc1.42001E" acodec="mp4a.40.2" progressive="True" '
         'type="video">'
     )
-    assert stream == expected
+    assert expected in stream_reprs
 
 
 def test_repr_for_adaptive_streams(cipher_signature):

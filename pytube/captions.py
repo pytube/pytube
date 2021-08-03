@@ -19,7 +19,17 @@ class Caption:
             Caption track data extracted from ``watch_html``.
         """
         self.url = caption_track.get("baseUrl")
-        self.name = caption_track["name"]["simpleText"]
+
+        # Certain videos have runs instead of simpleText
+        #  this handles that edge case
+        name_dict = caption_track['name']
+        if 'simpleText' in name_dict:
+            self.name = name_dict['simpleText']
+        else:
+            for el in name_dict['runs']:
+                if 'text' in el:
+                    self.name = el['text']
+
         # Use "vssId" instead of "languageCode", fix issue #779
         self.code = caption_track["vssId"]
         # Remove preceding '.' for backwards compatibility, e.g.:
