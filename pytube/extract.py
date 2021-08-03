@@ -89,34 +89,6 @@ def is_age_restricted(watch_html: str) -> bool:
     return True
 
 
-def is_region_blocked(watch_html: str) -> bool:
-    """Determine if a video is not available in the user's region.
-
-    :param str watch_html:
-        The html contents of the watch page.
-    :rtype: bool
-    :returns:
-        True if the video is blocked in the users region.
-        False if not, or if unknown.
-    """
-    player_response = initial_player_response(watch_html)
-    country_code_patterns = [
-        r"gl\s*=\s*['\"](\w{2})['\"]",  # gl="US"
-        r"['\"]gl['\"]\s*:\s*['\"](\w{2})['\"]"  # "gl":"US"
-    ]
-    for pattern in country_code_patterns:
-        try:
-            yt_detected_country = regex_search(pattern, watch_html, 1)
-            available_countries = player_response[
-                'microformat']['playerMicroformatRenderer']['availableCountries']
-        except (KeyError, RegexMatchError):
-            pass
-        else:
-            if yt_detected_country not in available_countries:
-                return True
-    return False
-
-
 def playability_status(watch_html: str) -> (str, str):
     """Return the playability status and status explanation of a video.
 

@@ -120,7 +120,7 @@ def test_create_mock_html_json(mock_url_open, mock_open):
          b'"jsUrl":"/s/player/13371337/player_ias.vflset/en_US/base.js"'),
         b'embed_html',
         b'watch_html',
-        b'vid_info_raw',
+        b'{\"responseContext\":{}}',
     ]
     mock_url_open.return_value = mock_url_open_object
 

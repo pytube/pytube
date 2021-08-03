@@ -223,9 +223,6 @@ class YouTube:
                 elif reason == 'This live stream recording is not available.':
                     raise exceptions.RecordingUnavailable(video_id=self.video_id)
                 else:
-                    if reason == 'Video unavailable':
-                        if extract.is_region_blocked(self.watch_html):
-                            raise exceptions.VideoRegionBlocked(video_id=self.video_id)
                     raise exceptions.VideoUnavailable(video_id=self.video_id)
             elif status == 'LOGIN_REQUIRED':
                 if reason == (

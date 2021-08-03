@@ -27,7 +27,7 @@ def load_and_init_from_playback_file(filename, mock_urlopen):
     mock_url_open_object = mock.Mock()
     mock_url_open_object.read.side_effect = [
         pb['watch_html'].encode('utf-8'),
-        pb['vid_info_raw'].encode('utf-8'),
+        pb['vid_info'].encode('utf-8'),
         pb['js'].encode('utf-8')
     ]
     mock_urlopen.return_value = mock_url_open_object
@@ -78,13 +78,6 @@ def private():
 def missing_recording():
     """Youtube instance initialized with video id 5YceQ8YqYMc."""
     filename = "yt-video-5YceQ8YqYMc-html.json.gz"
-    return load_playback_file(filename)
-
-
-@pytest.fixture
-def region_blocked():
-    """Youtube instance initialized with video id hZpzr8TbF08."""
-    filename = "yt-video-hZpzr8TbF08-html.json.gz"
     return load_playback_file(filename)
 
 
