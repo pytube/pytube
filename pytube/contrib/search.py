@@ -129,7 +129,7 @@ class Search:
                     continue
 
                 # Skip playlist results
-                if 'playlistRenderer' in video_details:
+                if 'compactPlaylistRenderer' in video_details:
                     continue
 
                 # Skip channel results
