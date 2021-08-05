@@ -91,19 +91,19 @@ class Search:
 
         # Initial result is handled by try block, continuations by except block
         try:
-            sections = raw_results['contents']['sectionListRenderer']['contents']
-            continuation_renderer = raw_results['contents']['sectionListRenderer']['continuations']
+            sections = raw_results['contents']['sectionListRenderer']
         except KeyError:
-            sections = raw_results['continuationContents']['sectionListContinuation']['contents']
-            try:
-                continuation_renderer = raw_results['continuationContents']['sectionListContinuation']['continuations']
-            except KeyError:
-                continuation_renderer = None
+            sections = raw_results['continuationContents']['sectionListContinuation']
 
-        item_renderer = None
+        item_renderer = []
+        continuation_renderer = None
         for s in sections:
-            if not item_renderer and 'itemSectionRenderer' in s:
-                item_renderer = s['itemSectionRenderer']
+            if s == 'contents':
+                for i in sections[s]:
+                    if 'itemSectionRenderer' in i:
+                        item_renderer.extend(i['itemSectionRenderer']['contents'])
+            if s == 'continuations':
+                continuation_renderer = sections[s]
 
         # If the continuationItemRenderer doesn't exist, assume no further results
         if continuation_renderer:
@@ -114,8 +114,7 @@ class Search:
         # If the itemSectionRenderer doesn't exist, assume no results.
         if item_renderer:
             videos = []
-            raw_video_list = item_renderer['contents']
-            for video_details in raw_video_list:
+            for video_details in item_renderer:
                 # Skip over ads
                 if video_details.get('searchPyvRenderer', {}).get('ads', None):
                     continue
@@ -181,7 +180,7 @@ class Search:
                     else:
                         vid_view_count_text = vid_renderer['viewCountText']['simpleText']
                     # Strip ' views' text, then remove commas
-                    stripped_text = vid_view_count_text.split()[0].replace(',','')
+                    stripped_text = vid_view_count_text.split()[0].replace(',', '')
                     if stripped_text == 'No':
                         vid_view_count = 0
                     else:
