@@ -92,21 +92,22 @@ class Search:
         # Initial result is handled by try block, continuations by except block
         try:
             sections = raw_results['contents']['sectionListRenderer']['contents']
+            continuation_renderer = raw_results['contents']['sectionListRenderer']['continuations']
         except KeyError:
-            sections = raw_results['onResponseReceivedCommands'][0][
-                'appendContinuationItemsAction']['continuationItems']
+            sections = raw_results['continuationContents']['sectionListContinuation']['contents']
+            try:
+                continuation_renderer = raw_results['continuationContents']['sectionListContinuation']['continuations']
+            except KeyError:
+                continuation_renderer = None
+
         item_renderer = None
-        continuation_renderer = None
         for s in sections:
             if not item_renderer and 'itemSectionRenderer' in s:
                 item_renderer = s['itemSectionRenderer']
-            if not continuation_renderer and 'continuationItemRenderer' in s:
-                continuation_renderer = s['continuationItemRenderer']
 
         # If the continuationItemRenderer doesn't exist, assume no further results
         if continuation_renderer:
-            next_continuation = continuation_renderer['continuationEndpoint'][
-                'continuationCommand']['token']
+            next_continuation = continuation_renderer[0]['nextContinuationData']['continuation']
         else:
             next_continuation = None
 
@@ -133,7 +134,7 @@ class Search:
                     continue
 
                 # Skip channel results
-                if 'channelRenderer' in video_details:
+                if 'compactChannelRenderer' in video_details:
                     continue
 
                 # Skip 'people also searched for' results
