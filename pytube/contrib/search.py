@@ -98,9 +98,9 @@ class Search:
         item_renderer = None
         continuation_renderer = None
         for s in sections:
-            if 'itemSectionRenderer' in s:
+            if not item_renderer and 'itemSectionRenderer' in s:
                 item_renderer = s['itemSectionRenderer']
-            if 'continuationItemRenderer' in s:
+            if not continuation_renderer and 'continuationItemRenderer' in s:
                 continuation_renderer = s['continuationItemRenderer']
 
         # If the continuationItemRenderer doesn't exist, assume no further results
@@ -146,6 +146,9 @@ class Search:
 
                 # Seems to be the renderer used for the image shown on a no results page
                 if 'backgroundPromoRenderer' in video_details:
+                    continue
+
+                if 'elementRenderer' in video_details:
                     continue
 
                 if 'compactVideoRenderer' not in video_details:
