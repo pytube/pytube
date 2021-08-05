@@ -91,8 +91,7 @@ class Search:
 
         # Initial result is handled by try block, continuations by except block
         try:
-            sections = raw_results['contents']['twoColumnSearchResultsRenderer'][
-                'primaryContents']['sectionListRenderer']['contents']
+            sections = raw_results['contents']['sectionListRenderer']['contents']
         except KeyError:
             sections = raw_results['onResponseReceivedCommands'][0][
                 'appendContinuationItemsAction']['continuationItems']
@@ -126,7 +125,7 @@ class Search:
                     continue
 
                 # Skip auto-generated "mix" playlist results
-                if 'radioRenderer' in video_details:
+                if 'compactRadioRenderer' in video_details:
                     continue
 
                 # Skip playlist results
@@ -149,7 +148,7 @@ class Search:
                 if 'backgroundPromoRenderer' in video_details:
                     continue
 
-                if 'videoRenderer' not in video_details:
+                if 'compactVideoRenderer' not in video_details:
                     logger.warn('Unexpected renderer encountered.')
                     logger.warn(f'Renderer name: {video_details.keys()}')
                     logger.warn(f'Search term: {self.query}')
@@ -163,13 +162,13 @@ class Search:
                 # Extract relevant video information from the details.
                 # Some of this can be used to pre-populate attributes of the
                 #  YouTube object.
-                vid_renderer = video_details['videoRenderer']
+                vid_renderer = video_details['compactVideoRenderer']
                 vid_id = vid_renderer['videoId']
                 vid_url = f'https://www.youtube.com/watch?v={vid_id}'
                 vid_title = vid_renderer['title']['runs'][0]['text']
-                vid_channel_name = vid_renderer['ownerText']['runs'][0]['text']
-                vid_channel_uri = vid_renderer['ownerText']['runs'][0][
-                    'navigationEndpoint']['commandMetadata']['webCommandMetadata']['url']
+                vid_channel_name = vid_renderer['longBylineText']['runs'][0]['text']
+                vid_channel_uri = 'https://www.youtube.com/channel/' + vid_renderer['longBylineText']['runs'][0][
+                    'navigationEndpoint']['browseEndpoint']['browseId']
                 # Livestreams have "runs", non-livestreams have "simpleText",
                 #  and scheduled releases do not have 'viewCountText'
                 if 'viewCountText' in vid_renderer:
@@ -186,7 +185,7 @@ class Search:
                 else:
                     vid_view_count = 0
                 if 'lengthText' in vid_renderer:
-                    vid_length = vid_renderer['lengthText']['simpleText']
+                    vid_length = vid_renderer['lengthText']['runs'][0]['text']
                 else:
                     vid_length = None
 
