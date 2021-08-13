@@ -18,7 +18,7 @@ class Search:
             Search query provided by the user.
         """
         self.query = query
-        self._innertube_client = InnerTube()
+        self._innertube_client = InnerTube(client='WEB')
 
         # The first search, without a continuation, is structured differently
         #  and contains completion suggestions, so we must store this separately
