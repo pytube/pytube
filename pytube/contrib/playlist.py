@@ -337,7 +337,7 @@ class Playlist(Sequence):
             return datetime.strptime(
                 f"{month} {day:0>2} {year}", "%b %d %Y"
             ).date()
-        except IndexError, KeyError:
+        except (IndexError, KeyError):
             return last_updated_text
 
     @property
