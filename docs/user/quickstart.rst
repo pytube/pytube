@@ -41,7 +41,9 @@ when you create a YouTube object::
             'http://youtube.com/watch?v=2lAe1cqCOXo',
             on_progress_callback=progress_func,
             on_complete_callback=complete_func,
-            proxies=my_proxies
+            proxies=my_proxies,
+            use_oauth=False,
+            allow_oauth_cache=True
         )
 
 When instantiating a YouTube object, these named arguments can be passed in to
@@ -56,6 +58,13 @@ The on_complete_callback function will run after a video has been fully
 downloaded, and is called with two arguments: the stream and the file path.
 This could be used, for example, to perform post-download processing on a video
 like trimming the length of it.
+
+The use_oauth and allow_oauth_cache flags allow you to authorize pytube to
+interact with YouTube using your account, and can be used to bypass age
+restrictions or access private videos and playlists. If allow_oauth_cache is
+set to True, you should only be prompted to do so once, after which point
+pytube will cache the tokens it needs to act on your behalf. Otherwise, you
+will be prompted again for each action that requires you to be authenticated.
 
 Once you have a YouTube object set up, you're ready to start looking at
 different media streams for the video, which is discussed in the next section.
