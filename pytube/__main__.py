@@ -154,8 +154,13 @@ class YouTube:
             return self.vid_info['streamingData']
         else:
             self.bypass_age_gate()
-            return self.vid_info['streamingData']
-
+            try:
+                return self.vid_info['streamingData']
+            except KeyError:
+                # check_availability() should raise the correct exception
+                self.check_availability()
+                # if it doesn't, we'll raise a generic one.
+                raise exceptions.VideoUnavailable(self.video_id)
     @property
     def fmt_streams(self):
         """Returns a list of streams if they have been initialized.
@@ -163,7 +168,6 @@ class YouTube:
         If the streams have not been initialized, finds all relevant
         streams and initializes them.
         """
-        self.check_availability()
         if self._fmt_streams:
             return self._fmt_streams
 
@@ -288,7 +292,6 @@ class YouTube:
 
         :rtype: :class:`StreamQuery <StreamQuery>`.
         """
-        self.check_availability()
         return StreamQuery(self.fmt_streams)
 
     @property
