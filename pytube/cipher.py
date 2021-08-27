@@ -265,7 +265,7 @@ def get_throttling_function_name(js: str) -> str:
         # https://github.com/ytdl-org/youtube-dl/issues/29326#issuecomment-865985377
         # a.C&&(b=a.get("n"))&&(b=Dea(b),a.set("n",b))}};
         # In above case, `Dea` is the relevant function name
-        r'a\.[A-Z]&&\(b=a\.[sg]et\([^\)]+\)\)&&\(b=([^(]+)\(b\)',
+        r'a\.[A-Z]&&\(b=a\.[sg]et\("n"\)\)&&\(b=([^(]+)\(b\)',
     ]
     logger.debug('Finding throttling function name')
     for pattern in function_patterns:
