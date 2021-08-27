@@ -319,18 +319,26 @@ class Playlist(Sequence):
     def last_updated(self) -> Optional[date]:
         """Extract the date that the playlist was last updated.
 
-        :return: Date of last playlist update
+        For some playlists, this will be a specific date, which is returned as a datetime
+        object. For other playlists, this is an estimate such as "1 week ago". Due to the
+        fact that this value is returned as a string, pytube does a best-effort parsing
+        where possible, and returns the raw string where it is not possible.
+
+        :return: Date of last playlist update where possible, else the string provided
         :rtype: datetime.date
         """
         last_updated_text = self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
             'stats'][2]['runs'][1]['text']
-        date_components = last_updated_text.split()
-        month = date_components[0]
-        day = date_components[1].strip(',')
-        year = date_components[2]
-        return datetime.strptime(
-            f"{month} {day:0>2} {year}", "%b %d %Y"
-        ).date()
+        try:
+            date_components = last_updated_text.split()
+            month = date_components[0]
+            day = date_components[1].strip(',')
+            year = date_components[2]
+            return datetime.strptime(
+                f"{month} {day:0>2} {year}", "%b %d %Y"
+            ).date()
+        except (IndexError, KeyError):
+            return last_updated_text
 
     @property
     @cache
