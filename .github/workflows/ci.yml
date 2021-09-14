@@ -25,7 +25,10 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Upgrade pip
-        run: pip install --upgrade pipenv
+        run: pip install --upgrade pip pipenv
+
+      - name: Install pipenv
+        run: pipenv install --dev --skip-lock --python ${{ matrix.python }}
 
       - name: Run make ci
         run: make ci
