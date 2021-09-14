@@ -261,33 +261,54 @@ class StreamQuery(Sequence):
             progressive=True, subtype="mp4", resolution=resolution
         ).first()
 
-    def get_lowest_resolution(self) -> Optional[Stream]:
-        """Get lowest resolution stream that is a progressive mp4.
+    def get_lowest_resolution(self, video_subtype: str = "mp4") -> Optional[Stream]:
+        """Get lowest resolution stream that is a progressive video.
 
+        :param str video_subtype:
+            Video subtype i.e. "mp4", "3gp", "webm". (Defaults to mp4)
         :rtype: :class:`Stream <Stream>` or None
         :returns:
             The :class:`Stream <Stream>` matching the given itag or None if
             not found.
 
         """
-        return (
-            self.filter(progressive=True, subtype="mp4")
-            .order_by("resolution")
-            .first()
-        )
+        if (video_subtype == ""):
+            return self.filter(progressive=True).order_by("resolution").first()
+        
+        return self.filter(progressive=True, subtype=video_subtype).order_by("resolution").first()
+        
 
-    def get_highest_resolution(self) -> Optional[Stream]:
+    def get_highest_resolution(self, video_subtype: str = "mp4") -> Optional[Stream]:
         """Get highest resolution stream that is a progressive video.
 
+        :param str video_subtype:
+            Video subtype i.e. "mp4", "3gp", "webm". (Defaults to mp4)
         :rtype: :class:`Stream <Stream>` or None
         :returns:
             The :class:`Stream <Stream>` matching the given itag or None if
             not found.
 
         """
-        return self.filter(progressive=True).order_by("resolution").last()
+        if (video_subtype == ""):
+            return self.filter(progressive=True).order_by("resolution").last()
 
-    def get_audio_only(self, subtype: str = "mp4") -> Optional[Stream]:
+        return self.filter(progressive=True, subtype=video_subtype).order_by("resolution").last()
+
+    def get_average_resolution(self,  video_subtype: str = "mp4") -> Optional[Stream]:
+        """Get average resolution stream that is a progressive video.
+
+        :param str video_subtype:
+            Video subtype i.e. "mp4", "3gp", "webm". (Defaults to mp4)
+        :rtype: :class:`Stream <Stream>` or None
+        :returns:
+            The :class:`Stream <Stream>` matching the given itag or None if
+            not found.
+        """
+        progressive_streams = self.filter(progressive=True) if (video_subtype == "") else self.filter(progressive=True, subtype=video_subtype)
+        
+        return progressive_streams.order_by("resolution").middle()
+
+    def get_audio_only(self, subtype: str = video_subtype) -> Optional[Stream]:
         """Get highest bitrate audio stream for given codec (defaults to mp4)
 
         :param str subtype:
@@ -325,6 +346,20 @@ class StreamQuery(Sequence):
             return self.fmt_streams[0]
         except IndexError:
             return None
+
+    def middle(self):
+        """Get the middle :class:`Stream <Stream>` in the results.
+
+        :rtype: :class:`Stream <Stream>` or None
+        :returns:
+            Return the result in the middle of this query or None if the result
+            doesn't contain any streams.
+
+        """
+        try:
+            return self.fmt_streams[round((len(self.fmt_streams) - 1) / 2)]
+        except IndexError:
+            pass
 
     def last(self):
         """Get the last :class:`Stream <Stream>` in the results.
