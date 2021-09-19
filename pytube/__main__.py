@@ -161,6 +161,7 @@ class YouTube:
                 self.check_availability()
                 # if it doesn't, we'll raise a generic one.
                 raise exceptions.VideoUnavailable(self.video_id)
+
     @property
     def fmt_streams(self):
         """Returns a list of streams if they have been initialized.
