@@ -149,11 +149,16 @@ class Search:
                 if 'backgroundPromoRenderer' in video_details:
                     continue
 
+                # no more results
+                if 'messageRenderer' in video_details:
+                    next_continuation = None
+                    break
+
                 if 'videoRenderer' not in video_details:
-                    logger.warn('Unexpected renderer encountered.')
-                    logger.warn(f'Renderer name: {video_details.keys()}')
-                    logger.warn(f'Search term: {self.query}')
-                    logger.warn(
+                    logger.warning('Unexpected renderer encountered.')
+                    logger.warning(f'Renderer name: {video_details.keys()}')
+                    logger.warning(f'Search term: {self.query}')
+                    logger.warning(
                         'Please open an issue at '
                         'https://github.com/pytube/pytube/issues '
                         'and provide this log output.'
@@ -223,3 +228,17 @@ class Search:
         if not self._initial_results:
             self._initial_results = query_results
         return query_results  # noqa:R504
+
+    def iterate_results(self):
+        """ yield video search results.
+        :rtype: generator
+        :returns:
+            A generator of YouTube objects.
+        """
+        videos, continuation = self.fetch_and_parse()
+        for v in videos:
+            yield v
+        while continuation is not None:
+            videos, continuation = self.fetch_and_parse(continuation)
+            for v in videos:
+                yield v
