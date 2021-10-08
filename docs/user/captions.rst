@@ -12,7 +12,7 @@ streams. Let's begin by switching to a video that contains them::
 
 Now let's checkout the english captions::
 
-    >>> caption = yt.captions.get_by_language_code('en')
+    >>> caption = yt.captions['en']
 
 Great, now let's see how YouTube formats them::
 
@@ -30,3 +30,11 @@ Oh, this isn't very easy to work with, let's convert them to the srt format::
     00:00:13,400 --> 00:00:16,200
     That is so awkward to watch.
     ...
+
+Now to save the caption as a file, we can use download method::
+
+    >>> caption.download('filename')
+
+By default the download method will save caption in SubRip Subtitle (srt) format.
+The download method has a number of different useful arguments, which are 
+documented in the API reference here :meth:`pytube.Caption.download`.
