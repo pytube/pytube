@@ -141,10 +141,10 @@ class StreamQuery(Sequence):
             filters.append(lambda s: s.abr == (abr or bitrate))
 
         if video_codec:
-            filters.append(lambda s: s.video_codec == video_codec)
+            filters.append(lambda s: s.video_codec.startswith(video_codec))
 
         if audio_codec:
-            filters.append(lambda s: s.audio_codec == audio_codec)
+            filters.append(lambda s: s.audio_codec.startswith(audio_codec))
 
         if only_audio:
             filters.append(
