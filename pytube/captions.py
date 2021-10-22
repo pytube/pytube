@@ -22,20 +22,20 @@ class Caption:
 
         # Certain videos have runs instead of simpleText
         #  this handles that edge case
-        name_dict = caption_track['name']
-        if 'simpleText' in name_dict:
-            self.name = name_dict['simpleText']
+        name_dict = caption_track["name"]
+        if "simpleText" in name_dict:
+            self.name = name_dict["simpleText"]
         else:
-            for el in name_dict['runs']:
-                if 'text' in el:
-                    self.name = el['text']
+            for el in name_dict["runs"]:
+                if "text" in el:
+                    self.name = el["text"]
 
         # Use "vssId" instead of "languageCode", fix issue #779
         self.code = caption_track["vssId"]
         # Remove preceding '.' for backwards compatibility, e.g.:
         # English -> vssId: .en, languageCode: en
         # English (auto-generated) -> vssId: a.en, languageCode: en
-        self.code = self.code.strip('.')
+        self.code = self.code.strip(".")
 
     @property
     def xml_captions(self) -> str:
@@ -72,15 +72,17 @@ class Caption:
             XML formatted caption tracks.
         """
         segments = []
-        root = ElementTree.fromstring(xml_captions)
+        root = ElementTree.fromstring(xml_captions)[0]
         for i, child in enumerate(list(root)):
             text = child.text or ""
-            caption = unescape(text.replace("\n", " ").replace("  ", " "),)
+            caption = unescape(
+                text.replace("\n", " ").replace("  ", " "),
+            )
             try:
-                duration = float(child.attrib["dur"])
+                duration = float(child.attrib["d"]) / 1000.0
             except KeyError:
                 duration = 0.0
-            start = float(child.attrib["start"])
+            start = float(child.attrib["t"]) / 1000.0
             end = start + duration
             sequence_number = i + 1  # convert from 0-indexed to 1.
             line = "{seq}\n{start} --> {end}\n{text}\n".format(
