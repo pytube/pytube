@@ -377,10 +377,10 @@ def _ffmpeg_downloader(
     _download(stream=audio_stream, target=target, filename=audio_unique_name)
 
     video_path = os.path.join(
-        target, f"{video_unique_name}.{video_stream.subtype}"
+        target, video_unique_name
     )
     audio_path = os.path.join(
-        target, f"{audio_unique_name}.{audio_stream.subtype}"
+        target, audio_unique_name
     )
     final_path = os.path.join(
         target, f"{safe_filename(video_stream.title)}.{video_stream.subtype}"
