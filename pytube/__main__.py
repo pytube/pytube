@@ -93,8 +93,7 @@ class YouTube:
 
     def __eq__(self, o: object) -> bool:
         # Compare types and urls, if they're same return true, else return false.
-        if type(o) == type(self) and o.watch_url == self.watch_url: return True
-        else: return False
+        return type(o) == type(self) and o.watch_url == self.watch_url
 
     @property
     def watch_html(self):
