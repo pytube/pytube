@@ -155,6 +155,8 @@ def throttling_array_split(js_array):
         if curr_substring.startswith('function'):
             # Handle functions separately. These can contain commas
             match = func_regex.search(curr_substring)
+            if match is None:
+                break
             match_start, match_end = match.span()
 
             function_text = find_object_from_startpoint(curr_substring, match.span()[1])
