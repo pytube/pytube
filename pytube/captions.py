@@ -72,15 +72,15 @@ class Caption:
             XML formatted caption tracks.
         """
         segments = []
-        root = ElementTree.fromstring(xml_captions)
+        root = ElementTree.fromstring(xml_captions).findall(".//p")
         for i, child in enumerate(list(root)):
             text = child.text or ""
             caption = unescape(text.replace("\n", " ").replace("  ", " "),)
             try:
-                duration = float(child.attrib["dur"])
+                duration = float(child.attrib["d"])
             except KeyError:
                 duration = 0.0
-            start = float(child.attrib["start"])
+            start = float(child.attrib["t"])
             end = start + duration
             sequence_number = i + 1  # convert from 0-indexed to 1.
             line = "{seq}\n{start} --> {end}\n{text}\n".format(
