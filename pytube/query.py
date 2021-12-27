@@ -123,28 +123,52 @@ class StreamQuery(Sequence):
         """
         filters = []
         if res or resolution:
-            filters.append(lambda s: s.resolution == (res or resolution) if hasattr(s, "resolution") else False)
+            filters.append(
+                lambda s: s.resolution == (res or resolution)
+                if hasattr(s, "resolution") else False
+            )
 
         if fps:
-            filters.append(lambda s: s.fps == fps if hasattr(s, "fps") else False)
+            filters.append(
+                lambda s: s.fps == fps
+                if hasattr(s, "fps") else False
+            )
 
         if mime_type:
-            filters.append(lambda s: s.mime_type == mime_type if hasattr(s, "mime_type") else False)
+            filters.append(
+                lambda s: s.mime_type == mime_type
+                if hasattr(s, "mime_type") else False
+            )
 
         if type:
-            filters.append(lambda s: s.type == type if hasattr(s, "type") else False)
+            filters.append(
+                lambda s: s.type == type
+                if hasattr(s, "type") else False
+            )
 
         if subtype or file_extension:
-            filters.append(lambda s: s.subtype == (subtype or file_extension) if hasattr(s, "subtype") else False)
+            filters.append(
+                lambda s: s.subtype == (subtype or file_extension)
+                if hasattr(s, "subtype") else False
+            )
 
         if abr or bitrate:
-            filters.append(lambda s: s.abr == (abr or bitrate) if hasattr(s, "abr") else False)
+            filters.append(
+                lambda s: s.abr == (abr or bitrate)
+                if hasattr(s, "abr") else False
+            )
 
         if video_codec:
-            filters.append(lambda s: s.video_codec == video_codec if hasattr(s, "video_codec") else False)
+            filters.append(
+                lambda s: s.video_codec == video_codec
+                if hasattr(s, "video_codec") else False
+            )
 
         if audio_codec:
-            filters.append(lambda s: s.audio_codec == audio_codec if hasattr(s, "audio_codec") else False)
+            filters.append(
+                lambda s: s.audio_codec == audio_codec
+                if hasattr(s, "audio_codec") else False
+            )
 
         if only_audio:
             filters.append(
