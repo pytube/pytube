@@ -132,6 +132,7 @@ def seq_stream(
 
 def stream(
     url,
+    chunk_size = default_range_size,
     timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
     max_retries=0
 ):
@@ -139,10 +140,10 @@ def stream(
     :param str url: The URL to perform the GET request for.
     :rtype: Iterable[bytes]
     """
-    file_size: int = default_range_size  # fake filesize to start
+    file_size: int = chunk_size  # fake filesize to start
     downloaded = 0
     while downloaded < file_size:
-        stop_pos = min(downloaded + default_range_size, file_size) - 1
+        stop_pos = min(downloaded + chunk_size, file_size) - 1
         range_header = f"bytes={downloaded}-{stop_pos}"
         tries = 0
 
@@ -175,7 +176,7 @@ def stream(
                 break
             tries += 1
 
-        if file_size == default_range_size:
+        if file_size == chunk_size:
             try:
                 content_range = response.info()["Content-Range"]
                 file_size = int(content_range.split("/")[1])

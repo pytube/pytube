@@ -198,6 +198,7 @@ class Stream:
         output_path: Optional[str] = None,
         filename: Optional[str] = None,
         filename_prefix: Optional[str] = None,
+        chunk_size: Optional[int] = None,
         skip_existing: bool = True,
         timeout: Optional[int] = None,
         max_retries: Optional[int] = 0
@@ -222,6 +223,9 @@ class Stream:
         :param skip_existing:
             (optional) Skip existing files, defaults to True
         :type skip_existing: bool
+        :param chunk_size:
+            (optional) download chunk size
+        :type chunk_size: int
         :param timeout:
             (optional) Request timeout length in seconds. Uses system default.
         :type timeout: int
@@ -249,10 +253,12 @@ class Stream:
 
         with open(file_path, "wb") as fh:
             try:
+                kwargs = dict(chunk_size=chunk_size) if chunk_size else {}
                 for chunk in request.stream(
                     self.url,
                     timeout=timeout,
-                    max_retries=max_retries
+                    max_retries=max_retries,
+                    **kwargs
                 ):
                     # reduce the (bytes) remainder by the length of the chunk.
                     bytes_remaining -= len(chunk)
@@ -292,7 +298,7 @@ class Stream:
             and os.path.getsize(file_path) == self.filesize
         )
 
-    def stream_to_buffer(self, buffer: BinaryIO) -> None:
+    def stream_to_buffer(self, buffer: BinaryIO, chunk_size: Optional[int] = None) -> None:
         """Write the media stream to buffer
 
         :rtype: io.BytesIO buffer
@@ -301,8 +307,8 @@ class Stream:
         logger.info(
             "downloading (%s total bytes) file to buffer", self.filesize,
         )
-
-        for chunk in request.stream(self.url):
+        kwargs = dict(chunk_size=chunk_size) if chunk_size else {}
+        for chunk in request.stream(self.url, **kwargs):
             # reduce the (bytes) remainder by the length of the chunk.
             bytes_remaining -= len(chunk)
             # send to the on_progress callback.
