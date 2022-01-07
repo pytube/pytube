@@ -87,6 +87,7 @@ def post(url, extra_headers=None, data=None, timeout=socket._GLOBAL_DEFAULT_TIME
 
 def seq_stream(
     url,
+    chunk_size=default_range_size,
     timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
     max_retries=0
 ):
@@ -106,7 +107,7 @@ def seq_stream(
     url = base_url + parse.urlencode(querys)
 
     segment_data = b''
-    for chunk in stream(url, timeout=timeout, max_retries=max_retries):
+    for chunk in stream(url, chunk_size=chunk_size, timeout=timeout, max_retries=max_retries):
         yield chunk
         segment_data += chunk
 

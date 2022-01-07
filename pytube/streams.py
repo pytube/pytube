@@ -251,9 +251,9 @@ class Stream:
         bytes_remaining = self.filesize
         logger.debug(f'downloading ({self.filesize} total bytes) file to {file_path}')
 
+        kwargs = dict(chunk_size=chunk_size) if chunk_size else {}
         with open(file_path, "wb") as fh:
             try:
-                kwargs = dict(chunk_size=chunk_size) if chunk_size else {}
                 for chunk in request.stream(
                     self.url,
                     timeout=timeout,
@@ -271,7 +271,8 @@ class Stream:
                 for chunk in request.seq_stream(
                     self.url,
                     timeout=timeout,
-                    max_retries=max_retries
+                    max_retries=max_retries,
+                    **kwargs
                 ):
                     # reduce the (bytes) remainder by the length of the chunk.
                     bytes_remaining -= len(chunk)
