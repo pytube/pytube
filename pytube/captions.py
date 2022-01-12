@@ -60,7 +60,7 @@ class Caption:
 
         float_to_srt_time_format(3.89) -> '00:00:03,890'
         """
-        fraction, whole = math.modf(d)
+        fraction, whole = math.modf(d/1000)
         time_fmt = time.strftime("%H:%M:%S,", time.gmtime(whole))
         ms = f"{fraction:.3f}".replace("0.", "")
         return time_fmt + ms
@@ -73,8 +73,10 @@ class Caption:
         """
         segments = []
         root = ElementTree.fromstring(xml_captions).findall(".//p")
-        for i, child in enumerate(list(root)):
-            text = child.text or ""
+        for i, child in enumerate(list(root.findall('body/p'))):
+            text = ''.join(child.itertext()).strip()
+            if not text:
+                continue
             caption = unescape(text.replace("\n", " ").replace("  ", " "),)
             try:
                 duration = float(child.attrib["d"])
