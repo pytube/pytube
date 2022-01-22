@@ -606,9 +606,8 @@ def throttling_prepend(d: list, e: int):
 def throttling_swap(d: list, e: int):
     """Swap positions of the 0'th and e'th elements in-place."""
     e = throttling_mod_func(d, e)
-    f = d[0]
-    d[0] = d[e]
-    d[e] = f
+    
+    d[0] , d[e]  = d[e], d[0]
 
 
 def js_splice(arr: list, start: int, delete_count=None, *items):
