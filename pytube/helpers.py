@@ -8,6 +8,7 @@ import re
 import warnings
 from typing import Any, Callable, Dict, List, Optional, TypeVar
 from urllib import request
+from collections import OrderedDict
 
 from pytube.exceptions import RegexMatchError
 
@@ -270,15 +271,8 @@ def uniqueify(duped_list: List) -> List:
     :return List result
         De-duplicated list
     """
-    seen: Dict[Any, bool] = {}
-    result = []
-    for item in duped_list:
-        if item in seen:
-            continue
-        seen[item] = True
-        result.append(item)
-    return result
-
+    return list(OrderedDict.fromkeys(duped_list))
+    
 
 def generate_all_html_json_mocks():
     """Regenerate the video mock json files for all current test videos.
