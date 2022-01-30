@@ -271,6 +271,7 @@ class Stream:
                     bytes_remaining -= len(chunk)
                     # send to the on_progress callback.
                     self.on_progress(chunk, fh, bytes_remaining)
+            fh.close()
         self.on_complete(file_path)
         return file_path
 
