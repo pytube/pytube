@@ -39,10 +39,9 @@ class Search:
         :returns:
             A list of autocomplete suggestions provided by YouTube for the query.
         """
-        if self._completion_suggestions:
-            return self._completion_suggestions
         if self.results:
             self._completion_suggestions = self._initial_results['refinements']
+            
         return self._completion_suggestions
 
     @property
