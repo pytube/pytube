@@ -47,10 +47,7 @@ def recording_available(watch_html):
     unavailable_strings = [
         'This live stream recording is not available.'
     ]
-    for string in unavailable_strings:
-        if string in watch_html:
-            return False
-    return True
+    return unavailable_strings.count(watch_html) != 0
 
 
 def is_private(watch_html):
@@ -67,10 +64,8 @@ def is_private(watch_html):
         "\"simpleText\":\"Private video\"",
         "This video is private."
     ]
-    for string in private_strings:
-        if string in watch_html:
-            return True
-    return False
+    
+    return private_strings.count(watch_html) != 0
 
 
 def is_age_restricted(watch_html: str) -> bool:
