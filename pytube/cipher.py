@@ -288,7 +288,9 @@ def get_throttling_function_name(js: str) -> str:
                     js
                 )
                 if array:
-                    return array.group(1).strip("[]").split(",")[int(idx)]
+                    array = array.group(1).strip("[]").split(",")
+                    array = [x.strip() for x in array]
+                    return array[int(idx)]
 
     raise RegexMatchError(
         caller="get_throttling_function_name", pattern="multiple"
