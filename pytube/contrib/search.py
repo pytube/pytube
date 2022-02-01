@@ -150,6 +150,7 @@ class Search:
                 # Seems to be the renderer used for the image shown on a no results page
                 if 'backgroundPromoRenderer' in video_details:
                     continue
+                
                 #issue 1214
                 if 'showingResultsForRenderer' in video_details:
                     continue
