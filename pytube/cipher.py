@@ -146,12 +146,15 @@ def get_initial_function_name(js: str) -> str:
 
     function_patterns = [
         r"\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
-        r"\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
-        r'(?:\b|[^a-zA-Z0-9$])(?P<sig>[a-zA-Z0-9$]{2})\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\)',  # noqa: E501
+        r"\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",
+        # noqa: E501
+        r'(?:\b|[^a-zA-Z0-9$])(?P<sig>[a-zA-Z0-9$]{2})\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\)',
+        # noqa: E501
         r'(?P<sig>[a-zA-Z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\)',  # noqa: E501
         r'(["\'])signature\1\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(',
         r"\.sig\|\|(?P<sig>[a-zA-Z0-9$]+)\(",
-        r"yt\.akamaized\.net/\)\s*\|\|\s*.*?\s*[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?:encodeURIComponent\s*\()?\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
+        r"yt\.akamaized\.net/\)\s*\|\|\s*.*?\s*[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?:encodeURIComponent\s*\()?\s*(?P<sig>[a-zA-Z0-9$]+)\(",
+        # noqa: E501
         r"\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
         r"\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
         r"\bc\s*&&\s*a\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(",  # noqa: E501
@@ -290,7 +293,8 @@ def get_throttling_function_code(js: str) -> str:
         The name of the function used to compute the throttling parameter.
     """
     # Begin by extracting the correct function name
-    name = re.escape(get_throttling_function_name(js))
+    # name = re.escape(get_throttling_function_name(js))
+    name = "iha"  # temporary fix
 
     # Identify where the function is defined
     pattern_start = r"%s=function\(\w\)" % name
@@ -342,15 +346,18 @@ def get_throttling_function_array(js: str) -> List[Any]:
 
         if el.startswith('function'):
             mapper = (
-                (r"{for\(\w=\(\w%\w\.length\+\w\.length\)%\w\.length;\w--;\)\w\.unshift\(\w.pop\(\)\)}", throttling_unshift),  # noqa:E501
+                (r"{for\(\w=\(\w%\w\.length\+\w\.length\)%\w\.length;\w--;\)\w\.unshift\(\w.pop\(\)\)}",
+                 throttling_unshift),  # noqa:E501
                 (r"{\w\.reverse\(\)}", throttling_reverse),
                 (r"{\w\.push\(\w\)}", throttling_push),
                 (r";var\s\w=\w\[0\];\w\[0\]=\w\[\w\];\w\[\w\]=\w}", throttling_swap),
                 (r"case\s\d+", throttling_cipher_function),
                 (r"\w\.splice\(0,1,\w\.splice\(\w,1,\w\[0\]\)\[0\]\)", throttling_nested_splice),  # noqa:E501
                 (r";\w\.splice\(\w,1\)}", js_splice),
-                (r"\w\.splice\(-\w\)\.reverse\(\)\.forEach\(function\(\w\){\w\.unshift\(\w\)}\)", throttling_prepend),  # noqa:E501
-                (r"for\(var \w=\w\.length;\w;\)\w\.push\(\w\.splice\(--\w,1\)\[0\]\)}", throttling_reverse),  # noqa:E501
+                (r"\w\.splice\(-\w\)\.reverse\(\)\.forEach\(function\(\w\){\w\.unshift\(\w\)}\)", throttling_prepend),
+                # noqa:E501
+                (r"for\(var \w=\w\.length;\w;\)\w\.push\(\w\.splice\(--\w,1\)\[0\]\)}", throttling_reverse),
+            # noqa:E501
             )
 
             found = False
@@ -399,9 +406,9 @@ def get_throttling_plan(js: str):
     transform_steps = []
     for match in matches:
         if match[4] != '':
-            transform_steps.append((match[0],match[1],match[4]))
+            transform_steps.append((match[0], match[1], match[4]))
         else:
-            transform_steps.append((match[0],match[1]))
+            transform_steps.append((match[0], match[1]))
 
     return transform_steps
 
@@ -458,7 +465,7 @@ def swap(arr: List, b: int):
     [3, 2, 1, 4]
     """
     r = b % len(arr)
-    return list(chain([arr[r]], arr[1:r], [arr[0]], arr[r + 1 :]))
+    return list(chain([arr[r]], arr[1:r], [arr[0]], arr[r + 1:]))
 
 
 def throttling_reverse(arr: list):
