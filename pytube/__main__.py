@@ -91,6 +91,10 @@ class YouTube:
     def __repr__(self):
         return f'<pytube.__main__.YouTube object: videoId={self.video_id}>'
 
+    def __eq__(self, o: object) -> bool:
+        # Compare types and urls, if they're same return true, else return false.
+        return type(o) == type(self) and o.watch_url == self.watch_url
+
     @property
     def watch_html(self):
         if self._watch_html:
