@@ -83,7 +83,8 @@ def test_get_throttling_function_name(base_js):
     # Values expected as of 2022/02/04:
     raw_var = r'var Apa=[hha]'
     assert raw_var in base_js
-    raw_code = r'a.url="";a.C&&(b=a.get("n"))&&(b=Apa[0](b),a.set("n",b),Apa.length||hha(""))}};'
+    raw_code = r'a.url="";a.C&&(b=a.get("n"))&&(b=Apa[0](b),a.set("n",b),'\
+               r'Apa.length||hha(""))}};'
     assert raw_code in base_js
     func_name = cipher.get_throttling_function_name(base_js)
     assert func_name == "hha"
