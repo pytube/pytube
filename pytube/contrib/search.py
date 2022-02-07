@@ -46,9 +46,9 @@ class Search:
                 if self._initial_results['refinements']:
                     self._completion_suggestions = self._initial_results['refinements']
                     return self._completion_suggestions
-            except KeyError: #Search query does not return any suggestions
+            except KeyError:  # Search query does not return any suggestions
                 return "No suggestions available"
-                
+
     @property
     def results(self):
         """Return search results.
@@ -60,7 +60,7 @@ class Search:
         :returns:
             A list of YouTube objects.
         """
-        
+
         if self._results:
             return self._results
 
@@ -153,23 +153,23 @@ class Search:
                 # Seems to be the renderer used for the image shown on a no results page
                 if 'backgroundPromoRenderer' in video_details:
                     continue
-                
-                #If search query is also a movie it will return a movie renderer object
+
+                # If search query is also a movie it will return a movie renderer object
                 if 'movieRenderer' in video_details:
                     continue
-                
-                #Seems to be the renderer used for suggestions to misspelt words
+
+                # Seems to be the renderer used for suggestions to misspelt words
                 if 'showingResultsForRenderer' in video_details:
                     continue
-                
-                #Seems to be the renderer used for including alternative text in the search
+
+                # Seems to be the renderer used for including alternative text in the search
                 if 'includingResultsForRenderer' in video_details:
                     continue
-                
-                #hashtag image rendered for # based searches
+
+                # hashtag image rendered for # based searches
                 if 'hashtagTileRenderer' in video_details:
                     continue
-                
+
                 if 'videoRenderer' not in video_details:
                     logger.warn('Unexpected renderer encountered.')
                     logger.warn(f'Renderer name: {video_details.keys()}')
@@ -180,7 +180,7 @@ class Search:
                         'and provide this log output.'
                     )
                     continue
-                
+
                 # Extract relevant video information from the details.
                 # Some of this can be used to pre-populate attributes of the
                 #  YouTube object.
