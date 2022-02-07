@@ -43,9 +43,8 @@ class Search:
             return self._completion_suggestions
         if self.results:
             try:
-                if self._initial_results['refinements']:
-                    self._completion_suggestions = self._initial_results['refinements']
-                    return self._completion_suggestions
+                self._completion_suggestions = self._initial_results['refinements']
+                return self._completion_suggestions
             except KeyError:  # Search query does not return any suggestions
                 return "No suggestions available"
 
