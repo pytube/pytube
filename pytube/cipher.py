@@ -273,7 +273,16 @@ def get_throttling_function_name(js: str) -> str:
         function_match = regex.search(js)
         if function_match:
             logger.debug("finished regex search, matched: %s", pattern)
-            return function_match.group(1)
+            function_name = function_match.group(1)
+            is_Array = True if '[' or ']' in function_name else False
+            if is_Array:
+                index = int(re.findall(r'\d+', function_name)[0])
+                name = function_name.split('[')[0]
+                pattern = r"var %s=\[(.*?)\];" % name
+                regex = re.compile(pattern)
+                return regex.search(js).group(1).split(',')[index]
+            else:
+                return function_name
 
     raise RegexMatchError(
         caller="get_throttling_function_name", pattern="multiple"
