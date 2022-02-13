@@ -146,3 +146,17 @@ def channel_videos_html():
     )
     with gzip.open(file_path, 'rb') as f:
         return f.read().decode('utf-8')
+
+
+@pytest.fixture
+def base_js():
+    """Youtube base.js retrieved on 2022-02-04 from
+    https://www.youtube.com/watch?v=vmzxpUsN0uA
+    """
+    file_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "mocks",
+        "base.js.gz",
+    )
+    with gzip.open(file_path, 'rb') as f:
+        return f.read().decode('utf-8')
