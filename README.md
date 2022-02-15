@@ -9,42 +9,33 @@
   </p>
 </div>
 
-### Actively soliciting contributers!
+### Actively soliciting contributors!
 
-Have ideas for how pytube can be improved? Feel free to open an issue or a pull
-request!
+Have ideas for how pytube can be improved? Feel free to open an issue or a pull request!
 
 # pytube
 
-*pytube* is a very serious, lightweight, dependency-free Python library (and
-command-line utility) for downloading YouTube Videos.
+*pytube* is a genuine, lightweight, dependency-free Python library (and command-line utility) for downloading YouTube videos.
 
 ## Documentation
 
-Detailed documentation about how to use the library can be found on 
-[pytube.io](https://pytube.io). This is recommended
-for most use cases. If you just want to quickly download a single video,
-the [quickstart](#Quickstart) guide below might be what you're looking for.
+Detailed documentation about the usage of the library can be found at [pytube.io](https://pytube.io). This is recommended for most cases. If you want to hastily download a single video, the [quick start](#Quickstart) guide below might be what you're looking for.
 
 ## Description
 
-YouTube is the most popular video-sharing platform in the world and as a hacker
-you may encounter a situation where you want to script something to download
-videos. For this I present to you *pytube*.
+YouTube is the most popular video-sharing platform in the world and as a hacker, you may encounter a situation where you want to script something to download videos. For this, I present to you: *pytube*.
 
-*pytube* is a lightweight library written in Python. It has no third party
+*pytube* is a lightweight library written in Python. It has no third-party
 dependencies and aims to be highly reliable.
 
-*pytube* also makes pipelining easy, allowing you to specify callback functions
-for different download events, such as  ``on progress`` or ``on complete``.
+*pytube* also makes pipelining easy, allowing you to specify callback functions for different download events, such as  ``on progress`` or ``on complete``.
 
-Finally *pytube* also includes a command-line utility, allowing you to quickly
-download videos right from terminal.
+Furthermore, *pytube* includes a command-line utility, allowing you to download videos right from the terminal.
 
 ## Features
 
 - Support for both progressive & DASH streams
-- Support for downloading complete playlist
+- Support for downloading the complete playlist
 - Easily register ``on_download_progress`` & ``on_download_complete`` callbacks
 - Command-line interfaced included
 - Caption track support
@@ -55,33 +46,27 @@ download videos right from terminal.
 
 ## Quickstart
 
-This guide is only meant to cover the most basic usage of the library. For more
-detailed information, please refer to [pytube.io](https://pytube.io).
+This guide covers the most basic usage of the library. For more detailed information, please refer to [pytube.io](https://pytube.io).
 
 ### Installation
 
-Pytube requires an installation of python 3.6 or greater, as well as pip.
-Pip is typically bundled with python installations, and you can find options
-for how to install python at https://python.org.
+Pytube requires an installation of Python 3.6 or greater, as well as pip. (Pip is typically bundled with Python [installations](https://python.org/downloads).)
 
-To install from pypi with pip:
+To install from PyPI with pip:
 
 ```bash
 $ python -m pip install pytube
 ```
 
-Sometime, the pypi release becomes slightly outdated. To install from the
-source with pip:
+Sometimes, the PyPI release becomes slightly outdated. To install from the source with pip:
 
 ```bash
 $ python -m pip install git+https://github.com/pytube/pytube
 ```
 
-### Using pytube in a python script
+### Using pytube in a Python script
 
-To download a video using the library in a script, you'll need to first import
-the YouTube class from the library, and pass it an argument of the video url.
-From there, you can access the streams and download them.
+To download a video using the library in a script, you'll need to import the YouTube class from the library and pass an argument of the video URL. From there, you can access the streams and download them.
 
 ```python
  >>> from pytube import YouTube
@@ -97,8 +82,7 @@ From there, you can access the streams and download them.
 
 ### Using the command-line interface
 
-Using the CLI is extremely straightforward as well. To download a video at the
-highest progressive quality, you can use the following command:
+Using the CLI is remarkably straightforward as well. To download a video at the highest progressive quality, you can use the following command:
 ```bash
 $ pytube https://youtube.com/watch?v=2lAe1cqCOXo
 ```
@@ -107,4 +91,3 @@ You can also do the same for a playlist:
 ```bash
 $ pytube https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n
 ```
-
