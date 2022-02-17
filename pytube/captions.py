@@ -1,4 +1,3 @@
-import math
 import os
 import time
 import xml.etree.ElementTree as ElementTree
@@ -51,19 +50,18 @@ class Caption:
         return self.xml_caption_to_srt(self.xml_captions)
 
     @staticmethod
-    def float_to_srt_time_format(d: float) -> str:
+    def ms_time_to_srt_time_format(d: int) -> str:
         """Convert decimal durations into proper srt format.
 
         :rtype: str
         :returns:
             SubRip Subtitle (str) formatted time duration.
 
-        float_to_srt_time_format(3.89) -> '00:00:03,890'
+        ms_time_to_srt_time_format(3890) -> '00:00:03,890'
         """
-        fraction, whole = math.modf(d)
-        time_fmt = time.strftime("%H:%M:%S,", time.gmtime(whole))
-        ms = f"{fraction:.3f}".replace("0.", "")
-        return time_fmt + ms
+        sec, ms = d // 1000, d % 1000
+        time_fmt = time.strftime("%H:%M:%S", time.gmtime(sec))
+        return f"{time_fmt},{ms}"
 
     def xml_caption_to_srt(self, xml_captions: str) -> str:
         """Convert xml caption tracks to "SubRip Subtitle (srt)".
@@ -72,21 +70,24 @@ class Caption:
             XML formatted caption tracks.
         """
         segments = []
-        root = ElementTree.fromstring(xml_captions)
+        tree = ElementTree.fromstring(xml_captions)
+        root = tree.find("body")
         for i, child in enumerate(list(root)):
-            text = child.text or ""
+            text = ''.join(child.itertext()).strip()
+            if not text:
+                continue
             caption = unescape(text.replace("\n", " ").replace("  ", " "),)
             try:
-                duration = float(child.attrib["dur"])
+                duration_ms = int(child.attrib["d"])    # in milliseconds
             except KeyError:
-                duration = 0.0
-            start = float(child.attrib["start"])
-            end = start + duration
-            sequence_number = i + 1  # convert from 0-indexed to 1.
+                duration_ms = 0
+            start_ms = int(child.attrib["t"])           # in milliseconds
+            end_ms = start_ms + duration_ms             
+            sequence_number = i + 1                     # convert from 0-indexed to 1.
             line = "{seq}\n{start} --> {end}\n{text}\n".format(
                 seq=sequence_number,
-                start=self.float_to_srt_time_format(start),
-                end=self.float_to_srt_time_format(end),
+                start=self.ms_time_to_srt_time_format(start_ms),
+                end=self.ms_time_to_srt_time_format(end_ms),
                 text=caption,
             )
             segments.append(line)
