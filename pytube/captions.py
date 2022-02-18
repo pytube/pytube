@@ -61,6 +61,10 @@ class Caption:
         """
         sec, ms = d // 1000, d % 1000
         time_fmt = time.strftime("%H:%M:%S", time.gmtime(sec))
+        
+        # if ms < 100 we get ...,00 or ...,0 when expected ...,000
+        ms = '0' * (3 - len(str(ms))) + str(ms)
+        
         return f"{time_fmt},{ms}"
 
     def xml_caption_to_srt(self, xml_captions: str) -> str:
@@ -78,16 +82,16 @@ class Caption:
                 continue
             caption = unescape(text.replace("\n", " ").replace("  ", " "),)
             try:
-                duration_ms = int(child.attrib["d"])    # in milliseconds
+                duration = int(child.attrib["d"])   # in milliseconds
             except KeyError:
-                duration_ms = 0
-            start_ms = int(child.attrib["t"])           # in milliseconds
-            end_ms = start_ms + duration_ms             
-            sequence_number = i + 1                     # convert from 0-indexed to 1.
+                duration = 0
+            start = int(child.attrib["t"])          # in milliseconds
+            end = start + duration            
+            sequence_number = i + 1                 # convert from 0-indexed to 1.
             line = "{seq}\n{start} --> {end}\n{text}\n".format(
                 seq=sequence_number,
-                start=self.ms_time_to_srt_time_format(start_ms),
-                end=self.ms_time_to_srt_time_format(end_ms),
+                start=self.ms_time_to_srt_time_format(start),
+                end=self.ms_time_to_srt_time_format(end),
                 text=caption,
             )
             segments.append(line)
