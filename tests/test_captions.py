@@ -6,11 +6,11 @@ from unittest.mock import MagicMock, mock_open, patch
 from pytube import Caption, CaptionQuery, captions
 
 
-def test_float_to_srt_time_format():
+def test_ms_time_to_srt_time_format():
     caption1 = Caption(
         {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en", "vssId": ".en"}
     )
-    assert caption1.float_to_srt_time_format(3.89) == "00:00:03,890"
+    assert caption1.ms_time_to_srt_time_format(3890) == "00:00:03,890"
 
 
 def test_caption_query_sequence():
@@ -151,9 +151,12 @@ def test_xml_captions(request_get):
 @mock.patch("pytube.captions.request")
 def test_generate_srt_captions(request):
     request.get.return_value = (
-        '<?xml version="1.0" encoding="utf-8" ?><transcript><text start="6.5" dur="1.7">['
-        'Herb, Software Engineer]\n本影片包含隱藏式字幕。</text><text start="8.3" dur="2.7">'
-        "如要啓動字幕，請按一下這裡的圖示。</text></transcript>"
+        '<?xml version="1.0" encoding="utf-8" ?><timedtext format="3">'
+        '<body>'
+        '<p t="6500" d="1700">[Herb, Software Engineer]\n本影片包含隱藏式字幕。</p>'
+        '<p t="8300" d="2700">如要啓動字幕，請按一下這裡的圖示。</p>'
+        '</body>'
+        '</timedtext>'
     )
     caption = Caption(
         {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en", "vssId": ".en"}
