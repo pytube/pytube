@@ -1,36 +1,27 @@
 from pytube import Search
+import unittest
 
+class TestCompletionSuggestions(unittest.TestCase):
+    def test_for_missing_hashtagTileRenderer(self): 
+        s = Search("#crapsnation") # check missing hashtagTileRenderer object
+        self.assertTrue(s.completion_suggestions, 'No suggestions available')
+    
+    def test_for_no_suggestions(self):
+        s = Search("crapsnation") # check for words without suggestions
+        self.assertTrue(s.completion_suggestions, 'No suggestions available')
 
-def test_for_completion_suggestions():
+    def test_for_missing_movieRenderer(self):
+        s = Search("gone with the wind") # check missing movieRenderer object
+        self.assertTrue(s.completion_suggestions, 'No suggestions available')
 
-    temp_0 = "#crapsnation"  # check missing hashtagTileRenderer object
-    try:
-        s = Search(temp_0)
-        if 'Unexpected renderer encountered.' not in s.completion_suggestions:
-            assert True
-    except KeyError:
-        assert False
+    def test_for_showingResultsForRenderer(self):
+        s = Search("rangmnam style") # check missing showingResultsForRenderer object
+        res = ['gangnam style just dance', 'gangnam style parody', 'gangnam style fortnite',
+                'gangnam style minecraft', 'gangnam style remix', 'gangnam style clean', 
+                'gangnam style reaction', 'gangnam style live', 'psy gentleman',
+                'gangnam style dance', 'gangnam style 1 hour', 'psy daddy',
+                'gangnam style lyrics', 'psy new face']
+        self.assertTrue(s.completion_suggestions, res)
 
-    temp = "crapsnation"  # check for words without suggestions
-    try:
-        s = Search(temp)
-        if 'Unexpected renderer encountered.' not in s.completion_suggestions:
-            assert True
-    except KeyError:
-        assert False
-
-    temp_1 = "gone with the wind"  # check missing movieRenderer object
-    try:
-        s = Search(temp_1)
-        if 'Unexpected renderer encountered.' not in s.completion_suggestions:
-            assert True
-    except KeyError:
-        assert False
-
-    temp_2 = "rangmnam style"  # check missing showingResultsForRenderer object
-    try:
-        s = Search(temp_2)
-        if 'Unexpected renderer encountered.' not in s.completion_suggestions:
-            assert True
-    except KeyError:
-        assert False
+if __name__ == '__main__':
+    unittest.main()
