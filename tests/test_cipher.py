@@ -88,10 +88,11 @@ def test_get_throttling_function_name(base_js):
                         r'Apa.length||hha(""))}};',
             'nfunc_name': 'hha'
         },
-        #Values expected as of 2022/04/15:
+        # Values expected as of 2022/04/15:
         {
             'raw_var' : r'var $x=[uq]',
-            'raw_code': r'a.url="";a.D&&(b=a.get("n"))&&(b=$x[0](b),a.set("n",b),$x.length||uq(""))',
+            'raw_code': r'a.url="";a.D&&(b=a.get("n"))&&(b=$x[0](b),a.set("n",b),'\
+                        r'$x.length||uq(""))',
             'nfunc_name': 'uq'
         }
     ]
