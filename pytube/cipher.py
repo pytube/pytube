@@ -263,9 +263,15 @@ def get_throttling_function_name(js: str) -> str:
     """
     function_patterns = [
         # https://github.com/ytdl-org/youtube-dl/issues/29326#issuecomment-865985377
-        # a.C&&(b=a.get("n"))&&(b=Dea(b),a.set("n",b))}};
-        # In above case, `Dea` is the relevant function name
-        r'a\.[A-Z]&&\(b=a\.get\("n"\)\)&&\(b=([^(]+)\(b\)',
+        # https://github.com/yt-dlp/yt-dlp/commit/48416bc4a8f1d5ff07d5977659cb8ece7640dcd8
+        # var Bpa = [iha];
+        # ...
+        # a.C && (b = a.get("n")) && (b = Bpa[0](b), a.set("n", b),
+        # Bpa.length || iha("")) }};
+        # In the above case, `iha` is the relevant function name
+        r'a\.[a-zA-Z]\s*&&\s*\([a-z]\s*=\s*a\.get\("n"\)\)\s*&&\s*'
+        r'\([a-z]\s*=\s*([a-zA-Z0-9$]{2,3})(\[\d+\])?\([a-z]\)'
+
     ]
     logger.debug('Finding throttling function name')
     for pattern in function_patterns:
@@ -273,16 +279,20 @@ def get_throttling_function_name(js: str) -> str:
         function_match = regex.search(js)
         if function_match:
             logger.debug("finished regex search, matched: %s", pattern)
-            function_name = function_match.group(1)
-            is_Array = True if '[' in function_name or ']' in function_name else False
-            if is_Array:
-                index = int(re.findall(r'\d+', function_name)[0])
-                name = function_name.split('[')[0]
-                pattern = r"var %s=\[(.*?)\];" % name
-                regex = re.compile(pattern)
-                return regex.search(js).group(1).split(',')[index]
-            else:
-                return function_name
+            if len(function_match.groups()) == 1:
+                return function_match.group(1)
+            idx = function_match.group(2)
+            if idx:
+                idx = idx.strip("[]")
+                array = re.search(
+                    r'var {nfunc}\s*=\s*(\[.+?\]);'.format(
+                        nfunc=re.escape(function_match.group(1))),
+                    js
+                )
+                if array:
+                    array = array.group(1).strip("[]").split(",")
+                    array = [x.strip() for x in array]
+                    return array[int(idx)]
 
     raise RegexMatchError(
         caller="get_throttling_function_name", pattern="multiple"
