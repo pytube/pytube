@@ -155,7 +155,7 @@ def base_js():
     https://www.youtube.com/watch?v=Y4-GSFKZmEg respectively
     """
     base_js_files = []
-    for file in ["base.js.gz", "base.js-2022-04-15.gz"]:
+    for file in ["base.js-2022-02-04.gz", "base.js-2022-04-15.gz"]:
         file_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             "mocks",
