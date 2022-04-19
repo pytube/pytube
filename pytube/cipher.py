@@ -285,7 +285,7 @@ def get_throttling_function_name(js: str) -> str:
                 idx = idx.strip("[]")
                 array = re.search(
                     r'var {nfunc}\s*=\s*(\[.+?\]);'.format(
-                        nfunc=function_match.group(1)),
+                        nfunc=re.escape(function_match.group(1))),
                     js
                 )
                 if array:
