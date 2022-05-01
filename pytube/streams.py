@@ -9,9 +9,10 @@ separately).
 import logging
 import os
 from datetime import datetime
-from typing import BinaryIO, Dict, Optional, Tuple
+from typing import BinaryIO, Dict, Optional, Tuple, Callable
 from urllib.error import HTTPError
 from urllib.parse import parse_qs
+from io import BufferedWriter, BytesIO
 
 from pytube import extract, request
 from pytube.helpers import safe_filename, target_directory
@@ -200,7 +201,8 @@ class Stream:
         filename_prefix: Optional[str] = None,
         skip_existing: bool = True,
         timeout: Optional[int] = None,
-        max_retries: Optional[int] = 0
+        max_retries: Optional[int] = 0,
+        write_immediately: bool = True,
     ) -> str:
         """Write the media stream to disk.
 
@@ -243,35 +245,27 @@ class Stream:
             logger.debug(f'file {file_path} already exists, skipping')
             self.on_complete(file_path)
             return file_path
+        
+        if write_immediately:
+            file_handler = open(file_path, "wb")
+        else:
+            file_handler = BytesIO()
 
-        bytes_remaining = self.filesize
         logger.debug(f'downloading ({self.filesize} total bytes) file to {file_path}')
 
-        with open(file_path, "wb") as fh:
-            try:
-                for chunk in request.stream(
-                    self.url,
-                    timeout=timeout,
-                    max_retries=max_retries
-                ):
-                    # reduce the (bytes) remainder by the length of the chunk.
-                    bytes_remaining -= len(chunk)
-                    # send to the on_progress callback.
-                    self.on_progress(chunk, fh, bytes_remaining)
-            except HTTPError as e:
-                if e.code != 404:
-                    raise
-                # Some adaptive streams need to be requested with sequence numbers
-                for chunk in request.seq_stream(
-                    self.url,
-                    timeout=timeout,
-                    max_retries=max_retries
-                ):
-                    # reduce the (bytes) remainder by the length of the chunk.
-                    bytes_remaining -= len(chunk)
-                    # send to the on_progress callback.
-                    self.on_progress(chunk, fh, bytes_remaining)
-        self.on_complete(file_path)
+        try:
+            self.stream_to_buffer(file_handler, timeout, max_retries)
+        except HTTPError as e:
+            if e.code != 404:
+                raise
+            # Some adaptive streams need to be requested with sequence numbers
+            self.stream_to_buffer(file_handler, timeout, max_retries, request.seq_stream)
+
+        # If we used a buffer, flush it to disk
+        if not write_immediately:
+            with open(file_path, "wb") as f:
+                f.write(file_handler.getvalue())
+        file_handler.close()
         return file_path
 
     def get_file_path(
@@ -292,7 +286,13 @@ class Stream:
             and os.path.getsize(file_path) == self.filesize
         )
 
-    def stream_to_buffer(self, buffer: BinaryIO) -> None:
+    def stream_to_buffer(
+        self,
+        buffer: BinaryIO,
+        timeout: Optional[int] = None,
+        max_retries: Optional[int] = 0,
+        stream_func: Callable = request.stream
+        ) -> None:
         """Write the media stream to buffer
 
         :rtype: io.BytesIO buffer
@@ -302,12 +302,19 @@ class Stream:
             "downloading (%s total bytes) file to buffer", self.filesize,
         )
 
-        for chunk in request.stream(self.url):
+        for chunk in stream_func(
+            self.url,
+            timeout=timeout,
+            max_retries=max_retries
+        ):
             # reduce the (bytes) remainder by the length of the chunk.
             bytes_remaining -= len(chunk)
             # send to the on_progress callback.
             self.on_progress(chunk, buffer, bytes_remaining)
-        self.on_complete(None)
+        name = None
+        if type(buffer) == BufferedWriter:
+            name = buffer.name
+        self.on_complete(name)
 
     def on_progress(
         self, chunk: bytes, file_handler: BinaryIO, bytes_remaining: int
