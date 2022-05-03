@@ -226,6 +226,8 @@ class YouTube:
                     'Please sign in to verify that you may see it.'
                 ):
                     raise exceptions.VideoPrivate(video_id=self.video_id)
+                elif reason == 'Sign in to confirm your age' and self.use_oauth == False:
+                    raise exceptions.AgeRestrictedError(video_id=self.video_id)
             elif status == 'ERROR':
                 if reason == 'Video unavailable':
                     raise exceptions.VideoUnavailable(video_id=self.video_id)
