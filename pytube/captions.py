@@ -91,6 +91,21 @@ class Caption:
             )
             segments.append(line)
         return "\n".join(segments).strip()
+        
+    def get_captions_as_array(self) -> [str]:
+        xml_captions = self.xml_captions
+        segments = []
+        root = ElementTree.fromstring(xml_captions)
+        target = ".//p"
+        
+        if(self.code[:2] == "a."):
+            target = ".//s"
+        
+        for child in list(root.findall(target)):
+            text = child.text or ""
+            caption = unescape(text.replace("\n", " ").replace("  ", " "),)
+            segments.append(caption)
+        return segments
 
     def download(
         self,
