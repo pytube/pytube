@@ -80,11 +80,24 @@ def test_js_splice():
 
 
 def test_get_throttling_function_name(base_js):
-    # Values expected as of 2022/02/04:
-    raw_var = r'var Apa=[hha]'
-    assert raw_var in base_js
-    raw_code = r'a.url="";a.C&&(b=a.get("n"))&&(b=Apa[0](b),a.set("n",b),'\
-               r'Apa.length||hha(""))}};'
-    assert raw_code in base_js
-    func_name = cipher.get_throttling_function_name(base_js)
-    assert func_name == "hha"
+    base_js_code_fragments = [
+        # Values expected as of 2022/02/04:
+        {
+            'raw_var' : r'var Apa=[hha]',
+            'raw_code': r'a.url="";a.C&&(b=a.get("n"))&&(b=Apa[0](b),a.set("n",b),'\
+                        r'Apa.length||hha(""))}};',
+            'nfunc_name': 'hha'
+        },
+        # Values expected as of 2022/04/15:
+        {
+            'raw_var' : r'var $x=[uq]',
+            'raw_code': r'a.url="";a.D&&(b=a.get("n"))&&(b=$x[0](b),a.set("n",b),'\
+                        r'$x.length||uq(""))',
+            'nfunc_name': 'uq'
+        }
+    ]
+    for code_fragment, base_js_file in zip(base_js_code_fragments, base_js):
+        assert code_fragment['raw_var'] in base_js_file
+        assert code_fragment['raw_code'] in base_js_file
+        func_name = cipher.get_throttling_function_name(base_js_file)
+        assert func_name == code_fragment['nfunc_name']
