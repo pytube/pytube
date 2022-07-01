@@ -67,41 +67,30 @@ class Caption:
 
     def xml_caption_to_srt(self, xml_captions: str) -> str:
         """Convert xml caption tracks to "SubRip Subtitle (srt)".
-
-        :param str xml_captions:
-        XML formatted caption tracks.
+        :param xml_captions: XML formatted caption tracks.
         """
         segments = []
         root = ElementTree.fromstring(xml_captions)
 
         for sequence_number, child in enumerate(list(root.iter('body'))[0], start=1):
-            if child.tag == 'p':
-                caption = ''
+            text = child.text or ''
+            caption = unescape(text.replace('\n', ' ').replace('  ', ' '),)
 
-                if len(list(child)) == 0:
-                    caption = child.text
+            try:
+                duration = float(child.attrib['d']) / 1000.0
+            except KeyError:
+                duration = 0.0
 
-                for s in list(child):
-                    if s.tag == 's':
-                        caption += f' {s.text}'
+            start = float(child.attrib['t']) / 1000.0
+            end = start + duration
+            line = '{seq}\n{start} --> {end}\n{text}\n'.format(
+                seq=sequence_number,
+                start=self.float_to_srt_time_format(start),
+                end=self.float_to_srt_time_format(end),
+                text=caption,
+            )
 
-                caption = unescape(caption.replace('\n', ' ').replace('  ', ' '),)
-
-                try:
-                    duration = float(child.attrib['d']) / 1000.0
-                except KeyError:
-                    duration = 0.0
-
-                start = float(child.attrib['t']) / 1000.0
-                end = start + duration
-                
-                line = '{seq}\n{start} --> {end}\n{text}\n'.format(
-                    seq=sequence_number,
-                    start=self.float_to_srt_time_format(start),
-                    end=self.float_to_srt_time_format(end),
-                    text=caption,
-                )
-                segments.append(line)
+            segments.append(line)
 
         return '\n'.join(segments).strip()
 
