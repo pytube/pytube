@@ -151,7 +151,7 @@ class Stream:
             except Exception as e:
                 if "content-length" in str(e):
                     self._filesize = int((self._monostate.duration * self.bitrate) / 8)
-                else: print(e)
+                else: raise(e)
         return self._filesize
 
     @property
