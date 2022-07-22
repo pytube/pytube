@@ -12,7 +12,7 @@ streams. Let's begin by switching to a video that contains them::
 
 Now let's checkout the english captions::
 
-    >>> caption = yt.captions.get_by_language_code('en')
+    >>> caption = yt.captions['en']
 
 Great, now let's see how YouTube formats them::
 
