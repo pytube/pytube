@@ -61,6 +61,15 @@ class Stream:
 
         # filesize in bytes
         self._filesize: Optional[int] = int(stream.get('contentLength', 0))
+        
+        # filesize in kilobytes
+        self._filesizekb: Optional[int] = round(int(stream.get('contentLength', 0))/1024)
+        
+        # filesize in megabytes
+        self._filesizemb: Optional[int] = round(int(stream.get('contentLength', 0))/1024/1024)
+        
+        # filesize in gigabytes(fingers crossed we don't need terabytes going forward though)
+        self._filesizegb: Optional[int] = round(int(stream.get('contentLength', 0))/1024/1024/1024)
 
         # Additional information about the stream format, such as resolution,
         # frame rate, and whether the stream is live (HLS) or 3D.
@@ -149,7 +158,58 @@ class Stream:
                     raise
                 self._filesize = request.seq_filesize(self.url)
         return self._filesize
+    
+    @property
+    def filesizekb(self) -> int:
+        """File size of the media stream in bytes.
 
+        :rtype: int
+        :returns:
+            Rounded filesize (in kilobytes) of the stream.
+        """
+        if self._filesizekb == 0:
+            try:
+                self._filesizekb = request.filesize(self.url)/1024
+            except HTTPError as e:
+                if e.code != 404:
+                    raise
+                self._filesizekb = request.seq_filesize(self.url)/1024
+        return self._filesizekb
+    
+    @property
+    def filesizemb(self) -> int:
+        """File size of the media stream in bytes.
+
+        :rtype: int
+        :returns:
+            Rounded filesize (in megabytes) of the stream.
+        """
+        if self._filesizemb == 0:
+            try:
+                self._filesizemb = request.filesize(self.url)/1024/1024
+            except HTTPError as e:
+                if e.code != 404:
+                    raise
+                self._filesizemb = request.seq_filesize(self.url)/1024/1024
+        return self._filesizemb
+
+    @property
+    def filesizegb(self) -> int:
+        """File size of the media stream in bytes.
+
+        :rtype: int
+        :returns:
+            Rounded filesize (in gigabytes) of the stream.
+        """
+        if self._filesizegb == 0:
+            try:
+                self._filesizegb = request.filesize(self.url)/1024/1024/1024
+            except HTTPError as e:
+                if e.code != 404:
+                    raise
+                self._filesizegb = request.seq_filesize(self.url)/1024/1024/1024
+        return self._filesizegb
+    
     @property
     def title(self) -> str:
         """Get title of video

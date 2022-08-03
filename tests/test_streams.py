@@ -29,7 +29,15 @@ def test_stream_to_buffer(mock_request, cipher_signature):
 
 def test_filesize(cipher_signature):
     assert cipher_signature.streams[0].filesize == 3399554
+    
+def test_filesizekb(cipher_signature):
+    assert cipher_signature.streams[0].filesize == 3320
 
+def test_filesizemb(cipher_signature):
+    assert cipher_signature.streams[0].filesize == 3
+
+def test_filesizegb(cipher_signature):
+    assert cipher_signature.streams[0].filesize == 0
 
 def test_filesize_approx(cipher_signature):
     stream = cipher_signature.streams[0]
