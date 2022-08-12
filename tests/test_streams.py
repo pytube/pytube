@@ -31,13 +31,13 @@ def test_filesize(cipher_signature):
     assert cipher_signature.streams[0].filesize == 3399554
     
 def test_filesizekb(cipher_signature):
-    assert cipher_signature.streams[0].filesize == 3320
+    assert cipher_signature.streams[0].filesize == float(3319.877)
 
 def test_filesizemb(cipher_signature):
-    assert cipher_signature.streams[0].filesize == 3
+    assert cipher_signature.streams[0].filesize == float(3.243)
 
 def test_filesizegb(cipher_signature):
-    assert cipher_signature.streams[0].filesize == 0
+    assert cipher_signature.streams[0].filesize == float(0.004)
 
 def test_filesize_approx(cipher_signature):
     stream = cipher_signature.streams[0]
