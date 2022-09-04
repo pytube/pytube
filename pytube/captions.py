@@ -65,6 +65,7 @@ class Caption:
         ms = f"{fraction:.3f}".replace("0.", "")
         return time_fmt + ms
 
+
     def xml_caption_to_srt(self, xml_captions: str) -> str:
         """Convert xml caption tracks to "SubRip Subtitle (srt)".
 
@@ -73,15 +74,20 @@ class Caption:
         """
         segments = []
         root = ElementTree.fromstring(xml_captions)
-        for i, child in enumerate(list(root)):
-            text = child.text or ""
+        for i, child in enumerate(list(root.findall('body/p'))):
+            text = ''.join(child.itertext()).strip()
+            if not text:
+                continue
             caption = unescape(text.replace("\n", " ").replace("  ", " "),)
             try:
-                duration = float(child.attrib["dur"])
+                duration = float(child.attrib["d"])
             except KeyError:
                 duration = 0.0
-            start = float(child.attrib["start"])
-            end = start + duration
+            start = float(child.attrib["t"])
+            try:
+                end = float(root.findall('body/p')[i+2].attrib['t'])
+            except:
+                end = float(root.findall('body/p')[i].attrib['t']) + duration
             sequence_number = i + 1  # convert from 0-indexed to 1.
             line = "{seq}\n{start} --> {end}\n{text}\n".format(
                 seq=sequence_number,
@@ -90,7 +96,9 @@ class Caption:
                 text=caption,
             )
             segments.append(line)
+
         return "\n".join(segments).strip()
+
 
     def download(
         self,
