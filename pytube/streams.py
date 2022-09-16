@@ -65,13 +65,13 @@ class Stream:
         self._filesize: Optional[int] = int(stream.get('contentLength', 0))
         
         # filesize in kilobytes
-        self._filesizekb: Optional[float] = float(ceil(stream.get('contentLength', 0) / 1024 * 1000) / 1000)
+        self._filesize_kb: Optional[float] = float(ceil(stream.get('contentLength', 0) / 1024 * 1000) / 1000)
         
         # filesize in megabytes
-        self._filesizemb: Optional[float] = float(ceil(stream.get('contentLength', 0) / 1024 / 1024 * 1000) / 1000)
+        self._filesize_mb: Optional[float] = float(ceil(stream.get('contentLength', 0) / 1024 / 1024 * 1000) / 1000)
         
         # filesize in gigabytes(fingers crossed we don't need terabytes going forward though)
-        self._filesizegb: Optional[float] = float(ceil(stream.get('contentLength', 0) / 1024 / 1024 / 1024 * 1000) / 1000)
+        self._filesize_gb: Optional[float] = float(ceil(stream.get('contentLength', 0) / 1024 / 1024 / 1024 * 1000) / 1000)
 
         # Additional information about the stream format, such as resolution,
         # frame rate, and whether the stream is live (HLS) or 3D.
@@ -169,14 +169,14 @@ class Stream:
         :returns:
             Rounded filesize (in kilobytes) of the stream.
         """
-        if self._filesizekb == 0:
+        if self._filesize_kb == 0:
             try:
-                self._filesizekb = float(ceil(request.filesize(self.url)/1024 * 1000) / 1000)
+                self._filesize_kb = float(ceil(request.filesize(self.url)/1024 * 1000) / 1000)
             except HTTPError as e:
                 if e.code != 404:
                     raise
-                self._filesizekb = float(ceil(request.seq_filesize(self.url)/1024 * 1000) / 1000)
-        return self._filesizekb
+                self._filesize_kb = float(ceil(request.seq_filesize(self.url)/1024 * 1000) / 1000)
+        return self._filesize_kb
     
     @property
     def filesizemb(self) -> float:
@@ -186,14 +186,14 @@ class Stream:
         :returns:
             Rounded filesize (in megabytes) of the stream.
         """
-        if self._filesizemb == 0:
+        if self._filesize_mb == 0:
             try:
-                self._filesizemb = float(ceil(request.filesize(self.url)/1024/1024 * 1000) / 1000)
+                self._filesize_mb = float(ceil(request.filesize(self.url)/1024/1024 * 1000) / 1000)
             except HTTPError as e:
                 if e.code != 404:
                     raise
-                self._filesizemb = float(ceil(request.seq_filesize(self.url)/1024/1024 * 1000) / 1000)
-        return self._filesizemb
+                self._filesize_mb = float(ceil(request.seq_filesize(self.url)/1024/1024 * 1000) / 1000)
+        return self._filesize_mb
 
     @property
     def filesizegb(self) -> float:
@@ -203,14 +203,14 @@ class Stream:
         :returns:
             Rounded filesize (in gigabytes) of the stream.
         """
-        if self._filesizegb == 0:
+        if self._filesize_gb == 0:
             try:
-                self._filesizegb = float(ceil(request.filesize(self.url)/1024/1024/1024 * 1000) / 1000)
+                self._filesize_gb = float(ceil(request.filesize(self.url)/1024/1024/1024 * 1000) / 1000)
             except HTTPError as e:
                 if e.code != 404:
                     raise
-                self._filesizegb = float(ceil(request.seq_filesize(self.url)/1024/1024/1024 * 1000) / 1000)
-        return self._filesizegb
+                self._filesize_gb = float(ceil(request.seq_filesize(self.url)/1024/1024/1024 * 1000) / 1000)
+        return self._filesize_gb
     
     @property
     def title(self) -> str:
