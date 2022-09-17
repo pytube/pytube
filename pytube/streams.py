@@ -65,13 +65,13 @@ class Stream:
         self._filesize: Optional[int] = int(stream.get('contentLength', 0))
         
         # filesize in kilobytes
-        self._filesize_kb: Optional[float] = float(ceil(stream.get('contentLength', 0) / 1024 * 1000) / 1000)
+        self._filesize_kb: Optional[float] = float(ceil(float(stream.get('contentLength', 0)) / 1024 * 1000) / 1000)
         
         # filesize in megabytes
-        self._filesize_mb: Optional[float] = float(ceil(stream.get('contentLength', 0) / 1024 / 1024 * 1000) / 1000)
+        self._filesize_mb: Optional[float] = float(ceil(float(stream.get('contentLength', 0)) / 1024 / 1024 * 1000) / 1000)
         
         # filesize in gigabytes(fingers crossed we don't need terabytes going forward though)
-        self._filesize_gb: Optional[float] = float(ceil(stream.get('contentLength', 0) / 1024 / 1024 / 1024 * 1000) / 1000)
+        self._filesize_gb: Optional[float] = float(ceil(float(stream.get('contentLength', 0)) / 1024 / 1024 / 1024 * 1000) / 1000)
 
         # Additional information about the stream format, such as resolution,
         # frame rate, and whether the stream is live (HLS) or 3D.
@@ -162,8 +162,8 @@ class Stream:
         return self._filesize
     
     @property
-    def filesizekb(self) -> float:
-        """File size of the media stream in bytes.
+    def filesize_kb(self) -> float:
+        """File size of the media stream in kilobytes.
 
         :rtype: float
         :returns:
@@ -179,8 +179,8 @@ class Stream:
         return self._filesize_kb
     
     @property
-    def filesizemb(self) -> float:
-        """File size of the media stream in bytes.
+    def filesize_mb(self) -> float:
+        """File size of the media stream in megabytes.
 
         :rtype: float
         :returns:
@@ -196,8 +196,8 @@ class Stream:
         return self._filesize_mb
 
     @property
-    def filesizegb(self) -> float:
-        """File size of the media stream in bytes.
+    def filesize_gb(self) -> float:
+        """File size of the media stream in gigabytes.
 
         :rtype: float
         :returns:
