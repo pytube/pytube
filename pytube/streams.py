@@ -11,7 +11,9 @@ import os
 from math import ceil
 
 from datetime import datetime
-from typing import BinaryIO, Dict, Optional, Tuple
+import shutil
+import sys
+from typing import BinaryIO, Callable, Dict, Optional, Tuple
 from urllib.error import HTTPError
 from urllib.parse import parse_qs
 
@@ -86,6 +88,34 @@ class Stream:
         self.is_3d = itag_profile["is_3d"]
         self.is_hdr = itag_profile["is_hdr"]
         self.is_live = itag_profile["is_live"]
+
+        # --- Progress bar variables ---
+        # 'pb' stands for 'progress bar'
+
+        # If true, then progress bar will be shown
+        self._pb_show: bool = False
+
+        # Segment character of progress bar
+        self._pb_character: str = '█'
+
+        # Number of segments. If value equal to -1,
+        # then terminal column value will be got
+        self._pb_width: int = -1
+
+        # Value to scale number of segments
+        self._pb_scale: float = 0.55
+
+        # Custom display function. If is None, 
+        # then progress bar will be just printed to standard output
+        self._pb_custom_function: Optional[Callable[[str], None]] = None
+
+        # If true, then progress bar will only contain '_pb_character' and spaces.
+        # Example of a progress bar depending on the value:
+        #   >>> self._pb_is_raw_string = False
+        #    '|███████████████████████████████████████| 100.0%'
+        #   >>> self._pb_is_raw_string = True
+        #    '███████████████████████████████████████'
+        self._pb_is_raw_string: bool = False
 
     @property
     def is_adaptive(self) -> bool:
@@ -393,6 +423,11 @@ class Stream:
         :rtype: None
 
         """
+
+        # Show progress bar if 'self.config_progress_bar(show=True, ...)' method was called
+        if self._pb_show:
+            self.__show_progress_bar(bytes_remaining)
+
         file_handler.write(chunk)
         logger.debug("download remaining: %s", bytes_remaining)
         if self._monostate.on_progress:
@@ -414,6 +449,53 @@ class Stream:
             logger.debug("calling on_complete callback %s", on_complete)
             on_complete(self, file_path)
 
+    def configure_progress_bar(self, *,
+        show: bool,
+        character: str = '█',
+        scale: float = 0.55,
+        width: int = -1,
+        custom_function: Optional[Callable[[str], None]] = None,
+        raw_string: bool = False,
+    ) -> 'Stream':
+        """Configure a simple, pretty progress bar.
+
+        Example:
+        ~~~~~~~~
+         |███████████████████████████████████████| 100.0%
+
+        :param show: (Required) If set to true, then progress bar will be shown.
+        :type: bool
+        :param character: Character to use for presenting progress segment.
+        :type: str
+        :param scale: Scale multiplier to reduce progress bar size.
+        :type: float
+        :param width: Width of a progress bar. If set to -1, then terminal column width will be used as default.
+        :type: int
+        :param custom_function: (Optional) Custom display function. If is None, then progress bar will be just printed to standard output
+        :type: ((str) -> None)
+        :param raw_string: Display only progress segments without percentage and additional formatting.
+        Useful with custom function.
+        Example of a progress bar depending on the value:
+            >>> raw_string = False
+            '|████████████████████████████████████   | 82.95%'
+            >>> raw_string = True
+            '█████████████████████████████████████  '
+        :type: bool
+
+        :rtype: Stream
+        :returns: an instance of this class
+        """
+
+        # Setup all attributes for the progress bar
+        self._pb_show = show
+        self._pb_character = character
+        self._pb_width = max(width, -1) # accept integers: [-1; +infinity)
+        self._pb_scale = scale
+        self._pb_custom_function = custom_function
+        self._pb_is_raw_string = raw_string
+
+        return self
+
     def __repr__(self) -> str:
         """Printable object representation.
 
@@ -434,3 +516,46 @@ class Stream:
             parts.extend(['abr="{s.abr}"', 'acodec="{s.audio_codec}"'])
         parts.extend(['progressive="{s.is_progressive}"', 'type="{s.type}"'])
         return f"<Stream: {' '.join(parts).format(s=self)}>"
+
+    def __show_progress_bar(self, bytes_remaining: int):
+        """Display a simple, pretty progress bar during a downloading process.
+
+        Copy of 'pytube.cli.display_progress_bar' function with some changes.
+
+        Example:
+        ~~~~~~~~
+         |███████████████████████████████████████| 100.0%
+
+        :param bytes_remaining: Number of bytes left to download
+        :type: int
+        """
+
+        bytes_received = self.filesize - bytes_remaining
+
+        # Determine the width of a segments of a progress bar
+        if self._pb_width == -1: # by a number of columns in a terminal
+            columns = shutil.get_terminal_size().columns
+        else: # by the specified value
+            columns = self._pb_width
+
+        # Adjust width with scaling value
+        max_width = int(columns * self._pb_scale)
+
+        # Construct resulting progress bar
+        filled = int(round(max_width * bytes_received / float(self.filesize)))
+        remaining = max_width - filled
+        progress_bar = self._pb_character * filled + " " * remaining
+        percent = round(100.0 * bytes_received / float(self.filesize), 1)
+
+        # Determine a format of the final progress bar
+        if not self._pb_is_raw_string:
+            text = f" |{progress_bar}| {percent}%\r"
+        else:
+            text = progress_bar
+
+        # Determine a way to display progress bar
+        if self._pb_custom_function is not None:
+            self._pb_custom_function(text)
+        else:
+            sys.stdout.write(text)
+            sys.stdout.flush()
