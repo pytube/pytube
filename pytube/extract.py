@@ -428,7 +428,7 @@ def apply_signature(stream_manifest: Dict, vid_info: Dict, js: str) -> None:
             logger.debug("signature found, skip decipher")
             continue
         
-        if cipher == None:
+        if cipher is None:
             logger.debug("signature not found, starting decipher")
             cipher = Cipher(js=js)
         signature = cipher.get_signature(ciphered_signature=stream["s"])
