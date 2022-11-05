@@ -276,7 +276,7 @@ class StreamQuery(Sequence):
             .first()
         )
 
-    def get_highest_resolution(self) -> Optional[Stream]:
+    def get_highest_resolution(self, adaptive=True) -> Optional[Stream]:
         """Get highest resolution stream that is a progressive video.
 
         :rtype: :class:`Stream <Stream>` or None
@@ -285,7 +285,10 @@ class StreamQuery(Sequence):
             not found.
 
         """
-        return self.filter(progressive=True).order_by("resolution").last()
+        if adaptive is True:
+            return self.filter(adaptive=True).order_by("resolution").last()
+        else:
+            return self.filter(progressive=True).order_by("resolution").last()
 
     def get_audio_only(self, subtype: str = "mp4") -> Optional[Stream]:
         """Get highest bitrate audio stream for given codec (defaults to mp4)
