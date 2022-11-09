@@ -31,7 +31,8 @@ class YouTube:
         on_complete_callback: Optional[Callable[[Any, Optional[str]], None]] = None,
         proxies: Dict[str, str] = None,
         use_oauth: bool = False,
-        allow_oauth_cache: bool = True
+        allow_oauth_cache: bool = True,
+        cache_location: str = None
     ):
         """Construct a :class:`YouTube <YouTube>`.
 
@@ -51,6 +52,9 @@ class YouTube:
         :param bool allow_oauth_cache:
             (Optional) Cache OAuth tokens locally on the machine. Defaults to True.
             These tokens are only generated if use_oauth is set to True as well.
+        :param str cache_location:
+            (Optional) Directory path where oauth-tokens file will be cached (if passed, else default path will be used)
+            These tokens are only cached if use_oauth and allow_oauth_cache is set to True as well.
         """
         self._js: Optional[str] = None  # js fetched by js_url
         self._js_url: Optional[str] = None  # the url to the js, parsed from watch html
@@ -87,6 +91,7 @@ class YouTube:
 
         self.use_oauth = use_oauth
         self.allow_oauth_cache = allow_oauth_cache
+        self.cache_location = cache_location
 
     def __repr__(self):
         return f'<pytube.__main__.YouTube object: videoId={self.video_id}>'
@@ -241,7 +246,7 @@ class YouTube:
         if self._vid_info:
             return self._vid_info
 
-        innertube = InnerTube(use_oauth=self.use_oauth, allow_cache=self.allow_oauth_cache)
+        innertube = InnerTube(use_oauth=self.use_oauth, allow_cache=self.allow_oauth_cache, cache_location=self.cache_location)
 
         innertube_response = innertube.player(self.video_id)
         self._vid_info = innertube_response
@@ -252,7 +257,8 @@ class YouTube:
         innertube = InnerTube(
             client='ANDROID_EMBED',
             use_oauth=self.use_oauth,
-            allow_cache=self.allow_oauth_cache
+            allow_cache=self.allow_oauth_cache,
+            cache_location = self.cache_location
         )
         innertube_response = innertube.player(self.video_id)
 
