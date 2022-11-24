@@ -2,6 +2,7 @@
 from datetime import datetime
 import pytest
 import re
+import itertools
 
 from pytube import extract
 from pytube.exceptions import RegexMatchError
@@ -75,6 +76,27 @@ def test_mime_type_codec():
     )
     assert mime_type == "audio/webm"
     assert mime_subtype == ["opus"]
+
+
+def test_channel_name():
+    options = [
+        ["http://", "https://", ""],
+        ["www.", ""],
+        ["youtube.com/"],
+        ["c/", "channel/", "user/", ""],
+        ["CHANNELNAME", "@CHANNELNAME"],
+        ["/extra", ""]
+    ]
+    for opt in itertools.product(*options):
+        url = "".join(opt)
+        channel_name = extract.channel_name(url)
+        assert channel_name in {'/c/CHANNELNAME', '/channel/CHANNELNAME', '/user/CHANNELNAME'}
+
+
+@pytest.mark.parametrize("bad_url", ["", "youtube.com/", "google.com/CHANNELNAME"])
+def test_channel_name_incorrect_should_error(bad_url):
+    with pytest.raises(RegexMatchError):
+        extract.channel_name(bad_url)
 
 
 def test_mime_type_codec_with_no_match_should_error():

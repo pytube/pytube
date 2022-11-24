@@ -156,8 +156,12 @@ def channel_name(url: str) -> str:
 
     This function supports the following patterns:
 
+    - :samp:`https://youtube.com/{channel_name}/*`
+    - :samp:`https://youtube.com/@{channel_name}/*`
     - :samp:`https://youtube.com/c/{channel_name}/*`
     - :samp:`https://youtube.com/channel/{channel_id}/*
+    - :samp:`https://youtube.com/c/@{channel_name}/*`
+    - :samp:`https://youtube.com/channel/@{channel_id}/*
     - :samp:`https://youtube.com/u/{channel_name}/*`
     - :samp:`https://youtube.com/user/{channel_id}/*
 
@@ -167,24 +171,20 @@ def channel_name(url: str) -> str:
     :returns:
         YouTube channel name.
     """
-    patterns = [
-        r"(?:\/(c)\/([%\d\w_\-]+)(\/.*)?)",
-        r"(?:\/(channel)\/([%\w\d_\-]+)(\/.*)?)",
-        r"(?:\/(u)\/([%\d\w_\-]+)(\/.*)?)",
-        r"(?:\/(user)\/([%\w\d_\-]+)(\/.*)?)"
-    ]
-    for pattern in patterns:
-        regex = re.compile(pattern)
-        function_match = regex.search(url)
-        if function_match:
-            logger.debug("finished regex search, matched: %s", pattern)
-            uri_style = function_match.group(1)
-            uri_identifier = function_match.group(2)
-            return f'/{uri_style}/{uri_identifier}'
+    pattern = r"(?:https?:\/\/)?(?:www\.)?youtube\.com\/(?:(user|channel|c)(?:\/))?\@?([%\d\w_\-]+)"
+    regex = re.compile(pattern)
+    function_match = regex.search(url)
+    if function_match:
+        logger.debug("finished regex search, matched: %s", pattern)
+        uri_style = function_match.group(1)
+        uri_style = uri_style if uri_style else "c"
+        uri_identifier = function_match.group(2)
+        return f'/{uri_style}/{uri_identifier}'
+    else:
+        raise RegexMatchError(
+            caller="channel_name", pattern="patterns"
+        )
 
-    raise RegexMatchError(
-        caller="channel_name", pattern="patterns"
-    )
 
 
 def video_info_url(video_id: str, watch_url: str) -> str:
