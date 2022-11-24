@@ -33,7 +33,7 @@ class Channel(Playlist):
         self.featured_channels_url = self.channel_url + '/channels'
         self.about_url = self.channel_url + '/about'
 
-        self._html_page = self.videos_url  # Videos will be preferred over short videos
+        self._html_url = self.videos_url  # Videos will be preferred over short videos
         self._visitor_data = None
 
         # Possible future additions
@@ -71,6 +71,24 @@ class Channel(Playlist):
         return self.initial_data['metadata']['channelMetadataRenderer'].get('vanityChannelUrl', None)  # noqa:E501
 
     @property
+    def html_url(self):
+        """Get the html url.
+
+        :rtype: str
+        """
+        return self._html_url
+
+    @html_url.setter
+    def html_url(self, value):
+        """Set the html url and clear the cache."""
+        if self._html_url != value:
+            self._html = None
+            self.__class__.video_urls.fget.cache_clear()
+            self.__class__.last_updated.fget.cache_clear()
+            self.__class__.title.fget.cache_clear()
+            self._html_url = value
+
+    @property
     def html(self):
         """Get the html for the /videos or /shorts page.
 
@@ -78,7 +96,7 @@ class Channel(Playlist):
         """
         if self._html:
             return self._html
-        self._html = request.get(self._html_page)
+        self._html = request.get(self.html_url)
         return self._html
 
     @property
@@ -253,7 +271,7 @@ class Channel(Playlist):
         :rtype: List[YouTube]
         :returns: List of YouTube
         """
-        self._html_page = self.videos_url  # Set video tab
+        self.html_url = self.videos_url  # Set video tab
         return DeferredGeneratorList(self.videos_generator())
 
     @property
@@ -263,5 +281,5 @@ class Channel(Playlist):
        :rtype: List[YouTube]
        :returns: List of YouTube
        """
-        self._html_page = self.shorts_url  # Set shorts tab
+        self.html_url = self.shorts_url  # Set shorts tab
         return DeferredGeneratorList(self.videos_generator())
