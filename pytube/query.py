@@ -126,7 +126,7 @@ class StreamQuery(Sequence):
             if isinstance(res, str) or isinstance(resolution, str):
                 filters.append(lambda s: s.resolution == (res or resolution))
             elif isinstance(res, list) or isinstance(resolution, list):
-                filters.append(lambda s: s.resolution in (resolution or res))
+                filters.append(lambda s: s.resolution in (res or resolution))
 
         if fps:
             filters.append(lambda s: s.fps == fps)
