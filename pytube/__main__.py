@@ -465,3 +465,15 @@ class YouTube:
 
         """
         self.stream_monostate.on_complete = func
+
+    @staticmethod
+    def from_id(video_id: str) -> "YouTube":
+        """Construct a :class:`YouTube <YouTube>` object from a video id.
+
+        :param str video_id:
+            The video id of the YouTube video.
+
+        :rtype: :class:`YouTube <YouTube>`
+        
+        """
+        return YouTube(f"https://www.youtube.com/watch?v={video_id}")
