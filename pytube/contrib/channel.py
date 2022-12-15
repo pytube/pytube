@@ -28,12 +28,13 @@ class Channel(Playlist):
 
         self.videos_url = self.channel_url + '/videos'
         self.shorts_url = self.channel_url + '/shorts'
+        self.live_url = self.channel_url + '/streams'
         self.playlists_url = self.channel_url + '/playlists'
         self.community_url = self.channel_url + '/community'
         self.featured_channels_url = self.channel_url + '/channels'
         self.about_url = self.channel_url + '/about'
 
-        self._html_url = self.videos_url  # Videos will be preferred over short videos
+        self._html_url = self.videos_url  # Videos will be preferred over short videos and live
         self._visitor_data = None
 
         # Possible future additions
@@ -202,17 +203,16 @@ class Channel(Playlist):
         # this is the json tree structure, if the json was extracted from
         # html
         try:
-            try:
-                # This is the json tree structure for videos
-                videos = initial_data["contents"][
-                    "twoColumnBrowseResultsRenderer"][
-                    "tabs"][1]["tabRenderer"]["content"]["richGridRenderer"]["contents"]
+            # Possible tabs: Home, Videos, Shorts, Live, Playlists, Community, Channels, About
+            active_tab = {}
+            for tab in initial_data["contents"]["twoColumnBrowseResultsRenderer"]["tabs"]:
+                tab_url = tab["tabRenderer"]["endpoint"]["commandMetadata"]["webCommandMetadata"]["url"]
+                if tab_url.rsplit('/', maxsplit=1)[-1] == self.html_url.rsplit('/', maxsplit=1)[-1]:
+                    active_tab = tab
+                    break
 
-            except(KeyError, IndexError, TypeError):
-                # This is the json tree structure for short videos
-                videos = initial_data["contents"][
-                    "twoColumnBrowseResultsRenderer"][
-                    "tabs"][2]["tabRenderer"]["content"]["richGridRenderer"]["contents"]
+            # This is the json tree structure for videos, shorts and streams
+            videos = active_tab["tabRenderer"]["content"]["richGridRenderer"]["contents"]
 
             # This is the json tree structure of visitor data
             # It is necessary to send the visitorData together with the continuation token
@@ -251,7 +251,7 @@ class Channel(Playlist):
         # only extract the video ids from the video data
         videos_url = []
         try:
-            # Extract id from videos
+            # Extract id from videos and live
             for x in videos:
                 videos_url.append(f"/watch?v="
                                   f"{x['richItemRenderer']['content']['videoRenderer']['videoId']}")
@@ -282,4 +282,14 @@ class Channel(Playlist):
        :returns: List of YouTube
        """
         self.html_url = self.shorts_url  # Set shorts tab
+        return DeferredGeneratorList(self.videos_generator())
+
+    @property
+    def live(self) -> Iterable[YouTube]:
+        """Yields YouTube objects of live in this channel
+
+       :rtype: List[YouTube]
+       :returns: List of YouTube
+       """
+        self.html_url = self.live_url  # Set stream tab
         return DeferredGeneratorList(self.videos_generator())
