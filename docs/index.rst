@@ -23,7 +23,7 @@ command-line utility) for downloading YouTube Videos.
 **Behold, a perfect balance of simplicity versus flexibility**::
 
     >>> from pytube import YouTube
-    >>> YouTube('https://youtu.be/9bZkp7q19f0').streams.first().download()
+    >>> YouTube('https://youtu.be/dQw4w9WgXcQ').streams.first().download()
     >>> yt = YouTube('http://youtube.com/watch?v=9bZkp7q19f0')
     >>> yt.streams
     ... .filter(progressive=True, file_extension='mp4')
