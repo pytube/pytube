@@ -150,14 +150,6 @@ class Search:
                     continue
 
                 if 'videoRenderer' not in video_details:
-                    logger.warn('Unexpected renderer encountered.')
-                    logger.warn(f'Renderer name: {video_details.keys()}')
-                    logger.warn(f'Search term: {self.query}')
-                    logger.warn(
-                        'Please open an issue at '
-                        'https://github.com/pytube/pytube/issues '
-                        'and provide this log output.'
-                    )
                     continue
 
                 # Extract relevant video information from the details.

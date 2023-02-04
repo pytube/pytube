@@ -20,6 +20,7 @@ setup(
     author_email="hey@pytube.io",
     packages=["pytube", "pytube.contrib"],
     package_data={"": ["LICENSE"],},
+    install_requires=["requests", "bs4"],
     url="https://github.com/pytube/pytube",
     license="The Unlicense (Unlicense)",
     entry_points={

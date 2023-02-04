@@ -2,8 +2,9 @@
 """Module for interacting with a user's youtube channel."""
 import json
 import logging
+import requests
 from typing import Dict, List, Optional, Tuple
-
+from bs4 import BeautifulSoup
 from pytube import extract, Playlist, request
 from pytube.helpers import uniqueify
 
@@ -20,6 +21,9 @@ class Channel(Playlist):
             (Optional) A dictionary of proxies to use for web requests.
         """
         super().__init__(url, proxies)
+
+        if "/@" in url:
+            url = BeautifulSoup(requests.get(url).text, "html.parser").find_all("meta", property="og:url")[0].get("content")
 
         self.channel_uri = extract.channel_name(url)
 
@@ -56,6 +60,22 @@ class Channel(Playlist):
         :rtype: str
         """
         return self.initial_data['metadata']['channelMetadataRenderer']['externalId']
+
+    @property
+    def channel_description(self):
+        """Get the description of the YouTube channel.
+
+        :rtype: str
+        """
+        return self.initial_data['metadata']['channelMetadataRenderer']['description']
+
+    @property
+    def icon_url(self):
+        """Get the URL of the channel icon.
+
+        :rtype: str
+        """
+        return self.initial_data['metadata']['channelMetadataRenderer']['avatar']['thumbnails'][0]['url']
 
     @property
     def vanity_url(self):
