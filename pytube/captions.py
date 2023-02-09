@@ -84,13 +84,15 @@ class Caption:
         root = ElementTree.fromstring(xml_captions)
         i = 1
         for child in root[0]:
+            text = child.text or ""
+            caption = unescape(text.replace("\n", " ").replace("  ", " "), )
             start = float(child.attrib["t"]) / 1000.0
             try:
                 duration = float(child.attrib["d"]) / 1000.0
             except KeyError:
                 duration = 0.0
             end = start + duration
-            text = child.text
+            text = caption
 
             srt_start = self.float_to_srt_time_format(start)
             srt_end = self.float_to_srt_time_format(end)
