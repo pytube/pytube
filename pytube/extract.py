@@ -173,7 +173,7 @@ def channel_name(url: str) -> str:
         r"(?:\/(channel)\/([%\w\d_\-]+)(\/.*)?)",
         r"(?:\/(u)\/([%\d\w_\-]+)(\/.*)?)",
         r"(?:\/(user)\/([%\w\d_\-]+)(\/.*)?)",
-        r"(?:\/(\@)([%\d\w_\-]+)(\/.*)?)"
+        r"(?:\/(\@)([%\d\w_\-\.]+)(\/.*)?)"
     ]
     for pattern in patterns:
         regex = re.compile(pattern)
