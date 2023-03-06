@@ -91,6 +91,15 @@ DASH_VIDEO = {
     401: ("2160p", None),  # MP4
     402: ("4320p", None),  # MP4
     571: ("4320p", None),  # MP4
+    694: ("144p", None),  # MP4
+    695: ("240p", None),  # MP4
+    696: ("360p", None),  # MP4
+    697: ("480p", None),  # MP4
+    698: ("720p", None),  # MP4
+    699: ("1080p", None),  # MP4
+    700: ("1440p", None),  # MP4
+    701: ("2160p", None),  # MP4
+    702: ("4320p", None),  # MP4
 }
 
 DASH_AUDIO = {
