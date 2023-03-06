@@ -7,7 +7,7 @@ from typing import Dict, Optional
 
 from pytube import request
 from pytube.helpers import safe_filename, target_directory
-
+import json
 
 class Caption:
     """Container for caption tracks."""
