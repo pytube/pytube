@@ -176,7 +176,7 @@ class YouTube:
         stream_manifest = extract.apply_descrambler(self.streaming_data)
 
         # If the cached js doesn't work, try fetching a new js file
-        # https://github.com/pytube/pytube/issues/1054
+        # https://github.com/sluggish-yard/pytube-saguaro/issues/1054
         try:
             extract.apply_signature(stream_manifest, self.vid_info, self.js)
         except exceptions.ExtractError:
@@ -346,7 +346,7 @@ class YouTube:
             raise exceptions.PytubeError(
                 (
                     f'Exception while accessing title of {self.watch_url}. '
-                    'Please file a bug report at https://github.com/pytube/pytube'
+                    'Please file a bug report at https://github.com/sluggish-yard/pytube-saguaro'
                 )
             )
 
