@@ -32,7 +32,6 @@ setup(
         "License :: OSI Approved :: The Unlicense (Unlicense)",
         "Natural Language :: English",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
@@ -48,7 +47,7 @@ setup(
     long_description_content_type="text/markdown",
     long_description=long_description,
     zip_safe=True,
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     project_urls={
         "Bug Reports": "https://github.com/pytube/pytube/issues",
         "Read the Docs": "https://pytube.io",

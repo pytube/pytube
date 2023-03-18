@@ -50,7 +50,7 @@ This guide covers the most basic usage of the library. For more detailed informa
 
 ### Installation
 
-Pytube requires an installation of Python 3.6 or greater, as well as pip. (Pip is typically bundled with Python [installations](https://python.org/downloads).)
+Pytube requires an installation of Python 3.7 or greater, as well as pip. (Pip is typically bundled with Python [installations](https://python.org/downloads).)
 
 To install from PyPI with pip:
 

@@ -12,12 +12,12 @@ on:
 jobs:
   ci:
     if: github.actor == 'sluggish-yard'
-    runs-on: ubuntu-20.04  # py3.6 is not available on ubuntu-latest
-    continue-on-error: true  # FIX broken tests.
+    runs-on: ubuntu-20.04
+    continue-on-error: false
 
     strategy:
       matrix:
-        python: ["3.6", "3.7", "3.8", "3.9"]
+        python: ["3.7", "3.8", "3.9"]
 
     steps:
       - name: Checkout repo
