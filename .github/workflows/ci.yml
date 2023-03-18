@@ -2,25 +2,28 @@ name: CI testing
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ upstream ]
     paths-ignore:
       - '**/README.md'
       - 'docs/**'
 
+  workflow_dispatch:
+
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    if: github.actor == 'sluggish-yard'
+    runs-on: ubuntu-20.04  # py3.6 is not available on ubuntu-latest
 
     strategy:
       matrix:
-        python: [3.6, 3.7, 3.8, 3.9]
+        python: ["3.6", "3.7", "3.8", "3.9"]
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
 
