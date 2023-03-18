@@ -474,6 +474,6 @@ class YouTube:
             The video id of the YouTube video.
 
         :rtype: :class:`YouTube <YouTube>`
-        
+
         """
         return YouTube(f"https://www.youtube.com/watch?v={video_id}")

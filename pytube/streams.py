@@ -63,13 +63,13 @@ class Stream:
 
         # filesize in bytes
         self._filesize: Optional[int] = int(stream.get('contentLength', 0))
-        
+
         # filesize in kilobytes
         self._filesize_kb: Optional[float] = float(ceil(float(stream.get('contentLength', 0)) / 1024 * 1000) / 1000)
-        
+
         # filesize in megabytes
         self._filesize_mb: Optional[float] = float(ceil(float(stream.get('contentLength', 0)) / 1024 / 1024 * 1000) / 1000)
-        
+
         # filesize in gigabytes(fingers crossed we don't need terabytes going forward though)
         self._filesize_gb: Optional[float] = float(ceil(float(stream.get('contentLength', 0)) / 1024 / 1024 / 1024 * 1000) / 1000)
 
@@ -160,7 +160,7 @@ class Stream:
                     raise
                 self._filesize = request.seq_filesize(self.url)
         return self._filesize
-    
+
     @property
     def filesize_kb(self) -> float:
         """File size of the media stream in kilobytes.
@@ -177,7 +177,7 @@ class Stream:
                     raise
                 self._filesize_kb = float(ceil(request.seq_filesize(self.url)/1024 * 1000) / 1000)
         return self._filesize_kb
-    
+
     @property
     def filesize_mb(self) -> float:
         """File size of the media stream in megabytes.
@@ -211,7 +211,7 @@ class Stream:
                     raise
                 self._filesize_gb = float(ceil(request.seq_filesize(self.url)/1024/1024/1024 * 1000) / 1000)
         return self._filesize_gb
-    
+
     @property
     def title(self) -> str:
         """Get title of video
