@@ -82,12 +82,34 @@ def find_object_from_startpoint(html, start_point):
         '[': ']',
         '"': '"'
     }
-
+    is_regex = False
+    regex_start = -1
     while i < len(html):
         if len(stack) == 0:
             break
         curr_char = html[i]
         curr_context = stack[-1]
+
+        # TODO: find a better way to handle regexes.
+        # JS regex can include { and } characters, so we need to handle them to avoid closing the context too early.
+        # Examples:
+        #   ,/[,\]],[\]];}/,
+        #   e.split(""))},\n/[,\]],[\]];}/,-2088968882,
+        if curr_context != "" and not is_regex and html[i] == "/":
+            _text = html[max(0, i-4):min(i+2, len(html)+1)]
+            if re.search(r",\s*/", _text):
+                is_regex = True
+                regex_start = i
+
+        if is_regex:
+            if i != regex_start and curr_char == "/":
+                is_regex = curr_char != "/"
+            if curr_char != "/":
+                if i - regex_start > 20:
+                    # Most likely we failed to parse the regex.
+                    raise HTMLParseError(f"Most likely we failed to parse js regex: {html[regex_start:i+1]}")
+            i += 1
+            continue
 
         # If we've reached a context closer, we can remove an element off the stack
         if curr_char == context_closers[curr_context]:
