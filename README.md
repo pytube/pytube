@@ -11,7 +11,7 @@
 
 ## Disclaimer
 
-The [pytube-saquaro](https://github.com/sluggish-yard/pytube-saguaro) is is [pytube](https://github.com/pytube/pytube) on life support.
+The [pytube-saquaro](https://github.com/sluggish-yard/pytube-saguaro) is [pytube](https://github.com/pytube/pytube) on life support.
 
 Although the [pytube](https://github.com/pytube/pytube) has not been maintained since December 2022, many people including me continue to rely on it for their needs. To address this, I have forked the project, and trying to make it function for my use cases. I cannot make a commitment to actively maintain the project. There are no plans adding new features. The project will eventually be either archived or deleted.
 
