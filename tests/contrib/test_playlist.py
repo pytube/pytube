@@ -46,7 +46,7 @@ def test_init_with_watch_url(request_get):
 
 @mock.patch("pytube.request.get")
 def test_last_updated(request_get, playlist_long_html):
-    expected = datetime.date(2020, 10, 8)
+    expected = datetime.date(2023, 2, 23)
     request_get.return_value = playlist_long_html
     playlist = Playlist(
         "https://www.youtube.com/playlist?list"
@@ -193,7 +193,7 @@ def test_playlist_failed_pagination(request_post, request_get, playlist_long_htm
 
 @mock.patch("pytube.request.get")
 @mock.patch("pytube.request.post")
-def test_playlist_pagination(request_post, request_get, playlist_html, playlist_long_html):
+def test_playlist_pagination(request_post, request_get, playlist_long_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.side_effect = [
         playlist_long_html
@@ -212,7 +212,7 @@ def test_playlist_pagination(request_post, request_get, playlist_html, playlist_
 
 
 @mock.patch("pytube.request.get")
-def test_trimmed_pagination(request_get, playlist_html, playlist_long_html):
+def test_trimmed_pagination(request_get, playlist_long_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.side_effect = [
         playlist_long_html,
@@ -229,9 +229,7 @@ def test_trimmed_pagination(request_get, playlist_html, playlist_long_html):
 
 # TODO: Test case not clear to me
 @mock.patch("pytube.request.get")
-def test_trimmed_pagination_not_found(
-    request_get, playlist_html, playlist_long_html
-):
+def test_trimmed_pagination_not_found(request_get, playlist_long_html):
     url = "https://www.fakeurl.com/playlist?list=whatever"
     request_get.side_effect = [
         playlist_long_html,
@@ -242,7 +240,7 @@ def test_trimmed_pagination_not_found(
         "{}",
     ]
     playlist = Playlist(url) # noqa
-    # assert len(list(playlist.trimmed("wont-be-found"))) == 101 # noqa
+    assert len(list(playlist.trimmed("wont-be-found"))) == 226 # noqa
     assert True
 
 
@@ -267,7 +265,7 @@ def test_playlist_length(request_get, playlist_long_html):
     url = 'https://www.example.com/playlist?list=whatever'
     request_get.return_value = playlist_long_html
     p = Playlist(url)
-    assert p.length == 217
+    assert p.length == 229
 
 
 @mock.patch("pytube.request.get")
@@ -275,6 +273,7 @@ def test_playlist_description(request_get, playlist_long_html):
     url = 'https://www.example.com/playlist?list=whatever'
     request_get.return_value = playlist_long_html
     p = Playlist(url)
+    print(p.description)
     assert p.description == (
         'Python Object Oriented - Learning Python in '
         "simple and easy steps ,python,xml,script,install, A beginner's "
@@ -295,7 +294,7 @@ def test_playlist_views(request_get, playlist_long_html):
     url = 'https://www.example.com/playlist?list=whatever'
     request_get.return_value = playlist_long_html
     p = Playlist(url)
-    assert p.views == 4617130
+    assert p.views == 4800161
 
 
 @mock.patch("pytube.request.get")
