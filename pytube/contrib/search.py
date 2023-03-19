@@ -111,7 +111,7 @@ class Search:
         else:
             next_continuation = None
 
-        # If the itemSectionRenderer doesn't exist, assume no results.
+        # If the  doesn't exist, assume no results.
         if item_renderer:
             videos = []
             raw_video_list = item_renderer['contents']
@@ -140,10 +140,6 @@ class Search:
                 # Skip 'people also searched for' results
                 if 'horizontalCardListRenderer' in video_details:
                     continue
-                    
-                # Skip Youtube Shorts videos
-                if 'reelShelfRenderer' in video_details:
-                    continue
 
                 # Can't seem to reproduce, probably related to typo fix suggestions
                 if 'didYouMeanRenderer' in video_details:
@@ -152,63 +148,74 @@ class Search:
                 # Seems to be the renderer used for the image shown on a no results page
                 if 'backgroundPromoRenderer' in video_details:
                     continue
+                if 'reelShelfRenderer' in video_details:
+                      vid = video_details['reelShelfRenderer']['items']
+                      for videoo in vid:
+                          vid_ren= videoo['reelItemRenderer']
+                          vid_id = videoo['reelItemRenderer']['videoId']
+                          vid_url = f'https://www.youtube.com/watch?v={vid_id}'
+                          vid_title = vid_ren['headline']['simpleText']
 
-                if 'videoRenderer' not in video_details:
-                    logger.warn('Unexpected renderer encountered.')
-                    logger.warn(f'Renderer name: {video_details.keys()}')
-                    logger.warn(f'Search term: {self.query}')
-                    logger.warn(
-                        'Please open an issue at '
-                        'https://github.com/pytube/pytube/issues '
-                        'and provide this log output.'
-                    )
-                    continue
+                          vid_metadata = {
+                            'id': vid_id,
+                            'url': vid_url,
+                            'title': vid_title,
+                            'channel_name':None ,
+                            'channel_url':None 
+                          }
+                          vid = YouTube(vid_metadata['url'])
+                          vid.author = vid_metadata['channel_name']
+                          vid.title = vid_metadata['title']
+                          videos.append(vid)
+                         
 
-                # Extract relevant video information from the details.
-                # Some of this can be used to pre-populate attributes of the
-                #  YouTube object.
-                vid_renderer = video_details['videoRenderer']
-                vid_id = vid_renderer['videoId']
-                vid_url = f'https://www.youtube.com/watch?v={vid_id}'
-                vid_title = vid_renderer['title']['runs'][0]['text']
-                vid_channel_name = vid_renderer['ownerText']['runs'][0]['text']
-                vid_channel_uri = vid_renderer['ownerText']['runs'][0][
-                    'navigationEndpoint']['commandMetadata']['webCommandMetadata']['url']
-                # Livestreams have "runs", non-livestreams have "simpleText",
-                #  and scheduled releases do not have 'viewCountText'
-                if 'viewCountText' in vid_renderer:
-                    if 'runs' in vid_renderer['viewCountText']:
-                        vid_view_count_text = vid_renderer['viewCountText']['runs'][0]['text']
+                elif 'videoRenderer' in video_details:
+                    # Extract relevant video information from the details.
+                    # Some of this can be used to pre-populate attributes of the
+                    #  YouTube object.
+                    vid_renderer = video_details['videoRenderer']
+                    vid_id = vid_renderer['videoId']
+                  
+                    vid_url = f'https://www.youtube.com/watch?v={vid_id}'
+                    vid_title = vid_renderer['title']['runs'][0]['text']
+                    vid_channel_name = vid_renderer['ownerText']['runs'][0]['text']
+                    vid_channel_uri = vid_renderer['ownerText']['runs'][0][
+                        'navigationEndpoint']['commandMetadata']['webCommandMetadata']['url']
+                    # Livestreams have "runs", non-livestreams have "simpleText",
+                    #  and scheduled releases do not have 'viewCountText'
+                    if 'viewCountText' in vid_renderer:
+                        if 'runs' in vid_renderer['viewCountText']:
+                            vid_view_count_text = vid_renderer['viewCountText']['runs'][0]['text']
+                        else:
+                            vid_view_count_text = vid_renderer['viewCountText']['simpleText']
+                        # Strip ' views' text, then remove commas
+                        stripped_text = vid_view_count_text.split()[0].replace(',','')
+                        if stripped_text == 'No':
+                            vid_view_count = 0
+                        else:
+                            vid_view_count = int(stripped_text)
                     else:
-                        vid_view_count_text = vid_renderer['viewCountText']['simpleText']
-                    # Strip ' views' text, then remove commas
-                    stripped_text = vid_view_count_text.split()[0].replace(',','')
-                    if stripped_text == 'No':
                         vid_view_count = 0
+                    if 'lengthText' in vid_renderer:
+                        vid_length = vid_renderer['lengthText']['simpleText']
                     else:
-                        vid_view_count = int(stripped_text)
-                else:
-                    vid_view_count = 0
-                if 'lengthText' in vid_renderer:
-                    vid_length = vid_renderer['lengthText']['simpleText']
-                else:
-                    vid_length = None
+                        vid_length = None
 
-                vid_metadata = {
-                    'id': vid_id,
-                    'url': vid_url,
-                    'title': vid_title,
-                    'channel_name': vid_channel_name,
-                    'channel_url': vid_channel_uri,
-                    'view_count': vid_view_count,
-                    'length': vid_length
-                }
+                    vid_metadata = {
+                        'id': vid_id,
+                        'url': vid_url,
+                        'title': vid_title,
+                        'channel_name': vid_channel_name,
+                        'channel_url': vid_channel_uri,
+                        'view_count': vid_view_count,
+                        'length': vid_length
+                    }
 
-                # Construct YouTube object from metadata and append to results
-                vid = YouTube(vid_metadata['url'])
-                vid.author = vid_metadata['channel_name']
-                vid.title = vid_metadata['title']
-                videos.append(vid)
+                    # Construct YouTube object from metadata and append to results
+                    vid = YouTube(vid_metadata['url'])
+                    vid.author = vid_metadata['channel_name']
+                    vid.title = vid_metadata['title']
+                    videos.append(vid)
         else:
             videos = None
 
