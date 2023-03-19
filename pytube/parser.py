@@ -134,12 +134,11 @@ def parse_for_object_from_startpoint(html, start_point):
     full_obj = find_object_from_startpoint(html, start_point)
     try:
         return json.loads(full_obj)
-    except Exception as e:
+    except json.decoder.JSONDecodeError:
         try:
             return ast.literal_eval(full_obj)
         except (ValueError, SyntaxError):
             raise HTMLParseError('Could not parse object.')
-
 
 
 def throttling_array_split(js_array):
