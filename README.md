@@ -9,9 +9,21 @@
   </p> -->
 </div>
 
-### Actively soliciting contributors!
+## Disclaimer
 
-Have ideas for how pytube can be improved? Feel free to open an issue or a pull request!
+This is pytube on life support.
+
+Although the popular video downloading library pytube/pytube has not been maintained since December 2022, many people continue to rely on it for their needs. To address this, I have taken the initiative to fork the project and trying to make it function for my use cases. I cannot make a commitment to actively maintain the project. There are no plans adding new features. The project will eventually be either archived or deleted.
+
+If you're also struggling with supporting existing applications while searching for pytube alternatives, I would like to invite you to join my efforts in making the project more stable and reliable. I am not an expert in pytube library and would appreciate pull requests from more experienced users.
+Perhaps, together, we can make it more sustainable for some time to come.
+
+## Known issues
+
+Multiple `Channel` attributes(`last_updated`, `title`, `description`, `length`) raise exceptions instead of returning data.
+
+Many tests are failing.
+
 
 # pytube
 
