@@ -84,6 +84,9 @@ def playlist_html():
     """Youtube playlist HTML loaded on 2020-01-25 from
     https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr
     """
+    # Commands to update the file:
+    #  curl -o tests/mocks/playlist.html https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr
+    #  gzip tests/mocks/playlist.html
     file_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         "mocks",
@@ -96,8 +99,11 @@ def playlist_html():
 @pytest.fixture
 def playlist_long_html():
     """Youtube playlist HTML loaded on 2020-01-25 from
-    https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr
+    https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n
     """
+    # Commands to update the file:
+    #  curl -o tests/mocks/playlist_long.html https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n
+    #  gzip tests/mocks/playlist_long.html
     file_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         "mocks",
@@ -109,7 +115,7 @@ def playlist_long_html():
 
 @pytest.fixture
 def playlist_submenu_html():
-    """Youtube playlist HTML loaded on 2020-01-24 from
+    """Youtube playlist HTML loaded on 2023-03-19 from
     https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr
     """
     file_path = os.path.join(
@@ -189,10 +195,11 @@ def channel_live_html():
 def base_js():
     """Youtube base.js files retrieved on 2022-02-04 and 2022-04-15
     from https://www.youtube.com/watch?v=vmzxpUsN0uA and
-    https://www.youtube.com/watch?v=Y4-GSFKZmEg respectively
+    https://www.youtube.com/watch?v=Y4-GSFKZmEg and
+    https://www.youtube.com/watch?v=ujTCoH21GlA respectively
     """
     base_js_files = []
-    for file in ["base.js-2022-02-04.gz", "base.js-2022-04-15.gz"]:
+    for file in ["base.js-2022-02-04.gz", "base.js-2022-04-15.gz", "base.js-2023-03-19.gz"]:
         file_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             "mocks",

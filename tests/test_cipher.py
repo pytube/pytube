@@ -94,7 +94,14 @@ def test_get_throttling_function_name(base_js):
             'raw_code': (r'a.url="";a.D&&(b=a.get("n"))&&(b=$x[0](b),a.set("n",b),'
                          r'$x.length||uq(""))'),
             'nfunc_name': 'uq'
-        }
+        },
+        # Values expected as of 2023/03/19:
+        {
+            'raw_var' : r'var bua=[mma]',
+            'raw_code': (r'a.url="";a.D&&(b=a.get("n"))&&(b=bua[0](b),a.set("n",b),'
+                         r'bua.length||mma(""))'),
+            'nfunc_name': 'mma'
+        },
     ]
     for code_fragment, base_js_file in zip(base_js_code_fragments, base_js):
         assert code_fragment['raw_var'] in base_js_file
