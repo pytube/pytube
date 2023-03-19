@@ -408,7 +408,14 @@ def get_throttling_plan(js: str):
     plan_regex = re.compile(transform_start)
     match = plan_regex.search(raw_code)
 
-    transform_plan_raw = find_object_from_startpoint(raw_code, match.span()[1] - 1)
+    # A Change in the JS code on YouTube's end has Pytube to stop working.
+    # This is a temporary fix to get the code working again.
+
+    # The code below is the original code
+    # transform_plan_raw = find_object_from_startpoint(raw_code, match.span()[1] - 1)
+
+    # The code below is the temporary fix
+    transform_plan_raw = js
 
     # Steps are either c[x](c[y]) or c[x](c[y],c[z])
     step_start = r"c\[(\d+)\]\(c\[(\d+)\](,c(\[(\d+)\]))?\)"
