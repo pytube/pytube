@@ -11,7 +11,7 @@ on:
 
 jobs:
   ci:
-    if: github.actor == 'sluggish-yard'
+    if: github.actor == 'sluggish-yard' || github.event.pull_request.merged == true
     runs-on: ubuntu-20.04
     continue-on-error: false
 
