@@ -136,13 +136,50 @@ def stream_dict():
 
 @pytest.fixture
 def channel_videos_html():
-    """Youtube channel HTML loaded on 2021-05-05 from
+    """Youtube channel HTML loaded on 2023-03-18 from
     https://www.youtube.com/c/ProgrammingKnowledge/videos
     """
+    # Commands to update this file:
+    #   curl -o tests/mocks/channel-videos.html https://www.youtube.com/c/ProgrammingKnowledge/videos
+    #   gzip tests/mocks/channel-videos.html
     file_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         "mocks",
         "channel-videos.html.gz",
+    )
+    with gzip.open(file_path, 'rb') as f:
+        return f.read().decode('utf-8')
+
+
+@pytest.fixture
+def channel_shorts_html():
+    """Youtube channel HTML loaded on 2023-03-18 from
+    https://www.youtube.com/@MLB/shorts
+    """
+    # Commands to update this file:
+    #   curl -o tests/mocks/channel-shorts.html https://www.youtube.com/@MLB/shorts
+    #   gzip tests/mocks/channel-shorts.html
+    file_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "mocks",
+        "channel-shorts.html.gz",
+    )
+    with gzip.open(file_path, 'rb') as f:
+        return f.read().decode('utf-8')
+
+
+@pytest.fixture
+def channel_live_html():
+    """Youtube channel HTML loaded on 2023-03-18 from
+    https://www.youtube.com/@MLB/shorts
+    """
+    # Commands to update this file:
+    #   curl -o tests/mocks/channel-live.html https://www.youtube.com/@MLB/streams
+    #   gzip tests/mocks/channel-live.html
+    file_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "mocks",
+        "channel-live.html.gz",
     )
     with gzip.open(file_path, 'rb') as f:
         return f.read().decode('utf-8')

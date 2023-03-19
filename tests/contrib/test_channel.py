@@ -47,7 +47,7 @@ def test_channel_vanity_url(request_get, channel_videos_html):
     request_get.return_value = channel_videos_html
 
     c = Channel('https://www.youtube.com/c/ProgrammingKnowledge/videos')
-    assert c.vanity_url == 'http://www.youtube.com/c/ProgrammingKnowledge'
+    assert c.vanity_url == 'http://www.youtube.com/@ProgrammingKnowledge'
 
 
 @mock.patch('pytube.request.get')
@@ -56,16 +56,54 @@ def test_channel_video_list(request_get, channel_videos_html):
 
     c = Channel('https://www.youtube.com/c/ProgrammingKnowledge/videos')
     first_ten = [
-        'https://www.youtube.com/watch?v=t_xLpJo_35k',
-        'https://www.youtube.com/watch?v=ccbh5YhxouQ',
-        'https://www.youtube.com/watch?v=wDnFjDjxW_0',
-        'https://www.youtube.com/watch?v=F3W_p_4XftA',
-        'https://www.youtube.com/watch?v=_fxm0xGGEi4',
-        'https://www.youtube.com/watch?v=cRbKZzcuIsg',
-        'https://www.youtube.com/watch?v=sdDu3dfIuow',
-        'https://www.youtube.com/watch?v=10KIbp-gJCE',
-        'https://www.youtube.com/watch?v=wZIT-cRtd6s',
-        'https://www.youtube.com/watch?v=KucCvEbTj0w',
+        'https://www.youtube.com/watch?v=ZR4FHmypft4',
+        'https://www.youtube.com/watch?v=oLu1U77qjSc',
+        'https://www.youtube.com/watch?v=WDEdRmTCSs8',
+        'https://www.youtube.com/watch?v=eZMV-fOPNLU',
+        'https://www.youtube.com/watch?v=suE1vJPLDd8',
+        'https://www.youtube.com/watch?v=RSjrUXECxW0',
+        'https://www.youtube.com/watch?v=bj3BzUDX0S8',
+        'https://www.youtube.com/watch?v=28gsNU-ylDI',
+        'https://www.youtube.com/watch?v=sxbTqVgLLjQ',
+        'https://www.youtube.com/watch?v=b165eo5SmA0',
+    ]
+    assert c.video_urls[:10] == first_ten
+
+
+@mock.patch('pytube.request.get')
+def test_channel_shorts_list(request_get, channel_shorts_html):
+    request_get.return_value = channel_shorts_html
+    c = Channel('https://www.youtube.com/@MLB/shorts')
+    first_ten = [
+        'https://www.youtube.com/watch?v=QkxWDZWLdPo',
+        'https://www.youtube.com/watch?v=PFhXf8JNTlk',
+        'https://www.youtube.com/watch?v=OYtlbyue5wk',
+        'https://www.youtube.com/watch?v=1QrfBgCilcg',
+        'https://www.youtube.com/watch?v=_h6ZxGGol5A',
+        'https://www.youtube.com/watch?v=cf_cjXbIWuk',
+        'https://www.youtube.com/watch?v=W_XX5yXjclI',
+        'https://www.youtube.com/watch?v=X_yifl4zvMQ',
+        'https://www.youtube.com/watch?v=HnYmQ1pNIxk',
+        'https://www.youtube.com/watch?v=prBUfkJyY1E',
+    ]
+    assert c.video_urls[:10] == first_ten
+
+
+@mock.patch('pytube.request.get')
+def test_channel_live_list(request_get, channel_live_html):
+    request_get.return_value = channel_live_html
+    c = Channel('https://www.youtube.com/@MLB/streams')
+    first_ten = [
+        'https://www.youtube.com/watch?v=2u5Y3wadFc0',
+        'https://www.youtube.com/watch?v=VS3QeZ823Lg',
+        'https://www.youtube.com/watch?v=dtG7A1wJKLs',
+        'https://www.youtube.com/watch?v=Kw2C3XOsFY0',
+        'https://www.youtube.com/watch?v=yc2SSlcl2Ek',
+        'https://www.youtube.com/watch?v=SyQ2UZ9EF-k',
+        'https://www.youtube.com/watch?v=qjtzooqcjgA',
+        'https://www.youtube.com/watch?v=rU-K8Im4KRw',
+        'https://www.youtube.com/watch?v=cio1zhDHP-E',
+        'https://www.youtube.com/watch?v=w72lUUiN__s',
     ]
     assert c.video_urls[:10] == first_ten
 
