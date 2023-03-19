@@ -6,6 +6,7 @@ on:
     paths-ignore:
       - '**/README.md'
       - 'docs/**'
+      - 'images/**'
 
   workflow_dispatch:
 
