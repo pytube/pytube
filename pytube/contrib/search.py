@@ -140,6 +140,10 @@ class Search:
                 # Skip 'people also searched for' results
                 if 'horizontalCardListRenderer' in video_details:
                     continue
+                    
+                # Skip Youtube Shorts videos
+                if 'reelShelfRenderer' in video_details:
+                    continue
 
                 # Can't seem to reproduce, probably related to typo fix suggestions
                 if 'didYouMeanRenderer' in video_details:
