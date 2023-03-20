@@ -327,8 +327,11 @@ class Playlist(Sequence):
         :return: Date of last playlist update where possible, else the string provided
         :rtype: datetime.date
         """
-        last_updated_text = self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
-            'stats'][2]['runs'][1]['text']
+        last_updated_text = ""
+        try:
+            last_updated_text = self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer']['stats'][2]['runs'][1]['text']
+        except IndexError:            
+            last_updated_text = self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer']['stats'][2]['runs'][0]['text']
         try:
             date_components = last_updated_text.split()
             month = date_components[0]
@@ -338,6 +341,8 @@ class Playlist(Sequence):
                 f"{month} {day:0>2} {year}", "%b %d %Y"
             ).date()
         except (IndexError, KeyError):
+            if last_updated_text == "Updated today":
+                return date.today()
             return last_updated_text
 
     @property
@@ -353,8 +358,11 @@ class Playlist(Sequence):
 
     @property
     def description(self) -> str:
-        return self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
-            'description']['simpleText']
+        try:
+            description = self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer']['description']['simpleText']
+        except KeyError:
+            description = None
+        return description
 
     @property
     def length(self):
