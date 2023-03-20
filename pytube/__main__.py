@@ -477,3 +477,50 @@ class YouTube:
         
         """
         return YouTube(f"https://www.youtube.com/watch?v={video_id}")
+    
+    @property
+    def likes(self) -> int:
+        """Get the number of the times the video has been liked.
+
+        :rtype: int
+        """        
+        likes = 0
+        try:
+            likes = self.initial_data["contents"]["twoColumnWatchNextResults"]["results"]["results"]["contents"][0]["videoPrimaryInfoRenderer"]["videoActions"]["menuRenderer"]["topLevelButtons"][0]["segmentedLikeDislikeButtonRenderer"]["likeButton"]["toggleButtonRenderer"]["defaultText"]["accessibility"]["accessibilityData"]["label"]
+            likes = likes.replace("likes", "").replace(",", "")
+            likes = int(likes)     
+        except Exception as e:
+        
+            raise exceptions.PytubeError(
+                (
+                    f'Exception while accessing likes of {self.watch_url}. '
+                    f'Exception caused by: {e}'
+                    'Please file a bug report at https://github.com/pytube/pytube'
+                )
+            )
+   
+        return likes
+    
+    @property
+    def comments_count(self) -> int:
+        """Get the number of the times the video has been comment.
+
+        :rtype: int
+        """       
+        comments_count = 0
+        try: 
+            comments_count = self.initial_data["contents"]["twoColumnWatchNextResults"]["results"]["results"]["contents"][2]["itemSectionRenderer"]["contents"][0]["commentsEntryPointHeaderRenderer"]["commentCount"]["simpleText"]
+            comments_count = comments_count.replace("K", "e3").replace("M", "e6").replace("No", "0")  
+            comments_count = int(float(comments_count))    
+        except Exception as e:
+        
+            raise exceptions.PytubeError(
+                (
+                    f'Exception while accessing comments_count of {self.watch_url}. '
+                    f'Exception caused by: {e}'
+                    'Please file a bug report at https://github.com/pytube/pytube'
+                )
+            )
+   
+        return comments_count
+    
