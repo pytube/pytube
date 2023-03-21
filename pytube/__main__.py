@@ -9,6 +9,8 @@ smaller peripheral modules and functions.
 import logging
 from typing import Any, Callable, Dict, List, Optional
 
+from re import findall
+
 import pytube
 import pytube.exceptions as exceptions
 from pytube import extract, request
@@ -523,4 +525,22 @@ class YouTube:
             )
    
         return _comments_count
-    
+        
+    @property        
+    def urls_present_in_the_video_description(self) -> List[str]:
+        """Get the Urls present in the video description.
+
+        :rtype: List[str]
+        """                
+        pattern = "https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)"         
+        return list(set(findall(pattern, self.description)))    
+           
+    @property
+    def mails_present_in_the_video_description(self) -> List[str]:
+        """Get the Mails present in the video description.
+
+        :rtype: List[str]
+        """                 
+        pattern = r"\S+@\S+\.\S+"             
+        _mails = [mail for mail in list(set(findall(pattern, self.description))) if not mail.startswith("http")]         
+        return _mails

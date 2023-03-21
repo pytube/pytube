@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Tuple
 
 from datetime import datetime
 from urllib.parse import unquote
+from re import findall
 
 from pytube import extract, Playlist, request
 from pytube.helpers import uniqueify
@@ -252,7 +253,26 @@ class Channel(Playlist):
         except KeyError:
             _description = None
         return _description
-    
+        
+    @property
+    def urls_present_in_the_channel_description(self) -> List[str]:
+        """Get the Urls present in the channel description of the YouTube channel.
+
+        :rtype: List[str]
+        """                
+        pattern = "https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)"         
+        return list(set(findall(pattern, self.description)))    
+           
+    @property
+    def mails_present_in_the_channel_description(self) -> List[str]:
+        """Get the Mails present in the channel description of the YouTube channel.
+
+        :rtype: List[str]
+        """                 
+        pattern = r"\S+@\S+\.\S+"             
+        _mails = [mail for mail in list(set(findall(pattern, self.description))) if not mail.startswith("http")]         
+        return _mails
+     
     @property
     def keywords(self) -> Optional[str]:
         """Get the description of the YouTube channel.
