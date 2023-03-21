@@ -4,6 +4,7 @@ import logging
 from collections.abc import Sequence
 from datetime import date, datetime
 from typing import Dict, Iterable, List, Optional, Tuple, Union
+from re import findall
 
 from pytube import extract, request, YouTube
 from pytube.helpers import cache, DeferredGeneratorList, install_proxy, uniqueify
@@ -425,3 +426,27 @@ class Playlist(Sequence):
     @staticmethod
     def _video_url(watch_path: str):
         return f"https://www.youtube.com{watch_path}"
+       
+    @property
+    def urls_present_in_the_playlist_description(self) -> List[str]:
+        """Get the Urls present in the playlist description of the YouTube channel.
+
+        :rtype: List[str]
+        """        
+        _urls = []
+        if self.description:           
+            pattern = "https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)"         
+            _urls = list(set(findall(pattern, self.description)))    
+        return _urls
+           
+    @property
+    def mails_present_in_the_playlist_description(self) -> List[str]:
+        """Get the Mails present in the playlist description of the YouTube channel.
+
+        :rtype: List[str]
+        """           
+        _mails = []
+        if self.description:      
+            pattern = r"\S+@\S+\.\S+"             
+            _mails = [mail for mail in list(set(findall(pattern, self.description))) if not mail.startswith("http")]         
+        return _mails

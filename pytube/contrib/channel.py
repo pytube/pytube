@@ -259,18 +259,23 @@ class Channel(Playlist):
         """Get the Urls present in the channel description of the YouTube channel.
 
         :rtype: List[str]
-        """                
-        pattern = "https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)"         
-        return list(set(findall(pattern, self.description)))    
+        """        
+        _urls = []
+        if self.description:           
+            pattern = "https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)"         
+            _urls = list(set(findall(pattern, self.description)))    
+        return _urls
            
     @property
     def mails_present_in_the_channel_description(self) -> List[str]:
         """Get the Mails present in the channel description of the YouTube channel.
 
         :rtype: List[str]
-        """                 
-        pattern = r"\S+@\S+\.\S+"             
-        _mails = [mail for mail in list(set(findall(pattern, self.description))) if not mail.startswith("http")]         
+        """           
+        _mails = []
+        if self.description:      
+            pattern = r"\S+@\S+\.\S+"             
+            _mails = [mail for mail in list(set(findall(pattern, self.description))) if not mail.startswith("http")]         
         return _mails
      
     @property
@@ -374,9 +379,18 @@ class Channel(Playlist):
 
         :rtype: str
         """
-        try:
-            _channel_type = None   
-        except KeyError:
-            _channel_type = None
+        _channel_type = None
         return _channel_type
+   
+
+    @property
+    def length(self) -> str:
+        """Get the number of videos of the YouTube channel.
+        
+        Not implemented yet
+
+        :rtype: str
+        """
+        _length = None   
+        return _length
    
