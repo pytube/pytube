@@ -391,7 +391,12 @@ class Playlist(Sequence):
         count_text = views_text.split()[0]
         # "1234567"
         count_text = count_text.replace(',', '')
-        return int(count_text)
+        count = 0
+        try:
+            count = int(count_text)
+        except ValueError:
+            count = 0
+        return count
 
     @property
     def owner(self):
@@ -428,25 +433,29 @@ class Playlist(Sequence):
         return f"https://www.youtube.com{watch_path}"
        
     @property
-    def urls_present_in_the_playlist_description(self) -> List[str]:
+    def urls_present_in_the_playlist_description(self) -> Union[List[str], int]:
         """Get the Urls present in the playlist description of the YouTube channel.
 
-        :rtype: List[str]
+        :rtype: Union[List[str], int]
         """        
         _urls = []
         if self.description:           
             pattern = "https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)"         
             _urls = list(set(findall(pattern, self.description)))    
+        if not len(_urls):
+            _urls =0     
         return _urls
            
     @property
-    def mails_present_in_the_playlist_description(self) -> List[str]:
+    def mails_present_in_the_playlist_description(self) -> Union[List[str], int]:
         """Get the Mails present in the playlist description of the YouTube channel.
 
-        :rtype: List[str]
+        :rtype: Union[List[str], int]
         """           
         _mails = []
         if self.description:      
             pattern = r"\S+@\S+\.\S+"             
-            _mails = [mail for mail in list(set(findall(pattern, self.description))) if not mail.startswith("http")]         
+            _mails = [mail for mail in list(set(findall(pattern, self.description))) if not mail.startswith("http")]   
+        if not len(_mails):
+            _mails = 0           
         return _mails

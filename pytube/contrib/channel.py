@@ -2,7 +2,7 @@
 """Module for interacting with a user's youtube channel."""
 import json
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from datetime import datetime
 from urllib.parse import unquote
@@ -255,39 +255,43 @@ class Channel(Playlist):
         return _description
         
     @property
-    def urls_present_in_the_channel_description(self) -> List[str]:
+    def urls_present_in_the_channel_description(self) -> Union[List[str], int]:
         """Get the Urls present in the channel description of the YouTube channel.
 
-        :rtype: List[str]
+        :rtype: Union[List[str], int]
         """        
         _urls = []
         if self.description:           
             pattern = "https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)"         
             _urls = list(set(findall(pattern, self.description)))    
+        if not len(_urls):
+            _urls = 0      
         return _urls
            
     @property
-    def mails_present_in_the_channel_description(self) -> List[str]:
+    def mails_present_in_the_channel_description(self) -> Union[List[str], int]:
         """Get the Mails present in the channel description of the YouTube channel.
 
-        :rtype: List[str]
+        :rtype: Union[List[str], int]
         """           
         _mails = []
         if self.description:      
             pattern = r"\S+@\S+\.\S+"             
-            _mails = [mail for mail in list(set(findall(pattern, self.description))) if not mail.startswith("http")]         
+            _mails = [mail for mail in list(set(findall(pattern, self.description))) if not mail.startswith("http")]   
+        if not len(_mails):
+            _mails = 0      
         return _mails
      
     @property
-    def keywords(self) -> Optional[str]:
+    def keywords(self) -> List[str]:
         """Get the description of the YouTube channel.
 
-        :rtype: Optional[str]
+        :rtype: List[str]
         """
         try:
-            _keywords = self.initial_data["microformat"]["microformatDataRenderer"]["tags"]
+            _keywords = self.initial_data["microformat"]["microformatDataRenderer"]["tags"] # -> List[str] or raise KeyError if there not exists tags
         except KeyError:
-            _keywords = None
+            _keywords = []
         return _keywords
     
     @property
@@ -387,10 +391,9 @@ class Channel(Playlist):
     def length(self) -> str:
         """Get the number of videos of the YouTube channel.
         
-        Not implemented yet
+        currently it does not return a correct value because it does not get all the urls of the channel's videos correctly 
 
         :rtype: str
         """
-        _length = None   
-        return _length
+        return len(self.video_urls)
    

@@ -414,8 +414,9 @@ class YouTube:
         """Get the video keywords.
 
         :rtype: List[str]
-        """
-        return self.vid_info.get('videoDetails', {}).get('keywords', [])
+        """        
+        keywords = str(self.vid_info.get('videoDetails', {}).get('keywords', [])).replace("'", "").replace("[", "").replace("]", "").split(", ") 
+        return [keyword for keyword in keywords if "" != keyword]
 
     @property
     def channel_id(self) -> str:
