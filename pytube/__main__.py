@@ -484,11 +484,11 @@ class YouTube:
 
         :rtype: int
         """        
-        likes = 0
+        _likes = 0
         try:
-            likes = self.initial_data["contents"]["twoColumnWatchNextResults"]["results"]["results"]["contents"][0]["videoPrimaryInfoRenderer"]["videoActions"]["menuRenderer"]["topLevelButtons"][0]["segmentedLikeDislikeButtonRenderer"]["likeButton"]["toggleButtonRenderer"]["defaultText"]["accessibility"]["accessibilityData"]["label"]
-            likes = likes.replace("likes", "").replace(",", "")
-            likes = int(likes)     
+            _likes = self.initial_data["contents"]["twoColumnWatchNextResults"]["results"]["results"]["contents"][0]["videoPrimaryInfoRenderer"]["videoActions"]["menuRenderer"]["topLevelButtons"][0]["segmentedLikeDislikeButtonRenderer"]["likeButton"]["toggleButtonRenderer"]["defaultText"]["accessibility"]["accessibilityData"]["label"]
+            _likes = _likes.replace("likes", "").replace(",", "")
+            _likes = int(_likes)     
         except Exception as e:
         
             raise exceptions.PytubeError(
@@ -499,7 +499,7 @@ class YouTube:
                 )
             )
    
-        return likes
+        return _likes
     
     @property
     def comments_count(self) -> int:
@@ -507,11 +507,11 @@ class YouTube:
 
         :rtype: int
         """       
-        comments_count = 0
+        _comments_count = 0
         try: 
-            comments_count = self.initial_data["contents"]["twoColumnWatchNextResults"]["results"]["results"]["contents"][2]["itemSectionRenderer"]["contents"][0]["commentsEntryPointHeaderRenderer"]["commentCount"]["simpleText"]
-            comments_count = comments_count.replace("K", "e3").replace("M", "e6").replace("No", "0")  
-            comments_count = int(float(comments_count))    
+            _comments_count = self.initial_data["contents"]["twoColumnWatchNextResults"]["results"]["results"]["contents"][2]["itemSectionRenderer"]["contents"][0]["commentsEntryPointHeaderRenderer"]["commentCount"]["simpleText"]
+            _comments_count = _comments_count.replace("K", "e3").replace("M", "e6").replace("No", "0")  
+            _comments_count = int(float(_comments_count))    
         except Exception as e:
         
             raise exceptions.PytubeError(
@@ -522,5 +522,5 @@ class YouTube:
                 )
             )
    
-        return comments_count
+        return _comments_count
     

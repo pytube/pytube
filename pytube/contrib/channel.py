@@ -4,6 +4,9 @@ import json
 import logging
 from typing import Dict, List, Optional, Tuple
 
+from datetime import datetime
+from urllib.parse import unquote
+
 from pytube import extract, Playlist, request
 from pytube.helpers import uniqueify
 
@@ -38,6 +41,8 @@ class Channel(Playlist):
         self._community_html = None
         self._featured_channels_html = None
         self._about_html = None
+        
+        self._about_page_initial_data = None
 
     @property
     def channel_name(self):
@@ -197,3 +202,161 @@ class Channel(Playlist):
             ),
             continuation,
         )
+
+
+
+    @property
+    def is_a_verified_channel(self) -> bool:
+        """Get the the verified badge status of the YouTube channel.
+
+        :rtype: bool
+        """
+        try:
+            _is_a_verified_channel= self.initial_data["header"]["c4TabbedHeaderRenderer"]["badges"][0]["metadataBadgeRenderer"]["tooltip"] == "Verified"
+        except KeyError:
+            _is_a_verified_channel = False
+        return _is_a_verified_channel
+    
+    @property
+    def banner_thumbnail(self) -> Optional[str]:
+        """Get the banner thumbnail of the YouTube channel.
+
+        :rtype: Optional[str]
+        """
+        try:
+            _banner_thumbnail = self.initial_data["header"]["c4TabbedHeaderRenderer"]["banner"]["thumbnails"][-1]["url"]
+        except KeyError:
+            _banner_thumbnail = None
+        return _banner_thumbnail    
+    
+    @property
+    def avatar_thumbnail(self) -> Optional[str]:
+        """Get the avatar thumbnail of the YouTube channel.
+
+        :rtype: Optional[str]
+        """
+        try:
+            _avatar_thumbnail = self.initial_data["metadata"]["channelMetadataRenderer"]["avatar"]["thumbnails"][-1]["url"]
+        except KeyError:
+            _avatar_thumbnail = None
+        return _avatar_thumbnail    
+    
+    @property
+    def description(self) -> Optional[str]:
+        """Get the description of the YouTube channel.
+
+        :rtype: Optional[str]
+        """
+        try:
+            _description = self.initial_data["metadata"]["channelMetadataRenderer"]["description"]       
+        except KeyError:
+            _description = None
+        return _description
+    
+    @property
+    def keywords(self) -> Optional[str]:
+        """Get the description of the YouTube channel.
+
+        :rtype: Optional[str]
+        """
+        try:
+            _keywords = self.initial_data["microformat"]["microformatDataRenderer"]["tags"]
+        except KeyError:
+            _keywords = None
+        return _keywords
+    
+    @property
+    def about_page_initial_data(self):
+        """Get the initial data for the /about page.
+
+        Currently unused for any functionality.
+
+        :rtype: dict
+        """
+        if not self._about_page_initial_data:
+            self._about_page_initial_data = extract.initial_data(self.about_html)
+        return self._about_page_initial_data
+       
+    @property
+    def joined_date(self) -> str:
+        """Get the joined date of the YouTube channel.
+
+        :rtype: str
+        """        
+        try:
+            _joined_date = self.about_page_initial_data["contents"]["twoColumnBrowseResultsRenderer"]["tabs"][-2]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["itemSectionRenderer"]["contents"][0]["channelAboutFullMetadataRenderer"]["joinedDateText"]["runs"][-1]["text"]
+            _joined_date = str(datetime.strptime(_joined_date, '%b %d, %Y').date())
+        except KeyError:
+            _joined_date = None
+        return _joined_date    
+    
+    @property
+    def channel_views(self) -> int:
+        """Get the number of views of the YouTube channel.
+
+        :rtype: int
+        """        
+        try:
+            _channel_views = self.about_page_initial_data["contents"]["twoColumnBrowseResultsRenderer"]["tabs"][-2]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["itemSectionRenderer"]["contents"][0]["channelAboutFullMetadataRenderer"]["viewCountText"]["simpleText"]
+            _channel_views = int(_channel_views.replace(",", "").replace(" views", ""))
+        except KeyError:
+            _channel_views = None
+        return _channel_views    
+    
+    @property
+    def country(self) -> str:
+        """Get the country of the YouTube channel.
+
+        :rtype: str
+        """        
+        try:
+            _country = self.about_page_initial_data["contents"]["twoColumnBrowseResultsRenderer"]["tabs"][-2]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["itemSectionRenderer"]["contents"][0]["channelAboutFullMetadataRenderer"]["country"]["simpleText"]
+        except KeyError:
+            _country = None
+        return _country    
+    
+    @property
+    def social_links(self) -> dict:
+        """Get the social links of the YouTube channel.
+
+        :rtype: dict
+        """
+        social_links_dict = {}
+        try:
+            social_links = self.about_page_initial_data["contents"]["twoColumnBrowseResultsRenderer"]["tabs"][-2]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["itemSectionRenderer"]["contents"][0]["channelAboutFullMetadataRenderer"]['primaryLinks']
+            for social_link in social_links:
+                k = social_link["title"]["simpleText"]
+                v = unquote(social_link["navigationEndpoint"]["urlEndpoint"]["url"].split("=")[-1])
+                social_links_dict[k] = v
+        except KeyError:
+            social_links_dict = None
+        return social_links_dict    
+    
+    @property
+    def subscribers(self) -> int:
+        """Get the number of subscribers of the YouTube channel.
+
+        :rtype: int
+        """
+        try:
+            _subscribers = self.initial_data["header"]["c4TabbedHeaderRenderer"]["subscriberCountText"]["simpleText"].replace(" subscribers", "")     
+            _subscribers = _subscribers.replace("K", "e3").replace("M", "e6").replace("No", "0")  
+            _subscribers = int(float(_subscribers))    
+        except KeyError:
+            _subscribers = None
+        return _subscribers
+       
+    @property
+    def channel_type(self) -> str:
+        """Get the type of the YouTube channel.
+        
+        Not implemented yet
+
+        :rtype: str
+        """
+        try:
+            _channel_type = None   
+        except KeyError:
+            _channel_type = None
+        return _channel_type
+   
