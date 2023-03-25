@@ -9,6 +9,8 @@ on:
       - 'images/**'
 
   workflow_dispatch:
+  schedule:
+    - cron: '30 15 * * *'
 
 jobs:
   ci:
