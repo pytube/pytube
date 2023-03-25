@@ -196,10 +196,11 @@ def base_js():
     """Youtube base.js files retrieved on 2022-02-04 and 2022-04-15
     from https://www.youtube.com/watch?v=vmzxpUsN0uA and
     https://www.youtube.com/watch?v=Y4-GSFKZmEg and
-    https://www.youtube.com/watch?v=ujTCoH21GlA respectively
+    https://www.youtube.com/watch?v=ujTCoH21GlA and
+    https://www.youtube.com/watch?v=7p9TzlqbqZc respectively
     """
     base_js_files = []
-    for file in ["base.js-2022-02-04.gz", "base.js-2022-04-15.gz", "base.js-2023-03-19.gz"]:
+    for file in ["base.js-2022-02-04.gz", "base.js-2022-04-15.gz", "base.js-2023-03-19.gz", "base.js-2023-03-24.gz"]:
         file_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             "mocks",

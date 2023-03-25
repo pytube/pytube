@@ -102,9 +102,18 @@ def test_get_throttling_function_name(base_js):
                          r'bua.length||mma(""))'),
             'nfunc_name': 'mma'
         },
+        # Values expected as of 2023/03/24:
+        {
+            'raw_var' : r'var cua=[mma]',
+            'raw_code': (r'a.url="";a.D&&(b=a.get("n"))&&(b=cua[0](b),a.set("n",b),'
+                         r'cua.length||mma(""))'),
+            'nfunc_name': 'mma'
+        },
     ]
     for code_fragment, base_js_file in zip(base_js_code_fragments, base_js):
+        func_name = cipher.get_throttling_function_name(base_js_file)
+        code = cipher.get_throttling_function_code(base_js_file)
+        assert len(code) < 6500  # sanity check, function can't be this long.
+        assert func_name == code_fragment['nfunc_name']
         assert code_fragment['raw_var'] in base_js_file
         assert code_fragment['raw_code'] in base_js_file
-        func_name = cipher.get_throttling_function_name(base_js_file)
-        assert func_name == code_fragment['nfunc_name']

@@ -74,40 +74,28 @@ def find_object_from_startpoint(html, start_point):
 
     # First letter MUST be a open brace, so we put that in the stack,
     # and skip the first character.
+    last_char = '{'
+    curr_char = None
     stack = [html[0]]
     i = 1
 
     context_closers = {
         '{': '}',
         '[': ']',
-        '"': '"'
+        '"': '"',
+        "'": "'",
+        '/': '/',  # javascript regex
     }
-    is_regex = False
-    regex_start = -1
+
     while i < len(html):
         if len(stack) == 0:
             break
+        if curr_char not in [' ', '\n']:
+            last_char = curr_char
         curr_char = html[i]
         curr_context = stack[-1]
 
-        # TODO: find a better way to handle regexes.
-        # JS regex can include { and } characters, so we need to handle them to avoid closing the context too early.
-        # Examples:
-        #   ,/[,\]],[\]];}/,
-        #   e.split(""))},\n/[,\]],[\]];}/,-2088968882,
-        if curr_context != "" and not is_regex and html[i] == "/":
-            _text = html[max(0, i-4):min(i+2, len(html)+1)]
-            if re.search(r",\s*/", _text):
-                is_regex = True
-                regex_start = i
-
-        if is_regex:
-            if i != regex_start and curr_char == "/":
-                is_regex = curr_char != "/"
-            if curr_char != "/":
-                if i - regex_start > 20:
-                    # Most likely we failed to parse the regex.
-                    raise HTMLParseError(f"Most likely we failed to parse js regex: {html[regex_start:i+1]}")
+        if (curr_context == "'" and curr_char == '"') or (curr_context == '"' and curr_char == "'"):
             i += 1
             continue
 
@@ -117,17 +105,19 @@ def find_object_from_startpoint(html, start_point):
             i += 1
             continue
 
-        # Strings require special context handling because they can contain
+        # Strings and regex expressions require special context handling because they can contain
         #  context openers *and* closers
-        if curr_context == '"':
-            # If there's a backslash in a string, we skip a character
+        if curr_context in ['"', "'", '/']:
+            # If there's a backslash in a string or regex expression, we skip a character
             if curr_char == '\\':
                 i += 2
                 continue
         else:
             # Non-string contexts are when we need to look for context openers.
             if curr_char in context_closers.keys():
-                stack.append(curr_char)
+                # Slash starts a regular expression depending on context
+                if not (curr_char == '/' and last_char not in ['(', ',', '=', ':', '[', '!', '&', '|', '?', '{', '}', ';']):
+                    stack.append(curr_char)
 
         i += 1
 
