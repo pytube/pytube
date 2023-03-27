@@ -1,0 +1,34 @@
+name: CI tests
+
+on:
+  pull_request:
+    branches: [ master ]
+    paths-ignore:
+      - '**/README.md'
+      - 'docs/**'
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: [3.7, 3.8, 3.9, 3.10, 3.11]
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Upgrade pip
+        run: pip install --upgrade pip pipenv
+
+      - name: Install pipenv
+        run: pipenv install --dev --skip-lock --python ${{ matrix.python }}
+
+      - name: Run make ci
+        run: make ci
