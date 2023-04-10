@@ -148,6 +148,40 @@ def test_xml_captions(request_get):
     assert caption.xml_captions == "test"
 
 
+@mock.patch("pytube.request.get")
+@mock.patch("pytube.captions.Caption.get_url_for_json")
+def test_json_caption(mock_url, mock_resp):
+    mock_url.return_value = "test"
+
+    caption = Caption(
+        {"url": "url1", "name": {"simpleText": "name1"}, "languageCode": "en", "vssId": ".en"}
+    )
+
+    mock_resp.return_value = """{
+        "wireMagic": "pb3", "pens": [{}], "wsWinStyles": [{}], "wpWinPositions": [{}],
+          "events": [{
+              "tStartMs": 1120,"dDurationMs": 2640,
+              "segs": [{"utf8": "In this course, you're going to learn\neverything you need to know to get"}]},
+            {
+              "tStartMs": 3760,"dDurationMs": 3039,
+              "segs": [{"utf8": "started with Git.\nIf you're an absolute beginner or if you"}]}
+          ]}""".replace("\n", " ")
+
+    assert caption.json_captions == {
+        'wireMagic': 'pb3', 'pens': [{}], 'wsWinStyles': [{}], 'wpWinPositions': [{}],
+        'events': [
+            {'tStartMs': 1120, 'dDurationMs': 2640,
+             'segs': [{
+                 'utf8': "In this course, you're going to learn everything you need to know to get"
+             }]},
+            {'tStartMs': 3760, 'dDurationMs': 3039,
+             'segs': [{
+                 'utf8': "started with Git. If you're an absolute beginner or if you"
+             }]}
+        ]
+    }
+
+
 @mock.patch("pytube.captions.request")
 def test_generate_srt_captions(request):
     request.get.return_value = (

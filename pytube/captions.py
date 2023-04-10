@@ -4,6 +4,7 @@ import time
 import xml.etree.ElementTree as ElementTree
 from html import unescape
 from typing import Dict, Optional
+import json
 
 from pytube import request
 from pytube.helpers import safe_filename, target_directory
@@ -45,11 +46,15 @@ class Caption:
     @property
     def json_captions(self) -> dict:
         """Download and parse the json caption tracks."""
-        json_captions_url = self.url.replace('fmt=srv3','fmt=json3')
+        json_captions_url = self.get_url_for_json()
         text = request.get(json_captions_url)
         parsed = json.loads(text)
         assert parsed['wireMagic'] == 'pb3', 'Unexpected captions format'
         return parsed
+
+    def get_url_for_json(self) -> str:
+        """Format the URL, for getting the JSON"""
+        return self.url.replace('fmt=srv3', 'fmt=json3')
 
     def generate_srt_captions(self) -> str:
         """Generate "SubRip Subtitle" captions.
