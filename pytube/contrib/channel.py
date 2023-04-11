@@ -5,7 +5,7 @@ import logging
 from typing import Dict, List, Optional, Tuple, Iterable
 
 from pytube import extract, YouTube, Playlist, request
-from pytube.helpers import uniqueify, DeferredGeneratorList
+from pytube.helpers import cache, uniqueify, DeferredGeneratorList
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +84,7 @@ class Channel(Playlist):
         """Set the html url and clear the cache."""
         if self._html_url != value:
             self._html = None
+            self._initial_data = None
             self.__class__.video_urls.fget.cache_clear()
             self.__class__.last_updated.fget.cache_clear()
             self.__class__.title.fget.cache_clear()
@@ -263,6 +264,77 @@ class Channel(Playlist):
 
         # remove duplicates
         return uniqueify(videos_url), continuation
+
+    @property
+    def views(self) -> int:
+        """Extract view count for channel.
+
+        :return: Channel view count
+        :rtype: int
+        """
+        self.html_url = self.about_url
+        # Get the position of the "about" tab.
+        about_tab_pos = len(self.initial_data['contents']['twoColumnBrowseResultsRenderer']['tabs']) - 2
+        try:
+            views_text = self.initial_data['contents']['twoColumnBrowseResultsRenderer']['tabs'][about_tab_pos][
+                'tabRenderer']['content']['sectionListRenderer']['contents'][0]['itemSectionRenderer'][
+                'contents'][0]['channelAboutFullMetadataRenderer']['viewCountText']['simpleText']
+
+            # "1,234,567 view"
+            count_text = views_text.split(' ')[0]
+            # "1234567"
+            count_text = count_text.replace(',', '')
+            return int(count_text)
+        except KeyError:
+            return 0
+
+    @property
+    @cache
+    def title(self) -> str:
+        """Extract the channel title.
+
+        :return: Channel title (name)
+        :rtype: str
+        """
+        self.html_url = self.channel_url
+        return self.initial_data['metadata']['channelMetadataRenderer']['title']
+
+    @property
+    def description(self) -> str:
+        """Extract the channel description.
+
+        :return: Channel description
+        :rtype: str
+        """
+        self.html_url = self.channel_url
+        return self.initial_data['metadata']['channelMetadataRenderer']['description']
+
+    @property
+    def length(self):
+        """Extracts the approximate amount of videos from the channel.
+
+        :return: Channel videos count
+        :rtype: str
+        """
+        self.html_url = self.channel_url
+        return self.initial_data['header']['c4TabbedHeaderRenderer']['videosCountText']['runs'][0]['text']
+
+    @property
+    @cache
+    def last_updated(self):
+        """Extract the date of the last uploaded video.
+
+        :return: Last video uploaded
+        :rtype: str
+        """
+        self.html_url = self.videos_url
+        try:
+            last_updated_text = self.initial_data['contents']['twoColumnBrowseResultsRenderer']['tabs'][1][
+                'tabRenderer']['content']['richGridRenderer']['contents'][0]['richItemRenderer']['content'][
+                'videoRenderer']['publishedTimeText']['simpleText']
+            return last_updated_text
+        except KeyError:
+            return None
 
     @property
     def videos(self) -> Iterable[YouTube]:
