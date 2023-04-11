@@ -79,26 +79,68 @@ class Caption:
 
         :param str xml_captions:
             XML formatted caption tracks.
+
+
+        Bug fixed @2023-04-11 by tsaijamey@github :
+        原代码运行时报错  KeyError 'start'，所以根据最新的xml进行了修正。
+        xml的结构已经发生了变化，样例如下：
+        ```
+            <body>
+                <w t="0" id="1" wp="1" ws="1"/>
+                    <p t="60" d="6180" w="1">
+                        <s ac="248">I</s>
+                        <s t="599" ac="248"> created</s>
+                        <s t="960" ac="248"> a</s>
+                        <s t="1200" ac="248"> graphic</s>
+                        <s t="1560" ac="248"> novel</s>
+                        <s t="1860" ac="248"> using</s>
+                        <s t="2400" ac="248"> nothing</s>
+                    </p>
+                    <p t="2690" d="3550" w="1" a="1">
+                    </p>
+                    <p t="2700" d="6720" w="1">
+                        <s ac="248">but</s>
+                        <s t="479" ac="248"> chat</s>
+                        <s t="1140" ac="223"> GPT</s>
+                        <s t="1700" ac="243"> mid-journey</s>
+                        <s t="2700" ac="215"> and</s>
+                        <s t="3240" ac="245"> Affinity</s>
+                    </p>
+                    <p t="6230" d="3190" w="1" a="1">
+                    </p>
+        ```
+        不包含 a=1 的<p>表示的是整段字幕区域，<s>是该段字幕中每个单词出现的顺序和时间点；
+        包含 a=1 的<p>标签表示的应该是字幕区域，它的t值对于生成srt文件没有意义。
+        所以实际的时间轴解析应该是从不包含的<p>标签中获取每段字幕的起始时间t，并以下一段字幕的出现时间-1毫秒作为结束时间。
+        -1毫秒的目的是让前后两段时间轴保持间隔，避免在使用字幕渲染时出现交叠情况。
         """
         segments = []
         root = ElementTree.fromstring(xml_captions)
-        for i, child in enumerate(list(root)):
-            text = child.text or ""
-            caption = unescape(text.replace("\n", " ").replace("  ", " "),)
-            try:
-                duration = float(child.attrib["dur"])
-            except KeyError:
-                duration = 0.0
-            start = float(child.attrib["start"])
-            end = start + duration
+        p_tags = root.findall('.//p')
+        subtitles = []
+
+        for p in p_tags:
+            if p.get("a") is None:
+                start_time = float(p.get("t"))
+                subtitle_text = " ".join([s.text for s in p.findall("s") if s.text is not None])
+                subtitle_text = subtitle_text.replace("  ", " ") + " "
+                subtitles.append((start_time, subtitle_text))
+
+        for i, (start_time, subtitle_text) in enumerate(subtitles):
+            if i + 1 < len(subtitles):
+                end_time = subtitles[i + 1][0] - 1
+            else:
+                end_time = start_time + int(subtitles[-1][0]) - 1
+
             sequence_number = i + 1  # convert from 0-indexed to 1.
             line = "{seq}\n{start} --> {end}\n{text}\n".format(
                 seq=sequence_number,
-                start=self.float_to_srt_time_format(start),
-                end=self.float_to_srt_time_format(end),
-                text=caption,
+                start=self.float_to_srt_time_format(start_time),
+                end=self.float_to_srt_time_format(end_time),
+                text=subtitle_text,
             )
             segments.append(line)
+
         return "\n".join(segments).strip()
 
     def download(
