@@ -55,13 +55,7 @@ Pytube requires an installation of Python 3.6 or greater, as well as pip. (Pip i
 To install from PyPI with pip:
 
 ```bash
-$ python -m pip install pytube
-```
-
-Sometimes, the PyPI release becomes slightly outdated. To install from the source with pip:
-
-```bash
-$ python -m pip install git+https://github.com/pytube/pytube
+$ python -m pip install git+https://github.com/dudegladiator/pytube.git
 ```
 
 ### Using pytube in a Python script
