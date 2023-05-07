@@ -152,13 +152,11 @@ def stream(
             if tries >= 1 + max_retries:
                 raise MaxRetriesExceeded()
 
-             # Try to execute the request, ignoring socket timeouts
+            # Try to execute the request, ignoring socket timeouts
             try:
                 response = _execute_request(
-                    url,
                     url + f"&range={downloaded}-{stop_pos}",
                     method="GET",
-                    headers={"Range": range_header},
                     timeout=timeout
                 )
             except URLError as e:
@@ -178,8 +176,6 @@ def stream(
 
         if file_size == default_range_size:
             try:
-                content_range = response.info()["Content-Range"]
-                file_size = int(content_range.split("/")[1])
                 resp = _execute_request(
                     url + f"&range={0}-{99999999999}",
                     method="GET",
