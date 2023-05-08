@@ -149,6 +149,10 @@ class Search:
                 if 'backgroundPromoRenderer' in video_details:
                     continue
 
+                # YouTube movies to buy/rent
+                if 'movieRenderer' in video_details:
+                    continue
+
                 if 'videoRenderer' not in video_details:
                     logger.warn('Unexpected renderer encountered.')
                     logger.warn(f'Renderer name: {video_details.keys()}')
