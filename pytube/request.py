@@ -5,6 +5,7 @@ import logging
 import re
 import socket
 from functools import lru_cache
+from typing import Optional
 from urllib import parse
 from urllib.error import URLError
 from urllib.request import Request, urlopen
@@ -13,7 +14,8 @@ from pytube.exceptions import RegexMatchError, MaxRetriesExceeded
 from pytube.helpers import regex_search
 
 logger = logging.getLogger(__name__)
-default_range_size = 9437184  # 9MB
+
+DEFAULT_RANGE_SIZE = 9 * 1024 * 1024  # 9MB
 
 
 def _execute_request(
@@ -139,24 +141,37 @@ def stream(
     :param str url: The URL to perform the GET request for.
     :rtype: Iterable[bytes]
     """
-    file_size: int = default_range_size  # fake filesize to start
-    downloaded = 0
-    while downloaded < file_size:
-        stop_pos = min(downloaded + default_range_size, file_size) - 1
-        range_header = f"bytes={downloaded}-{stop_pos}"
-        tries = 0
+    total_size: Optional[int] = None
+    try:
+        if content_length := head(url, timeout=timeout).get('content-length'):
+            total_size = int(content_length)
+    except URLError as e:
+        # We only want to skip over timeout errors, and
+        # raise any other URLError exceptions
+        if isinstance(e.reason, socket.timeout):
+            pass
+        else:
+            raise
+    downloaded_size = 0
+    while total_size is None or downloaded_size < total_size:
+        requested_range_start = downloaded_size
+        requested_range_end = requested_range_start + DEFAULT_RANGE_SIZE - 1
+        if total_size is not None:
+            requested_range_end = min(requested_range_end, total_size - 1)
+        requested_range_size = requested_range_end - requested_range_start + 1
 
         # Attempt to make the request multiple times as necessary.
+        retries = 0
         while True:
             # If the max retries is exceeded, raise an exception
-            if tries >= 1 + max_retries:
+            if retries >= 1 + max_retries:
                 raise MaxRetriesExceeded()
 
             # Try to execute the request, ignoring socket timeouts
             try:
                 response = _execute_request(
-                    url + f"&range={downloaded}-{stop_pos}",
-                    method="GET",
+                    url + f'&range={requested_range_start}-{requested_range_end}',
+                    method='GET',
                     timeout=timeout
                 )
             except URLError as e:
@@ -172,36 +187,32 @@ def stream(
             else:
                 # On a successful request, break from loop
                 break
-            tries += 1
+            retries += 1
 
-        if file_size == default_range_size:
-            try:
-                resp = _execute_request(
-                    url + f"&range={0}-{99999999999}",
-                    method="GET",
-                    timeout=timeout
-                )
-                content_range = resp.info()["Content-Length"]
-                file_size = int(content_range)
-            except (KeyError, IndexError, ValueError) as e:
-                logger.error(e)
+        headers = {k.lower(): v for k, v in response.info().items()}
+
+        if total_size is None and (range_content_length := headers.get('content-length')):
+            real_range_size = int(range_content_length)
+            if requested_range_size > real_range_size:
+                total_size = downloaded_size + real_range_size
+
         while True:
             chunk = response.read()
             if not chunk:
                 break
-            downloaded += len(chunk)
+            downloaded_size += len(chunk)
             yield chunk
     return  # pylint: disable=R1711
 
 
 @lru_cache()
-def filesize(url):
+def filesize(url, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
     """Fetch size in bytes of file at given URL
 
     :param str url: The URL to get the size of
     :returns: int: size in bytes of remote file
     """
-    return int(head(url)["content-length"])
+    return int(head(url, timeout=timeout)["content-length"])
 
 
 @lru_cache()
@@ -256,7 +267,7 @@ def seq_filesize(url):
     return total_filesize
 
 
-def head(url):
+def head(url, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
     """Fetch headers returned http GET request.
 
     :param str url:
@@ -265,5 +276,9 @@ def head(url):
     :returns:
         dictionary of lowercase headers
     """
-    response_headers = _execute_request(url, method="HEAD").info()
+    response_headers = _execute_request(
+        url,
+        method="HEAD",
+        timeout=timeout,
+    ).info()
     return {k.lower(): v for k, v in response_headers.items()}

@@ -6,7 +6,9 @@ exclusively on the developer interface. Pytube offloads the heavy lifting to
 smaller peripheral modules and functions.
 
 """
+import json
 import logging
+import re
 from typing import Any, Callable, Dict, List, Optional
 
 import pytube
@@ -242,10 +244,32 @@ class YouTube:
             return self._vid_info
 
         innertube = InnerTube(use_oauth=self.use_oauth, allow_cache=self.allow_oauth_cache)
-
-        innertube_response = innertube.player(self.video_id)
-        self._vid_info = innertube_response
+        self._vid_info = innertube.player(self.video_id)
         return self._vid_info
+
+    def refresh_vid_info(self, client='ANDROID_MUSIC'):
+        """Refresh the vid_info."""
+        inner_tube = InnerTube(
+            use_oauth=self.use_oauth,
+            allow_cache=self.allow_oauth_cache,
+            client=client,
+        )
+        self._vid_info = inner_tube.player(self.video_id)
+        return self._vid_info
+
+    def load_vid_info_from_watch_html(self):
+        initial_player_response_regex = re.compile(
+            r'<script[^>]*>\s*var\s+ytInitialPlayerResponse\s*=\s*({.+?})\s*;?\s*</script>'
+        )
+        initial_player_response_match = initial_player_response_regex.search(self.watch_html)
+        if initial_player_response_match:
+            initial_player_response = json.loads(initial_player_response_match.group(1))
+            try:
+                self._vid_info = initial_player_response
+                return self._vid_info
+            except KeyError:
+                pass
+        return None
 
     def bypass_age_gate(self):
         """Attempt to update the vid_info by bypassing the age gate."""
@@ -474,6 +498,6 @@ class YouTube:
             The video id of the YouTube video.
 
         :rtype: :class:`YouTube <YouTube>`
-        
+
         """
         return YouTube(f"https://www.youtube.com/watch?v={video_id}")

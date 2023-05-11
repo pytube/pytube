@@ -47,7 +47,7 @@ def test_channel_vanity_url(request_get, channel_videos_html):
     request_get.return_value = channel_videos_html
 
     c = Channel('https://www.youtube.com/c/ProgrammingKnowledge/videos')
-    assert c.vanity_url == 'http://www.youtube.com/c/ProgrammingKnowledge'
+    assert c.vanity_url == 'http://www.youtube.com/@ProgrammingKnowledge'
 
 
 @mock.patch('pytube.request.get')
@@ -56,16 +56,16 @@ def test_channel_video_list(request_get, channel_videos_html):
 
     c = Channel('https://www.youtube.com/c/ProgrammingKnowledge/videos')
     first_ten = [
-        'https://www.youtube.com/watch?v=t_xLpJo_35k',
-        'https://www.youtube.com/watch?v=ccbh5YhxouQ',
-        'https://www.youtube.com/watch?v=wDnFjDjxW_0',
-        'https://www.youtube.com/watch?v=F3W_p_4XftA',
-        'https://www.youtube.com/watch?v=_fxm0xGGEi4',
-        'https://www.youtube.com/watch?v=cRbKZzcuIsg',
-        'https://www.youtube.com/watch?v=sdDu3dfIuow',
-        'https://www.youtube.com/watch?v=10KIbp-gJCE',
-        'https://www.youtube.com/watch?v=wZIT-cRtd6s',
-        'https://www.youtube.com/watch?v=KucCvEbTj0w',
+        'https://www.youtube.com/watch?v=S19QqBytWC4',
+        'https://www.youtube.com/watch?v=ah5M4Umuf9w',
+        'https://www.youtube.com/watch?v=fclTFQQvQFQ',
+        'https://www.youtube.com/watch?v=RphKLsy3tSc',
+        'https://www.youtube.com/watch?v=ANE0uKeX-U0',
+        'https://www.youtube.com/watch?v=SeOlDGN346E',
+        'https://www.youtube.com/watch?v=Z2r46Gv7mp4',
+        'https://www.youtube.com/watch?v=B3DndCaYgyM',
+        'https://www.youtube.com/watch?v=KzS39YvFOv8',
+        'https://www.youtube.com/watch?v=nkMTc_E2a_Q',
     ]
     assert c.video_urls[:10] == first_ten
 
