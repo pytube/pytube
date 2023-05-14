@@ -46,43 +46,43 @@ def load_and_init_from_playback_file(filename, mock_urlopen):
 
 @pytest.fixture
 def cipher_signature():
-    """Youtube instance initialized with video id 2lAe1cqCOXo."""
+    """Youtube instance initialized with video id 2lAe1cqCOXo on 2023-05-11."""
     filename = "yt-video-2lAe1cqCOXo-html.json.gz"
     return load_and_init_from_playback_file(filename)
 
 
 @pytest.fixture
 def presigned_video():
-    """Youtube instance initialized with video id QRS8MkLhQmM."""
+    """Youtube instance initialized with video id QRS8MkLhQmM on 2023-05-11."""
     filename = "yt-video-QRS8MkLhQmM-html.json.gz"
     return load_and_init_from_playback_file(filename)
 
 
 @pytest.fixture
 def age_restricted():
-    """Youtube instance initialized with video id irauhITDrsE."""
-    filename = "yt-video-irauhITDrsE-html.json.gz"
+    """Youtube instance initialized with video id HFlmHY8QFiY on 2023-05-11."""
+    filename = "yt-video-HFlmHY8QFiY-html.json.gz"
     return load_playback_file(filename)
 
 
 @pytest.fixture
 def private():
-    """Youtube instance initialized with video id m8uHb5jIGN8."""
+    """Youtube instance initialized with video id m8uHb5jIGN8 on 2023-05-11."""
     filename = "yt-video-m8uHb5jIGN8-html.json.gz"
     return load_playback_file(filename)
 
 
 @pytest.fixture
 def missing_recording():
-    """Youtube instance initialized with video id 5YceQ8YqYMc."""
+    """Youtube instance initialized with video id 5YceQ8YqYMc on 2023-05-11."""
     filename = "yt-video-5YceQ8YqYMc-html.json.gz"
     return load_playback_file(filename)
 
 
 @pytest.fixture
 def playlist_html():
-    """Youtube playlist HTML loaded on 2020-01-25 from
-    https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr
+    """Youtube playlist HTML loaded on 2023-05-11 from
+    https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr&hl=en
     """
     file_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
@@ -95,8 +95,8 @@ def playlist_html():
 
 @pytest.fixture
 def playlist_long_html():
-    """Youtube playlist HTML loaded on 2020-01-25 from
-    https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr
+    """Youtube playlist HTML loaded on 2023-05-11 from
+    https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n&hl=en
     """
     file_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
@@ -109,8 +109,8 @@ def playlist_long_html():
 
 @pytest.fixture
 def playlist_submenu_html():
-    """Youtube playlist HTML loaded on 2020-01-24 from
-    https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr
+    """Youtube playlist HTML loaded on 2023-05-11 from
+    https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr&hl=en
     """
     file_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
@@ -123,7 +123,7 @@ def playlist_submenu_html():
 
 @pytest.fixture
 def stream_dict():
-    """Youtube instance initialized with video id WXxV9g7lsFE."""
+    """Youtube instance initialized with video id WXxV9g7lsFE on 2023-05-11."""
     file_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         "mocks",
@@ -136,7 +136,7 @@ def stream_dict():
 
 @pytest.fixture
 def channel_videos_html():
-    """Youtube channel HTML loaded on 2021-05-05 from
+    """Youtube channel HTML loaded on 2023-05-11 from
     https://www.youtube.com/c/ProgrammingKnowledge/videos
     """
     file_path = os.path.join(
@@ -150,12 +150,13 @@ def channel_videos_html():
 
 @pytest.fixture
 def base_js():
-    """Youtube base.js files retrieved on 2022-02-04 and 2022-04-15
-    from https://www.youtube.com/watch?v=vmzxpUsN0uA and
-    https://www.youtube.com/watch?v=Y4-GSFKZmEg respectively
+    """Youtube base.js files retrieved:
+     - on 2022-02-04 from https://www.youtube.com/watch?v=vmzxpUsN0uA
+     - on 2022-04-15 from https://www.youtube.com/watch?v=Y4-GSFKZmEg
+     - on 2023-05-11 from https://www.youtube.com/watch?v=Y4-GSFKZmEg
     """
     base_js_files = []
-    for file in ["base.js-2022-02-04.gz", "base.js-2022-04-15.gz"]:
+    for file in ["base.js-2022-02-04.gz", "base.js-2022-04-15.gz", "base.js-2023-05-11.gz"]:
         file_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             "mocks",
