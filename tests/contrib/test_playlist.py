@@ -8,8 +8,7 @@ from pytube import Playlist
 def test_title(request_get, playlist_long_html):
     request_get.return_value = playlist_long_html
     url = (
-        "https://www.fakeurl.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ"
-        "-ghgoSH6n"
+        "https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n"
     )
     pl = Playlist(url)
     pl_title = pl.title
@@ -23,8 +22,7 @@ def test_title(request_get, playlist_long_html):
 def test_init_with_playlist_url(request_get):
     request_get.return_value = ""
     url = (
-        "https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ"
-        "-ghgoSH6n"
+        "https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n"
     )
     playlist = Playlist(url)
     assert playlist.playlist_url == url
@@ -46,11 +44,10 @@ def test_init_with_watch_url(request_get):
 
 @mock.patch("pytube.request.get")
 def test_last_updated(request_get, playlist_long_html):
-    expected = datetime.date(2020, 10, 8)
+    expected = datetime.date(2023, 4, 18)
     request_get.return_value = playlist_long_html
     playlist = Playlist(
-        "https://www.youtube.com/playlist?list"
-        "=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n"
+        "https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n"
     )
     assert playlist.last_updated == expected
 
@@ -264,15 +261,15 @@ def test_playlist_submenu(request_get, playlist_submenu_html):
 
 @mock.patch("pytube.request.get")
 def test_playlist_length(request_get, playlist_long_html):
-    url = 'https://www.example.com/playlist?list=whatever'
+    url = 'https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n&hl=en'
     request_get.return_value = playlist_long_html
     p = Playlist(url)
-    assert p.length == 217
+    assert p.length == 233
 
 
 @mock.patch("pytube.request.get")
 def test_playlist_description(request_get, playlist_long_html):
-    url = 'https://www.example.com/playlist?list=whatever'
+    url = 'https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n&hl=en'
     request_get.return_value = playlist_long_html
     p = Playlist(url)
     assert p.description == (
@@ -292,10 +289,10 @@ def test_playlist_description(request_get, playlist_long_html):
 
 @mock.patch("pytube.request.get")
 def test_playlist_views(request_get, playlist_long_html):
-    url = 'https://www.example.com/playlist?list=whatever'
+    url = 'https://www.youtube.com/playlist?list=PLS1QulWo1RIaJECMeUT4LFwJ-ghgoSH6n&hl=en'
     request_get.return_value = playlist_long_html
     p = Playlist(url)
-    assert p.views == 4617130
+    assert p.views == 4805910
 
 
 @mock.patch("pytube.request.get")
