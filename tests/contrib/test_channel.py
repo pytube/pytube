@@ -19,11 +19,18 @@ def test_init_with_url(request_get, channel_videos_html):
 def test_channel_uri(request_get, channel_videos_html):
     request_get.return_value = channel_videos_html
 
+    c = Channel('https://youtube.com/@Keamind')
+    assert c.channel_uri == '/@Keamind'
+
+    c = Channel('https://youtube.be/channel/UCEIWuETKLk4KuDP5dUmu_wA')
+    assert c.channel_uri == '/channel/UCEIWuETKLk4KuDP5dUmu_wA'
+
     c = Channel('https://www.youtube.com/c/ProgrammingKnowledge/videos')
     assert c.channel_uri == '/c/ProgrammingKnowledge'
 
     c = Channel('https://www.youtube.com/channel/UCs6nmQViDpUw0nuIx9c_WvA/videos')
     assert c.channel_uri == '/channel/UCs6nmQViDpUw0nuIx9c_WvA'
+
 
 
 @mock.patch('pytube.request.get')
