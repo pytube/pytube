@@ -66,6 +66,10 @@ def _perform_args_on_youtube(
         display_streams(youtube)
     if args.build_playback_report:
         build_playback_report(youtube)
+    if args.target:
+        download_highest_resolution_progressive(
+            youtube=youtube, resolution="highest", target=args.target
+        )
     if args.itag:
         download_by_itag(youtube=youtube, itag=args.itag, target=args.target)
     if args.caption_code:
