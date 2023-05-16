@@ -250,7 +250,7 @@ class YouTube:
     def bypass_embed_gate(self):
         """Attempt to update the vid_info by bypassing embed gate."""
         innertube = InnerTube(
-            client='WEB',
+            client='ANDROID_MUSIC',
             use_oauth=self.use_oauth,
             allow_cache=self.allow_oauth_cache
         )
