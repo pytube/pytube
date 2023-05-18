@@ -33,6 +33,9 @@ def test_channel_name(request_get, channel_videos_html):
     c = Channel('https://www.youtube.com/c/ProgrammingKnowledge/videos')
     assert c.channel_name == 'ProgrammingKnowledge'
 
+    c = Channel('https://www.youtube.com/@ProgrammingKnowledge/videos')
+    assert c.channel_name == 'ProgrammingKnowledge'
+
 
 @mock.patch('pytube.request.get')
 def test_channel_id(request_get, channel_videos_html):
