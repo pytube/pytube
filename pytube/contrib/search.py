@@ -148,6 +148,14 @@ class Search:
                 # Seems to be the renderer used for the image shown on a no results page
                 if 'backgroundPromoRenderer' in video_details:
                     continue
+                    
+                # Some rendering type that pytube doesn't know how to handle
+                if 'reelShelfRenderer' in video_details:
+                    continue
+                
+                # Some rendering type that pytube doesn't know how to handle
+                if 'showingResultsForRenderer' in video_details:
+                    continue
 
                 if 'videoRenderer' not in video_details:
                     logger.warning('Unexpected renderer encountered.')
