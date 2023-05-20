@@ -90,8 +90,8 @@ class Playlist(Sequence):
         if self._sidebar_info:
             return self._sidebar_info
         else:
-            self._sidebar_info = self.initial_data['sidebar'][
-                'playlistSidebarRenderer']['items']
+            self._sidebar_info = \
+                self.initial_data['sidebar']['playlistSidebarRenderer']['items']
             return self._sidebar_info
 
     @property
