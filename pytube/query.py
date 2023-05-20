@@ -250,8 +250,6 @@ class StreamQuery(Sequence):
     def get_by_resolution(self, resolution: str) -> Optional[Stream]:
         """Get the corresponding :class:`Stream <Stream>` for a given resolution.
 
-        Stream must be a progressive mp4.
-
         :param str resolution:
             Video resolution i.e. "720p", "480p", "360p", "240p", "144p"
         :rtype: :class:`Stream <Stream>` or None
@@ -260,9 +258,7 @@ class StreamQuery(Sequence):
             not found.
 
         """
-        return self.filter(
-            progressive=True, subtype="mp4", resolution=resolution
-        ).first()
+        return self.filter(resolution=resolution).first()
 
     def get_lowest_resolution(self) -> Optional[Stream]:
         """Get lowest resolution stream that is a progressive mp4.
