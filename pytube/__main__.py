@@ -31,7 +31,8 @@ class YouTube:
         on_complete_callback: Optional[Callable[[Any, Optional[str]], None]] = None,
         proxies: Dict[str, str] = None,
         use_oauth: bool = False,
-        allow_oauth_cache: bool = True
+        allow_oauth_cache: bool = True,
+        innertube_client: str = 'ANDROID'
     ):
         """Construct a :class:`YouTube <YouTube>`.
 
@@ -51,6 +52,11 @@ class YouTube:
         :param bool allow_oauth_cache:
             (Optional) Cache OAuth tokens locally on the machine. Defaults to True.
             These tokens are only generated if use_oauth is set to True as well.
+        :param str innertube_client:
+            (Optional) Which client to use for interacting with youtube. String has to be one of:
+            'WEB', 'ANDROID', 'IOS', 'WEB_EMBED', 'ANDROID_EMBED', 'IOS_EMBED', 'WEB_MUSIC',
+            'ANDROID_MUSIC', 'IOS_MUSIC', 'WEB_CREATOR', 'ANDROID_CREATOR', 'IOS_CREATOR',
+            'MWEB', 'TV_EMBED'
         """
         self._js: Optional[str] = None  # js fetched by js_url
         self._js_url: Optional[str] = None  # the url to the js, parsed from watch html
@@ -87,6 +93,8 @@ class YouTube:
 
         self.use_oauth = use_oauth
         self.allow_oauth_cache = allow_oauth_cache
+
+        self.innertube_client = innertube_client
 
     def __repr__(self):
         return f'<pytube.__main__.YouTube object: videoId={self.video_id}>'
@@ -154,11 +162,8 @@ class YouTube:
     @property
     def streaming_data(self):
         """Return streamingData from video info."""
-        if 'streamingData' in self.vid_info:
-            return self.vid_info['streamingData']
-        else:
-            self.bypass_age_gate()
-            return self.vid_info['streamingData']
+        return self.vid_info['streamingData']
+
 
     @property
     def fmt_streams(self):
@@ -232,6 +237,32 @@ class YouTube:
             elif status == 'LIVE_STREAM':
                 raise exceptions.LiveStreamError(video_id=self.video_id)
 
+    def check_innertube_availability(self, innertube_response):
+        """Check whether video is available by analysing the innertube response
+
+        Raises different exceptions based on why the video is unavailable,
+        otherwise does nothing.
+        """
+        status = innertube_response['playabilityStatus']['status']
+        if status == 'OK':
+            return
+
+        reason = innertube_response['playabilityStatus']['reason']
+
+        if reason == 'Sorry, this content is age-restricted' or reason == 'This video may be inappropriate for some users.' or reason == 'Sign in to confirm your age':
+            raise exceptions.AgeRestrictedError(video_id=self.video_id)
+
+        if reason == 'Playback on other websites has been disabled by the video owner':
+            raise exceptions.EmbedPlaybackDisabled(video_id=self.video_id)
+
+        # if we got this far and none of the reasons apply and login is required
+        # then we raise a video private exception
+        if status == 'LOGIN_REQUIRED':
+            raise exceptions.VideoPrivate(video_id=self.video_id)
+
+        # if the status was not login required, then we raise a more generic video unavailable exception
+        raise exceptions.VideoUnavailable(video_id=self.video_id)
+
     @property
     def vid_info(self):
         """Parse the raw vid info and return the parsed result.
@@ -241,29 +272,13 @@ class YouTube:
         if self._vid_info:
             return self._vid_info
 
-        innertube = InnerTube(use_oauth=self.use_oauth, allow_cache=self.allow_oauth_cache)
+        innertube = InnerTube(client=self.innertube_client, use_oauth=self.use_oauth, allow_cache=self.allow_oauth_cache)
 
         innertube_response = innertube.player(self.video_id)
+        self.check_innertube_availability(innertube_response)
+
         self._vid_info = innertube_response
         return self._vid_info
-
-    def bypass_age_gate(self):
-        """Attempt to update the vid_info by bypassing the age gate."""
-        innertube = InnerTube(
-            client='ANDROID_EMBED',
-            use_oauth=self.use_oauth,
-            allow_cache=self.allow_oauth_cache
-        )
-        innertube_response = innertube.player(self.video_id)
-
-        playability_status = innertube_response['playabilityStatus'].get('status', None)
-
-        # If we still can't access the video, raise an exception
-        # (tier 3 age restriction)
-        if playability_status == 'UNPLAYABLE':
-            raise exceptions.AgeRestrictedError(self.video_id)
-
-        self._vid_info = innertube_response
 
     @property
     def caption_tracks(self) -> List[pytube.Caption]:
