@@ -52,6 +52,19 @@ class VideoUnavailable(PytubeError):
     def error_string(self):
         return f'{self.video_id} is unavailable'
 
+class EmbedPlaybackDisabled(VideoUnavailable):
+    """Playback on other websites has been disabled by the video owner."""
+    def __init__(self, video_id: str):
+        """
+        :param str video_id:
+            A YouTube video identifier.
+        """
+        self.video_id = video_id
+        super().__init__(self.video_id)
+
+    @property
+    def error_string(self):
+        return f"{self.video_id} can only be reproduced on the youtube website."
 
 class AgeRestrictedError(VideoUnavailable):
     """Video is age restricted, and cannot be accessed without OAuth."""
