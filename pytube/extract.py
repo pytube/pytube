@@ -406,7 +406,7 @@ def apply_signature(stream_manifest: Dict, vid_info: Dict, js: str) -> None:
         The contents of the base.js asset file.
 
     """
-    cipher = Cipher(js=js)
+    cipher = None
 
     for i, stream in enumerate(stream_manifest):
         try:
@@ -427,7 +427,10 @@ def apply_signature(stream_manifest: Dict, vid_info: Dict, js: str) -> None:
             # the whole signature descrambling entirely.
             logger.debug("signature found, skip decipher")
             continue
-
+        
+        if cipher is None:
+            logger.debug("signature not found, starting decipher")
+            cipher = Cipher(js=js)
         signature = cipher.get_signature(ciphered_signature=stream["s"])
 
         logger.debug(
