@@ -5,18 +5,18 @@ import pytest
 @pytest.mark.parametrize(
     ("test_input", "expected"),
     [
-        ({"progressive": True}, [17, 18, 22]),
+        ({"progressive": True}, [18, 22]),
         ({"resolution": "720p"}, [22, 136, 247, 398]),
         ({"res": "720p"}, [22, 136, 247, 398]),
         ({"fps": 24, "resolution": "480p"}, [135, 244, 397]),
-        ({"mime_type": "audio/mp4"}, [139, 140]),
-        ({"type": "audio"}, [139, 140, 249, 250, 251]),
-        ({"subtype": "3gpp"}, [17]),
+        ({"mime_type": "audio/mp4"}, [140]),
+        ({"type": "audio"}, [140, 249, 250, 251]),
+        ({"subtype": "mp4"}, [18, 22, 137, 399, 136, 398, 135, 397, 134, 396, 133, 395, 160, 394, 140]),
         ({"abr": "128kbps"}, [140]),
         ({"bitrate": "128kbps"}, [140]),
         ({"audio_codec": "opus"}, [249, 250, 251]),
         ({"video_codec": "vp9"}, [248, 247, 244, 243, 242, 278]),
-        ({"only_audio": True}, [139, 140, 249, 250, 251]),
+        ({"only_audio": True}, [140, 249, 250, 251]),
         ({"only_video": True, "video_codec": "avc1.4d4015"}, [133]),
         ({"adaptive": True, "resolution": "1080p"}, [137, 248, 399]),
         ({"custom_filter_functions": [lambda s: s.itag == 18]}, [18]),
@@ -129,16 +129,7 @@ def test_order_by_non_numerical_ascending(cipher_signature):
 
 def test_order_by_with_none_values(cipher_signature):
     abrs = [s.abr for s in cipher_signature.streams.order_by("abr").asc()]
-    assert abrs == [
-        "24kbps",
-        "48kbps",
-        "50kbps",
-        "70kbps",
-        "96kbps",
-        "128kbps",
-        "160kbps",
-        "192kbps"
-    ]
+    assert abrs == ['50kbps', '70kbps', '96kbps', '128kbps', '160kbps', '192kbps']
 
 
 def test_get_by_itag(cipher_signature):
@@ -167,7 +158,7 @@ def test_get_highest_resolution(cipher_signature):
 def test_filter_is_dash(cipher_signature):
     streams = cipher_signature.streams.filter(is_dash=False)
     itags = [s.itag for s in streams]
-    assert itags == [17, 18, 22]
+    assert itags == [18, 22]
 
 
 def test_get_audio_only(cipher_signature):
@@ -179,13 +170,13 @@ def test_get_audio_only_with_subtype(cipher_signature):
 
 
 def test_sequence(cipher_signature):
-    assert len(cipher_signature.streams) == 26
+    assert len(cipher_signature.streams) == 24
     assert cipher_signature.streams[0] is not None
 
 
 def test_otf(cipher_signature):
     non_otf = cipher_signature.streams.otf()
-    assert len(non_otf) == 26
+    assert len(non_otf) == 24
 
     otf = cipher_signature.streams.otf(True)
     assert len(otf) == 0
