@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Module for interacting with a user's youtube channel."""
+"""Module for interacting with a user's YouTube channel."""
 import json
 import logging
 from typing import Dict, List, Optional, Tuple
@@ -27,7 +27,7 @@ class Channel(Playlist):
             f"https://www.youtube.com{self.channel_uri}"
         )
 
-        self.videos_url = self.channel_url + '/videos'
+        self.videos_url = self.channel_url + 'videos'
         self.playlists_url = self.channel_url + '/playlists'
         self.community_url = self.channel_url + '/community'
         self.featured_channels_url = self.channel_url + '/channels'
@@ -151,9 +151,7 @@ class Channel(Playlist):
             videos = initial_data["contents"][
                 "twoColumnBrowseResultsRenderer"][
                 "tabs"][1]["tabRenderer"]["content"][
-                "sectionListRenderer"]["contents"][0][
-                "itemSectionRenderer"]["contents"][0][
-                "gridRenderer"]["items"]
+                "richGridRenderer"]["contents"]
         except (KeyError, IndexError, TypeError):
             try:
                 # this is the json tree structure, if the json was directly sent
@@ -191,7 +189,7 @@ class Channel(Playlist):
                     map(
                         lambda x: (
                             f"/watch?v="
-                            f"{x['gridVideoRenderer']['videoId']}"
+                            f"{x['richItemRenderer']['content']['videoRenderer']['videoId']}"
                         ),
                         videos
                     )
