@@ -353,9 +353,12 @@ class Playlist(Sequence):
 
     @property
     def description(self) -> str:
+        if len(self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer']['description']) == 0:
+            return ""
+        
         return self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
             'description']['simpleText']
-
+            
     @property
     def length(self):
         """Extract the number of videos in the playlist.
