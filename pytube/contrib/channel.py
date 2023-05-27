@@ -5,7 +5,7 @@ import logging
 from typing import Dict, List, Optional, Tuple
 
 from pytube import extract, Playlist, request
-from pytube.helpers import uniqueify
+from pytube.helpers import recursive_findall
 
 logger = logging.getLogger(__name__)
 
@@ -147,55 +147,10 @@ class Channel(Playlist):
         initial_data = json.loads(raw_json)
         # this is the json tree structure, if the json was extracted from
         # html
-        try:
-            videos = initial_data["contents"][
-                "twoColumnBrowseResultsRenderer"][
-                "tabs"][1]["tabRenderer"]["content"][
-                "sectionListRenderer"]["contents"][0][
-                "itemSectionRenderer"]["contents"][0][
-                "gridRenderer"]["items"]
-        except (KeyError, IndexError, TypeError):
-            try:
-                # this is the json tree structure, if the json was directly sent
-                # by the server in a continuation response
-                important_content = initial_data[1]['response']['onResponseReceivedActions'][
-                    0
-                ]['appendContinuationItemsAction']['continuationItems']
-                videos = important_content
-            except (KeyError, IndexError, TypeError):
-                try:
-                    # this is the json tree structure, if the json was directly sent
-                    # by the server in a continuation response
-                    # no longer a list and no longer has the "response" key
-                    important_content = initial_data['onResponseReceivedActions'][0][
-                        'appendContinuationItemsAction']['continuationItems']
-                    videos = important_content
-                except (KeyError, IndexError, TypeError) as p:
-                    logger.info(p)
-                    return [], None
+        r = recursive_findall(initial_data, 'videoId')
+        videos = [f'/watch?v={videoId}' for videoId in set(r)]
 
-        try:
-            continuation = videos[-1]['continuationItemRenderer'][
-                'continuationEndpoint'
-            ]['continuationCommand']['token']
-            videos = videos[:-1]
-        except (KeyError, IndexError):
-            # if there is an error, no continuation is available
-            continuation = None
+        r = recursive_findall(initial_data, 'continuationCommand')
+        continuation = r[0]['token'] if r else None
 
-        # remove duplicates
-        return (
-            uniqueify(
-                list(
-                    # only extract the video ids from the video data
-                    map(
-                        lambda x: (
-                            f"/watch?v="
-                            f"{x['gridVideoRenderer']['videoId']}"
-                        ),
-                        videos
-                    )
-                ),
-            ),
-            continuation,
-        )
+        return videos, continuation
