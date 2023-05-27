@@ -333,3 +333,28 @@ def create_mock_html_json(vid_id) -> Dict[str, Any]:
         f.write(json.dumps(html_data).encode('utf-8'))
 
     return html_data
+
+
+def recursive_findall(data: Dict, key: str) -> List:
+    """Returns all occurances of a key.
+
+    :param Dict data
+        Dictionary (for example json data)
+    :param str key:
+        A string to specify the key.
+
+    :return List result
+        List of found objects
+    """
+    def _rfind(data, key, res):
+        if isinstance(data, list):
+            for e in data:
+                _rfind(e, key, res)
+        elif isinstance(data, dict):
+            for k, v in data.items():
+                if k == key:
+                    res.append(v)
+                else:
+                    _rfind(v, key, res)
+        return res
+    return _rfind(data, key, [])
