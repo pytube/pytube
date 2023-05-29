@@ -191,10 +191,10 @@ class Search:
                 # Check if found renderer is unsupported
                 supported_renderers = {'videoRenderer', 'reelShelfRenderer'}
                 if video_details.keys().isdisjoint(supported_renderers):
-                    logger.warn('Unexpected renderer encountered.')
-                    logger.warn(f'Renderer name: {video_details.keys()}')
-                    logger.warn(f'Search term: {self.query}')
-                    logger.warn(
+                    logger.warning('Unexpected renderer encountered.')
+                    logger.warning(f'Renderer name: {video_details.keys()}')
+                    logger.warning(f'Search term: {self.query}')
+                    logger.warning(
                         'Please open an issue at '
                         'https://github.com/pytube/pytube/issues '
                         'and provide this log output.'
