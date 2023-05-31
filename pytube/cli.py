@@ -55,7 +55,7 @@ def main():
 
 def _perform_args_on_youtube(
     youtube: YouTube, args: argparse.Namespace
-) -> None:
+    ) -> None:
     if len(sys.argv) == 2 :  # no arguments parsed
         download_highest_resolution_progressive(
             youtube=youtube, resolution="highest", target=args.target
@@ -208,7 +208,7 @@ def build_playback_report(youtube: YouTube) -> None:
 
 def display_progress_bar(
     bytes_received: int, filesize: int, ch: str = "█", scale: float = 0.55
-) -> None:
+    ) -> None:
     """Display a simple, pretty progress bar.
 
     Example:
@@ -242,7 +242,7 @@ def display_progress_bar(
 # noinspection PyUnusedLocal
 def on_progress(
     stream: Stream, chunk: bytes, bytes_remaining: int
-) -> None:  # pylint: disable=W0613
+    ) -> None:  # pylint: disable=W0613
     filesize = stream.filesize
     bytes_received = filesize - bytes_remaining
     display_progress_bar(bytes_received, filesize)
@@ -252,7 +252,7 @@ def _download(
     stream: Stream,
     target: Optional[str] = None,
     filename: Optional[str] = None,
-) -> None:
+    ) -> None:
     filesize_megabytes = stream.filesize // 1048576
     print(f"{filename or stream.default_filename} | {filesize_megabytes} MB")
     file_path = stream.get_file_path(filename=filename, output_path=target)
@@ -288,7 +288,7 @@ def _unique_name(base: str, subtype: str, media_type: str, target: str) -> str:
 
 def ffmpeg_process(
     youtube: YouTube, resolution: str, target: Optional[str] = None
-) -> None:
+    ) -> None:
     """
     Decides the correct video stream to download, then calls _ffmpeg_downloader.
 
@@ -346,7 +346,7 @@ def ffmpeg_process(
 
 def _ffmpeg_downloader(
     audio_stream: Stream, video_stream: Stream, target: str
-) -> None:
+    ) -> None:
     """
     Given a YouTube Stream object, finds the correct audio stream, downloads them both
     giving them a unique name, them uses ffmpeg to create a new file with the audio
@@ -404,7 +404,7 @@ def _ffmpeg_downloader(
 
 def download_by_itag(
     youtube: YouTube, itag: int, target: Optional[str] = None
-) -> None:
+    ) -> None:
     """Start downloading a YouTube video.
 
     :param YouTube youtube:
@@ -431,7 +431,7 @@ def download_by_itag(
 
 def download_by_resolution(
     youtube: YouTube, resolution: str, target: Optional[str] = None
-) -> None:
+    ) -> None:
     """Start downloading a YouTube video.
 
     :param YouTube youtube:
@@ -459,7 +459,7 @@ def download_by_resolution(
 
 def download_highest_resolution_progressive(
     youtube: YouTube, resolution: str, target: Optional[str] = None
-) -> None:
+    ) -> None:
     """Start downloading the highest resolution progressive stream.
 
     :param YouTube youtube:
@@ -500,7 +500,7 @@ def _print_available_captions(captions: CaptionQuery) -> None:
 
 def download_caption(
     youtube: YouTube, lang_code: Optional[str], target: Optional[str] = None
-) -> None:
+    ) -> None:
     """Download a caption for the YouTube video.
 
     :param YouTube youtube:
@@ -525,7 +525,7 @@ def download_caption(
 
 def download_audio(
     youtube: YouTube, filetype: str, target: Optional[str] = None
-) -> None:
+    ) -> None:
     """
     Given a filetype, downloads the highest quality available audio stream for a
     YouTube video.
