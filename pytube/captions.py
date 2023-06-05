@@ -102,7 +102,7 @@ class Caption:
     #         segments.append(line)
     #     return "\n".join(segments).strip()
 
-### REPLACE this function, beacause Youtube updated captions
+### REPLACE this function, because Youtube updated captions
     def xml_caption_to_srt(self, xml_captions: str) -> str:
       """Convert xml caption tracks to "SubRip Subtitle (srt)".
 
