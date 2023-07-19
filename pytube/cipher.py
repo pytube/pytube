@@ -198,33 +198,16 @@ def get_transform_plan(js: str) -> List[str]:
 
 
 def get_transform_object(js: str, var: str) -> List[str]:
-    """Extract the "transform object".
-
-    The "transform object" contains the function definitions referenced in the
-    "transform plan". The ``var`` argument is the obfuscated variable name
-    which contains these functions, for example, given the function call
-    ``DE.AJ(a,15)`` returned by the transform plan, "DE" would be the var.
-
-    :param str js:
-        The contents of the base.js asset file.
-    :param str var:
-        The obfuscated variable name that stores an object with all functions
-        that descrambles the signature.
-
-    **Example**:
-
-    >>> get_transform_object(js, 'DE')
-    ['AJ:function(a){a.reverse()}',
-    'VR:function(a,b){a.splice(0,b)}',
-    'kT:function(a,b){var c=a[0];a[0]=a[b%a.length];a[b]=c}']
-
-    """
     pattern = r"var %s={(.*?)};" % re.escape(var)
     logger.debug("getting transform object")
     regex = re.compile(pattern, flags=re.DOTALL)
     transform_match = regex.search(js)
+    
     if not transform_match:
-        raise RegexMatchError(caller="get_transform_object", pattern=pattern)
+        # i commented out the line raising the error
+        # raise RegexMatchError(caller="get_transform_object", pattern=pattern)
+        logger.error(f"No match found for pattern: {pattern}")
+        return []  # Return an empty list if no match is found
 
     return transform_match.group(1).replace("\n", " ").split(", ")
 
