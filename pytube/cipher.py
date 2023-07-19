@@ -218,6 +218,7 @@ def get_transform_object(js: str, var: str) -> List[str]:
     regex = re.compile(pattern, flags=re.DOTALL)
     transform_match = regex.search(js)
     if not transform_match:
+        logger.debug(f"No match found for pattern: {pattern}")
         return []  # Return an empty list if no match is found
 
     return transform_match.group(1).replace("\n", " ").split(", ")
