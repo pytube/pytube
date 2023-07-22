@@ -336,6 +336,16 @@ class Stream:
         self.on_complete(file_path)
         return file_path
 
+    def get_download_url(self) -> str:
+        """Returns the download URL for the Video.
+
+        :rtype: str
+        :returns:
+            URL for downloading the video
+        """
+        
+        return self.url
+
     def get_file_path(
         self,
         filename: Optional[str] = None,
