@@ -148,6 +148,10 @@ class Search:
                 # Seems to be the renderer used for the image shown on a no results page
                 if 'backgroundPromoRenderer' in video_details:
                     continue
+                
+                # Skip 'related searches with shorts' results
+                if 'reelShelfRenderer' in video_details:
+                    continue
 
                 if 'videoRenderer' not in video_details:
                     logger.warning('Unexpected renderer encountered.')
