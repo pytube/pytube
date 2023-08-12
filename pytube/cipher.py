@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class Cipher:
     def __init__(self, js: str):
         self.transform_plan: List[str] = get_transform_plan(js)
-        var_regex = re.compile(r"^\w+\W")
+        var_regex = re.compile(r"^\$*\w+\W")
         var_match = var_regex.search(self.transform_plan[0])
         if not var_match:
             raise RegexMatchError(
@@ -224,7 +224,10 @@ def get_transform_object(js: str, var: str) -> List[str]:
     regex = re.compile(pattern, flags=re.DOTALL)
     transform_match = regex.search(js)
     if not transform_match:
-        raise RegexMatchError(caller="get_transform_object", pattern=pattern)
+        # i commented out the line raising the error
+        # raise RegexMatchError(caller="get_transform_object", pattern=pattern)
+        logger.error(f"No match found for pattern: {pattern}")
+        return []  # Return an empty list if no match is found
 
     return transform_match.group(1).replace("\n", " ").split(", ")
 
