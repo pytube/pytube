@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class Cipher:
     def __init__(self, js: str):
         self.transform_plan: List[str] = get_transform_plan(js)
-        var_regex = re.compile(r"^\w+\W")
+        var_regex = re.compile(r"^\$*\w+\W")
         var_match = var_regex.search(self.transform_plan[0])
         if not var_match:
             raise RegexMatchError(
