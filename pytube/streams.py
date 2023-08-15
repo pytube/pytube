@@ -37,9 +37,7 @@ class Stream:
             Dictionary of data shared across all instances of
             :class:`Stream <Stream>`.
         """
-        # An extra attribute I added:
         self.stop_signal = False
-        #################
         # A dictionary shared between all instances of :class:`Stream <Stream>`
         # (Borg pattern).
         self._monostate = monostate
@@ -319,10 +317,8 @@ class Stream:
                     timeout=timeout,
                     max_retries=max_retries
                 ):
-                    # An extra check I added:
                     if self.stop_signal:
                         break
-                    ##############
                     # reduce the (bytes) remainder by the length of the chunk.
                     bytes_remaining -= len(chunk)
                     # send to the on_progress callback.
