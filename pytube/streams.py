@@ -339,6 +339,7 @@ class Stream:
         self.on_complete(file_path)
         self.stop_signal = False        
         return file_path
+        
     def stop_download(self):
         self.stop_signal = True
     def get_file_path(
