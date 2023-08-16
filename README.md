@@ -62,12 +62,6 @@ cd pytube
 pip install .
 ```
 
-To install from PyPI with pip:
-
-```bash
-$ python -m pip install pytube
-```
-
 Sometimes, the PyPI release becomes slightly outdated. To install from the source with pip:
 
 ```bash
