@@ -9,6 +9,19 @@ from typing import Dict, Optional
 from pytube import request
 from pytube.helpers import safe_filename, target_directory
 
+def _caption_time_format(millisec: float) -> str:
+    """Convert milliseconds to an SRT formatted timestamp.
+
+    :param float millisec:
+        Time in milliseconds.
+    :rtype: str
+    :returns:
+        SRT formatted timestamp.
+    """
+    seconds, millisec = divmod(millisec, 1000)
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02},{int(millisec):03}"
 
 class Caption:
     """Container for caption tracks."""
@@ -81,6 +94,21 @@ class Caption:
         :param str xml_captions:
             XML formatted caption tracks.
         """
+        root = ElementTree.fromstring(xml_captions)
+        srt = ""
+        for i, child in enumerate(list(root.findall('body/p'))):
+            text = ''.join(child.itertext()).strip()
+            if not text:
+                continue
+            duration = float(child.attrib["d"])
+            start = float(child.attrib["t"])
+            end = start + duration
+            sequence_number = i + 1
+            srt += f"{sequence_number}\n"
+            srt += f"{_caption_time_format(start)} --> {_caption_time_format(end)}\n"
+            srt += f"{text}\n\n"
+        return srt
+        # Old implementation:
         segments = []
         root = ElementTree.fromstring(xml_captions)
         for i, child in enumerate(list(root)):
