@@ -21,7 +21,7 @@ def _caption_time_format(millisec: float) -> str:
     seconds, millisec = divmod(millisec, 1000)
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
-    return f"{hours:02}:{minutes:02}:{seconds:02},{millisec:03}"
+    return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02},{int(millisec):03}"
 
 class Caption:
     """Container for caption tracks."""
