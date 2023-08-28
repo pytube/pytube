@@ -8,7 +8,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import parse_qs, quote, urlencode, urlparse
 
 from pytube.cipher import Cipher
-from pytube.exceptions import HTMLParseError, LiveStreamError, RegexMatchError
+from pytube.exceptions import HTMLParseError, LiveStreamError, \
+    RegexMatchError, ExtractError
 from pytube.helpers import regex_search
 from pytube.metadata import YouTubeMetadata
 from pytube.parser import parse_for_object, parse_for_all_objects
@@ -577,3 +578,57 @@ def metadata(initial_data) -> Optional[YouTubeMetadata]:
     metadata_rows = [x["metadataRowRenderer"] for x in metadata_rows]
 
     return YouTubeMetadata(metadata_rows)
+
+
+def transcript_params(next_data: Dict) -> str:
+    """Extract transcript endpoint of the video.
+
+    :rtype: str
+    """
+    params = None
+    try:
+        engagement_panels = next_data["engagementPanels"]
+        for panel in engagement_panels:
+            panel_section = panel["engagementPanelSectionListRenderer"]
+            if (
+                panel_section.get("panelIdentifier")
+                == "engagement-panel-searchable-transcript"
+            ):
+                params = panel_section["content"]["continuationItemRenderer"][
+                    "continuationEndpoint"]["getTranscriptEndpoint"]["params"]
+                break
+    except KeyError as ex:
+        key = ex.args[0]
+        raise ExtractError(f"No \"{key}\" field found.")
+    return params
+
+
+def parse_chapters(transcript: Dict) -> List[Dict[str, int]]:
+    """Extract chapters from get_transcript endpoint response.
+
+    :rtype: List[Dict[str, int]]
+    """
+    segments = []
+    try:
+        segments = transcript["actions"][0][
+            "updateEngagementPanelAction"]["content"][
+            "transcriptRenderer"]["content"][
+            "transcriptSearchPanelRenderer"]["body"][
+            "transcriptSegmentListRenderer"]["initialSegments"]
+    except KeyError as ex:
+        key = ex.args[0]
+        raise ExtractError(f"No \"{key}\" field found.")
+
+    chapters = []
+    for segment in segments:
+        chapter = segment.get("transcriptSectionHeaderRenderer")
+        if chapter:
+            try:
+                chapters.append(dict(
+                    timestamp=int(chapter["startMs"]),
+                    label=chapter["snippet"]["simpleText"]
+                ))
+            except KeyError as ex:
+                key = ex.args[0]
+                raise ExtractError(f"No \"{key}\" field found.")
+    return chapters

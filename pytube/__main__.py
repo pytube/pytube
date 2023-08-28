@@ -443,6 +443,22 @@ class YouTube:
             self._metadata = extract.metadata(self.initial_data)
             return self._metadata
 
+    @property
+    def chapters(self) -> List[Dict[str, int]]:
+        """Get the video chapters with timestamps.
+        See: https://github.com/tombulled/innertube/blob/main/examples/get-video-transcript.py
+
+        :rtype: List[Dict[str, int]]
+        """
+        innertube = InnerTube(client="WEB")
+
+        next_data = innertube.next(self.video_id)
+        params = extract.transcript_params(next_data)
+
+        transcript = innertube.get_transcript(params)
+        chapters = extract.parse_chapters(transcript)
+        return chapters
+
     def register_on_progress_callback(self, func: Callable[[Any, bytes, int], None]):
         """Register a download progress callback function post initialization.
 
@@ -474,6 +490,6 @@ class YouTube:
             The video id of the YouTube video.
 
         :rtype: :class:`YouTube <YouTube>`
-        
+
         """
         return YouTube(f"https://www.youtube.com/watch?v={video_id}")
