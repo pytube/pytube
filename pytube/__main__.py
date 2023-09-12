@@ -243,7 +243,7 @@ class YouTube:
         if self._vid_info:
             return self._vid_info
 
-        innertube = InnerTube(use_oauth=self.use_oauth, allow_cache=self.allow_oauth_cache,token_file = token_file)
+        innertube = InnerTube(use_oauth=self.use_oauth, allow_cache=self.allow_oauth_cache,token_file = self.token_file)
 
         innertube_response = innertube.player(self.video_id)
         self._vid_info = innertube_response
@@ -255,7 +255,7 @@ class YouTube:
             client='ANDROID_EMBED',
             use_oauth=self.use_oauth,
             allow_cache=self.allow_oauth_cache,
-            token_file = token_file
+            token_file = self.token_file
         )
         innertube_response = innertube.player(self.video_id)
 
