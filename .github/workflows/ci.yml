@@ -1,4 +1,4 @@
-name: CI testing
+name: CI tests
 
 on:
   pull_request:
@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        python: [3.6, 3.7, 3.8, 3.9]
+        python: [3.7, 3.8, 3.9, 3.11]
 
     steps:
       - name: Checkout repo

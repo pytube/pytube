@@ -1,6 +1,7 @@
 import math
 import os
 import time
+import json
 import xml.etree.ElementTree as ElementTree
 from html import unescape
 from typing import Dict, Optional
@@ -41,6 +42,15 @@ class Caption:
     def xml_captions(self) -> str:
         """Download the xml caption tracks."""
         return request.get(self.url)
+
+    @property
+    def json_captions(self) -> dict:
+        """Download and parse the json caption tracks."""
+        json_captions_url = self.url.replace('fmt=srv3','fmt=json3')
+        text = request.get(json_captions_url)
+        parsed = json.loads(text)
+        assert parsed['wireMagic'] == 'pb3', 'Unexpected captions format'
+        return parsed
 
     def generate_srt_captions(self) -> str:
         """Generate "SubRip Subtitle" captions.
