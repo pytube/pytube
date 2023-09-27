@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class Cipher:
     def __init__(self, js: str):
         self.transform_plan: List[str] = get_transform_plan(js)
-        var_regex = re.compile(r"^\w+\W")
+        var_regex = re.compile(r"^\$*\w+\W")
         var_match = var_regex.search(self.transform_plan[0])
         if not var_match:
             raise RegexMatchError(
@@ -224,7 +224,8 @@ def get_transform_object(js: str, var: str) -> List[str]:
     regex = re.compile(pattern, flags=re.DOTALL)
     transform_match = regex.search(js)
     if not transform_match:
-        raise RegexMatchError(caller="get_transform_object", pattern=pattern)
+        logger.error(f"no match found for pattern: {pattern}")
+        return []
 
     return transform_match.group(1).replace("\n", " ").split(", ")
 
@@ -269,8 +270,12 @@ def get_throttling_function_name(js: str) -> str:
         # a.C && (b = a.get("n")) && (b = Bpa[0](b), a.set("n", b),
         # Bpa.length || iha("")) }};
         # In the above case, `iha` is the relevant function name
-        r'a\.[a-zA-Z]\s*&&\s*\([a-z]\s*=\s*a\.get\("n"\)\)\s*&&\s*'
-        r'\([a-z]\s*=\s*([a-zA-Z0-9$]+)(\[\d+\])?\([a-z]\)',
+        #r'a\.[a-zA-Z]\s*&&\s*\([a-z]\s*=\s*a\.get\("n"\)\)\s*&&\s*'
+        #r'\([a-z]\s*=\s*([a-zA-Z0-9$]+)(\[\d+\])?\([a-z]\)',
+
+        # starts from 2023 Aug
+        r'a\.[a-zA-Z]\s*&&\s*\([a-z]\s*=\s*a\.get\("n"\)\)\s*&&.*?\|\|\s*([a-z]+)',
+        r'\([a-z]\s*=\s*([a-zA-Z0-9$]+)(\[\d+\])\([a-z]\)',
     ]
     logger.debug('Finding throttling function name')
     for pattern in function_patterns:
@@ -284,7 +289,7 @@ def get_throttling_function_name(js: str) -> str:
             if idx:
                 idx = idx.strip("[]")
                 array = re.search(
-                    r'var {nfunc}\s*=\s*(\[.+?\]);'.format(
+                    r'var {nfunc}\s*=\s*(\[.+?\])'.format(
                         nfunc=re.escape(function_match.group(1))),
                     js
                 )
@@ -408,7 +413,8 @@ def get_throttling_plan(js: str):
     plan_regex = re.compile(transform_start)
     match = plan_regex.search(raw_code)
 
-    transform_plan_raw = find_object_from_startpoint(raw_code, match.span()[1] - 1)
+    transform_plan_raw = js 
+    # find_object_from_startpoint(raw_code, match.span()[1] - 1)
 
     # Steps are either c[x](c[y]) or c[x](c[y],c[z])
     step_start = r"c\[(\d+)\]\(c\[(\d+)\](,c(\[(\d+)\]))?\)"

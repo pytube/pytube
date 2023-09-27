@@ -246,6 +246,21 @@ class YouTube:
         innertube_response = innertube.player(self.video_id)
         self._vid_info = innertube_response
         return self._vid_info
+    
+    def bypass_embed_gate(self):
+        """Attempt to update the vid_info by bypassing embed gate."""
+        innertube = InnerTube(
+            client='ANDROID_MUSIC',
+            use_oauth=self.use_oauth,
+            allow_cache=self.allow_oauth_cache
+        )
+
+        innertube_response = innertube.player(self.video_id)
+        playability_status = innertube_response['playabilityStatus'].get('status', None)
+        # If we still can't access the video, raise an exception
+        if playability_status == 'UNPLAYABLE':
+            raise exceptions.VideoUnavailable(self.video_id)
+        self._vid_info = innertube_response
 
     def bypass_age_gate(self):
         """Attempt to update the vid_info by bypassing the age gate."""
@@ -257,11 +272,16 @@ class YouTube:
         innertube_response = innertube.player(self.video_id)
 
         playability_status = innertube_response['playabilityStatus'].get('status', None)
+        reason = innertube_response['playabilityStatus'].get('reason', None)
 
         # If we still can't access the video, raise an exception
         # (tier 3 age restriction)
         if playability_status == 'UNPLAYABLE':
-            raise exceptions.AgeRestrictedError(self.video_id)
+            if reason == 'Playback on other websites has been disabled by the video owner':
+                self.bypass_embed_gate()
+                return
+            else:
+                raise exceptions.AgeRestrictedError(self.video_id)
 
         self._vid_info = innertube_response
 
