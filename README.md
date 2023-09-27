@@ -52,16 +52,20 @@ This guide covers the most basic usage of the library. For more detailed informa
 
 Pytube requires an installation of Python 3.6 or greater, as well as pip. (Pip is typically bundled with Python [installations](https://python.org/downloads).)
 
-To install from PyPI with pip:
+Install
 
 ```bash
-$ python -m pip install pytube
+sudo apt install git
+cd ~
+git clone https://github.com/oncename/pytube.git
+cd pytube
+pip install .
 ```
 
 Sometimes, the PyPI release becomes slightly outdated. To install from the source with pip:
 
 ```bash
-$ python -m pip install git+https://github.com/pytube/pytube
+$ python -m pip install git+https://github.com/oncename/pytube
 ```
 
 ### Using pytube in a Python script
@@ -70,8 +74,8 @@ To download a video using the library in a script, you'll need to import the You
 
 ```python
  >>> from pytube import YouTube
- >>> YouTube('https://youtu.be/2lAe1cqCOXo').streams.first().download()
- >>> yt = YouTube('http://youtube.com/watch?v=2lAe1cqCOXo')
+ >>> YouTube('https://youtu.be/AXkbqdJFbcE').streams.first().download()
+ >>> yt = YouTube('https://www.youtube.com/watch?v=AXkbqdJFbcE')
  >>> yt.streams
   ... .filter(progressive=True, file_extension='mp4')
   ... .order_by('resolution')
@@ -84,7 +88,7 @@ To download a video using the library in a script, you'll need to import the You
 
 Using the CLI is remarkably straightforward as well. To download a video at the highest progressive quality, you can use the following command:
 ```bash
-$ pytube https://youtube.com/watch?v=2lAe1cqCOXo
+$ pytube https://www.youtube.com/watch?v=AXkbqdJFbcE
 ```
 
 You can also do the same for a playlist:
