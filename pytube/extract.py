@@ -8,8 +8,12 @@ from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import parse_qs, quote, urlencode, urlparse
 
 from pytube.cipher import Cipher
-from pytube.exceptions import HTMLParseError, LiveStreamError, \
-    RegexMatchError, ExtractError
+from pytube.exceptions import (
+    HTMLParseError,
+    LiveStreamError,
+    RegexMatchError,
+    ExtractError
+)
 from pytube.helpers import regex_search
 from pytube.metadata import YouTubeMetadata
 from pytube.parser import parse_for_object, parse_for_all_objects
