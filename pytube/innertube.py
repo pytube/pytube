@@ -30,10 +30,12 @@ _api_keys = [
 
 _default_clients = {
     'WEB': {
-        'context': {
-            'client': {
-                'clientName': 'WEB',
-                'clientVersion': '2.20200720.00.02'
+        'innertube_context': {
+            'context': {
+                'client': {
+                    'clientName': 'WEB',
+                    'clientVersion': '2.20200720.00.02'
+                }
             }
         },
         'header': {
@@ -42,12 +44,15 @@ _default_clients = {
         'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
     },
     'ANDROID': {
-        'context': {
-            'client': {
-                'clientName': 'ANDROID',
-                'clientVersion': '17.31.35',
-                'androidSdkVersion': 30
-            }
+        'innertube_context': {
+            'context': {
+                'client': {
+                    'clientName': 'ANDROID',
+                    'clientVersion': '17.31.35',
+                    'androidSdkVersion': 30
+                }
+            },
+            "params": "CgIQBg"
         },
         'header': {
             'User-Agent': 'com.google.android.youtube/',
@@ -55,11 +60,13 @@ _default_clients = {
         'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
     },
     'IOS': {
-        'context': {
-            'client': {
-                'clientName': 'IOS',
-                'clientVersion': '17.33.2',
-                'deviceModel': 'iPhone14,3'
+        'innertube_context': {
+            'context': {
+                'client': {
+                    'clientName': 'IOS',
+                    'clientVersion': '17.33.2',
+                    'deviceModel': 'iPhone14,3'
+                }
             }
         },
         'header': {
@@ -69,11 +76,13 @@ _default_clients = {
     },
 
     'WEB_EMBED': {
-        'context': {
-            'client': {
-                'clientName': 'WEB_EMBEDDED_PLAYER',
-                'clientVersion': '2.20210721.00.00',
-                'clientScreen': 'EMBED'
+        'innertube_context': {
+            'context': {
+                'client': {
+                    'clientName': 'WEB_EMBEDDED_PLAYER',
+                    'clientVersion': '2.20210721.00.00',
+                    'clientScreen': 'EMBED'
+                }
             }
         },
         'header': {
@@ -82,12 +91,14 @@ _default_clients = {
         'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
     },
     'ANDROID_EMBED': {
-        'context': {
-            'client': {
-                'clientName': 'ANDROID_EMBEDDED_PLAYER',
-                'clientVersion': '17.31.35',
-                'clientScreen': 'EMBED',
-                'androidSdkVersion': 30,
+        'innertube_context': {
+            'context': {
+                'client': {
+                    'clientName': 'ANDROID_EMBEDDED_PLAYER',
+                    'clientVersion': '17.31.35',
+                    'clientScreen': 'EMBED',
+                    'androidSdkVersion': 30,
+                }
             }
         },
         'header': {
@@ -96,11 +107,13 @@ _default_clients = {
         'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
     },
     'IOS_EMBED': {
-        'context': {
-            'client': {
-                'clientName': 'IOS_MESSAGES_EXTENSION',
-                'clientVersion': '17.33.2',
-                'deviceModel': 'iPhone14,3'
+        'innertube_context': {
+            'context': {
+                'client': {
+                    'clientName': 'IOS_MESSAGES_EXTENSION',
+                    'clientVersion': '17.33.2',
+                    'deviceModel': 'iPhone14,3'
+                }
             }
         },
         'header': {
@@ -110,10 +123,12 @@ _default_clients = {
     },
 
     'WEB_MUSIC': {
-        'context': {
-            'client': {
-                'clientName': 'WEB_REMIX',
-                'clientVersion': '1.20220727.01.00',
+        'innertube_context': {
+            'context': {
+                'client': {
+                    'clientName': 'WEB_REMIX',
+                    'clientVersion': '1.20220727.01.00',
+                }
             }
         },
         'header': {
@@ -122,11 +137,13 @@ _default_clients = {
         'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
     },
     'ANDROID_MUSIC': {
-        'context': {
-            'client': {
-                'clientName': 'ANDROID_MUSIC',
-                'clientVersion': '5.16.51',
-                'androidSdkVersion': 30
+        'innertube_context': {
+            'context': {
+                'client': {
+                    'clientName': 'ANDROID_MUSIC',
+                    'clientVersion': '5.16.51',
+                    'androidSdkVersion': 30
+                }
             }
         },
         'header': {
@@ -135,11 +152,13 @@ _default_clients = {
         'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
     },
     'IOS_MUSIC': {
-        'context': {
-            'client': {
-                'clientName': 'IOS_MUSIC',
-                'clientVersion': '5.21',
-                'deviceModel': 'iPhone14,3'
+        'innertube_context': {
+            'context': {
+                'client': {
+                    'clientName': 'IOS_MUSIC',
+                    'clientVersion': '5.21',
+                    'deviceModel': 'iPhone14,3'
+                }
             }
         },
         'header': {
@@ -149,10 +168,12 @@ _default_clients = {
     },
 
     'WEB_CREATOR': {
-        'context': {
-            'client': {
-                'clientName': 'WEB_CREATOR',
-                'clientVersion': '1.20220726.00.00',
+        'innertube_context': {
+            'context': {
+                'client': {
+                    'clientName': 'WEB_CREATOR',
+                    'clientVersion': '1.20220726.00.00',
+                }
             }
         },
         'header': {
@@ -161,11 +182,13 @@ _default_clients = {
         'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
     },
     'ANDROID_CREATOR': {
-        'context': {
-            'client': {
-                'clientName': 'ANDROID_CREATOR',
-                'clientVersion': '22.30.100',
-                'androidSdkVersion': 30,
+        'innertube_context': {
+            'context': {
+                'client': {
+                    'clientName': 'ANDROID_CREATOR',
+                    'clientVersion': '22.30.100',
+                    'androidSdkVersion': 30,
+                }
             }
         },
         'header': {
@@ -174,11 +197,13 @@ _default_clients = {
         'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
     },
     'IOS_CREATOR': {
-        'context': {
-            'client': {
-                'clientName': 'IOS_CREATOR',
-                'clientVersion': '22.33.101',
-                'deviceModel': 'iPhone14,3',
+        'innertube_context': {
+            'context': {
+                'client': {
+                    'clientName': 'IOS_CREATOR',
+                    'clientVersion': '22.33.101',
+                    'deviceModel': 'iPhone14,3',
+                }
             }
         },
         'header': {
@@ -188,10 +213,12 @@ _default_clients = {
     },
 
     'MWEB': {
-        'context': {
-            'client': {
-                'clientName': 'MWEB',
-                'clientVersion': '2.20220801.00.00',
+        'inertube_context': {
+            'context': {
+                'client': {
+                    'clientName': 'MWEB',
+                    'clientVersion': '2.20220801.00.00',
+                }
             }
         },
         'header': {
@@ -201,10 +228,12 @@ _default_clients = {
     },
 
     'TV_EMBED': {
-        'context': {
-            'client': {
-                'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
-                'clientVersion': '2.0',
+        'innertube_context': {
+            'context': {
+                'client': {
+                    'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
+                    'clientVersion': '2.0',
+                }
             }
         },
         'header': {
@@ -220,18 +249,19 @@ _token_file = os.path.join(_cache_dir, 'tokens.json')
 
 class InnerTube:
     """Object for interacting with the innertube API."""
-    def __init__(self, client='ANDROID_MUSIC', use_oauth=False, allow_cache=True):
+    def __init__(self, client='ANDROID', use_oauth=False, allow_cache=True):
         """Initialize an InnerTube object.
 
         :param str client:
             Client to use for the object.
-            Default to web because it returns the most playback types.
+            The default is ANDROID because there is no need to decrypt the
+            signature cipher and throttling parameter.
         :param bool use_oauth:
             Whether or not to authenticate to YouTube.
         :param bool allow_cache:
             Allows caching of oauth tokens on the machine.
         """
-        self.context = _default_clients[client]['context']
+        self.innertube_context = _default_clients[client]['innertube_context']
         self.header = _default_clients[client]['header']
         self.api_key = _default_clients[client]['api_key']
         self.access_token = None
@@ -351,11 +381,9 @@ class InnerTube:
         return 'https://www.youtube.com/youtubei/v1'
 
     @property
-    def base_data(self):
+    def base_data(self) -> dict:
         """Return the base json data to transmit to the innertube API."""
-        return {
-            'context': self.context
-        }
+        return self.innertube_context
 
     @property
     def base_params(self):
