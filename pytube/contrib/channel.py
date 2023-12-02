@@ -337,6 +337,16 @@ class Channel(Playlist):
             return None
 
     @property
+    def thumbnail_url(self) -> str:
+        """extract the profile image from the json of the channel home page
+
+        :rtype: str
+        :return: a string with the url of the channel's profile image
+        """
+        self.html_url = self.channel_url  # get the url of the channel home page
+        return self.initial_data['metadata']['channelMetadataRenderer']['avatar']['thumbnails'][0]['url']
+
+    @property
     def videos(self) -> Iterable[YouTube]:
         """Yields YouTube objects of videos in this channel
 
