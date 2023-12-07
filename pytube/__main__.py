@@ -94,6 +94,14 @@ class YouTube:
     def __eq__(self, o: object) -> bool:
         # Compare types and urls, if they're same return true, else return false.
         return type(o) == type(self) and o.watch_url == self.watch_url
+    
+    @property
+    def is_private(self) -> bool:
+        try: 
+            self.streams
+            return False
+        except exceptions.VideoPrivate:
+            return True
 
     @property
     def watch_html(self):
@@ -364,6 +372,32 @@ class YouTube:
         :rtype: str
         """
         return self.vid_info.get("videoDetails", {}).get("shortDescription")
+    
+    @property
+    def id(self) -> str:
+        """Get the video id.
+        
+        :rtype: str
+        """
+        return self.watch_url.split("=")[1]
+    
+    @property
+    def is_short(self) -> bool:
+        """Gets whether the video is a short or not.
+        
+        :rtype: bool
+        """
+        yt_short_url = f'https://www.youtube.com/shorts/{self.id}'
+
+        try:
+            response = request.get(yt_short_url)
+
+            # so basically it's checking to see if the url got redirected,
+            # or if stayed as a short url or not. :) 
+            return response.geturl() == yt_short_url
+        
+        except request.URLError:
+            return False
 
     @property
     def rating(self) -> float:
