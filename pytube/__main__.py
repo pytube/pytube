@@ -363,7 +363,8 @@ class YouTube:
 
         :rtype: str
         """
-        return self.vid_info.get("videoDetails", {}).get("shortDescription")
+        video_description = extract.video_description_info(self.watch_html).replace('\\n', '\n')
+        return video_description
 
     @property
     def rating(self) -> float:

@@ -212,6 +212,12 @@ def video_info_url(video_id: str, watch_url: str) -> str:
     )
     return _video_info_url(params)
 
+def video_description_info(watch_html: str):
+    try:
+        yt_description_result = regex_search(r'"(?<=description":{"simpleText":")([^}]+)', watch_html, group=0)
+    except RegexMatchError:
+        yt_description_result = None
+    return yt_description_result
 
 def video_info_url_age_restricted(video_id: str, embed_html: str) -> str:
     """Construct the video_info url.
