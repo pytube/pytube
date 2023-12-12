@@ -74,18 +74,23 @@ def find_object_from_startpoint(html, start_point):
 
     # First letter MUST be a open brace, so we put that in the stack,
     # and skip the first character.
+    last_char = '{'
+    curr_char = None
     stack = [html[0]]
     i = 1
 
     context_closers = {
         '{': '}',
         '[': ']',
-        '"': '"'
+        '"': '"',
+        '/': '/' # javascript regex
     }
 
     while i < len(html):
         if len(stack) == 0:
             break
+        if curr_char not in [' ', '\n']:
+            last_char = curr_char
         curr_char = html[i]
         curr_context = stack[-1]
 
@@ -95,17 +100,19 @@ def find_object_from_startpoint(html, start_point):
             i += 1
             continue
 
-        # Strings require special context handling because they can contain
+        # Strings and regex expressions require special context handling because they can contain
         #  context openers *and* closers
-        if curr_context == '"':
-            # If there's a backslash in a string, we skip a character
+        if curr_context in ['"', '/']:
+            # If there's a backslash in a string or regex expression, we skip a character
             if curr_char == '\\':
                 i += 2
                 continue
         else:
             # Non-string contexts are when we need to look for context openers.
             if curr_char in context_closers.keys():
-                stack.append(curr_char)
+                # Slash starts a regular expression depending on context
+                if not (curr_char == '/' and last_char not in ['(', ',', '=', ':', '[', '!', '&', '|', '?', '{', '}', ';']): 
+                    stack.append(curr_char)
 
         i += 1
 
