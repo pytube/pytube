@@ -375,9 +375,11 @@ class Playlist(Sequence):
         :return: Playlist view count
         :rtype: int
         """
-        # "1,234,567 views"
+        # "1,234,567 views" or "No views"
         views_text = self.sidebar_info[0]['playlistSidebarPrimaryInfoRenderer'][
             'stats'][1]['simpleText']
+        if views_text == "No views":
+            return 0
         # "1,234,567"
         count_text = views_text.split()[0]
         # "1234567"
