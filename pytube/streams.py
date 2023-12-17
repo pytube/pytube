@@ -57,6 +57,16 @@ class Stream:
         # ['vp8', 'vorbis'] -> video_codec: vp8, audio_codec: vorbis. DASH
         # streams return NoneType for audio/video depending.
         self.video_codec, self.audio_codec = self.parse_codecs()
+        
+        # This is only for multiple audio track
+        self.language: Optional[str] = stream.get("audioTrack", {}).get("displayName")
+        self.language_code: Optional[str] = None
+        self.audio_id: Optional[str] = stream.get("audioTrack", {}).get("id")
+        self.is_default_audio: Optional[bool] = stream.get("audioTrack", {}).get("audioIsDefault")
+        self.has_multiple_audio_track: bool = bool(self.language)
+        if self.has_multiple_audio_track:
+            self.language = self.language.removesuffix(" original")
+            self.language_code = self.audio_id.split(".")[0]
 
         self.is_otf: bool = stream["is_otf"]
         self.bitrate: Optional[int] = stream["bitrate"]
@@ -432,5 +442,7 @@ class Stream:
                 parts.extend(['vcodec="{s.video_codec}"'])
         else:
             parts.extend(['abr="{s.abr}"', 'acodec="{s.audio_codec}"'])
+            if self.has_multiple_audio_track:
+                parts.extend(['lang="{s.language}"', 'code="{s.language_code}"'])
         parts.extend(['progressive="{s.is_progressive}"', 'type="{s.type}"'])
         return f"<Stream: {' '.join(parts).format(s=self)}>"
