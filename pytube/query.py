@@ -36,6 +36,7 @@ class StreamQuery(Sequence):
         progressive=None,
         adaptive=None,
         is_dash=None,
+        lang_code=None,
         custom_filter_functions=None,
     ):
         """Apply the given filtering criterion.
@@ -113,6 +114,11 @@ class StreamQuery(Sequence):
 
         :param bool only_video:
             Excludes streams with audio tracks.
+            
+        :param lang_code:
+            Includes only given language code.
+        :type lang_code:
+            str or None
 
         :param custom_filter_functions:
             (optional) Interface for defining complex filters without
@@ -168,6 +174,9 @@ class StreamQuery(Sequence):
 
         if adaptive:
             filters.append(lambda s: s.is_adaptive)
+        
+        if lang_code:
+            filters.append(lambda s: s.language_code == lang_code)
 
         if custom_filter_functions:
             filters.extend(custom_filter_functions)
