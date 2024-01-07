@@ -215,12 +215,12 @@ _default_clients = {
 }
 _token_timeout = 1800
 _cache_dir = pathlib.Path(__file__).parent.resolve() / '__cache__'
-_token_file = os.path.join(_cache_dir, 'tokens.json')
+_token_file = os.path.join(_cache_dir, 'pytube-tokens.json')
 
 
 class InnerTube:
     """Object for interacting with the innertube API."""
-    def __init__(self, client='ANDROID_MUSIC', use_oauth=False, allow_cache=True):
+    def __init__(self, client='ANDROID_MUSIC', use_oauth=False, allow_cache=True, cache_location=None):
         """Initialize an InnerTube object.
 
         :param str client:
@@ -230,6 +230,8 @@ class InnerTube:
             Whether or not to authenticate to YouTube.
         :param bool allow_cache:
             Allows caching of oauth tokens on the machine.
+        :param str cache_location:
+            Directory path where oauth-tokens file will be cached (if passed, else default path will be used)
         """
         self.context = _default_clients[client]['context']
         self.header = _default_clients[client]['header']
@@ -239,14 +241,18 @@ class InnerTube:
         self.use_oauth = use_oauth
         self.allow_cache = allow_cache
 
+        # cache dir
+        self._cacheDir = cache_location or _cache_dir
+        self._tokenFile = os.path.join(self._cacheDir, 'pytube-tokens.json')
+
         # Stored as epoch time
         self.expires = None
 
         # Try to load from file if specified
         if self.use_oauth and self.allow_cache:
             # Try to load from file if possible
-            if os.path.exists(_token_file):
-                with open(_token_file) as f:
+            if os.path.exists(self._tokenFile):
+                with open(self._tokenFile) as f:
                     data = json.load(f)
                     self.access_token = data['access_token']
                     self.refresh_token = data['refresh_token']
@@ -263,9 +269,9 @@ class InnerTube:
             'refresh_token': self.refresh_token,
             'expires': self.expires
         }
-        if not os.path.exists(_cache_dir):
-            os.mkdir(_cache_dir)
-        with open(_token_file, 'w') as f:
+        if not os.path.exists(self._cacheDir):
+            os.mkdir(self._cacheDir)
+        with open(self._tokenFile, 'w') as f:
             json.dump(data, f)
 
     def refresh_bearer_token(self, force=False):
