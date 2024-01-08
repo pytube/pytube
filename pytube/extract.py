@@ -6,6 +6,7 @@ from collections import OrderedDict
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import parse_qs, quote, urlencode, urlparse
+from enum import Enum
 
 from pytube.cipher import Cipher
 from pytube.exceptions import HTMLParseError, LiveStreamError, RegexMatchError
@@ -16,6 +17,12 @@ from pytube.parser import parse_for_object, parse_for_all_objects
 
 logger = logging.getLogger(__name__)
 
+class Status(Enum):
+    """Status enum class"""
+    UNPLAYABLE = 'UNPLAYABLE'
+    LOGIN_REQUIRED = 'LOGIN_REQUIRED'
+    ERROR = 'ERROR'
+    LIVE_STREAM = 'LIVE_STREAM'
 
 def publish_date(watch_html: str):
     """Extract publish date

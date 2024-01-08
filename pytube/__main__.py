@@ -210,7 +210,7 @@ class YouTube:
         status, messages = extract.playability_status(self.watch_html)
 
         for reason in messages:
-            if status == 'UNPLAYABLE':
+            if status == extract.Status.UNPLAYABLE:
                 if reason == (
                     'Join this channel to get access to members-only content '
                     'like this video, and other exclusive perks.'
@@ -220,16 +220,16 @@ class YouTube:
                     raise exceptions.RecordingUnavailable(video_id=self.video_id)
                 else:
                     raise exceptions.VideoUnavailable(video_id=self.video_id)
-            elif status == 'LOGIN_REQUIRED':
+            elif status == extract.Status.LOGIN_REQUIRED:
                 if reason == (
                     'This is a private video. '
                     'Please sign in to verify that you may see it.'
                 ):
                     raise exceptions.VideoPrivate(video_id=self.video_id)
-            elif status == 'ERROR':
+            elif status == extract.Status.ERROR:
                 if reason == 'Video unavailable':
                     raise exceptions.VideoUnavailable(video_id=self.video_id)
-            elif status == 'LIVE_STREAM':
+            elif status == extract.Status.LIVE_STREAM:
                 raise exceptions.LiveStreamError(video_id=self.video_id)
 
     @property
