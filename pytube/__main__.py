@@ -9,6 +9,7 @@ smaller peripheral modules and functions.
 import logging
 from typing import Any, Callable, Dict, List, Optional
 
+import re
 import pytube
 import pytube.exceptions as exceptions
 from pytube import extract, request
@@ -362,8 +363,24 @@ class YouTube:
         """Get the video description.
 
         :rtype: str
-        """
-        return self.vid_info.get("videoDetails", {}).get("shortDescription")
+        """        # Get the Html file of the page with a timeout of 10 seconds
+        page_detail = request.get(self.watch_url, timeout=10)
+
+        # The start and end point of the description in page
+        start = re.compile(r'shortdescri\w+', re.IGNORECASE)
+        end = re.compile(r'iscrawl\w+', re.IGNORECASE)
+
+        # Finds the pattern in the page
+        match1 = start.findall(page_detail)
+        match2 = end.findall(page_detail)
+
+        if match1 and match2:
+            # Retrives the index and trims not required commas
+            ind1 = page_detail.index(''.join(match1)) + 19
+            ind2 = page_detail.index(''.join(match2)) - 3
+
+            return page_detail[ind1:ind2]
+        return None
 
     @property
     def rating(self) -> float:
