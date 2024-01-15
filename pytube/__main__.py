@@ -363,23 +363,20 @@ class YouTube:
         """Get the video description.
 
         :rtype: str
-        """        # Get the Html file of the page with a timeout of 10 seconds
-        page_detail = request.get(self.watch_url, timeout=10)
+        """
+        # The Description is contained between ShortDescription and iscrawlable inside of the watch html
+        des_start = re.compile(r'shortDescription')
+        des_end = re.compile(r'isCrawlable')
 
-        # The start and end point of the description in page
-        start = re.compile(r'shortdescri\w+', re.IGNORECASE)
-        end = re.compile(r'iscrawl\w+', re.IGNORECASE)
+        # The starting and ending index of description
+        ind_start = des_start.search(self.watch_html).end() + 3     # added 3 to remove quotes and colon
+        ind_end = des_end.search(self.watch_html).start() - 3       # subtracted 3 to remove quotes and colon
 
-        # Finds the pattern in the page
-        match1 = start.findall(page_detail)
-        match2 = end.findall(page_detail)
+        # Returns the description or return none
+        description = self.watch_html[ind_start: ind_end]
 
-        if match1 and match2:
-            # Retrives the index and trims not required commas
-            ind1 = page_detail.index(''.join(match1)) + 19
-            ind2 = page_detail.index(''.join(match2)) - 3
-
-            return page_detail[ind1:ind2]
+        if description is not None:
+            return description
         return None
 
     @property
