@@ -369,14 +369,14 @@ class YouTube:
         des_end = re.compile(r'isCrawlable')
 
         # The starting and ending index of description
-        ind_start = des_start.search(self.watch_html).end() + 3     # added 3 to remove quotes and colon
-        ind_end = des_end.search(self.watch_html).start() - 3       # subtracted 3 to remove quotes and colon
+        ind_start = des_start.search(self.watch_html).end()
+        ind_end = des_end.search(self.watch_html).start()
 
         # Returns the description or return none
-        description = self.watch_html[ind_start: ind_end]
+        if ind_start and ind_end:
+            # Added and subtracted 3 to remove colon and quotes
+            return self.watch_html[ind_start  + 3 : ind_end  - 3]
 
-        if description is not None:
-            return description
         return None
 
     @property
