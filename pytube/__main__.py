@@ -9,6 +9,7 @@ smaller peripheral modules and functions.
 import logging
 from typing import Any, Callable, Dict, List, Optional
 
+import re
 import pytube
 import pytube.exceptions as exceptions
 from pytube import extract, request
@@ -363,7 +364,20 @@ class YouTube:
 
         :rtype: str
         """
-        return self.vid_info.get("videoDetails", {}).get("shortDescription")
+        # The Description is contained between ShortDescription and iscrawlable inside of the watch html
+        des_start = re.compile(r'shortDescription')
+        des_end = re.compile(r'isCrawlable')
+
+        # The starting and ending index of description
+        ind_start = des_start.search(self.watch_html).end()
+        ind_end = des_end.search(self.watch_html).start()
+
+        # Returns the description or return none
+        if ind_start and ind_end:
+            # Added and subtracted 3 to remove colon and quotes
+            return self.watch_html[ind_start  + 3 : ind_end  - 3]
+
+        return None
 
     @property
     def rating(self) -> float:
