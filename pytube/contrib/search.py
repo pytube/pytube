@@ -117,12 +117,17 @@ class Search:
             raw_video_list = item_renderer['contents']
             for video_details in raw_video_list:
                 # Skip over ads
-                if video_details.get('searchPyvRenderer', {}).get('ads', None):
+                if 'adSlotRenderer' in video_details or \
+                        video_details.get('searchPyvRenderer', {}).get('ads', None):
                     continue
 
                 # Skip "recommended" type videos e.g. "people also watched" and "popular X"
                 #  that break up the search results
                 if 'shelfRenderer' in video_details:
+                    continue
+
+                # Skip Shorts results
+                if 'reelShelfRenderer' in video_details:
                     continue
 
                 # Skip auto-generated "mix" playlist results
