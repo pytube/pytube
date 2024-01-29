@@ -4,6 +4,7 @@ import json
 import logging
 import re
 import socket
+import sys
 from functools import lru_cache
 from urllib import parse
 from urllib.error import URLError
@@ -133,17 +134,16 @@ def seq_stream(
 def stream(
     url,
     timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
-    max_retries=0
+    max_retries=0,
+    start_pos=0
 ):
     """Read the response in chunks.
     :param str url: The URL to perform the GET request for.
     :rtype: Iterable[bytes]
     """
-    file_size: int = default_range_size  # fake filesize to start
-    downloaded = 0
-    while downloaded < file_size:
-        stop_pos = min(downloaded + default_range_size, file_size) - 1
-        range_header = f"bytes={downloaded}-{stop_pos}"
+    file_size: int = sys.maxsize  # fake filesize to start
+    while start_pos < file_size:
+        stop_pos = min(start_pos + default_range_size, file_size) - 1
         tries = 0
 
         # Attempt to make the request multiple times as necessary.
@@ -155,7 +155,7 @@ def stream(
             # Try to execute the request, ignoring socket timeouts
             try:
                 response = _execute_request(
-                    url + f"&range={downloaded}-{stop_pos}",
+                    url + f"&range={start_pos}-{stop_pos}",
                     method="GET",
                     timeout=timeout
                 )
@@ -174,7 +174,7 @@ def stream(
                 break
             tries += 1
 
-        if file_size == default_range_size:
+        if file_size == sys.maxsize:
             try:
                 resp = _execute_request(
                     url + f"&range={0}-{99999999999}",
@@ -189,7 +189,7 @@ def stream(
             chunk = response.read()
             if not chunk:
                 break
-            downloaded += len(chunk)
+            start_pos += len(chunk)
             yield chunk
     return  # pylint: disable=R1711
 
