@@ -305,19 +305,29 @@ class Stream:
             logger.debug(f'file {file_path} already exists, skipping')
             self.on_complete(file_path)
             return file_path
-
-        bytes_remaining = self.filesize
+        
         logger.debug(f'downloading ({self.filesize} total bytes) file to {file_path}')
+        downloaded = 0
+        bytes_remaining = self.filesize
+        if os.path.isfile(file_path):
+            partial_download_size = os.path.getsize(file_path)
+            if partial_download_size % request.default_range_size == 0:
+                downloaded = partial_download_size
+                bytes_remaining -= downloaded
+                logger.debug(f'appending to valid partial download file ({partial_download_size} bytes)')
 
-        with open(file_path, "wb") as fh:
+        file_mode = "ab" if downloaded > 0 else "wb"
+        with open(file_path, file_mode) as fh:
             try:
                 for chunk in request.stream(
                     self.url,
                     timeout=timeout,
-                    max_retries=max_retries
+                    max_retries=max_retries,
+                    start_pos=downloaded
                 ):
                     # reduce the (bytes) remainder by the length of the chunk.
                     bytes_remaining -= len(chunk)
+                    logger.debug(f"download chunks_left={bytes_remaining//len(chunk)}")
                     # send to the on_progress callback.
                     self.on_progress(chunk, fh, bytes_remaining)
             except HTTPError as e:
