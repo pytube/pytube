@@ -11,6 +11,12 @@ To download the highest resolution progressive stream:
 
     $ pytube https://www.youtube.com/watch?v=2lAe1cqCOXo
 
+In MacOS, enclosing the link within quotes is required:
+
+.. code:: bash
+
+    $ pytube 'https://www.youtube.com/watch?v=2lAe1cqCOXo'
+
 To view available streams:
 
 .. code:: bash
