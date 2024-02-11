@@ -89,6 +89,22 @@ def is_age_restricted(watch_html: str) -> bool:
     return True
 
 
+def has_multiple_audiotrack(watch_html: str) -> bool:
+    """Check if content has multiple audio tracks
+
+    :param str watch_html:
+        The html contents of the watch page.
+    :rtype: bool
+    :returns:
+        Whether or not the content has multiple audio track
+    """
+    try:
+        regex_search(r"displayName", watch_html, group=0)
+    except RegexMatchError:
+        return False
+    return True
+
+
 def playability_status(watch_html: str) -> (str, str):
     """Return the playability status and status explanation of a video.
 

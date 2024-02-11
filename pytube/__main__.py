@@ -61,6 +61,7 @@ class YouTube:
         self._embed_html: Optional[str] = None
         self._player_config_args: Optional[Dict] = None  # inline js in the html containing
         self._age_restricted: Optional[bool] = None
+        self._has_multiple_audiotrack: Optional[bool] = None
 
         self._fmt_streams: Optional[List[Stream]] = None
 
@@ -115,6 +116,13 @@ class YouTube:
             return self._age_restricted
         self._age_restricted = extract.is_age_restricted(self.watch_html)
         return self._age_restricted
+
+    @property
+    def has_multiple_audiotrack(self):
+        if self._has_multiple_audiotrack:
+            return self._has_multiple_audiotrack
+        self._has_multiple_audiotrack = extract.has_multiple_audiotrack(self.watch_html)
+        return self._has_multiple_audiotrack
 
     @property
     def js_url(self):
@@ -474,6 +482,6 @@ class YouTube:
             The video id of the YouTube video.
 
         :rtype: :class:`YouTube <YouTube>`
-        
+
         """
         return YouTube(f"https://www.youtube.com/watch?v={video_id}")
