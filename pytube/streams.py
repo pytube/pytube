@@ -446,7 +446,7 @@ class Stream:
                 parts.extend(['vcodec="{s.video_codec}"'])
         else:
             parts.extend(['abr="{s.abr}"', 'acodec="{s.audio_codec}"'])
-            if self.has_multiple_audio_track:
+            if self.language_code:
                 parts.extend(['lang="{s.language}"', 'code="{s.language_code}"'])
         parts.extend(['progressive="{s.is_progressive}"', 'type="{s.type}"'])
         return f"<Stream: {' '.join(parts).format(s=self)}>"
