@@ -8,7 +8,7 @@ from functools import lru_cache
 from urllib import parse
 from urllib.error import URLError
 from urllib.request import Request, urlopen
-
+import certifi
 from pytube.exceptions import RegexMatchError, MaxRetriesExceeded
 from pytube.helpers import regex_search
 
@@ -34,7 +34,7 @@ def _execute_request(
         request = Request(url, headers=base_headers, method=method, data=data)
     else:
         raise ValueError("Invalid URL")
-    return urlopen(request, timeout=timeout)  # nosec
+    return urlopen(request, timeout=timeout, cafile=certifi.where())  # nosec
 
 
 def get(url, extra_headers=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
