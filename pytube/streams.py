@@ -58,18 +58,24 @@ class Stream:
         # streams return NoneType for audio/video depending.
         self.video_codec, self.audio_codec = self.parse_codecs()
 
+        # This is only for multiple audio track
+        self.language: Optional[str] = stream.get("audioTrack", {}).get("displayName")
+        self.audio_id: Optional[str] = stream.get("audioTrack", {}).get("id")
+        self.language_code: Optional[str] = self.audio_id.split(".")[0] if self.language else None
+        self.is_default_audio: Optional[bool] = stream.get("audioTrack", {}).get("audioIsDefault", False)
+
         self.is_otf: bool = stream["is_otf"]
         self.bitrate: Optional[int] = stream["bitrate"]
 
         # filesize in bytes
         self._filesize: Optional[int] = int(stream.get('contentLength', 0))
-        
+
         # filesize in kilobytes
         self._filesize_kb: Optional[float] = float(ceil(float(stream.get('contentLength', 0)) / 1024 * 1000) / 1000)
-        
+
         # filesize in megabytes
         self._filesize_mb: Optional[float] = float(ceil(float(stream.get('contentLength', 0)) / 1024 / 1024 * 1000) / 1000)
-        
+
         # filesize in gigabytes(fingers crossed we don't need terabytes going forward though)
         self._filesize_gb: Optional[float] = float(ceil(float(stream.get('contentLength', 0)) / 1024 / 1024 / 1024 * 1000) / 1000)
 
@@ -121,6 +127,14 @@ class Stream:
         """
         return self.is_progressive or self.type == "video"
 
+    @property
+    def is_original_language(self) -> bool:
+        """Whether the stream is original language.
+
+        :rtype: bool
+        """
+        return self.is_default_audio
+
     def parse_codecs(self) -> Tuple[Optional[str], Optional[str]]:
         """Get the video/audio codecs from list of codecs.
 
@@ -160,7 +174,7 @@ class Stream:
                     raise
                 self._filesize = request.seq_filesize(self.url)
         return self._filesize
-    
+
     @property
     def filesize_kb(self) -> float:
         """File size of the media stream in kilobytes.
@@ -177,7 +191,7 @@ class Stream:
                     raise
                 self._filesize_kb = float(ceil(request.seq_filesize(self.url)/1024 * 1000) / 1000)
         return self._filesize_kb
-    
+
     @property
     def filesize_mb(self) -> float:
         """File size of the media stream in megabytes.
@@ -211,7 +225,7 @@ class Stream:
                     raise
                 self._filesize_gb = float(ceil(request.seq_filesize(self.url)/1024/1024/1024 * 1000) / 1000)
         return self._filesize_gb
-    
+
     @property
     def title(self) -> str:
         """Get title of video
@@ -432,5 +446,7 @@ class Stream:
                 parts.extend(['vcodec="{s.video_codec}"'])
         else:
             parts.extend(['abr="{s.abr}"', 'acodec="{s.audio_codec}"'])
+            if self.language_code:
+                parts.extend(['lang="{s.language}"', 'code="{s.language_code}"'])
         parts.extend(['progressive="{s.is_progressive}"', 'type="{s.type}"'])
         return f"<Stream: {' '.join(parts).format(s=self)}>"

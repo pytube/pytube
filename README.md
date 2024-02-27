@@ -2,11 +2,6 @@
   <p>
     <a href="#"><img src="https://assets.nickficano.com/gh-pytube.min.svg" width="456" height="143" alt="pytube logo" /></a>
   </p>
-  <p align="center">
-	<a href="https://pypi.org/project/pytube/"><img src="https://img.shields.io/pypi/dm/pytube?style=flat-square" alt="pypi"/></a>
-	<a href="https://pytube.io/en/latest/"><img src="https://readthedocs.org/projects/python-pytube/badge/?version=latest&style=flat-square" /></a>
-	<a href="https://pypi.org/project/pytube/"><img src="https://img.shields.io/pypi/v/pytube?style=flat-square" /></a>
-  </p>
 </div>
 
 ### Actively soliciting contributors!
@@ -52,16 +47,10 @@ This guide covers the most basic usage of the library. For more detailed informa
 
 Pytube requires an installation of Python 3.6 or greater, as well as pip. (Pip is typically bundled with Python [installations](https://python.org/downloads).)
 
-To install from PyPI with pip:
+To install from the source with pip:
 
 ```bash
-$ python -m pip install pytube
-```
-
-Sometimes, the PyPI release becomes slightly outdated. To install from the source with pip:
-
-```bash
-$ python -m pip install git+https://github.com/pytube/pytube
+$ python -m pip install git+https://github.com/MemoKing34/pytube
 ```
 
 ### Using pytube in a Python script

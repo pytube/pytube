@@ -7,7 +7,7 @@ smaller peripheral modules and functions.
 
 """
 import logging
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import pytube
 import pytube.exceptions as exceptions
@@ -61,6 +61,9 @@ class YouTube:
         self._embed_html: Optional[str] = None
         self._player_config_args: Optional[Dict] = None  # inline js in the html containing
         self._age_restricted: Optional[bool] = None
+        self._has_multiple_audiotrack: Optional[bool] = None
+        self._language: Optional[str] = None       # These are for multiple audio track
+        self._language_code: Optional[str] = None  # These are for multiple audio track
 
         self._fmt_streams: Optional[List[Stream]] = None
 
@@ -96,25 +99,51 @@ class YouTube:
         return type(o) == type(self) and o.watch_url == self.watch_url
 
     @property
-    def watch_html(self):
+    def watch_html(self) -> Optional[str]:
         if self._watch_html:
             return self._watch_html
         self._watch_html = request.get(url=self.watch_url)
         return self._watch_html
 
     @property
-    def embed_html(self):
+    def embed_html(self) -> Optional[str]:
         if self._embed_html:
             return self._embed_html
         self._embed_html = request.get(url=self.embed_url)
         return self._embed_html
 
     @property
-    def age_restricted(self):
+    def age_restricted(self) -> Optional[bool]:
         if self._age_restricted:
             return self._age_restricted
         self._age_restricted = extract.is_age_restricted(self.watch_html)
         return self._age_restricted
+
+    @property
+    def has_multiple_audiotrack(self) -> Optional[bool]:
+        if self._has_multiple_audiotrack:
+            return self._has_multiple_audiotrack
+        self._has_multiple_audiotrack = extract.has_multiple_audiotrack(self.watch_html)
+        return self._has_multiple_audiotrack
+
+    @property
+    def language(self) -> Optional[str]:
+        if (not self.has_multiple_audiotrack) or self._language:
+            return self._language
+        tracks: List[Dict[str, Union[str, bool]]] = [format.get("audioTrack") for format in self.vid_info.get("streamingData", {}).get("adaptiveFormats", []) if format.get("audioTrack", False)]
+        for track in tracks:
+            if track.get("audioIsDefault", False):
+                self._language = track.get("displayName")
+                self._language_code = track.get("id").split(".")[0]
+        return self._language
+
+    @property
+    def language_code(self) -> Optional[str]:
+        if self.language or self._language_code:
+            return self._language_code
+        self.language
+        return self._language_code
+
 
     @property
     def js_url(self):
@@ -466,14 +495,14 @@ class YouTube:
         """
         self.stream_monostate.on_complete = func
 
-    @staticmethod
-    def from_id(video_id: str) -> "YouTube":
+    @classmethod
+    def from_id(cls, video_id: str) -> "YouTube":
         """Construct a :class:`YouTube <YouTube>` object from a video id.
 
         :param str video_id:
             The video id of the YouTube video.
 
         :rtype: :class:`YouTube <YouTube>`
-        
+
         """
-        return YouTube(f"https://www.youtube.com/watch?v={video_id}")
+        return cls(f"https://www.youtube.com/watch?v={video_id}")
