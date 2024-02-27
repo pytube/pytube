@@ -62,7 +62,7 @@ class Stream:
         self.language: Optional[str] = stream.get("audioTrack", {}).get("displayName")
         self.audio_id: Optional[str] = stream.get("audioTrack", {}).get("id")
         self.language_code: Optional[str] = self.audio_id.split(".")[0] if self.language else None
-        self.is_default_audio: Optional[bool] = stream.get("audioTrack", {}).get("audioIsDefault")
+        self.is_default_audio: Optional[bool] = stream.get("audioTrack", {}).get("audioIsDefault", False)
 
         self.is_otf: bool = stream["is_otf"]
         self.bitrate: Optional[int] = stream["bitrate"]
@@ -133,7 +133,7 @@ class Stream:
 
         :rtype: bool
         """
-        return str(self.language).endswith("original")
+        return self.is_default_audio
 
     def parse_codecs(self) -> Tuple[Optional[str], Optional[str]]:
         """Get the video/audio codecs from list of codecs.
