@@ -80,6 +80,13 @@ def missing_recording():
 
 
 @pytest.fixture
+def video_with_chapters():
+    """Youtube instance initialized with video id pvkTC2xIbeY."""
+    filename = "yt-video-pvkTC2xIbeY-html.json.gz"
+    return load_and_init_from_playback_file(filename)
+
+
+@pytest.fixture
 def playlist_html():
     """Youtube playlist HTML loaded on 2020-01-25 from
     https://www.youtube.com/playlist?list=PLzMcBGfZo4-mP7qA9cagf68V06sko5otr

@@ -422,14 +422,21 @@ class InnerTube:
         ...
         # return self._call_api(endpoint, query, self.base_data)  # noqa:E800
 
-    def next(self):
+    def next(self, video_id):
         """Make a request to the next endpoint.
 
-        TODO: Figure out how we can use this
+        :param str video_id:
+            The video id to get next info for.
+        :rtype: dict
+        :returns:
+            Raw next info results.
         """
-        # endpoint = f'{self.base_url}/next'  # noqa:E800
-        ...
-        # return self._call_api(endpoint, query, self.base_data)  # noqa:E800
+        endpoint = f'{self.base_url}/next'
+        query = {
+            'videoId': video_id,
+        }
+        query.update(self.base_params)
+        return self._call_api(endpoint, query, self.base_data)
 
     def player(self, video_id):
         """Make a request to the player endpoint.
@@ -493,14 +500,19 @@ class InnerTube:
         result = self._call_api(endpoint, self.base_params, data)
         return result
 
-    def get_transcript(self, video_id):
+    def get_transcript(self, params):
         """Make a request to the get_transcript endpoint.
 
-        This is likely related to captioning for videos, but is currently untested.
+        :param str params:
+            Parameters to search transcript. Can be extracted from next endpoint response.
+
+        :rtype: dict
+        :returns:
+            Raw get_transcript results.
         """
         endpoint = f'{self.base_url}/get_transcript'
         query = {
-            'videoId': video_id,
+            'params': params,
         }
         query.update(self.base_params)
         result = self._call_api(endpoint, query, self.base_data)
