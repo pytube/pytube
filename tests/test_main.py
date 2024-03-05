@@ -25,7 +25,7 @@ def test_video_unavailable(get):
         youtube.check_availability()
 
 
-def test_transcript(
+def test_chapters(
     # video_with_chapters
 ):
     # TODO: use a preloaded playback
