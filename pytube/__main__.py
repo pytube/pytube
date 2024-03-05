@@ -446,7 +446,6 @@ class YouTube:
     @property
     def chapters(self) -> List[Dict[str, int]]:
         """Get the video chapters with timestamps.
-        See: https://github.com/tombulled/innertube/blob/main/examples/get-video-transcript.py
 
         :rtype: List[Dict[str, int]]
         """
@@ -455,8 +454,11 @@ class YouTube:
         next_data = innertube.next(self.video_id)
         params = extract.transcript_params(next_data)
 
-        transcript = innertube.get_transcript(params)
-        chapters = extract.parse_chapters(transcript)
+        try:
+            transcript = innertube.get_transcript(params)
+            chapters = extract.parse_chapters(transcript)
+        except exceptions.ExtractError:
+            return []
         return chapters
 
     def register_on_progress_callback(self, func: Callable[[Any, bytes, int], None]):

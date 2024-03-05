@@ -25,6 +25,24 @@ def test_video_unavailable(get):
         youtube.check_availability()
 
 
+def test_transcript(
+    # video_with_chapters
+):
+    # TODO: use a preloaded playback
+    expected = [
+        {'timestamp': 0, 'label': 'Intro'},
+        {'timestamp': 10000, 'label': 'YouTube Chapters'},
+        {'timestamp': 45000, 'label': 'What are YouTube chapters?'},
+        {'timestamp': 77000, 'label': 'How to add chapter markers?'},
+        {'timestamp': 162000, 'label': 'When are changes updated?'},
+        {'timestamp': 182000, 'label': 'How to disable chapters?'},
+        {'timestamp': 201000, 'label': 'Are chapters available in my country?'}
+    ]
+    # assert video_with_chapters.chapters == expected
+    youtube = YouTube('https://www.youtube.com/watch?v=pvkTC2xIbeY')
+    assert youtube.chapters == expected
+
+
 def test_video_keywords(cipher_signature):
     expected = [
         'Rewind', 'Rewind 2019',
