@@ -291,7 +291,8 @@ def generate_all_html_json_mocks():
         'irauhITDrsE',
         'm8uHb5jIGN8',
         'QRS8MkLhQmM',
-        'WXxV9g7lsFE'
+        'WXxV9g7lsFE',
+        'pvkTC2xIbeY'
     ]
     for vid_id in test_vid_ids:
         create_mock_html_json(vid_id)
