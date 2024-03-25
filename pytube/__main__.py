@@ -307,8 +307,13 @@ class YouTube:
             .get("thumbnails")
         )
         if thumbnail_details:
-            thumbnail_details = thumbnail_details[-1]  # last item has max size
-            return thumbnail_details["url"]
+            _url = thumbnail_details[-1]['url']  # last item has max size
+            accepted_filename_extensions = [".jpg", ".png", ".gif"]
+            for file_ext in accepted_filename_extensions:
+                _index = _url.index(file_ext)
+                if _index != -1:
+                    processed_url = _url[:_index + len(file_ext)]
+                    return processed_url
 
         return f"https://img.youtube.com/vi/{self.video_id}/maxresdefault.jpg"
 
