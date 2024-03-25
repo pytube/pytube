@@ -310,9 +310,9 @@ class YouTube:
             _url = thumbnail_details[-1]['url']  # last item has max size
             accepted_filename_extensions = [".jpg", ".png", ".gif"]
             for file_ext in accepted_filename_extensions:
-                _index = _url.index(file_ext)
-                if _index != -1:
-                    processed_url = _url[:_index + len(file_ext)]
+                idx = _url.find(file_ext)
+                if idx != -1:
+                    processed_url = _url[:idx + len(file_ext)]
                     return processed_url
 
         return f"https://img.youtube.com/vi/{self.video_id}/maxresdefault.jpg"
