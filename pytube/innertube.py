@@ -25,7 +25,15 @@ _api_keys = [
     'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
     'AIzaSyC8UYZpvA2eknNex0Pjid0_eTLJoDu6los',
     'AIzaSyCjc_pVEDi4qsv5MtC2dMXzpIaDoRFLsxw',
-    'AIzaSyDHQ9ipnphqTzDqZsbtd8_Ru4_kiKVQe2k'
+    'AIzaSyDHQ9ipnphqTzDqZsbtd8_Ru4_kiKVQe2k',
+
+    'AIzaSyBbZV_fZ3an51sF-mvs5w37OqqbsTOzwtU',
+    'AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
+    'AIzaSyBUPetSUmoZL-OhlxA7wSac5XinrygCqMo',
+    'AIzaSyAOghZGza2MQSZkY_zfZ370N-PUdXEo8AI',
+    'AIzaSyD_qjV8zaaUMehtLkrKFgVeSX_Iqbtyws8',
+    'AIzaSyB-63vPrdThhKuerbB2N_l7Kwwcxj6yUAc',
+    'AIzaSyBAETezhkwP0ZWA02RsqT1zu78Fpt0bC_s'
 ]
 
 _default_clients = {
@@ -33,7 +41,7 @@ _default_clients = {
         'context': {
             'client': {
                 'clientName': 'WEB',
-                'clientVersion': '2.20200720.00.02'
+                'clientVersion': '2.20200918.00.02'
             }
         },
         'header': {
@@ -45,8 +53,9 @@ _default_clients = {
         'context': {
             'client': {
                 'clientName': 'ANDROID',
-                'clientVersion': '17.31.35',
-                'androidSdkVersion': 30
+                # 'clientVersion': '17.31.35',
+                'clientVersion': '19.08.35',
+                'androidSdkVersion': 32
             }
         },
         'header': {
@@ -152,26 +161,29 @@ _default_clients = {
         'context': {
             'client': {
                 'clientName': 'WEB_CREATOR',
-                'clientVersion': '1.20220726.00.00',
+                'clientVersion': '1.20220918.00.00',
             }
         },
         'header': {
             'User-Agent': 'Mozilla/5.0'
         },
-        'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+        'api_key': 'AIzaSyBUPetSUmoZL-OhlxA7wSac5XinrygCqMo'
     },
     'ANDROID_CREATOR': {
         'context': {
             'client': {
                 'clientName': 'ANDROID_CREATOR',
-                'clientVersion': '22.30.100',
-                'androidSdkVersion': 30,
+                # 'clientVersion': '22.30.100',
+                'clientVersion': '22.36.102',
+                # 'androidSdkVersion': 30,
+                'androidSdkVersion': 34,
             }
         },
         'header': {
             'User-Agent': 'com.google.android.apps.youtube.creator/',
         },
-        'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+        # 'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+        'api_key': 'AIzaSyD_qjV8zaaUMehtLkrKFgVeSX_Iqbtyws8'
     },
     'IOS_CREATOR': {
         'context': {
@@ -220,7 +232,9 @@ _token_file = os.path.join(_cache_dir, 'tokens.json')
 
 class InnerTube:
     """Object for interacting with the innertube API."""
-    def __init__(self, client='ANDROID_MUSIC', use_oauth=False, allow_cache=True):
+    # def __init__(self, client='ANDROID_MUSIC', use_oauth=False, allow_cache=True):
+    # def __init__(self, client='ANDROID_CREATOR', use_oauth=False, allow_cache=True):
+    def __init__(self, client='ANDROID', use_oauth=False, allow_cache=True):
         """Initialize an InnerTube object.
 
         :param str client:
