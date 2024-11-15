@@ -14,9 +14,9 @@ with open(os.path.join(here, "pytube", "version.py")) as fp:
     exec(fp.read())
 
 setup(
-    name="pytube",
-    version=__version__,  # noqa: F821
-    author="Ronnie Ghose, Taylor Fox Dahlin, Nick Ficano",
+    name="pytube-cypher-fix",
+    version="15.0.2",  # noqa: F821
+    author="Shourya",
     author_email="hey@pytube.io",
     packages=["pytube", "pytube.contrib"],
     package_data={"": ["LICENSE"],},
@@ -44,15 +44,14 @@ setup(
         "Topic :: Terminals",
         "Topic :: Utilities",
     ],
-    description=("Python 3 library for downloading YouTube Videos."),
+    description=("Fix to pytube download issue , Python 3 library for downloading YouTube Videos."),
     include_package_data=True,
     long_description_content_type="text/markdown",
     long_description=long_description,
     zip_safe=True,
     python_requires=">=3.7",
     project_urls={
-        "Bug Reports": "https://github.com/pytube/pytube/issues",
-        "Read the Docs": "https://pytube.io",
+        "Bug Reports": "https://github.com/shouryashashank/pytube-cipher-fix",
     },
-    keywords=["youtube", "download", "video", "stream",],
+    keywords=["youtube", "download", "video", "stream","pytube","cipher","fix"],
 )
