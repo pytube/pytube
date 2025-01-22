@@ -5,36 +5,29 @@ import logging
 import re
 import socket
 from functools import lru_cache
-from urllib import parse
-from urllib.error import URLError
+from urllib import parse, request, error
 from urllib.request import Request, urlopen
 
 from pytube.exceptions import RegexMatchError, MaxRetriesExceeded
 from pytube.helpers import regex_search
 
 logger = logging.getLogger(__name__)
-default_range_size = 9437184  # 9MB
+default_range_size = 19437184  # 9MB
 
 
-def _execute_request(
-    url,
-    method=None,
-    headers=None,
-    data=None,
-    timeout=socket._GLOBAL_DEFAULT_TIMEOUT
-):
-    base_headers = {"User-Agent": "Mozilla/5.0", "accept-language": "en-US,en"}
-    if headers:
-        base_headers.update(headers)
+def _execute_request(url: str, method: str = "GET", headers: dict = None, data: dict = None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
     if data:
-        # encode data for request
-        if not isinstance(data, bytes):
-            data = bytes(json.dumps(data), encoding="utf-8")
-    if url.lower().startswith("http"):
-        request = Request(url, headers=base_headers, method=method, data=data)
-    else:
-        raise ValueError("Invalid URL")
-    return urlopen(request, timeout=timeout)  # nosec
+        data = json.dumps(data).encode("utf-8")
+    req = Request(url, data=data, method=method)
+    req.add_header("Content-Type", "application/json")
+    req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, como Gecko) Chrome/91.0.4472.124 Safari/537.36")
+    req.add_header("Accept-Language", "en-US,en;q=0.5")
+    req.add_header("Accept-Encoding", "gzip, deflate, br")
+    req.add_header("Connection", "keep-alive")
+    if headers:
+        for key, value in headers.items():
+            req.add_header(key, value)
+    return urlopen(req, timeout=timeout)
 
 
 def get(url, extra_headers=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
@@ -51,7 +44,10 @@ def get(url, extra_headers=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
     if extra_headers is None:
         extra_headers = {}
     response = _execute_request(url, headers=extra_headers, timeout=timeout)
-    return response.read().decode("utf-8")
+    try:
+        return response.read().decode("utf-8")
+    except UnicodeDecodeError:
+        return response.read().decode("latin-1")
 
 
 def post(url, extra_headers=None, data=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
