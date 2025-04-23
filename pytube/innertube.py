@@ -25,7 +25,15 @@ _api_keys = [
     'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
     'AIzaSyC8UYZpvA2eknNex0Pjid0_eTLJoDu6los',
     'AIzaSyCjc_pVEDi4qsv5MtC2dMXzpIaDoRFLsxw',
-    'AIzaSyDHQ9ipnphqTzDqZsbtd8_Ru4_kiKVQe2k'
+    'AIzaSyDHQ9ipnphqTzDqZsbtd8_Ru4_kiKVQe2k',
+
+    'AIzaSyBbZV_fZ3an51sF-mvs5w37OqqbsTOzwtU',
+    'AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
+    'AIzaSyBUPetSUmoZL-OhlxA7wSac5XinrygCqMo',
+    'AIzaSyAOghZGza2MQSZkY_zfZ370N-PUdXEo8AI',
+    'AIzaSyD_qjV8zaaUMehtLkrKFgVeSX_Iqbtyws8',
+    'AIzaSyB-63vPrdThhKuerbB2N_l7Kwwcxj6yUAc',
+    'AIzaSyBAETezhkwP0ZWA02RsqT1zu78Fpt0bC_s'
 ]
 
 _default_clients = {
@@ -33,8 +41,11 @@ _default_clients = {
         'context': {
             'client': {
                 'clientName': 'WEB',
-                'clientVersion': '2.20200720.00.02'
+                'clientVersion': '2.20200918.00.02'
             }
+        },
+        'header': {
+            'User-Agent': 'Mozilla/5.0'
         },
         'header': {
             'User-Agent': 'Mozilla/5.0'
@@ -45,8 +56,9 @@ _default_clients = {
         'context': {
             'client': {
                 'clientName': 'ANDROID',
-                'clientVersion': '17.31.35',
-                'androidSdkVersion': 30
+                # 'clientVersion': '17.31.35',
+                'clientVersion': '19.08.35',
+                'androidSdkVersion': 32
             }
         },
         'header': {
@@ -75,6 +87,9 @@ _default_clients = {
                 'clientVersion': '2.20210721.00.00',
                 'clientScreen': 'EMBED'
             }
+        },
+        'header': {
+            'User-Agent': 'Mozilla/5.0'
         },
         'header': {
             'User-Agent': 'Mozilla/5.0'
@@ -212,6 +227,20 @@ _default_clients = {
         },
         'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
     },
+    },
+
+    'TV_EMBED': {
+        'context': {
+            'client': {
+                'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
+                'clientVersion': '2.0',
+            }
+        },
+        'header': {
+            'User-Agent': 'Mozilla/5.0'
+        },
+        'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+    },
 }
 _token_timeout = 1800
 _cache_dir = pathlib.Path(__file__).parent.resolve() / '__cache__'
@@ -220,6 +249,8 @@ _token_file = os.path.join(_cache_dir, 'tokens.json')
 
 class InnerTube:
     """Object for interacting with the innertube API."""
+    # def __init__(self, client='ANDROID_MUSIC', use_oauth=False, allow_cache=True):
+    # def __init__(self, client='ANDROID_CREATOR', use_oauth=False, allow_cache=True):
     def __init__(self, client='ANDROID_MUSIC', use_oauth=False, allow_cache=True):
         """Initialize an InnerTube object.
 
@@ -232,6 +263,7 @@ class InnerTube:
             Allows caching of oauth tokens on the machine.
         """
         self.context = _default_clients[client]['context']
+        self.header = _default_clients[client]['header']
         self.header = _default_clients[client]['header']
         self.api_key = _default_clients[client]['api_key']
         self.access_token = None
@@ -387,6 +419,8 @@ class InnerTube:
 
         headers.update(self.header)
 
+        headers.update(self.header)
+
         response = request._execute_request(
             endpoint_url,
             'POST',
@@ -505,3 +539,4 @@ class InnerTube:
         query.update(self.base_params)
         result = self._call_api(endpoint, query, self.base_data)
         return result
+W

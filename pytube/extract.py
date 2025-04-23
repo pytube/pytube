@@ -124,6 +124,7 @@ def video_id(url: str) -> str:
     - :samp:`https://youtube.com/embed/{video_id}`
     - :samp:`https://youtu.be/{video_id}`
 
+
     :param str url:
         A YouTube url containing a video id.
     :rtype: str
