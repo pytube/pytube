@@ -5,103 +5,58 @@
     },
     "item": [
       {
-        "name": "Descargar Video",
+        "name": "Download Video (YouTube)",
         "request": {
           "method": "POST",
-          "header": [
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            }
-          ],
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
           "body": {
             "mode": "raw",
-            "raw": "{\n    \"url\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\",\n    \"format\": \"mp4\",\n    \"return_file\": true\n}"
+            "raw": "{\"url\":\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\",\"format\":\"mp4\",\"return_file\":true}"
           },
-          "url": {
-            "raw": "{{baseUrl}}/api/download",
-            "host": ["{{baseUrl}}"],
-            "path": ["api", "download"]
-          },
-          "description": "Descarga un video de la URL proporcionada"
+          "url": { "raw": "{{baseUrl}}/api/download", "host": ["{{baseUrl}}"], "path": ["api","download"] }
         }
       },
       {
-        "name": "Obtener Info del Video",
+        "name": "Get Video Info",
         "request": {
           "method": "POST",
-          "header": [
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            }
-          ],
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
           "body": {
             "mode": "raw",
-            "raw": "{\n    \"url\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"\n}"
+            "raw": "{\"url\":\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"}"
           },
-          "url": {
-            "raw": "{{baseUrl}}/api/info",
-            "host": ["{{baseUrl}}"],
-            "path": ["api", "info"]
-          },
-          "description": "Obtiene información del video sin descargarlo"
+          "url": { "raw": "{{baseUrl}}/api/info", "host": ["{{baseUrl}}"], "path": ["api","info"] }
         }
       },
       {
-        "name": "Limpiar Archivos Temporales",
+        "name": "Cleanup Temp Files",
         "request": {
           "method": "POST",
-          "url": {
-            "raw": "{{baseUrl}}/api/cleanup",
-            "host": ["{{baseUrl}}"],
-            "path": ["api", "cleanup"]
-          },
-          "description": "Elimina archivos temporales almacenados en el servidor"
+          "url": { "raw": "{{baseUrl}}/api/cleanup", "host": ["{{baseUrl}}"], "path": ["api","cleanup"] }
         }
       },
       {
-        "name": "Descargar Video de Instagram",
+        "name": "Download Video (Instagram)",
         "request": {
           "method": "POST",
-          "header": [
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            }
-          ],
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
           "body": {
             "mode": "raw",
-            "raw": "{\n    \"url\": \"https://www.instagram.com/p/EJEMPLO_POST/\",\n    \"return_file\": true\n}"
+            "raw": "{\"url\":\"https://www.instagram.com/p/EJEMPLO_POST/\",\"return_file\":true}"
           },
-          "url": {
-            "raw": "{{baseUrl}}/api/download",
-            "host": ["{{baseUrl}}"],
-            "path": ["api", "download"]
-          },
-          "description": "Descarga un video de Instagram"
+          "url": { "raw": "{{baseUrl}}/api/download", "host": ["{{baseUrl}}"], "path": ["api","download"] }
         }
       },
       {
-        "name": "Descargar Video de TikTok",
+        "name": "Download Video (TikTok)",
         "request": {
           "method": "POST",
-          "header": [
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            }
-          ],
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
           "body": {
             "mode": "raw",
-            "raw": "{\n    \"url\": \"https://www.tiktok.com/@usuario/video/ID_VIDEO\",\n    \"return_file\": true\n}"
+            "raw": "{\"url\":\"https://www.tiktok.com/@usuario/video/ID_VIDEO\",\"return_file\":true}"
           },
-          "url": {
-            "raw": "{{baseUrl}}/api/download",
-            "host": ["{{baseUrl}}"],
-            "path": ["api", "download"]
-          },
-          "description": "Descarga un video de TikTok"
+          "url": { "raw": "{{baseUrl}}/api/download", "host": ["{{baseUrl}}"], "path": ["api","download"] }
         }
       }
     ],
@@ -112,3 +67,4 @@
       }
     ]
   }
+  

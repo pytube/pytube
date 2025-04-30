@@ -3,7 +3,7 @@ services:
     name: video-downloader-api
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: python app.py
     repo: https://github.com/bot1004/descargavideos  # Deberás cambiar esto por tu repositorio
     branch: main
     healthCheckPath: /
