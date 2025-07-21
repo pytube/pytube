@@ -234,13 +234,23 @@ class Playlist(Sequence):
                 return [], None
 
         try:
+            # When querying the first page this seems to be the json tree structure
             continuation = videos[-1]['continuationItemRenderer'][
                 'continuationEndpoint'
-            ]['continuationCommand']['token']
+            ]['commandExecutorCommand']['commands'][-1][
+                    'continuationCommand'
+            ]['token']
             videos = videos[:-1]
         except (KeyError, IndexError):
-            # if there is an error, no continuation is available
-            continuation = None
+            # All pages following the first seem to have the json tree structure
+            try:
+                continuation = videos[-1]['continuationItemRenderer'][
+                    'continuationEndpoint'
+                ]['continuationCommand']['token']
+                videos = videos[:-1]
+            except (KeyError, IndexError):
+                # if there is an error, no continuation is available
+                continuation = None
 
         # remove duplicates
         return (
