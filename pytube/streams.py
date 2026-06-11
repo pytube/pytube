@@ -111,7 +111,7 @@ class Stream:
 
         :rtype: bool
         """
-        return self.is_progressive or self.type == "audio"
+        return self.audio_codec is not Noneogressive or self.type == "audio"
 
     @property
     def includes_video_track(self) -> bool:
