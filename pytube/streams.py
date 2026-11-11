@@ -10,7 +10,7 @@ import logging
 import os
 from math import ceil
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import BinaryIO, Dict, Optional, Tuple
 from urllib.error import HTTPError
 from urllib.parse import parse_qs
@@ -242,7 +242,7 @@ class Stream:
     @property
     def expiration(self) -> datetime:
         expire = parse_qs(self.url.split("?")[1])["expire"][0]
-        return datetime.utcfromtimestamp(int(expire))
+        return datetime.fromtimestamp(int(expire), timezone.utc)
 
     @property
     def default_filename(self) -> str:
