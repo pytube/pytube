@@ -186,7 +186,7 @@ def build_playback_report(youtube: YouTube) -> None:
     :param YouTube youtube:
         A YouTube object.
     """
-    ts = int(dt.datetime.utcnow().timestamp())
+    ts = int(dt.datetime.now(dt.timezone.utc).timestamp())
     fp = os.path.join(os.getcwd(), f"yt-video-{youtube.video_id}-{ts}.json.gz")
 
     js = youtube.js
