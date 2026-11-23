@@ -4,7 +4,7 @@
   </p>
   <p align="center">
 	<a href="https://pypi.org/project/pytube/"><img src="https://img.shields.io/pypi/dm/pytube?style=flat-square" alt="pypi"/></a>
-	<a href="https://pytube.io/en/latest/"><img src="https://readthedocs.org/projects/python-pytube/badge/?version=latest&style=flat-square" /></a>
+	<a href="https://github.com/pytube/pytube/tree/master/docs/user"><img src="https://readthedocs.org/projects/python-pytube/badge/?version=latest&style=flat-square" /></a>
 	<a href="https://pypi.org/project/pytube/"><img src="https://img.shields.io/pypi/v/pytube?style=flat-square" /></a>
   </p>
 </div>
@@ -19,7 +19,7 @@ Have ideas for how pytube can be improved? Feel free to open an issue or a pull 
 
 ## Documentation
 
-Detailed documentation about the usage of the library can be found at [pytube.io](https://pytube.io). This is recommended for most cases. If you want to hastily download a single video, the [quick start](#Quickstart) guide below might be what you're looking for.
+Detailed documentation about the usage of the library can be found at [the user guide](https://github.com/pytube/pytube/tree/master/docs/user). This is recommended for most cases. If you want to hastily download a single video, the [quick start](#Quickstart) guide below might be what you're looking for.
 
 ## Description
 
@@ -46,7 +46,7 @@ Furthermore, *pytube* includes a command-line utility, allowing you to download 
 
 ## Quickstart
 
-This guide covers the most basic usage of the library. For more detailed information, please refer to [pytube.io](https://pytube.io).
+This guide covers the most basic usage of the library. For more detailed information, please refer to [the user guide](https://github.com/pytube/pytube/tree/master/docs/user).
 
 ### Installation
 
